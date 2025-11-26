@@ -13,7 +13,7 @@ class Trigger {
                 data.nodes.contents,
                 R.map((data) => {
                     try {
-                        const NodeCls = getTriggerNode(data.module, data.type);
+                        const NodeCls = getTriggerNode(this.applicationKey, data.type);
                         if (!NodeCls) return;
 
                         const node = new NodeCls(this, data);
@@ -23,6 +23,18 @@ class Trigger {
                 R.filter(R.isTruthy)
             )
         );
+    }
+
+    get localizePath(): string {
+        return this.#data.applicationKey.replace(":", ".");
+    }
+
+    get applicationKey(): string {
+        return this.#data.applicationKey;
+    }
+
+    get path(): string {
+        return `${this.applicationKey}:${this.id}`;
     }
 
     get id(): string {
@@ -49,6 +61,11 @@ class Trigger {
         return this.#data.name;
     }
 
+    // TODO need to actually implement that when module triggers is done
+    get locked(): boolean {
+        return false;
+    }
+
     static create(source: CreateTriggerData): Trigger | undefined {
         try {
             const data = new TriggerData(source);
@@ -57,10 +74,30 @@ class Trigger {
             MODULE.error(`an error ocurred while trying to create a Trigger.`, error);
         }
     }
+
+    update(data: UpdateTriggerData): DeepPartial<TriggerDataSource> {
+        return this.#data.updateSource(data);
+    }
+
+    duplicate(): TriggerDataSource {
+        const source = this.#data.clone({
+            _id: foundry.utils.randomID(),
+            name: this.name ? game.i18n.format("DOCUMENT.CopyOf", { name: this.name }) : "",
+        } satisfies DeepPartial<TriggerDataSource>);
+
+        return source.toObject();
+    }
+
+    toObject() {
+        return this.#data.toObject();
+    }
 }
 
 interface Trigger {}
 
-type CreateTriggerData = WithRequired<DeepPartial<TriggerDataSource>, "system">;
+type CreateTriggerData = WithRequired<DeepPartial<TriggerDataSource>, "applicationKey">;
+
+type UpdateTriggerData = Pick<TriggerDataSource, "description" | "folder" | "name">;
 
 export { Trigger };
+export type { CreateTriggerData, UpdateTriggerData };

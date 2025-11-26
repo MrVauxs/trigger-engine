@@ -9,10 +9,6 @@ class TestNode extends TriggerNode {
         return "type";
     }
 
-    static get systems(): string[] {
-        return ["pf2e", "dnd5e"];
-    }
-
     static get isEvent(): boolean {
         return false;
     }

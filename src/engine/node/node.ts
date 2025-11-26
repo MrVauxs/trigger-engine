@@ -25,7 +25,6 @@ class TriggerNode {
             R.mapValues(
                 {
                     id: data.id,
-                    module: data.module,
                 },
                 (value) => {
                     return {
@@ -63,7 +62,7 @@ class TriggerNode {
         Object.defineProperties(
             this,
             R.pipe(
-                ["isEvent", "type", "category", "systems"] as const,
+                ["isEvent", "type", "category"] as const,
                 R.mapToObj((property) => {
                     return [
                         property,
@@ -77,8 +76,6 @@ class TriggerNode {
                 })
             )
         );
-
-        Object.seal(this.systems);
     }
 
     //////////////////////////////
@@ -102,14 +99,6 @@ class TriggerNode {
      */
     static get type(): string {
         throw MODULE.Error("the 'type' static getter must be implemented.");
-    }
-
-    /**
-     * @abstract
-     * List of ID of systems this node can operate on
-     */
-    static get systems(): string[] {
-        throw MODULE.Error("the 'systems' static getter must be implemented.");
     }
 
     /**
@@ -139,16 +128,6 @@ class TriggerNode {
      * @see {@link TriggerNode.isEvent}
      */
     declare readonly isEvent: boolean;
-
-    /**
-     * @see {@link NodeDataSource.module}
-     */
-    declare readonly module: string;
-
-    /**
-     * @see {@link TriggerNode.systems}
-     */
-    declare readonly systems: string[];
 
     /**
      * @see {@link TriggerNode.type}
@@ -344,7 +323,7 @@ class TriggerNode {
 
     #getLocalizeData(...args: LocalizeArgs) {
         const data = R.isObjectType(args.at(-1)) ? (args.pop() as LocalizeData) : undefined;
-        const path = joinStr(".", this.module, ...args);
+        const path = joinStr(".", this.#parent.localizePath, ...args);
         return { path, data };
     }
 

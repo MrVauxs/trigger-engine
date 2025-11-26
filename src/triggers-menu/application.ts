@@ -1,4 +1,4 @@
-import { Trigger } from "engine";
+import { Trigger, UpdateTriggerData } from "engine";
 import {
     addEnterKeyListeners,
     addListener,
@@ -7,16 +7,17 @@ import {
     ApplicationRenderOptions,
     createHTMLElement,
     htmlQuery,
+    info,
     localize,
     localizePath,
     R,
     render,
     waitDialog,
 } from "module-helpers";
-import { Blueprint, EditTriggerOptions } from ".";
+import { Blueprint } from ".";
 import apps = foundry.applications.api;
 
-class BlueprintApplication extends foundry.applications.api.ApplicationV2<
+abstract class BlueprintApplication extends apps.ApplicationV2<
     ApplicationConfiguration,
     BlueprintRenderOptions
 > {
@@ -30,8 +31,7 @@ class BlueprintApplication extends foundry.applications.api.ApplicationV2<
             frame: false,
             positioned: false,
         },
-        id: "trigger-engine-blueprint",
-        classes: ["app", "window-app"],
+        classes: ["app", "themed", "theme-dark", "window-app"],
     };
 
     #resizeObserver = new ResizeObserver((entries) => {
@@ -40,6 +40,13 @@ class BlueprintApplication extends foundry.applications.api.ApplicationV2<
 
         this.blueprint.resizeAll();
     });
+
+    abstract get moduleId(): string;
+    abstract get applicationId(): string;
+
+    get applicationKey(): string {
+        return `${this.moduleId}:${this.applicationId}`;
+    }
 
     get blueprint(): Blueprint {
         return this.#blueprint;
@@ -83,13 +90,15 @@ class BlueprintApplication extends foundry.applications.api.ApplicationV2<
     protected _configureRenderOptions(options: BlueprintRenderOptions): void {
         super._configureRenderOptions(options);
 
-        options.hasTrigger = !!this.blueprint.trigger;
+        options.trigger = this.blueprint.trigger;
     }
 
     async _prepareContext(options: BlueprintRenderOptions): Promise<BlueprintContext> {
-        if (options.hasTrigger) {
+        if (options.trigger) {
             this.#search = "";
-            return {} satisfies TriggerContext;
+            return {
+                trigger: options.trigger,
+            } satisfies TriggerContext;
         }
 
         const groups: TriggersGroup[] = R.pipe(
@@ -117,7 +126,7 @@ class BlueprintApplication extends foundry.applications.api.ApplicationV2<
         context: BlueprintContext,
         options: BlueprintRenderOptions
     ): Promise<string> {
-        const key = options.hasTrigger ? "trigger" : "triggers";
+        const key = options.trigger ? "trigger" : "triggers";
         return render(`blueprint.${key}`, context);
     }
 
@@ -135,7 +144,7 @@ class BlueprintApplication extends foundry.applications.api.ApplicationV2<
             content.appendChild(wrapper);
         }
 
-        if (!options.hasTrigger && this.search !== "") {
+        if (!options.trigger && this.search !== "") {
             this.#filterTriggers();
         }
 
@@ -143,6 +152,8 @@ class BlueprintApplication extends foundry.applications.api.ApplicationV2<
     }
 
     protected _onClickAction(event: PointerEvent, target: HTMLElement) {
+        if (event.button !== 0) return;
+
         const action = target.dataset.action as EventAction;
 
         switch (action) {
@@ -159,6 +170,11 @@ class BlueprintApplication extends foundry.applications.api.ApplicationV2<
                 return;
             }
 
+            case "create-trigger": {
+                const folder = target.dataset.folder;
+                return this.#editTrigger(folder);
+            }
+
             case "export-triggers": {
                 return;
             }
@@ -167,9 +183,9 @@ class BlueprintApplication extends foundry.applications.api.ApplicationV2<
                 return;
             }
 
-            case "create-trigger": {
-                const folder = target.dataset.folder;
-                return this.#createTrigger(folder);
+            case "select-trigger": {
+                const triggerId = target.dataset.triggerId ?? null;
+                return (this.blueprint.trigger = triggerId);
             }
         }
     }
@@ -179,12 +195,36 @@ class BlueprintApplication extends foundry.applications.api.ApplicationV2<
     }
 
     _getTriggerContextOptions(): ContextMenuEntry[] {
+        const getTriggerFromElement = (el: HTMLElement): Trigger | null => {
+            const triggerId = el.dataset.triggerId;
+            return triggerId ? this.blueprint.getTrigger(triggerId) : null;
+        };
+
         return [
             {
-                icon: "",
+                icon: `<i class="fa-solid fa-clipboard"></i>`,
+                name: localizePath("blueprint.trigger.copy.label"),
+                callback: (el) => {
+                    const path = el.dataset.triggerPath as string;
+                    game.clipboard.copyPlainText(path);
+                    return info("blueprint.trigger.copy.notify", { path });
+                },
+            },
+            {
+                icon: `<i class="fa-solid fa-pen-to-square"></i>`,
                 name: localizePath("blueprint.trigger.edit"),
                 callback: (el) => {
-                    console.log(el.dataset.triggerId);
+                    const trigger = getTriggerFromElement(el);
+                    return trigger && this.#editTrigger(trigger.folder, trigger);
+                },
+            },
+            {
+                icon: `<i class="fa-solid fa-copy"></i>`,
+                name: localizePath("blueprint.trigger.duplicate"),
+                callback: (el) => {
+                    const trigger = getTriggerFromElement(el);
+                    const source = trigger?.duplicate();
+                    return source && this.blueprint.createTrigger(source);
                 },
             },
         ];
@@ -209,10 +249,10 @@ class BlueprintApplication extends foundry.applications.api.ApplicationV2<
         });
     }
 
-    async #createTrigger(folder?: string, trigger?: Trigger) {
+    async #editTrigger(folder?: string, trigger?: Trigger) {
         const isEdit = !!trigger;
 
-        const result = await waitDialog<EditTriggerOptions>({
+        const result = await waitDialog<UpdateTriggerData>({
             classes: ["trigger-engine-edit-trigger"],
             content: await render("edit-trigger", {
                 description: trigger?.description ?? "",
@@ -232,7 +272,11 @@ class BlueprintApplication extends foundry.applications.api.ApplicationV2<
 
         if (!result) return;
 
-        this.blueprint.createTrigger(result);
+        if (isEdit) {
+            this.blueprint.editTrigger(trigger.id, result);
+        } else {
+            this.blueprint.createTrigger(result);
+        }
     }
 }
 
@@ -240,13 +284,16 @@ type EventAction =
     | "back-to-menu"
     | "clear-search"
     | "close-window"
+    | "create-trigger"
     | "export-triggers"
     | "import-triggers"
-    | "create-trigger";
+    | "select-trigger";
 
 type BlueprintContext = TriggersContext | TriggerContext;
 
-type TriggerContext = {};
+type TriggerContext = {
+    trigger: Trigger;
+};
 
 type TriggersContext = {
     groups: TriggersGroup[];
@@ -259,7 +306,7 @@ type TriggersGroup = {
 };
 
 type BlueprintRenderOptions = ApplicationRenderOptions & {
-    hasTrigger: boolean;
+    trigger: Trigger | undefined;
 };
 
 export { BlueprintApplication };

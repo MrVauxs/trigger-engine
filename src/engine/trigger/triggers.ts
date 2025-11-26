@@ -1,27 +1,23 @@
-import { getSetting } from "module-helpers";
-import { Trigger, TriggerData, TriggerDataSource } from ".";
-import { prepareHooks } from "engine/hooks";
+import { RegisteredApplication } from "engine/application";
 
 async function prepareModuleTriggers() {}
 
-function prepareWorldTriggers() {
-    const sources = getSetting<TriggerDataSource[]>("world-triggers");
-    const system = game.system.id;
-    const triggers: Trigger[] = [];
+function prepareTriggers(apps: RegisteredApplication[]) {
+    // const sources = getSetting<TriggerDataSource[]>("world-triggers");
+    // const system = game.system.id;
+    // const triggers: Trigger[] = [];
+    // try {
+    //     for (const source of sources) {
+    //         // if (source.system !== system) continue;
+    //         // const data = new TriggerData(source);
+    //         // if (data.invalid) continue;
+    //         // const trigger = new Trigger(data);
+    //         // triggers.push(trigger);
+    //     }
+    // } catch (error) {}
+    // prepareHooks(triggers);
 
-    try {
-        for (const source of sources) {
-            if (source.system !== system) continue;
-
-            const data = new TriggerData(source);
-            if (data.invalid) continue;
-
-            const trigger = new Trigger(data);
-            triggers.push(trigger);
-        }
-    } catch (error) {}
-
-    prepareHooks(triggers);
+    console.log(apps);
 }
 
-export { prepareModuleTriggers, prepareWorldTriggers };
+export { prepareModuleTriggers, prepareTriggers };

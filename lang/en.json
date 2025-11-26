@@ -3,6 +3,11 @@
         "blueprint": {
             "trigger": {
                 "back": "Back To Triggers",
+                "copy": {
+                    "label": "Copy Trigger Path",
+                    "notify": "The Trigger path has been copied to the clipboard."
+                },
+                "duplicate": "Duplicate Trigger",
                 "edit": "Edit Trigger"
             },
             "triggers": {

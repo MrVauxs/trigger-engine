@@ -29,7 +29,7 @@
         <div class="folder">
             <div class="title">
                 <i class="fa-solid fa-folder-open fa-fw"></i>
-                {{localize group.folder}}
+                <div class="label"> {{localize group.folder}}</div>
             </div>
             <div class="controls">
                 {{> 'create' folder=group.folder}}
@@ -39,8 +39,9 @@
         {{!-- triggers --}}
         <div class="list">
             {{#each group.triggers as |trigger|}}
-            <div class="trigger" {{#if trigger.name}} data-trigger-name="{{trigger.name}}" {{/if}}
-                data-trigger-id={{trigger.id}}>
+            <div class="trigger" data-action="select-trigger" {{#if trigger.name}}
+                data-trigger-name="{{trigger.name}}" {{/if}} data-trigger-id={{trigger.id}}
+                data-trigger-path="{{trigger.path}}">
                 <div class="label">
                     {{trigger.label}}
                 </div>

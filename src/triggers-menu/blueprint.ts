@@ -1,30 +1,6 @@
+import { Trigger, TriggerDataSource, UpdateTriggerData } from "engine";
 import { distanceToPoint, dividePointBy, onceDecorator, subtractPoint } from "module-helpers";
-import {
-    BlueprintApplication,
-    BlueprintConnectionsLayer,
-    BlueprintGridLayer,
-    BlueprintNodesLayer,
-} from ".";
-import { Trigger, TriggerDataSource } from "engine";
-
-class BlueprintLayers extends PIXI.Container {
-    #connections: BlueprintConnectionsLayer;
-    #nodes: BlueprintNodesLayer;
-
-    constructor(parent: Blueprint) {
-        super();
-
-        this.addChild(
-            (this.#connections = new BlueprintConnectionsLayer(parent)),
-            (this.#nodes = new BlueprintNodesLayer(parent))
-        );
-    }
-
-    _initialize() {
-        this.#connections._initialize();
-        this.#nodes._initialize();
-    }
-}
+import { BlueprintApplication, BlueprintGridLayer, BlueprintLayers } from ".";
 
 class Blueprint extends PIXI.Application<HTMLCanvasElement> {
     #drag: { origin: Point; dragging?: boolean } | null = null;
@@ -54,6 +30,10 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         this.stage.hitArea = this.#hitArea = new PIXI.Rectangle();
 
         this.#triggers = new Collection();
+    }
+
+    get applicationKey(): string {
+        return this.#parent.applicationKey;
     }
 
     get triggers(): Trigger[] {
@@ -109,12 +89,22 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         // this.render();
     }
 
-    createTrigger(source: EditTriggerOptions) {
-        const trigger = Trigger.create({ ...source, system: game.system.id });
+    createTrigger(source: DeepPartial<TriggerDataSource>) {
+        if (source._id && this.#triggers.has(source._id)) return;
+
+        const trigger = Trigger.create({ ...source, applicationKey: this.applicationKey });
         if (!trigger) return;
 
         this.#triggers.set(trigger.id, trigger);
         this.trigger = trigger;
+    }
+
+    editTrigger(triggerId: string, data: UpdateTriggerData) {
+        const trigger = this.#triggers.get(triggerId);
+        if (!trigger) return;
+
+        trigger.update(data);
+        this.#parent.render();
     }
 
     activateListeners() {
@@ -124,6 +114,10 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
 
     disableListeners() {
         this.stage.removeAllListeners();
+    }
+
+    getTrigger(triggerId: string): Trigger | null {
+        return this.#triggers.get(triggerId) ?? null;
     }
 
     #onPointerDown(event: PIXI.FederatedPointerEvent) {
@@ -157,6 +151,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
 
         this.stage.cursor = "grabbing";
         this.#layers.position.set(x, y);
+        this.#gridLayer.tilePosition.set(x, y);
     }
 
     #onPointerUp(event: PIXI.FederatedPointerEvent) {
@@ -185,7 +180,4 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
     }
 }
 
-type EditTriggerOptions = Pick<TriggerDataSource, "description" | "folder" | "name">;
-
 export { Blueprint };
-export type { EditTriggerOptions };

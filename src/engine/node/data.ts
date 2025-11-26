@@ -7,11 +7,6 @@ class NodeData extends abstract.DataModel<TriggerData, NodeDataSchema> {
     static defineSchema(): NodeDataSchema {
         return {
             _id: new IdField(),
-            module: new fields.StringField({
-                required: true,
-                nullable: false,
-                blank: false,
-            }),
             type: new fields.StringField({
                 required: true,
                 nullable: false,
@@ -31,7 +26,6 @@ type NodeDataSource = SourceFromSchema<NodeDataSchema>;
 
 type NodeDataSchema = {
     _id: IdField;
-    module: fields.StringField<string, string, true, false, false>;
     type: fields.StringField<string, string, true, false, false>;
 };
 

@@ -15,6 +15,11 @@ class TriggerData extends abstract.DataModel<null, TriggerDataSchema> {
                 nullable: false,
                 initial: () => [],
             }),
+            applicationKey: new fields.StringField({
+                required: true,
+                nullable: false,
+                blank: false,
+            }),
             description: new fields.StringField({
                 required: false,
                 nullable: false,
@@ -29,11 +34,6 @@ class TriggerData extends abstract.DataModel<null, TriggerDataSchema> {
                 required: false,
                 nullable: false,
                 initial: "",
-            }),
-            system: new fields.StringField({
-                required: true,
-                nullable: false,
-                blank: false,
             }),
         };
     }
@@ -87,10 +87,10 @@ type TriggerDataSource = SourceFromSchema<TriggerDataSchema>;
 type TriggerDataSchema = {
     _id: IdField;
     _nodes: fields.ArrayField<fields.SchemaField<NodeDataSchema>>;
+    applicationKey: fields.StringField<string, string, true, false, false>;
     description: fields.StringField<string, string, false, false, true>;
     folder: fields.StringField<string, string, false, false, true>;
     name: fields.StringField<string, string, false, false, true>;
-    system: fields.StringField<string, string, true, false, false>;
 };
 
 export { TriggerData };
