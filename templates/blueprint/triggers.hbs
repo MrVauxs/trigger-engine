@@ -1,0 +1,65 @@
+<div class="sidebar triggers">
+    <div class="header">
+        <div class="controls">
+            <a data-action="close-window" {{{@root.i18n.tooltip 'close' }}}>
+                <i class="fa-solid fa-xmark-large"></i>
+            </a>
+        </div>
+        <div class="controls">
+            <a data-action="export-triggers" {{{@root.i18n.tooltip 'export' }}}>
+                <i class="fa-solid fa-file-export"></i>
+            </a>
+            <a data-action="import-triggers" {{{@root.i18n.tooltip 'import' }}}>
+                <i class="fa-solid fa-file-import"></i>
+            </a>
+            {{> 'create'}}
+        </div>
+    </div>
+    <div class="search" {{#unless groups.length}}inert{{/unless}}>
+        <input type="text" name="search" value="{{search}}"
+            placeholder="{{@root.i18n 'search.label'}}">
+        <a data-action="clear-search" {{{@root.i18n.tooltip 'search.clear' }}}>
+            <i class="fa-solid fa-xmark"></i>
+        </a>
+    </div>
+    <div class="scroll">
+        {{#each groups as |group|}}
+        {{!-- folder header --}}
+        {{#if group.folder}}
+        <div class="folder">
+            <div class="title">
+                <i class="fa-solid fa-folder-open fa-fw"></i>
+                {{localize group.folder}}
+            </div>
+            <div class="controls">
+                {{> 'create' folder=group.folder}}
+            </div>
+        </div>
+        {{/if}}
+        {{!-- triggers --}}
+        <div class="list">
+            {{#each group.triggers as |trigger|}}
+            <div class="trigger" {{#if trigger.name}} data-trigger-name="{{trigger.name}}" {{/if}}
+                data-trigger-id={{trigger.id}}>
+                <div class="label">
+                    {{trigger.label}}
+                </div>
+                <div class="controls">
+
+                </div>
+                <div class="trigger-description"></div>
+            </div>
+            {{/each}}
+        </div>
+        {{/each}}
+    </div>
+</div>
+<div class="description"></div>
+
+
+{{#*inline 'create'}}
+<a data-action="create-trigger" {{#if folder}} data-folder="{{folder}}" {{/if}}
+    {{{@root.i18n.tooltip 'create' }}}>
+    <i class="fa-solid fa-plus-large"></i>
+</a>
+{{/inline}}

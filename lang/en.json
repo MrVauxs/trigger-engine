@@ -1,0 +1,28 @@
+{
+    "trigger-engine": {
+        "blueprint": {
+            "trigger": {
+                "back": "Back To Triggers",
+                "edit": "Edit Trigger"
+            },
+            "triggers": {
+                "close": "Close Window",
+                "create": "Create Trigger",
+                "export": "Export Triggers",
+                "import": "Import Triggers",
+                "search": {
+                    "clear": "Clear Search",
+                    "label": "Search Trigger"
+                }
+            }
+        },
+        "edit-trigger": {
+            "folder": "Folder",
+            "name": "Trigger Name",
+            "yes": {
+                "create": "Create",
+                "edit": "Edit"
+            }
+        }
+    }
+}

@@ -1,0 +1,8 @@
+.git/
+node_modules/
+releases/
+scripts/
+.VSCodeCounter/
+*.code-workspace
+release.mjs
+ignore.txt

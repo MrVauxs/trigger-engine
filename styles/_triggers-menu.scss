@@ -1,0 +1,172 @@
+#trigger-engine-blueprint {
+    --width: calc(100% - ((var(--sidebar-width) + 16px + 48px) * var(--ui-scale)));
+    --height: calc(100% - 10px);
+    --background: url("../../../ui/denim075.png") repeat;
+    --background-color: #00000030;
+    --background-color-alternate: #ffffff22;
+    --border: 1px solid #111111;
+    --border-separator: 1px solid #ffffff3b;
+    --folder-spacer-width: 6px;
+
+    height: var(--height);
+    max-height: var(--height);
+    width: var(--width);
+    max-width: var(--width);
+    margin: 0;
+
+    background: var(--background);
+    background-color: #808080;
+    border: var(--border);
+    border-left: 0;
+    border-radius: 0 5px 5px 0;
+
+    position: absolute;
+    top: 5px;
+
+    #context-menu {
+        --color-text-emphatic: var(--color-light-1);
+    }
+
+    .ui {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        pointer-events: none;
+        position: absolute;
+    }
+
+    .sidebar {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        width: 300px;
+        border-left: var(--border);
+        border-right: var(--border);
+        background: var(--background);
+        background-color: var(--background-color);
+        pointer-events: all;
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: var(--background-color);
+            border-bottom: var(--border-separator);
+            border-top: 1px solid transparent;
+            padding: 0.3rem;
+            font-size: 1.2em;
+
+            .controls {
+                display: flex;
+                align-items: center;
+                gap: 0.3em;
+
+                a {
+                    text-align: center;
+                    width: 1.2em;
+                }
+            }
+        }
+    }
+
+    .sidebar.triggers {
+        .search {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.3em;
+            background-color: var(--background-color);
+            border-bottom: var(--border-separator);
+            padding: 0.3rem;
+            font-size: 1.2em;
+
+            input {
+                color: var(--color-text-light-highlight);
+
+                &:focus {
+                    box-shadow: 0 0 5px #ffffff87;
+                }
+            }
+        }
+
+        .scroll {
+            flex: 1;
+            overflow: auto;
+        }
+
+        .folder {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--background-color-alternate);
+            font-size: 1.2em;
+            padding: 0.3rem;
+            padding-left: var(--folder-spacer-width);
+
+            .title {
+                display: flex;
+                align-items: center;
+                gap: 0.3em;
+            }
+
+            + .list {
+                margin-left: var(--folder-spacer-width);
+
+                .trigger {
+                    position: relative;
+
+                    &::before {
+                        position: absolute;
+                        content: "";
+                        inset: 0 100% 0 auto;
+                        background: var(--background-color-alternate);
+                        width: var(--folder-spacer-width);
+                    }
+                }
+            }
+
+            &:not(:has(+ .list .trigger:not(.hidden))) {
+                display: none;
+            }
+        }
+
+        .trigger {
+            display: flex;
+            align-items: center;
+            gap: 0.3em;
+            padding: 0.3rem;
+
+            .label {
+                flex: 1;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .controls {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.3em;
+            }
+
+            .trigger-description {
+                display: none;
+            }
+
+            &:hover {
+                background: var(--background-color-alternate);
+            }
+        }
+    }
+
+    .description {
+        height: 100%;
+        flex: 1;
+        background-color: var(--background-color);
+        pointer-events: all;
+
+        &:empty {
+            display: none;
+        }
+    }
+}

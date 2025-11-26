@@ -1,0 +1,23 @@
+{
+    "name": "trigger-engine",
+    "scripts": {
+        "build": "esbuild src/main.ts --bundle --keep-names --minify --sourcemap --outdir=scripts",
+        "dev": "esbuild src/main.ts --bundle --keep-names --watch --sourcemap --outdir=scripts"
+    },
+    "author": "Idle",
+    "homepage": "https://github.com/reonZ/trigger-engine#readme",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/reonZ/trigger-engine.git"
+    },
+    "bugs": {
+        "url": "https://github.com/reonZ/trigger-engine/issues"
+    },
+    "devDependencies": {
+        "esbuild": "^0.20.1",
+        "typescript": "5.3.3"
+    },
+    "dependencies": {
+        "module-helpers": "file:../../../../dev/module-helpers"
+    }
+}
