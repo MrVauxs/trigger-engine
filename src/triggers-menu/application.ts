@@ -1,4 +1,4 @@
-import { Trigger, UpdateTriggerData } from "engine";
+import { Trigger, TriggerApplication, TriggerDataSource, UpdateTriggerData } from "engine";
 import {
     addEnterKeyListeners,
     addListener,
@@ -21,7 +21,7 @@ abstract class BlueprintApplication extends apps.ApplicationV2<
     ApplicationConfiguration,
     BlueprintRenderOptions
 > {
-    #blueprint = new Blueprint(this);
+    #blueprint: Blueprint;
     #search: string = "";
 
     static DEFAULT_OPTIONS: DeepPartial<ApplicationConfiguration> = {
@@ -41,11 +41,15 @@ abstract class BlueprintApplication extends apps.ApplicationV2<
         this.blueprint.resizeAll();
     });
 
-    abstract get moduleId(): string;
-    abstract get applicationId(): string;
+    constructor(triggers: TriggerDataSource[], options?: DeepPartial<ApplicationConfiguration>) {
+        super(options);
+        this.#blueprint = new Blueprint(this, triggers);
+    }
+
+    abstract get application(): TriggerApplication;
 
     get applicationKey(): string {
-        return `${this.moduleId}:${this.applicationId}`;
+        return this.application.applicationKey;
     }
 
     get blueprint(): Blueprint {
@@ -69,6 +73,13 @@ abstract class BlueprintApplication extends apps.ApplicationV2<
         this.#resizeObserver.disconnect();
 
         return super.close(options);
+    }
+
+    abstract save(): Promise<void>;
+
+    expand() {
+        // TODO
+        this.bringToFront();
     }
 
     _onFirstRender(context: object, options: BlueprintRenderOptions) {
@@ -102,7 +113,8 @@ abstract class BlueprintApplication extends apps.ApplicationV2<
         }
 
         const groups: TriggersGroup[] = R.pipe(
-            this.blueprint.triggers,
+            this.blueprint.triggers.contents,
+            R.filter((trigger) => !trigger.invalid),
             R.groupBy(R.prop("folder")),
             R.entries(),
             R.sortBy(([folder]) => folder),

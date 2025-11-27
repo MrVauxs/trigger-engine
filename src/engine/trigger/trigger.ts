@@ -1,19 +1,22 @@
-import { getTriggerNode, TriggerData, TriggerDataSource, TriggerNode } from "engine";
-import { enrichHTML, MODULE, R } from "module-helpers";
+import { TriggerApplication, TriggerData, TriggerDataSource, TriggerNode } from "engine";
+import { enrichHTML, R } from "module-helpers";
 
 class Trigger {
     #data: TriggerData;
+    #invalid: boolean;
     #nodes: Collection<TriggerNode>;
+    #parent: TriggerApplication;
 
-    constructor(data: TriggerData) {
+    constructor(parent: TriggerApplication, data: TriggerData) {
         this.#data = data;
+        this.#parent = parent;
 
         this.#nodes = new Collection(
             R.pipe(
                 data.nodes.contents,
                 R.map((data) => {
                     try {
-                        const NodeCls = getTriggerNode(this.applicationKey, data.type);
+                        const NodeCls = this.parent.getNodeClass(data.type);
                         if (!NodeCls) return;
 
                         const node = new NodeCls(this, data);
@@ -23,6 +26,13 @@ class Trigger {
                 R.filter(R.isTruthy)
             )
         );
+
+        // TODO need to finish implementing that
+        this.#invalid = this.#nodes.some((node) => node.invalid);
+    }
+
+    get parent(): TriggerApplication {
+        return this.#parent;
     }
 
     get localizePath(): string {
@@ -61,18 +71,13 @@ class Trigger {
         return this.#data.name;
     }
 
+    get invalid(): boolean {
+        return this.#invalid;
+    }
+
     // TODO need to actually implement that when module triggers is done
     get locked(): boolean {
         return false;
-    }
-
-    static create(source: CreateTriggerData): Trigger | undefined {
-        try {
-            const data = new TriggerData(source);
-            return new Trigger(data);
-        } catch (error) {
-            MODULE.error(`an error ocurred while trying to create a Trigger.`, error);
-        }
     }
 
     update(data: UpdateTriggerData): DeepPartial<TriggerDataSource> {

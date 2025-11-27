@@ -20,32 +20,32 @@ class TriggerNode {
         this.#data = data;
         this.#parent = parent;
 
+        // from data accessors
         Object.defineProperties(
             this,
-            R.mapValues(
-                {
-                    id: data.id,
-                },
-                (value) => {
-                    return {
-                        value,
+            R.mapToObj(["id", "invalid"] as const, (property) => {
+                return [
+                    property,
+                    {
+                        value: data[property],
                         configurable: false,
                         enumerable: true,
                         writable: false,
-                    };
-                }
-            )
+                    },
+                ];
+            })
         );
 
+        // from private methods
         Object.defineProperties(
             this,
-            R.pipe(
+            R.mapToObj(
                 [
                     ["localize", this.#localize],
                     ["rootLocalize", this.#rootLocalize],
                     ["toObject", this.#toObject],
                 ] as const,
-                R.mapToObj(([property, method]) => {
+                ([property, method]) => {
                     return [
                         property,
                         {
@@ -55,26 +55,24 @@ class TriggerNode {
                             writable: false,
                         },
                     ];
-                })
+                }
             )
         );
 
+        // from static accessors
         Object.defineProperties(
             this,
-            R.pipe(
-                ["isEvent", "type", "category"] as const,
-                R.mapToObj((property) => {
-                    return [
-                        property,
-                        {
-                            value: (this.constructor as typeof TriggerNode)[property],
-                            configurable: false,
-                            enumerable: true,
-                            writable: false,
-                        },
-                    ];
-                })
-            )
+            R.mapToObj(["isEvent", "type", "category"] as const, (property) => {
+                return [
+                    property,
+                    {
+                        value: (this.constructor as typeof TriggerNode)[property],
+                        configurable: false,
+                        enumerable: true,
+                        writable: false,
+                    },
+                ];
+            })
         );
     }
 
@@ -109,30 +107,6 @@ class TriggerNode {
     static get isEvent(): boolean {
         throw MODULE.Error("the 'isEvent' static getter must be implemented.");
     }
-
-    //////////////////////////////
-    // IMMUTABLE PROPERTIES
-    //////////////////////////////
-
-    /**
-     * @see {@link TriggerNode.category}
-     */
-    declare readonly category: string;
-
-    /**
-     * @see {@link TriggerData#id}
-     */
-    declare readonly id: string;
-
-    /**
-     * @see {@link TriggerNode.isEvent}
-     */
-    declare readonly isEvent: boolean;
-
-    /**
-     * @see {@link TriggerNode.type}
-     */
-    declare readonly type: string;
 
     //////////////////////////////
     // ACCESSORS
@@ -332,6 +306,12 @@ class TriggerNode {
     }
 }
 
+interface TriggerNode
+    extends Pick<TriggerData, "id" | "invalid">,
+        Pick<typeof TriggerNode, "category" | "isEvent" | "type"> {}
+
+type CreateNodeData = WithRequired<DeepPartial<NodeDataSource>, "type">;
+
 type NodeInput = ValueOf<NodeInputs>;
 
 type NodeOutput = BaseNodeEntry;
@@ -415,3 +395,4 @@ type NodeOut = {
 };
 
 export { TriggerNode };
+export type { CreateNodeData };

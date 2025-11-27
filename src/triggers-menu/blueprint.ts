@@ -1,5 +1,5 @@
 import { Trigger, TriggerDataSource, UpdateTriggerData } from "engine";
-import { distanceToPoint, dividePointBy, onceDecorator, subtractPoint } from "module-helpers";
+import { distanceToPoint, dividePointBy, onceDecorator, R, subtractPoint } from "module-helpers";
 import { BlueprintApplication, BlueprintGridLayer, BlueprintLayers } from ".";
 
 class Blueprint extends PIXI.Application<HTMLCanvasElement> {
@@ -11,7 +11,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
     #triggerId: string | null = null;
     #triggers: Collection<Trigger>;
 
-    constructor(parent: BlueprintApplication) {
+    constructor(parent: BlueprintApplication, triggers: TriggerDataSource[]) {
         super({
             backgroundAlpha: 0,
             antialias: true,
@@ -21,6 +21,17 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
 
         this.#parent = parent;
 
+        this.#triggers = new Collection(
+            R.pipe(
+                triggers,
+                R.map((source) => {
+                    const trigger = this.parent.application.createTrigger(source);
+                    return trigger && ([trigger.id, trigger] as const);
+                }),
+                R.filter(R.isTruthy)
+            )
+        );
+
         this.stage.addChild(
             (this.#gridLayer = new BlueprintGridLayer(this)),
             (this.#layers = new BlueprintLayers(this))
@@ -28,29 +39,31 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
 
         this.stage.eventMode = "static";
         this.stage.hitArea = this.#hitArea = new PIXI.Rectangle();
+    }
 
-        this.#triggers = new Collection();
+    get parent(): BlueprintApplication {
+        return this.#parent;
     }
 
     get applicationKey(): string {
-        return this.#parent.applicationKey;
+        return this.parent.applicationKey;
     }
 
-    get triggers(): Trigger[] {
-        return this.#triggers.contents;
+    get triggers(): Collection<Trigger> {
+        return this.#triggers;
     }
 
     get trigger(): Trigger | undefined {
-        return this.#triggerId ? this.#triggers.get(this.#triggerId) : undefined;
+        return this.#triggerId ? this.triggers.get(this.#triggerId) : undefined;
     }
 
     set trigger(value: string | Trigger | null) {
         const triggerId = value instanceof Trigger ? value.id : value;
         if (this.#triggerId === triggerId) return;
-        if (triggerId && !this.#triggers.has(triggerId)) return;
+        if (triggerId && !this.triggers.has(triggerId)) return;
 
         this.#triggerId = triggerId;
-        this.#parent.render();
+        this.parent.render();
     }
 
     get scale(): number {
@@ -67,7 +80,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
 
     @onceDecorator()
     _initialize() {
-        const element = (this.resizeTo = this.#parent.element);
+        const element = (this.resizeTo = this.parent.element);
 
         element?.prepend(this.view);
         this.#layers._initialize();
@@ -90,21 +103,21 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
     }
 
     createTrigger(source: DeepPartial<TriggerDataSource>) {
-        if (source._id && this.#triggers.has(source._id)) return;
+        if (source._id && this.triggers.has(source._id)) return;
 
-        const trigger = Trigger.create({ ...source, applicationKey: this.applicationKey });
-        if (!trigger) return;
+        const trigger = this.parent.application.createTrigger(source);
+        if (!trigger || trigger.invalid) return;
 
-        this.#triggers.set(trigger.id, trigger);
+        this.triggers.set(trigger.id, trigger);
         this.trigger = trigger;
     }
 
     editTrigger(triggerId: string, data: UpdateTriggerData) {
-        const trigger = this.#triggers.get(triggerId);
+        const trigger = this.triggers.get(triggerId);
         if (!trigger) return;
 
         trigger.update(data);
-        this.#parent.render();
+        this.parent.render();
     }
 
     activateListeners() {
@@ -117,7 +130,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
     }
 
     getTrigger(triggerId: string): Trigger | null {
-        return this.#triggers.get(triggerId) ?? null;
+        return this.triggers.get(triggerId) ?? null;
     }
 
     #onPointerDown(event: PIXI.FederatedPointerEvent) {

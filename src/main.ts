@@ -26,12 +26,14 @@ Hooks.once("init", async () => {
     //     type: BlueprintApplication,
     //     restricted: true,
     // });
+    Hooks.callAll("triggerEngine.init", { registerApplication });
 });
 
 Hooks.once("setup", async () => {
     // Hooks.callAll("trigger-engine.setup", MODULE.current.api);
     // await prepareModuleTriggers();
     // prepareTriggers();
+    Hooks.callAll("triggerEngine.setup", { registerEntries, registerHooks, registerNodes });
 });
 
 Hooks.once("ready", () => {
@@ -48,8 +50,4 @@ globalThis.triggerEngine = {
     TriggerHook,
     TriggerNode,
     openBlueprintMenu,
-    registerApplication,
-    registerEntries,
-    registerHooks,
-    registerNodes,
 };
