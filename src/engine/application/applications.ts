@@ -1,14 +1,13 @@
 import {
-    ApplicationParentType,
     NodeEntry,
     TriggerApplication,
     TriggerApplicationOptions,
+    TriggerDataSource,
     TriggerHook,
     TriggerNode,
 } from "engine";
-import { R } from "module-helpers";
+import { MODULE, R } from "module-helpers";
 import { BlueprintApplication } from "triggers-menu";
-import abstract = foundry.abstract;
 
 const APPLICATIONS: { [applicationKey: string]: TriggerApplication } = {};
 
@@ -20,18 +19,10 @@ function registerApplication(
     const applicationKey = getApplicationKey(moduleId, applicationId);
     if (!applicationKey || applicationKey in APPLICATIONS) return;
 
-    const parentType: ApplicationParentType = options?.setting ? "setting" : "document";
-    const app = new TriggerApplication(parentType, moduleId, applicationId, options);
-
+    const app = new TriggerApplication(moduleId, applicationId, options);
     APPLICATIONS[applicationKey] = app;
 
-    // if (registered.nodes) {
-    //     registerNodes(moduleId, applicationId, ...registered.nodes);
-    // }
-
-    // prepareTriggers(R.values(APPLICATIONS));
-
-    console.log(APPLICATIONS);
+    MODULE.debug(app.applicationKey, app);
 }
 
 function registerNodes(moduleId: string, applicationId: string, ...Nodes: (typeof TriggerNode)[]) {
@@ -53,15 +44,13 @@ function registerHooks(moduleId: string, applicationId: string, ...Hooks: (typeo
     app?.registerHooks(...Hooks);
 }
 
-function openBlueprintMenu(moduleId: string, applicationId: string, document?: abstract.Document) {
+async function openBlueprintMenu(
+    moduleId: string,
+    applicationId: string,
+    source?: TriggerDataSource
+): Promise<BlueprintApplication | undefined> {
     const app = getApplication(moduleId, applicationId);
-    if (!app) return;
-
-    if (app.isSetting) {
-        app.openSettingMenu();
-    } else if (document instanceof abstract.Document) {
-        app.openDocumentMenu(document);
-    }
+    return app?.openMenu(source);
 }
 
 function getApplication(moduleId: string, applicationId: string): TriggerApplication | undefined {

@@ -1,15 +1,30 @@
 <div class="sidebar trigger">
     <div class="header">
         <div class="controls">
-            <a data-action="back-to-menu" {{{@root.i18n.tooltip 'back' }}}>
+            {{#if isFree}}
+            <a data-action="export-data" {{{@root.i18n.tooltip 'data' }}}>
+                <i class="fa-solid fa-file-export"></i>
+            </a>
+            {{else}}
+            <a data-action="back-menu" {{{@root.i18n.tooltip 'back' }}}>
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
+            {{/if}}
         </div>
         <div class="controls">
-
+            <a data-action="reset-trigger" {{{@root.i18n.tooltip 'reset' }}}>
+                <i class="fa-solid fa-rotate-left"></i>
+            </a>
+            <a data-action="save-triggers" {{{@root.i18n.tooltip 'save' }}}>
+                <i class="fa-solid fa-floppy-disk"></i>
+            </a>
+            <a data-action="collapse-window" {{{@root.i18n.tooltip 'collapse' }}}>
+                <i class="fa-solid fa-compress"></i>
+            </a>
         </div>
     </div>
 </div>
+{{#unless (and isFree (not trigger.name includeZero=true))}}
 <div class="trigger-title">
     {{#if trigger.locked}}
     <i class="fa-solid fa-plug-circle-xmark"></i>
@@ -18,3 +33,8 @@
         {{trigger.label}}
     </div>
 </div>
+{{/unless}}
+<a class="window-collapsed" data-action="expand-window">
+    <i class="fa-solid fa-expand"></i>
+    {{@root.i18n 'expand'}}
+</a>

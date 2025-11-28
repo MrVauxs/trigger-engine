@@ -17,21 +17,24 @@ import {
 import { Blueprint } from ".";
 import apps = foundry.applications.api;
 
-abstract class BlueprintApplication extends apps.ApplicationV2<
+class BlueprintApplication extends apps.ApplicationV2<
     ApplicationConfiguration,
     BlueprintRenderOptions
 > {
-    #blueprint: Blueprint;
+    #blueprint: Blueprint = new Blueprint(this);
     #search: string = "";
 
+    static APPLICATION_ID = "trigger-engine-blueprint";
+
     static DEFAULT_OPTIONS: DeepPartial<ApplicationConfiguration> = {
+        classes: ["app", "themed", "theme-dark", "window-app"],
+        id: BlueprintApplication.APPLICATION_ID,
         window: {
             resizable: false,
             minimizable: false,
             frame: false,
             positioned: false,
         },
-        classes: ["app", "themed", "theme-dark", "window-app"],
     };
 
     #resizeObserver = new ResizeObserver((entries) => {
@@ -40,13 +43,6 @@ abstract class BlueprintApplication extends apps.ApplicationV2<
 
         this.blueprint.resizeAll();
     });
-
-    constructor(triggers: TriggerDataSource[], options?: DeepPartial<ApplicationConfiguration>) {
-        super(options);
-        this.#blueprint = new Blueprint(this, triggers);
-    }
-
-    abstract get application(): TriggerApplication;
 
     get applicationKey(): string {
         return this.application.applicationKey;
@@ -75,11 +71,25 @@ abstract class BlueprintApplication extends apps.ApplicationV2<
         return super.close(options);
     }
 
-    abstract save(): Promise<void>;
+    collapseWindow(): this {
+        this.element.classList.add("collapsed");
+        return this;
+    }
 
-    expand() {
-        // TODO
+    expandWindow(): this {
+        this.element.classList.remove("collapsed");
         this.bringToFront();
+        return this;
+    }
+
+    clearSearch() {
+        const input = htmlQuery<HTMLInputElement>(this.element, `input[name="search"]`);
+
+        if (input) {
+            input.value = "";
+        }
+
+        this.search = "";
     }
 
     _onFirstRender(context: object, options: BlueprintRenderOptions) {
@@ -108,6 +118,7 @@ abstract class BlueprintApplication extends apps.ApplicationV2<
         if (options.trigger) {
             this.#search = "";
             return {
+                isFree: this.application.isFreeApplication,
                 trigger: options.trigger,
             } satisfies TriggerContext;
         }
@@ -169,17 +180,20 @@ abstract class BlueprintApplication extends apps.ApplicationV2<
         const action = target.dataset.action as EventAction;
 
         switch (action) {
-            case "back-to-menu": {
+            case "back-menu": {
                 return (this.blueprint.trigger = null);
             }
 
             case "clear-search": {
-                this.search = "";
-                return;
+                return this.clearSearch();
             }
 
             case "close-window": {
                 return;
+            }
+
+            case "collapse-window": {
+                return this.collapseWindow();
             }
 
             case "create-trigger": {
@@ -187,11 +201,28 @@ abstract class BlueprintApplication extends apps.ApplicationV2<
                 return this.#editTrigger(folder);
             }
 
+            case "expand-window": {
+                return this.expandWindow();
+            }
+
+            case "export-data": {
+                // if no callback was provided we export the trigger itself
+                return;
+            }
+
             case "export-triggers": {
                 return;
             }
 
             case "import-triggers": {
+                return;
+            }
+
+            case "reset-trigger": {
+                return;
+            }
+
+            case "save-triggers": {
                 return;
             }
 
@@ -236,7 +267,7 @@ abstract class BlueprintApplication extends apps.ApplicationV2<
                 callback: (el) => {
                     const trigger = getTriggerFromElement(el);
                     const source = trigger?.duplicate();
-                    return source && this.blueprint.createTrigger(source);
+                    return source && this.blueprint.addTrigger(source);
                 },
             },
         ];
@@ -246,10 +277,14 @@ abstract class BlueprintApplication extends apps.ApplicationV2<
         const html = this.element;
         const search = this.search.toLowerCase();
         const triggers = html.querySelectorAll<HTMLElement>(".sidebar.triggers .trigger");
+        const isSearch = !!search;
 
         for (const el of triggers) {
             const name = el.dataset.triggerName;
-            el.classList.toggle("hidden", !!name && !name.toLowerCase().includes(search));
+            el.classList.toggle(
+                "hidden",
+                isSearch && (!name || !name.toLowerCase().includes(search))
+            );
         }
     }
 
@@ -287,23 +322,34 @@ abstract class BlueprintApplication extends apps.ApplicationV2<
         if (isEdit) {
             this.blueprint.editTrigger(trigger.id, result);
         } else {
-            this.blueprint.createTrigger(result);
+            this.blueprint.addTrigger(result);
         }
     }
 }
 
+interface BlueprintApplication {
+    get application(): TriggerApplication;
+    getTriggersSources(): TriggerDataSource[];
+}
+
 type EventAction =
-    | "back-to-menu"
+    | "back-menu"
     | "clear-search"
     | "close-window"
+    | "collapse-window"
     | "create-trigger"
+    | "expand-window"
+    | "export-data"
     | "export-triggers"
     | "import-triggers"
+    | "reset-trigger"
+    | "save-triggers"
     | "select-trigger";
 
 type BlueprintContext = TriggersContext | TriggerContext;
 
 type TriggerContext = {
+    isFree: boolean;
     trigger: Trigger;
 };
 

@@ -3,12 +3,17 @@
         "blueprint": {
             "trigger": {
                 "back": "Back To Triggers",
+                "collapse": "Collapse Window",
                 "copy": {
                     "label": "Copy Trigger Path",
                     "notify": "The Trigger path has been copied to the clipboard."
                 },
+                "data": "Export Data",
                 "duplicate": "Duplicate Trigger",
-                "edit": "Edit Trigger"
+                "edit": "Edit Trigger",
+                "expand": "Restore Triggers Window",
+                "reset": "Reset Trigger",
+                "save": "Save Triggers"
             },
             "triggers": {
                 "close": "Close Window",

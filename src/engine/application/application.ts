@@ -6,40 +6,52 @@ import {
     TriggerHook,
     TriggerNode,
 } from "engine";
-import { ApplicationConfiguration, getFlag, MODULE, R } from "module-helpers";
+import { MODULE, R } from "module-helpers";
 import { BlueprintApplication } from "triggers-menu";
-import abstract = foundry.abstract;
 import utils = foundry.utils;
+
+const APPLICATION_MODES = ["setting", "free"] as const;
 
 class TriggerApplication {
     #applicationId: string;
     #applicationKey: string;
     #entries: Collection<typeof NodeEntry>;
     #hooks: Collection<typeof TriggerHook>;
+    #mode: TriggerApplicationMode;
     #moduleId: string;
     #nodes: Collection<typeof TriggerNode>;
-    #parentType: ApplicationParentType;
     #triggers: Collection<Trigger>;
 
     constructor(
-        parentType: ApplicationParentType,
         moduleId: string,
         applicationId: string,
-        { nodes, setting }: TriggerApplicationOptions = {}
+        { mode, nodes, setting }: TriggerApplicationOptions = {}
     ) {
+        this.#mode = R.isIncludedIn(mode, APPLICATION_MODES) ? mode : "setting";
+        this.#moduleId = moduleId;
         this.#applicationId = applicationId;
         this.#applicationKey = `${moduleId}:${applicationId}`;
-        this.#moduleId = moduleId;
-        this.#parentType = parentType;
 
         this.#entries = new Collection();
         this.#hooks = new Collection();
-        this.#nodes = new Collection();
+        this.#nodes = new Collection(nodes?.map((node) => [node.type, node] as const));
         this.#triggers = new Collection();
 
-        if (this.isSetting) {
-            this.#setupSetting(moduleId, applicationId, R.isBoolean(setting) ? {} : setting);
+        if (this.isSettingApplication) {
+            this.#setupSetting(setting);
         }
+    }
+
+    get mode(): TriggerApplicationMode {
+        return this.#mode;
+    }
+
+    get isSettingApplication(): boolean {
+        return this.mode === "setting";
+    }
+
+    get isFreeApplication(): boolean {
+        return this.mode === "free";
     }
 
     get applicationId(): string {
@@ -50,70 +62,26 @@ class TriggerApplication {
         return this.#applicationKey;
     }
 
-    get isSetting(): boolean {
-        return this.parentType === "setting";
-    }
-
     get moduleId(): string {
         return this.#moduleId;
-    }
-
-    get parentType(): ApplicationParentType {
-        return this.#parentType;
     }
 
     get triggers(): Collection<Trigger> {
         return this.#triggers;
     }
 
+    get settingMenuKey(): string {
+        return `${this.applicationId}-menu`;
+    }
+
+    get settingKey(): string {
+        return `${this.applicationId}-triggers`;
+    }
+
     initialize(triggers?: TriggerData[]) {
         this.#triggers.clear();
 
         // TODO
-    }
-
-    openSettingMenu(): Promise<BlueprintApplication> | undefined {
-        if (!this.isSetting || !this.#openExistingMenu()) return;
-
-        const menuKey = `${this.moduleId}.${getMenuKey(this.applicationId)}`;
-        const MenuCls = game.settings.menus.get(menuKey);
-        if (!MenuCls) return;
-
-        const app = new MenuCls.type() as BlueprintApplication;
-        return app.render(true);
-    }
-
-    openDocumentMenu(document: abstract.Document) {
-        if (this.isSetting || !(document instanceof abstract.Document)) return;
-
-        const menuId = this.#openExistingMenu(document);
-        if (!menuId) return;
-
-        const self = this;
-
-        class DocumentBlueprintApplication extends BlueprintApplication {
-            #document: abstract.Document = document;
-
-            static DEFAULT_OPTIONS: DeepPartial<ApplicationConfiguration> = {
-                id: menuId,
-            };
-
-            get application(): TriggerApplication {
-                return self;
-            }
-
-            save(): Promise<void> {
-                throw new Error("Method not implemented.");
-            }
-        }
-
-        try {
-            const flag = getFlag<TriggerDataSource[]>(document, "triggers") ?? [];
-            const triggers = utils.deepClone(flag);
-            const app = new DocumentBlueprintApplication(triggers);
-
-            app.render(true);
-        } catch (error) {}
     }
 
     registerNodes(...Nodes: (typeof TriggerNode)[]) {
@@ -147,25 +115,52 @@ class TriggerApplication {
         }
     }
 
-    #openExistingMenu(document?: abstract.Document): string | undefined {
-        const menuId = R.pipe([getMenuId(this), document?.uuid], R.filter(R.isTruthy), R.join("-"));
-        const exist = foundry.applications.instances.get(menuId);
+    async openMenu(arg?: TriggerDataSource): Promise<BlueprintApplication | undefined> {
+        const menuId = BlueprintApplication.APPLICATION_ID;
+        const exist = foundry.applications.instances.get(menuId) as Maybe<BlueprintApplication>;
 
-        if (exist) {
-            (exist as BlueprintApplication).expand();
+        if (exist?.application === this && (!arg || this.isSettingApplication)) {
+            return exist.expandWindow();
         } else {
-            return menuId;
+            await exist?.close();
+        }
+
+        const MenuCls = this.isFreeApplication
+            ? this.#getFreeApplication(arg)
+            : this.#getSettingApplication();
+
+        if (MenuCls) {
+            return new MenuCls().render(true);
         }
     }
 
-    // we need those because at that point, it hasn't been defined by the child
-    #setupSetting(
-        moduleId: string,
-        applicationId: string,
-        { hint, icon, label, name }: ApplicationMenuOptions = {}
-    ) {
+    #getSettingApplication(): typeof BlueprintApplication | undefined {
+        const menuKey = `${this.moduleId}.${this.settingMenuKey}`;
+        return game.settings.menus.get(menuKey)?.type as typeof BlueprintApplication;
+    }
+
+    #getFreeApplication(source: unknown): typeof BlueprintApplication {
         const self = this;
-        const settingKey = `${applicationId}-triggers`;
+        const test = R.isPlainObject(source) ? this.createTrigger(source) : undefined;
+        const valid = test?.invalid !== false ? this.createTrigger({})! : test;
+        const validSource = valid.toObject();
+
+        return class FreeBlueprintApplication extends BlueprintApplication {
+            get application() {
+                return self;
+            }
+
+            getTriggersSources(): TriggerDataSource[] {
+                return [validSource];
+            }
+        };
+    }
+
+    #setupSetting({ hint, icon, label, name }: ApplicationMenuOptions = {}) {
+        const self = this;
+        const moduleId = this.moduleId;
+        const applicationId = this.applicationId;
+        const settingKey = this.settingKey;
 
         game.settings.register(moduleId, settingKey, {
             type: Array,
@@ -179,23 +174,13 @@ class TriggerApplication {
         });
 
         class SettingBlueprintApplication extends BlueprintApplication {
-            static DEFAULT_OPTIONS: DeepPartial<ApplicationConfiguration> = {
-                id: getMenuId({ moduleId, applicationId }),
-            };
-
-            constructor(options?: DeepPartial<ApplicationConfiguration>) {
-                const setting = game.settings.get<TriggerDataSource[]>(moduleId, settingKey) ?? [];
-                const triggers = utils.deepClone(setting);
-
-                super(triggers, options);
-            }
-
             get application(): TriggerApplication {
                 return self;
             }
 
-            save(): Promise<void> {
-                throw new Error("Method not implemented.");
+            getTriggersSources(): TriggerDataSource[] {
+                const settings = game.settings.get<TriggerDataSource[]>(moduleId, settingKey);
+                return utils.deepClone(settings) ?? [];
             }
         }
 
@@ -203,7 +188,7 @@ class TriggerApplication {
             return `${moduleId}.${applicationId}.${path.join(".")}`;
         };
 
-        game.settings.registerMenu(moduleId, getMenuKey(applicationId), {
+        game.settings.registerMenu(moduleId, this.settingMenuKey, {
             name: name ?? settingPath(applicationId, "name"),
             label: label ?? settingPath(applicationId, "label"),
             hint: hint ?? settingPath(applicationId, "hint"),
@@ -214,19 +199,12 @@ class TriggerApplication {
     }
 }
 
-function getMenuKey(applicationId: string) {
-    return `${applicationId}-menu`;
-}
-
-function getMenuId({ moduleId, applicationId }: { moduleId: string; applicationId: string }) {
-    return `trigger-engine-blueprint-${moduleId}:${applicationId}`;
-}
-
 type ApplicationParentType = "setting" | "document";
 
 type TriggerApplicationOptions = {
+    mode?: TriggerApplicationMode;
     nodes?: (typeof TriggerNode)[];
-    setting?: boolean | ApplicationMenuOptions;
+    setting?: ApplicationMenuOptions;
 };
 
 type ApplicationMenuOptions = {
@@ -235,6 +213,8 @@ type ApplicationMenuOptions = {
     label?: string;
     name?: string;
 };
+
+type TriggerApplicationMode = (typeof APPLICATION_MODES)[number];
 
 export { TriggerApplication };
 export type { ApplicationParentType, TriggerApplicationOptions };
