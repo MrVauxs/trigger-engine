@@ -6,7 +6,7 @@ import {
     TriggerHook,
     TriggerNode,
 } from "engine";
-import { MODULE, R } from "module-helpers";
+import { joinStr, MODULE, R } from "module-helpers";
 import { BlueprintApplication } from "triggers-menu";
 import utils = foundry.utils;
 
@@ -78,6 +78,19 @@ class TriggerApplication {
         return `${this.applicationId}-triggers`;
     }
 
+    get localizePath(): string {
+        return `${this.moduleId}.${this.applicationId}`;
+    }
+
+    get nodes(): Collection<typeof TriggerNode> {
+        return this.#nodes;
+    }
+
+    localize(...path: string[]): string | undefined {
+        const joined = joinStr(".", path);
+        return game.i18n.has(joined, true) ? game.i18n.localize(joined) : undefined;
+    }
+
     initialize(triggers?: TriggerData[]) {
         this.#triggers.clear();
 
@@ -98,10 +111,6 @@ class TriggerApplication {
     registerEntries(...Entries: (typeof NodeEntry)[]) {}
 
     registerHooks(...Entries: (typeof TriggerHook)[]) {}
-
-    getNodeClass(type: string): typeof TriggerNode | undefined {
-        return this.#nodes.get(type);
-    }
 
     createTrigger(source: DeepPartial<TriggerDataSource>): Trigger | undefined {
         try {

@@ -16,7 +16,7 @@ class Trigger {
                 data.nodes.contents,
                 R.map((data) => {
                     try {
-                        const NodeCls = this.parent.getNodeClass(data.type);
+                        const NodeCls = this.parent.nodes.get(data.type);
                         if (!NodeCls) return;
 
                         const node = new NodeCls(this, data);
@@ -36,15 +36,11 @@ class Trigger {
     }
 
     get localizePath(): string {
-        return this.#data.applicationKey.replace(":", ".");
+        return this.parent.localizePath;
     }
 
     get applicationKey(): string {
         return this.#data.applicationKey;
-    }
-
-    get path(): string {
-        return `${this.applicationKey}:${this.id}`;
     }
 
     get id(): string {

@@ -1,1 +1,39 @@
-<div></div>
+<div class="content application">
+    <div class="left">
+        {{!-- search --}}
+        <fieldset>
+            <legend>{{@root.i18n 'search.label'}}</legend>
+            <input type="text" name="search" placeholder="{{@root.i18n 'search.placeholder'}}">
+        </fieldset>
+        {{!-- tags --}}
+        <fieldset>
+            <legend>{{@root.i18n 'tags'}}</legend>
+            <multi-select name="tags">
+                {{#each tags as |tag|}}
+                <option value="{{tag.value}}">{{tag.label}}</option>
+                {{/each}}
+            </multi-select>
+        </fieldset>
+        <div class="scroll">
+            {{> 'section' events}}
+        </div>
+    </div>
+    <div class="right">
+        <div class="scroll">
+            {{> 'section' groups}}
+        </div>
+    </div>
+</div>
+
+{{#*inline 'section'}}
+{{#each this as |group|}}
+<fieldset>
+    <legend>{{group.label}}</legend>
+    <div class="nodes" data-empty="{{@root.i18n 'empty'}}">{{#each group.nodes as |node|}}<div
+            class="node" data-action="select-node" data-node-type="{{node.type}}"
+            data-node-tags="{{node.tags}}">
+            <div class="name">{{node.title}}</div>
+        </div>{{/each}}</div>
+</fieldset>
+{{/each}}
+{{/inline}}

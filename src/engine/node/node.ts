@@ -1,5 +1,13 @@
 import { Trigger, TriggerData } from "engine";
-import { joinStr, localize, LocalizeArgs, LocalizeData, MODULE, R } from "module-helpers";
+import {
+    joinStr,
+    localize,
+    LocalizeArgs,
+    LocalizeData,
+    localizePath,
+    MODULE,
+    R,
+} from "module-helpers";
 import { NodeData, NodeDataSource } from ".";
 
 const NODE_ENTRY_CATEGORIES = ["inputs", "outputs"] as const;
@@ -77,17 +85,6 @@ class TriggerNode {
     }
 
     //////////////////////////////
-    // STATIC ACCESSORS
-    //////////////////////////////
-
-    /**
-     * Used to sort nodes in the triggers menu
-     */
-    static get category(): string {
-        return this.isEvent ? "event" : "";
-    }
-
-    //////////////////////////////
     // ABSTRACT STATIC ACCESSORS
     //////////////////////////////
 
@@ -99,13 +96,46 @@ class TriggerNode {
         throw MODULE.Error("the 'type' static getter must be implemented.");
     }
 
+    //////////////////////////////
+    // STATIC ACCESSORS
+    //////////////////////////////
+
+    /**
+     * Used to sort nodes in the triggers menu
+     *
+     * Category localization path:
+     * `<module-id>.<application-id>.category.<category>.title`
+     */
+    static get category(): string {
+        return this.isEvent ? "event" : "";
+    }
+
+    /**
+     * Title localization path:
+     * `<module-id>.<application-id>.node.<category>.<type>.title`
+     */
+    static get title(): string {
+        return this.type;
+    }
+
+    /**
+     * Tags used to filter in the triggers menu.
+     * The `category` is automatically added to them at runtime.
+     *
+     * Tag localization path:
+     * `<module-id>.<application-id>.tag.<tag>.title`
+     */
+    static get tags(): string[] {
+        return [];
+    }
+
     /**
      * Define this as a trigger event node.
      *
-     * Some getters will be overriden if `true`.
+     * Some functionalities will be excluded/overriden if `true`.
      */
     static get isEvent(): boolean {
-        throw MODULE.Error("the 'isEvent' static getter must be implemented.");
+        return false;
     }
 
     //////////////////////////////
@@ -131,15 +161,11 @@ class TriggerNode {
      */
     get header(): NodeHeaderSource | null {
         const isEvent = this.isEvent;
-        const category = this.category;
 
         return {
             background: isEvent ? "#c40000" : "#000000",
-            title: this.localize("title") ?? this.type,
-            subtitle:
-                isEvent && category === "event"
-                    ? localize("category.event.title")
-                    : this.rootLocalize("category", category, "title") ?? category,
+            title: (this.constructor as typeof TriggerNode).title,
+            subtitle: getCategoryLabel(this.rootLocalize.bind(this), this),
         };
     }
 
@@ -174,13 +200,6 @@ class TriggerNode {
      */
     get isAwait(): boolean {
         return false;
-    }
-
-    /**
-     * Filters used in the triggers menu
-     */
-    get filters(): string[] {
-        return [this.category];
     }
 
     //////////////////////////////
@@ -306,6 +325,21 @@ class TriggerNode {
     }
 }
 
+function getCategoryLabel(
+    rootLocalize: (...path: string[]) => string | undefined,
+    node: { category: string; isEvent: boolean }
+) {
+    const category = node.category;
+    return (
+        rootLocalize("category", category, "title") ??
+        ((node.isEvent && category === "event" && getEventLabel()) || category)
+    );
+}
+
+function getEventLabel(): string {
+    return localize("category.event.title");
+}
+
 interface TriggerNode
     extends Pick<TriggerData, "id" | "invalid">,
         Pick<typeof TriggerNode, "category" | "isEvent" | "type"> {}
@@ -394,5 +428,5 @@ type NodeOut = {
     label?: string;
 };
 
-export { TriggerNode };
+export { getCategoryLabel, getEventLabel, TriggerNode };
 export type { CreateNodeData };

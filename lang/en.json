@@ -26,6 +26,16 @@
                 }
             }
         },
+        "category": {
+            "event": {
+                "label": "Event",
+                "plural": "Events"
+            },
+            "node": {
+                "label": "Node",
+                "plural": "Nodes"
+            }
+        },
         "edit-trigger": {
             "folder": "Folder",
             "name": "Trigger Name",
@@ -33,6 +43,14 @@
                 "create": "Create",
                 "edit": "Edit"
             }
+        },
+        "nodes-menu": {
+            "empty": "No Matching Nodes",
+            "search": {
+                "label": "Search Node",
+                "placeholder": "Node Name"
+            },
+            "tags": "Filter Tags"
         }
     }
 }
