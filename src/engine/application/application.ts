@@ -5,6 +5,7 @@ import {
     TriggerDataSource,
     TriggerHook,
     TriggerNode,
+    TriggerNodeStringProperty,
 } from "engine";
 import { joinStr, MODULE, R } from "module-helpers";
 import { BlueprintApplication } from "triggers-menu";
@@ -82,13 +83,26 @@ class TriggerApplication {
         return `${this.moduleId}.${this.applicationId}`;
     }
 
-    get nodes(): Collection<typeof TriggerNode> {
-        return this.#nodes;
+    get nodesContents(): (typeof TriggerNode)[] {
+        return this.#nodes.contents;
+    }
+
+    getNode({ type }: { type: string }) {
+        return this.#nodes.get(type);
     }
 
     localize(...path: string[]): string | undefined {
-        const joined = joinStr(".", path);
+        const joined = joinStr(".", this.localizePath, path);
         return game.i18n.has(joined, true) ? game.i18n.localize(joined) : undefined;
+    }
+
+    localizeNodeTag(tag: string): string {
+        return this.localize("tag", tag, "title") ?? tag;
+    }
+
+    localizeNodeProperty(node: typeof TriggerNode, property: TriggerNodeStringProperty): string {
+        const path = getNodePropertyLocalizePath(node, property);
+        return this.localize(path) ?? node[property];
     }
 
     initialize(triggers?: TriggerData[]) {
@@ -205,6 +219,21 @@ class TriggerApplication {
             restricted: true,
             type: SettingBlueprintApplication,
         });
+    }
+}
+
+function getNodePropertyLocalizePath(
+    node: typeof TriggerNode,
+    property: TriggerNodeStringProperty
+): string {
+    switch (property) {
+        case "category": {
+            return `category.${node.category}.title`;
+        }
+
+        case "type": {
+            return `node.${node.category}.${node.type}.title`;
+        }
     }
 }
 

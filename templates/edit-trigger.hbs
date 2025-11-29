@@ -10,6 +10,12 @@
         <input type="text" name="folder" value="{{folder}}" placeholder="{{folder}}">
     </div>
 </div>
+<div class="form-group">
+    <label>{{@root.i18n 'tags'}}</label>
+    <div class="form-fields">
+        <string-tags name="tags" value="{{tags}}"></string-tags>
+    </div>
+</div>
 <prose-mirror name="description" value="{{description}}">
     {{{enrichedDescription}}}
 </prose-mirror>

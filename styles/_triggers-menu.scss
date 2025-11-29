@@ -1,3 +1,5 @@
+@use "./utils" as utils;
+
 @mixin app() {
     background: var(--background);
     background-color: #808080;
@@ -14,6 +16,7 @@
     --border: 1px solid #111111;
     --border-separator: 1px solid #ffffff3b;
     --folder-spacer-width: 6px;
+    --tags-buttons-border: 1px solid var(--color-border-light-tertiary);
 
     @include app();
 
@@ -96,21 +99,33 @@
     }
 
     .sidebar.triggers {
-        .search {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.3em;
+        [name="search"] {
+            @include utils.text-input();
+
             background-color: var(--background-color);
             border-bottom: var(--border-separator);
             padding: 0.3rem;
-            font-size: 1.2em;
 
             input {
                 color: var(--color-text-light-highlight);
+            }
 
-                &:focus {
-                    box-shadow: 0 0 5px #ffffff87;
+            a {
+                right: 0.3rem;
+            }
+        }
+
+        [name="tags"] {
+            @include utils.multi-select();
+
+            background-color: var(--background-color);
+            border-bottom: var(--border-separator);
+            padding: 0.3rem;
+            padding-top: 0.1rem;
+
+            select {
+                option {
+                    background: rgb(0 0 0 / 81%);
                 }
             }
         }

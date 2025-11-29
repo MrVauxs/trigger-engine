@@ -10,4 +10,12 @@
             }
         }
     }
+
+    .form-group {
+        align-items: flex-end;
+
+        &:has(.input-element-tags:not(:empty)) {
+            margin-top: -0.4em;
+        }
+    }
 }

@@ -3,16 +3,17 @@
         {{!-- search --}}
         <fieldset>
             <legend>{{@root.i18n 'search.label'}}</legend>
-            <input type="text" name="search" placeholder="{{@root.i18n 'search.placeholder'}}">
+            <extended-text-input name="search"
+                placeholder="{{@root.i18n 'search.placeholder'}}"></extended-text-input>
         </fieldset>
         {{!-- tags --}}
         <fieldset>
-            <legend>{{@root.i18n 'tags'}}</legend>
-            <multi-select name="tags">
+            <legend>{{@root.i18n 'tags.label'}}</legend>
+            <extended-multi-select name="tags">
                 {{#each tags as |tag|}}
                 <option value="{{tag.value}}">{{tag.label}}</option>
                 {{/each}}
-            </multi-select>
+            </extended-multi-select>
         </fieldset>
         <div class="scroll">
             {{> 'section' events}}
@@ -30,8 +31,8 @@
 <fieldset>
     <legend>{{group.label}}</legend>
     <div class="nodes" data-empty="{{@root.i18n 'empty'}}">{{#each group.nodes as |node|}}<div
-            class="node" data-action="select-node" data-node-type="{{node.type}}"
-            data-node-tags="{{node.tags}}">
+            class="node" data-action="select-node" data-tags="{{node.tags}}"
+            data-name="{{node.title}}">
             <div class="name">{{node.title}}</div>
         </div>{{/each}}</div>
 </fieldset>

@@ -9,6 +9,7 @@
                     "notify": "The Trigger path has been copied to the clipboard."
                 },
                 "data": "Export Data",
+                "delete": "Delete Trigger",
                 "duplicate": "Duplicate Trigger",
                 "edit": "Edit Trigger",
                 "expand": "Restore Triggers Window",
@@ -23,34 +24,35 @@
                 "search": {
                     "clear": "Clear Search",
                     "label": "Search Trigger"
+                },
+                "tags": {
+                    "placeholder": "Trigger Tags"
                 }
-            }
-        },
-        "category": {
-            "event": {
-                "label": "Event",
-                "plural": "Events"
-            },
-            "node": {
-                "label": "Node",
-                "plural": "Nodes"
             }
         },
         "edit-trigger": {
             "folder": "Folder",
             "name": "Trigger Name",
+            "tags": "Trigger Tags",
             "yes": {
                 "create": "Create",
                 "edit": "Edit"
             }
         },
         "nodes-menu": {
+            "category": {
+                "event": "Events",
+                "node": "Nodes"
+            },
             "empty": "No Matching Nodes",
+            "event": "Event",
             "search": {
                 "label": "Search Node",
                 "placeholder": "Node Name"
             },
-            "tags": "Filter Tags"
+            "tags": {
+                "label": "Filter Tags"
+            }
         }
     }
 }

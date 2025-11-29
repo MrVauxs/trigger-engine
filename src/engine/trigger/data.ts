@@ -35,6 +35,11 @@ class TriggerData extends abstract.DataModel<null, TriggerDataSchema> {
                 nullable: false,
                 initial: "",
             }),
+            tags: new fields.ArrayField(
+                new fields.StringField({
+                    blank: false,
+                })
+            ),
         };
     }
 
@@ -91,6 +96,7 @@ type TriggerDataSchema = {
     description: fields.StringField<string, string, false, false, true>;
     folder: fields.StringField<string, string, false, false, true>;
     name: fields.StringField<string, string, false, false, true>;
+    tags: fields.ArrayField<fields.StringField>;
 };
 
 export { TriggerData };

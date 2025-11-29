@@ -16,7 +16,7 @@ class Trigger {
                 data.nodes.contents,
                 R.map((data) => {
                     try {
-                        const NodeCls = this.parent.nodes.get(data.type);
+                        const NodeCls = this.parent.getNode(data);
                         if (!NodeCls) return;
 
                         const node = new NodeCls(this, data);
@@ -41,6 +41,10 @@ class Trigger {
 
     get applicationKey(): string {
         return this.#data.applicationKey;
+    }
+
+    get path(): string {
+        return `${this.applicationKey}:${this.id}`;
     }
 
     get id(): string {
@@ -71,6 +75,10 @@ class Trigger {
         return this.#invalid;
     }
 
+    get tags(): string[] {
+        return this.#data.tags;
+    }
+
     // TODO need to actually implement that when module triggers is done
     get locked(): boolean {
         return false;
@@ -79,6 +87,8 @@ class Trigger {
     update(data: UpdateTriggerData): DeepPartial<TriggerDataSource> {
         return this.#data.updateSource(data);
     }
+
+    delete() {}
 
     duplicate(): TriggerDataSource {
         const source = this.#data.clone({
@@ -96,9 +106,7 @@ class Trigger {
 
 interface Trigger {}
 
-type CreateTriggerData = WithRequired<DeepPartial<TriggerDataSource>, "applicationKey">;
-
-type UpdateTriggerData = Pick<TriggerDataSource, "description" | "folder" | "name">;
+type UpdateTriggerData = Omit<TriggerDataSource, "_id" | "_nodes" | "applicationKey">;
 
 export { Trigger };
-export type { CreateTriggerData, UpdateTriggerData };
+export type { UpdateTriggerData };

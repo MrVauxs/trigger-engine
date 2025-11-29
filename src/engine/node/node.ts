@@ -1,13 +1,5 @@
 import { Trigger, TriggerData } from "engine";
-import {
-    joinStr,
-    localize,
-    LocalizeArgs,
-    LocalizeData,
-    localizePath,
-    MODULE,
-    R,
-} from "module-helpers";
+import { joinStr, LocalizeArgs, LocalizeData, MODULE, R } from "module-helpers";
 import { NodeData, NodeDataSource } from ".";
 
 const NODE_ENTRY_CATEGORIES = ["inputs", "outputs"] as const;
@@ -90,7 +82,10 @@ class TriggerNode {
 
     /**
      * @abstract
-     * Must be an unique key among your module's nodes
+     * Must be an unique key among your registered module's nodes
+     *
+     * Title localization path:
+     * `<module-id>.<application-id>.node.<category>.<type>.title`
      */
     static get type(): string {
         throw MODULE.Error("the 'type' static getter must be implemented.");
@@ -107,15 +102,7 @@ class TriggerNode {
      * `<module-id>.<application-id>.category.<category>.title`
      */
     static get category(): string {
-        return this.isEvent ? "event" : "";
-    }
-
-    /**
-     * Title localization path:
-     * `<module-id>.<application-id>.node.<category>.<type>.title`
-     */
-    static get title(): string {
-        return this.type;
+        return this.isEvent ? "event" : "node";
     }
 
     /**
@@ -160,12 +147,13 @@ class TriggerNode {
      * Data to represent the node's header in the triggers menu
      */
     get header(): NodeHeaderSource | null {
-        const isEvent = this.isEvent;
+        const application = this.#parent.parent;
+        const node = this.constructor as typeof TriggerNode;
 
         return {
-            background: isEvent ? "#c40000" : "#000000",
-            title: (this.constructor as typeof TriggerNode).title,
-            subtitle: getCategoryLabel(this.rootLocalize.bind(this), this),
+            background: this.isEvent ? "#c40000" : "#000000",
+            title: application.localizeNodeProperty(node, "type"),
+            subtitle: application.localizeNodeProperty(node, "category"),
         };
     }
 
@@ -325,24 +313,15 @@ class TriggerNode {
     }
 }
 
-function getCategoryLabel(
-    rootLocalize: (...path: string[]) => string | undefined,
-    node: { category: string; isEvent: boolean }
-) {
-    const category = node.category;
-    return (
-        rootLocalize("category", category, "title") ??
-        ((node.isEvent && category === "event" && getEventLabel()) || category)
-    );
-}
-
-function getEventLabel(): string {
-    return localize("category.event.title");
-}
-
 interface TriggerNode
     extends Pick<TriggerData, "id" | "invalid">,
         Pick<typeof TriggerNode, "category" | "isEvent" | "type"> {}
+
+type TriggerNodeStringProperty = keyof {
+    [P in keyof typeof TriggerNode as (typeof TriggerNode)[P] extends string
+        ? P
+        : never]: (typeof TriggerNode)[P];
+};
 
 type CreateNodeData = WithRequired<DeepPartial<NodeDataSource>, "type">;
 
@@ -428,5 +407,5 @@ type NodeOut = {
     label?: string;
 };
 
-export { getCategoryLabel, getEventLabel, TriggerNode };
-export type { CreateNodeData };
+export { TriggerNode };
+export type { CreateNodeData, TriggerNodeStringProperty };

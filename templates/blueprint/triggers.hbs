@@ -15,13 +15,16 @@
             {{> 'create'}}
         </div>
     </div>
-    <div class="search" {{#unless groups.length}}inert{{/unless}}>
-        <input type="text" name="search" value="{{search}}"
-            placeholder="{{@root.i18n 'search.label'}}">
-        <a data-action="clear-search" {{{@root.i18n.tooltip 'search.clear' }}}>
-            <i class="fa-solid fa-xmark"></i>
-        </a>
-    </div>
+    <extended-text-input name="search" value="{{search}}"
+        placeholder="{{@root.i18n 'search.label'}}"></extended-text-input>
+    {{#if tags.list.length}}
+    <extended-multi-select name="tags" value="{{tags.selected}}" mode="{{tags.mode}}"
+        placeholder="{{@root.i18n 'tags.placeholder'}}">
+        {{#each tags.list as |tag|}}
+        <option value="{{tag.value}}">{{tag.label}}</option>
+        {{/each}}
+    </extended-multi-select>
+    {{/if}}
     <div class="scroll">
         {{#each groups as |group|}}
         {{!-- folder header --}}
@@ -40,8 +43,8 @@
         <div class="list">
             {{#each group.triggers as |trigger|}}
             <div class="trigger" data-action="select-trigger" {{#if trigger.name}}
-                data-trigger-name="{{trigger.name}}" {{/if}} data-trigger-id={{trigger.id}}
-                data-trigger-path="{{trigger.path}}">
+                data-name="{{trigger.name}}" {{/if}} data-id={{trigger.id}}
+                data-path="{{trigger.path}}" data-tags="{{trigger.tags}}">
                 <div class="label">
                     {{trigger.label}}
                 </div>

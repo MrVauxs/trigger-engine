@@ -26,6 +26,7 @@ Hooks.once("init", async () => {
     //     type: BlueprintApplication,
     //     restricted: true,
     // });
+
     Hooks.callAll("triggerEngine.init", { registerApplication });
 });
 

@@ -6,11 +6,17 @@ import {
     ApplicationConfiguration,
     ApplicationRenderOptions,
     createHTMLElement,
+    ExtendedMultiSelectElement,
+    ExtendedTextInputElement,
     htmlQuery,
+    includesAll,
+    includesAny,
     info,
     localize,
     localizePath,
+    MultiSelectTagsMode,
     R,
+    registerCustomElements,
     render,
     waitDialog,
 } from "module-helpers";
@@ -23,6 +29,8 @@ class BlueprintApplication extends apps.ApplicationV2<
 > {
     #blueprint: Blueprint = new Blueprint(this);
     #search: string = "";
+    #tags: string[] = [];
+    #tagsMode: MultiSelectTagsMode = "and";
 
     static APPLICATION_ID = "trigger-engine-blueprint";
 
@@ -64,6 +72,24 @@ class BlueprintApplication extends apps.ApplicationV2<
         this.#filterTriggers();
     }
 
+    get tagsMode(): MultiSelectTagsMode {
+        return this.#tagsMode;
+    }
+
+    set tagsMode(value) {
+        this.#tagsMode = value;
+        this.#filterTriggers();
+    }
+
+    get tags(): string[] {
+        return this.#tags;
+    }
+
+    set tags(value) {
+        this.#tags = value;
+        this.#filterTriggers();
+    }
+
     async close(options: ApplicationClosingOptions = {}) {
         options.animate = false;
         this.#resizeObserver.disconnect();
@@ -80,16 +106,6 @@ class BlueprintApplication extends apps.ApplicationV2<
         this.element.classList.remove("collapsed");
         this.bringToFront();
         return this;
-    }
-
-    clearSearch() {
-        const input = htmlQuery<HTMLInputElement>(this.element, `input[name="search"]`);
-
-        if (input) {
-            input.value = "";
-        }
-
-        this.search = "";
     }
 
     _onFirstRender(context: object, options: BlueprintRenderOptions) {
@@ -123,8 +139,9 @@ class BlueprintApplication extends apps.ApplicationV2<
             } satisfies TriggerContext;
         }
 
+        const triggers = this.blueprint.triggers.contents;
         const groups: TriggersGroup[] = R.pipe(
-            this.blueprint.triggers.contents,
+            triggers,
             R.filter((trigger) => !trigger.invalid),
             R.groupBy(R.prop("folder")),
             R.entries(),
@@ -139,10 +156,38 @@ class BlueprintApplication extends apps.ApplicationV2<
             groups.push(groups.shift()!);
         }
 
+        const tags = R.pipe(
+            triggers,
+            R.flatMap((trigger) => {
+                return trigger.tags;
+            }),
+            R.unique(),
+            R.map((tag): Required<SelectOption> => {
+                return {
+                    label: tag,
+                    value: tag,
+                };
+            }),
+            R.unique(),
+            R.sortBy(R.identity())
+        );
+
         return {
             groups,
             search: this.#search,
+            tags: {
+                list: tags,
+                mode: this.tagsMode,
+                selected: this.tags,
+            },
         } satisfies TriggersContext;
+    }
+
+    async _preFirstRender(
+        context: Record<string, unknown>,
+        options: BlueprintRenderOptions
+    ): Promise<void> {
+        registerCustomElements("extended-multi-select", "extended-text-input");
     }
 
     protected _renderHTML(
@@ -184,10 +229,6 @@ class BlueprintApplication extends apps.ApplicationV2<
                 return (this.blueprint.trigger = null);
             }
 
-            case "clear-search": {
-                return this.clearSearch();
-            }
-
             case "close-window": {
                 return;
             }
@@ -203,6 +244,11 @@ class BlueprintApplication extends apps.ApplicationV2<
 
             case "expand-window": {
                 return this.expandWindow();
+            }
+
+            case "edit-trigger": {
+                const trigger = this.blueprint.trigger;
+                return trigger && this.#editTrigger(trigger.folder, trigger);
             }
 
             case "export-data": {
@@ -227,7 +273,7 @@ class BlueprintApplication extends apps.ApplicationV2<
             }
 
             case "select-trigger": {
-                const triggerId = target.dataset.triggerId ?? null;
+                const triggerId = target.dataset.id ?? null;
                 return (this.blueprint.trigger = triggerId);
             }
         }
@@ -239,7 +285,7 @@ class BlueprintApplication extends apps.ApplicationV2<
 
     _getTriggerContextOptions(): ContextMenuEntry[] {
         const getTriggerFromElement = (el: HTMLElement): Trigger | null => {
-            const triggerId = el.dataset.triggerId;
+            const triggerId = el.dataset.id;
             return triggerId ? this.blueprint.getTrigger(triggerId) : null;
         };
 
@@ -248,7 +294,7 @@ class BlueprintApplication extends apps.ApplicationV2<
                 icon: `<i class="fa-solid fa-clipboard"></i>`,
                 name: localizePath("blueprint.trigger.copy.label"),
                 callback: (el) => {
-                    const path = el.dataset.triggerPath as string;
+                    const path = el.dataset.path as string;
                     game.clipboard.copyPlainText(path);
                     return info("blueprint.trigger.copy.notify", { path });
                 },
@@ -270,30 +316,44 @@ class BlueprintApplication extends apps.ApplicationV2<
                     return source && this.blueprint.addTrigger(source);
                 },
             },
+            {
+                icon: `<i class="fa-solid fa-trash"></i>`,
+                name: localizePath("blueprint.trigger.delete"),
+                callback: (el) => {
+                    const trigger = getTriggerFromElement(el);
+                    return trigger?.delete();
+                },
+            },
         ];
     }
 
     #filterTriggers() {
-        const html = this.element;
-        const search = this.search.toLowerCase();
-        const triggers = html.querySelectorAll<HTMLElement>(".sidebar.triggers .trigger");
-        const isSearch = !!search;
-
-        for (const el of triggers) {
-            const name = el.dataset.triggerName;
-            el.classList.toggle(
-                "hidden",
-                isSearch && (!name || !name.toLowerCase().includes(search))
-            );
-        }
+        filterElements(
+            this.element.querySelectorAll<HTMLElement>(".sidebar.triggers .trigger"),
+            this.search,
+            this.tags,
+            this.tagsMode
+        );
     }
 
     #activateListeners(html: HTMLElement) {
         addEnterKeyListeners(html, "text");
 
-        addListener(html, `input[name="search"]`, "input", (el: HTMLInputElement) => {
+        addListener(html, `[name="search"]`, "input", (el: ExtendedTextInputElement) => {
             this.search = el.value;
         });
+
+        const multiSelect = htmlQuery<ExtendedMultiSelectElement>(html, `[name="tags"]`);
+
+        if (multiSelect) {
+            multiSelect.addEventListener("change", () => {
+                this.tags = multiSelect.value;
+            });
+
+            multiSelect.addEventListener("mode", () => {
+                this.tagsMode = multiSelect.mode;
+            });
+        }
     }
 
     async #editTrigger(folder?: string, trigger?: Trigger) {
@@ -307,6 +367,7 @@ class BlueprintApplication extends apps.ApplicationV2<
                 folder: trigger?.folder ?? folder ?? "",
                 name: trigger?.name ?? "",
                 placeholder: trigger?.label ?? "",
+                tags: trigger?.tags,
             }),
             i18n: "edit-trigger",
             skipAnimate: true,
@@ -332,12 +393,35 @@ interface BlueprintApplication {
     getTriggersSources(): TriggerDataSource[];
 }
 
+function filterElements(
+    elements: NodeListOf<HTMLElement>,
+    search: string | undefined,
+    tags: string[] | undefined = [],
+    tagsMode: MultiSelectTagsMode = "and"
+) {
+    const searchTerm = search?.toLocaleLowerCase();
+    const tagsFn = tagsMode === "and" ? includesAll : includesAny;
+
+    const validateSearch = searchTerm?.length
+        ? (name: string | undefined) => name?.toLowerCase().includes(searchTerm)
+        : () => true;
+
+    const validateTags = tags?.length
+        ? (elementTags: string | undefined): boolean => tagsFn(elementTags?.split(",") ?? [], tags)
+        : () => true;
+
+    for (const el of elements) {
+        const valid = validateSearch(el.dataset.name) && validateTags(el.dataset.tags);
+        el.classList.toggle("hidden", !valid);
+    }
+}
+
 type EventAction =
     | "back-menu"
-    | "clear-search"
     | "close-window"
     | "collapse-window"
     | "create-trigger"
+    | "edit-trigger"
     | "expand-window"
     | "export-data"
     | "export-triggers"
@@ -356,6 +440,11 @@ type TriggerContext = {
 type TriggersContext = {
     groups: TriggersGroup[];
     search: string;
+    tags: {
+        list: RequiredSelectOptions;
+        mode: MultiSelectTagsMode;
+        selected: string[];
+    };
 };
 
 type TriggersGroup = {
@@ -367,4 +456,4 @@ type BlueprintRenderOptions = ApplicationRenderOptions & {
     trigger: Trigger | undefined;
 };
 
-export { BlueprintApplication };
+export { BlueprintApplication, filterElements };
