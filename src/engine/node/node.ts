@@ -1,4 +1,10 @@
-import { Trigger, TriggerData } from "engine";
+import {
+    BuiltInApplication,
+    isBuiltInNode,
+    Trigger,
+    TriggerApplication,
+    TriggerData,
+} from "engine";
 import { joinStr, LocalizeArgs, LocalizeData, MODULE, R } from "module-helpers";
 import { NodeData, NodeDataSource } from ".";
 
@@ -107,7 +113,7 @@ class TriggerNode {
 
     /**
      * Tags used to filter in the triggers menu.
-     * The `category` is automatically added to them at runtime.
+     * Nodes are already displayed by `category` so this is only for extra filtering.
      *
      * Tag localization path:
      * `<module-id>.<application-id>.tag.<tag>.title`
@@ -152,8 +158,9 @@ class TriggerNode {
 
         return {
             background: this.isEvent ? "#c40000" : "#000000",
-            title: application.localizeNodeProperty(node, "type"),
-            subtitle: application.localizeNodeProperty(node, "category"),
+            title: localizeNodeProperty(application, node, "type"),
+            subtitle:
+                this.localize("subtitle") ?? localizeNodeProperty(application, node, "category"),
         };
     }
 
@@ -293,29 +300,63 @@ class TriggerNode {
     }
 
     #localize(...args: LocalizeArgs): string | undefined {
-        const { data, path } = this.#getLocalizeData("node", this.category, this.type, ...args);
-        return game.i18n.has(path, true) ? this.#localizeOrFormat(path, data) : undefined;
+        return this.#rootLocalize("node", this.category, this.type, ...args);
     }
 
     #rootLocalize(...args: LocalizeArgs): string | undefined {
-        const { data, path } = this.#getLocalizeData(...args);
-        return this.#localizeOrFormat(path, data);
-    }
-
-    #getLocalizeData(...args: LocalizeArgs) {
-        const data = R.isObjectType(args.at(-1)) ? (args.pop() as LocalizeData) : undefined;
-        const path = joinStr(".", this.#parent.localizePath, ...args);
-        return { path, data };
-    }
-
-    #localizeOrFormat(path: string, data?: LocalizeData): string {
-        return R.isObjectType(data) ? game.i18n.format(path, data) : game.i18n.localize(path);
+        const NodeCls = this.constructor as typeof TriggerNode;
+        return triggerNodeLocalize(this.#parent.parent, NodeCls, ...args);
     }
 }
 
 interface TriggerNode
     extends Pick<TriggerData, "id" | "invalid">,
         Pick<typeof TriggerNode, "category" | "isEvent" | "type"> {}
+
+function triggerNodeLocalize(
+    application: TriggerApplication,
+    node: typeof TriggerNode,
+    ...args: LocalizeArgs
+): string | undefined {
+    const AppCls = isBuiltInNode(node) ? BuiltInApplication : application;
+    const data = R.isObjectType(args.at(-1)) ? (args.pop() as LocalizeData) : undefined;
+    const path = joinStr(".", AppCls.localizePath, ...args);
+
+    if (!game.i18n.has(path, true)) return;
+    return R.isObjectType(data) ? game.i18n.format(path, data) : game.i18n.localize(path);
+}
+
+function localizeNodeTag(
+    application: TriggerApplication,
+    node: typeof TriggerNode,
+    tag: string
+): string {
+    return triggerNodeLocalize(application, node, "tag", tag, "title") ?? tag;
+}
+
+function localizeNodeProperty(
+    application: TriggerApplication,
+    node: typeof TriggerNode,
+    property: TriggerNodeStringProperty
+): string {
+    const path = getNodePropertyLocalizePath(node, property);
+    return triggerNodeLocalize(application, node, path) ?? node[property];
+}
+
+function getNodePropertyLocalizePath(
+    node: typeof TriggerNode,
+    property: TriggerNodeStringProperty
+): string {
+    switch (property) {
+        case "category": {
+            return `category.${node.category}.title`;
+        }
+
+        case "type": {
+            return `node.${node.category}.${node.type}.title`;
+        }
+    }
+}
 
 type TriggerNodeStringProperty = keyof {
     [P in keyof typeof TriggerNode as (typeof TriggerNode)[P] extends string
@@ -407,5 +448,5 @@ type NodeOut = {
     label?: string;
 };
 
-export { TriggerNode };
+export { localizeNodeProperty, localizeNodeTag, TriggerNode, triggerNodeLocalize };
 export type { CreateNodeData, TriggerNodeStringProperty };

@@ -1,11 +1,4 @@
-import {
-    NodeEntry,
-    TriggerApplication,
-    TriggerApplicationOptions,
-    TriggerDataSource,
-    TriggerHook,
-    TriggerNode,
-} from "engine";
+import { TriggerApplication, TriggerApplicationOptions, TriggerDataSource } from "engine";
 import { MODULE, R } from "module-helpers";
 import { BlueprintApplication } from "triggers-menu";
 
@@ -23,25 +16,6 @@ function registerApplication(
     APPLICATIONS[applicationKey] = app;
 
     MODULE.debug(app.applicationKey, app);
-}
-
-function registerNodes(moduleId: string, applicationId: string, ...Nodes: (typeof TriggerNode)[]) {
-    const app = getApplication(moduleId, applicationId);
-    app?.registerNodes(...Nodes);
-}
-
-function registerEntries(
-    moduleId: string,
-    applicationId: string,
-    ...Entries: (typeof NodeEntry)[]
-) {
-    const app = getApplication(moduleId, applicationId);
-    app?.registerEntries(...Entries);
-}
-
-function registerHooks(moduleId: string, applicationId: string, ...Hooks: (typeof TriggerHook)[]) {
-    const app = getApplication(moduleId, applicationId);
-    app?.registerHooks(...Hooks);
 }
 
 async function openBlueprintMenu(
@@ -71,13 +45,5 @@ type RegisteredApplication = {
     moduleId: string;
 };
 
-export {
-    getApplication,
-    getApplicationKey,
-    openBlueprintMenu,
-    registerApplication,
-    registerEntries,
-    registerHooks,
-    registerNodes,
-};
+export { getApplication, getApplicationKey, openBlueprintMenu, registerApplication };
 export type { RegisteredApplication };

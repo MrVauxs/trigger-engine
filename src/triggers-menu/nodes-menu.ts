@@ -1,8 +1,16 @@
-import { NodeEntry, TriggerApplication, TriggerNode } from "engine";
+import {
+    isBuiltInNode,
+    localizeNodeProperty,
+    localizeNodeTag,
+    NodeEntry,
+    TriggerApplication,
+    TriggerNode,
+} from "engine";
 import {
     ApplicationClosingOptions,
     ApplicationConfiguration,
     ApplicationRenderOptions,
+    datasetToData,
     ExtendedMultiSelectElement,
     ExtendedTextInputElement,
     htmlQuery,
@@ -67,27 +75,28 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
     }
 
     async _prepareContext(options: ApplicationRenderOptions): Promise<NodesMenuContext> {
-        const allNodes = this.application.nodesContents;
+        const allNodes = this.application.nodes.allEntries;
         const [events, nodes] = R.partition(allNodes, (node) => node.isEvent);
         // TODO variables & gates
 
-        const tags: RequiredSelectOptions = [];
-
-        const groups: NodesGroup[] = R.filter(
-            [
-                ...this.#prepareNodesGroups(nodes, "node", tags), //
-            ],
-            R.isTruthy
+        const tags: RequiredSelectOptions = R.pipe(
+            allNodes,
+            R.flatMap((node): Required<SelectOption<string>>[] => {
+                return node.tags.map((tag): Required<SelectOption> => {
+                    return {
+                        label: localizeNodeTag(this.application, node, tag),
+                        value: tag,
+                    };
+                });
+            }),
+            R.uniqueBy(R.prop("label")),
+            R.sortBy(R.prop("label"))
         );
 
-        const eventsGroups = this.#prepareNodesGroups(events, "event", tags);
-
         return {
-            events: eventsGroups.length
-                ? eventsGroups
-                : [{ label: this.localize("category.event"), nodes: [], value: "" }],
-            groups,
-            tags: R.pipe(tags, R.uniqueBy(R.prop("value")), R.sortBy(R.prop("label"))),
+            events: this.#prepareNodesGroups(events, "event"),
+            groups: this.#prepareNodesGroups(nodes, "node"),
+            tags,
         };
     }
 
@@ -104,61 +113,52 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         return localize(this.key, ...path);
     }
 
-    #prepareNodesGroups(
-        nodes: (typeof TriggerNode)[],
-        empty: string,
-        tags: RequiredSelectOptions
-    ): NodesGroup[] {
+    protected _onClickAction(event: PointerEvent, target: HTMLElement): void {
+        const action = target.dataset.action as EventAction;
+
+        switch (action) {
+            case "select-node": {
+                const data = R.pick(datasetToData(target), ["type", "builtin"]);
+                const node = this.application.nodes.get(data);
+                console.log(node);
+                return;
+            }
+        }
+    }
+
+    #prepareNodesGroups(nodes: (typeof TriggerNode)[], empty: string): NodesGroup[] {
+        if (!nodes.length) {
+            return [{ label: this.localize("category", empty), nodes: [], value: "" }];
+        }
+
         return R.pipe(
             nodes,
             R.groupBy((node) => node.category.trim() || empty),
             R.entries(),
-            R.map(([category, nodes]): NodesGroup => {
+            R.map(([category, Nodes]): NodesGroup => {
                 const value = category === empty ? "" : category;
 
+                const label = value
+                    ? localizeNodeProperty(this.application, Nodes[0], "category")
+                    : this.localize("category", category);
+
+                const nodes = Nodes.map((node): PreparedNode => {
+                    return {
+                        builtin: isBuiltInNode(node),
+                        tags: node.tags,
+                        title: localizeNodeProperty(this.application, node, "type"),
+                        type: node.type,
+                    };
+                });
+
                 return {
-                    label: value
-                        ? this.application.localizeNodeProperty(nodes[0], "category")
-                        : this.localize("category", category),
-                    nodes: nodes.map((node): PreparedNode => this.#prepareNode(node, tags)),
+                    label,
+                    nodes,
                     value,
                 };
             }),
             R.sortBy(R.prop("label"))
         );
-    }
-
-    #prepareNode(node: typeof TriggerNode, tags: RequiredSelectOptions): PreparedNode {
-        const category = node.category;
-        const isEvent = node.isEvent;
-
-        const nodeTags: RequiredSelectOptions = R.pipe(
-            [
-                ...node.tags.map((tag): Required<SelectOption> => {
-                    return {
-                        value: tag,
-                        label: this.application.localizeNodeTag(tag),
-                    };
-                }),
-                category && {
-                    value: category,
-                    label: this.application.localizeNodeProperty(node, "category"),
-                },
-                isEvent && {
-                    value: "event",
-                    label: this.localize("event"),
-                },
-                // TODO gates & variables
-            ],
-            R.filter(R.isTruthy)
-        );
-
-        tags.push(...nodeTags);
-
-        return {
-            tags: nodeTags.map((tag) => tag.value),
-            title: this.application.localizeNodeProperty(node, "type"),
-        };
     }
 
     #addEventListeners(html: HTMLElement) {
@@ -185,6 +185,8 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
     }
 }
 
+type EventAction = "select-node";
+
 type NodesMenuContext = {
     events: NodesGroup[];
     groups: NodesGroup[];
@@ -198,8 +200,10 @@ type NodesGroup = {
 };
 
 type PreparedNode = {
-    title: string;
+    builtin: boolean;
     tags: string[];
+    title: string;
+    type: string;
 };
 
 type BlueprintNodesMenuResolve = (value: BlueprintNodesMenuResult | null) => void;

@@ -1,13 +1,14 @@
 import {
+    BuiltInApplication,
+    DualCollection,
     NodeEntry,
     Trigger,
     TriggerData,
     TriggerDataSource,
     TriggerHook,
     TriggerNode,
-    TriggerNodeStringProperty,
 } from "engine";
-import { joinStr, MODULE, R } from "module-helpers";
+import { R } from "module-helpers";
 import { BlueprintApplication } from "triggers-menu";
 import utils = foundry.utils;
 
@@ -20,26 +21,22 @@ class TriggerApplication {
     #hooks: Collection<typeof TriggerHook>;
     #mode: TriggerApplicationMode;
     #moduleId: string;
-    #nodes: Collection<typeof TriggerNode>;
+    #nodes: DualCollection<typeof TriggerNode>;
     #triggers: Collection<Trigger>;
 
-    constructor(
-        moduleId: string,
-        applicationId: string,
-        { mode, nodes, setting }: TriggerApplicationOptions = {}
-    ) {
-        this.#mode = R.isIncludedIn(mode, APPLICATION_MODES) ? mode : "setting";
+    constructor(moduleId: string, applicationId: string, options: TriggerApplicationOptions = {}) {
+        this.#mode = R.isIncludedIn(options.mode, APPLICATION_MODES) ? options.mode : "setting";
         this.#moduleId = moduleId;
         this.#applicationId = applicationId;
         this.#applicationKey = `${moduleId}:${applicationId}`;
 
         this.#entries = new Collection();
         this.#hooks = new Collection();
-        this.#nodes = new Collection(nodes?.map((node) => [node.type, node] as const));
+        this.#nodes = new DualCollection(options, "nodes");
         this.#triggers = new Collection();
 
         if (this.isSettingApplication) {
-            this.#setupSetting(setting);
+            this.#setupSetting(options.setting);
         }
     }
 
@@ -83,26 +80,8 @@ class TriggerApplication {
         return `${this.moduleId}.${this.applicationId}`;
     }
 
-    get nodesContents(): (typeof TriggerNode)[] {
-        return this.#nodes.contents;
-    }
-
-    getNode({ type }: { type: string }) {
-        return this.#nodes.get(type);
-    }
-
-    localize(...path: string[]): string | undefined {
-        const joined = joinStr(".", this.localizePath, path);
-        return game.i18n.has(joined, true) ? game.i18n.localize(joined) : undefined;
-    }
-
-    localizeNodeTag(tag: string): string {
-        return this.localize("tag", tag, "title") ?? tag;
-    }
-
-    localizeNodeProperty(node: typeof TriggerNode, property: TriggerNodeStringProperty): string {
-        const path = getNodePropertyLocalizePath(node, property);
-        return this.localize(path) ?? node[property];
+    get nodes(): DualCollection<typeof TriggerNode> {
+        return this.#nodes;
     }
 
     initialize(triggers?: TriggerData[]) {
@@ -111,34 +90,9 @@ class TriggerApplication {
         // TODO
     }
 
-    registerNodes(...Nodes: (typeof TriggerNode)[]) {
-        // const applicationKey = getApplicationKey(moduleId, applicationId);
-        // if (!applicationKey) return;
-        // for (const Node of Nodes) {
-        //     if (R.isFunction(Node) && Node.prototype instanceof TriggerNode) {
-        //         const application = (TRIGGER_NODES[applicationKey] ??= new Collection());
-        //         application.set(Node.type, Node);
-        //     }
-        // }
-    }
-
-    registerEntries(...Entries: (typeof NodeEntry)[]) {}
-
-    registerHooks(...Entries: (typeof TriggerHook)[]) {}
-
-    createTrigger(source: DeepPartial<TriggerDataSource>): Trigger | undefined {
-        try {
-            const data = new TriggerData({
-                ...source,
-                applicationKey: this.applicationKey,
-            });
-            return new Trigger(this, data);
-        } catch (error) {
-            MODULE.error(`an error ocurred while trying to create a Trigger.`, error);
-        }
-    }
-
     async openMenu(arg?: TriggerDataSource): Promise<BlueprintApplication | undefined> {
+        if (this instanceof BuiltInApplication) return;
+
         const menuId = BlueprintApplication.APPLICATION_ID;
         const exist = foundry.applications.instances.get(menuId) as Maybe<BlueprintApplication>;
 
@@ -162,11 +116,10 @@ class TriggerApplication {
         return game.settings.menus.get(menuKey)?.type as typeof BlueprintApplication;
     }
 
-    #getFreeApplication(source: unknown): typeof BlueprintApplication {
+    #getFreeApplication(source: unknown): typeof BlueprintApplication | null {
         const self = this;
-        const test = R.isPlainObject(source) ? this.createTrigger(source) : undefined;
-        const valid = test?.invalid !== false ? this.createTrigger({})! : test;
-        const validSource = valid.toObject();
+        const test = Trigger.create(this, R.isPlainObject(source) ? source : {});
+        if (!test || test.invalid) return null;
 
         return class FreeBlueprintApplication extends BlueprintApplication {
             get application() {
@@ -174,7 +127,7 @@ class TriggerApplication {
             }
 
             getTriggersSources(): TriggerDataSource[] {
-                return [validSource];
+                return [test.toObject()];
             }
         };
     }
@@ -222,26 +175,17 @@ class TriggerApplication {
     }
 }
 
-function getNodePropertyLocalizePath(
-    node: typeof TriggerNode,
-    property: TriggerNodeStringProperty
-): string {
-    switch (property) {
-        case "category": {
-            return `category.${node.category}.title`;
-        }
-
-        case "type": {
-            return `node.${node.category}.${node.type}.title`;
-        }
-    }
-}
-
 type ApplicationParentType = "setting" | "document";
 
-type TriggerApplicationOptions = {
-    mode?: TriggerApplicationMode;
+type TriggerApplicationCollections = {
     nodes?: (typeof TriggerNode)[];
+};
+
+type TriggerApplicationCollection = keyof TriggerApplicationCollections;
+
+type TriggerApplicationOptions = TriggerApplicationCollections & {
+    builtins?: Record<TriggerApplicationCollection, string[]>;
+    mode?: TriggerApplicationMode;
     setting?: ApplicationMenuOptions;
 };
 
@@ -252,7 +196,7 @@ type ApplicationMenuOptions = {
     name?: string;
 };
 
-type TriggerApplicationMode = (typeof APPLICATION_MODES)[number];
+type TriggerApplicationMode = (typeof APPLICATION_MODES)[number] | "builtin";
 
 export { TriggerApplication };
-export type { ApplicationParentType, TriggerApplicationOptions };
+export type { ApplicationParentType, TriggerApplicationCollection, TriggerApplicationOptions };

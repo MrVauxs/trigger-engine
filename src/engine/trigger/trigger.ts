@@ -1,9 +1,8 @@
 import { TriggerApplication, TriggerData, TriggerDataSource, TriggerNode } from "engine";
-import { enrichHTML, R } from "module-helpers";
+import { enrichHTML, MODULE, R } from "module-helpers";
 
 class Trigger {
     #data: TriggerData;
-    #invalid: boolean;
     #nodes: Collection<TriggerNode>;
     #parent: TriggerApplication;
 
@@ -16,7 +15,7 @@ class Trigger {
                 data.nodes.contents,
                 R.map((data) => {
                     try {
-                        const NodeCls = this.parent.getNode(data);
+                        const NodeCls = this.parent.nodes.get(data);
                         if (!NodeCls) return;
 
                         const node = new NodeCls(this, data);
@@ -26,17 +25,10 @@ class Trigger {
                 R.filter(R.isTruthy)
             )
         );
-
-        // TODO need to finish implementing that
-        this.#invalid = this.#nodes.some((node) => node.invalid);
     }
 
     get parent(): TriggerApplication {
         return this.#parent;
-    }
-
-    get localizePath(): string {
-        return this.parent.localizePath;
     }
 
     get applicationKey(): string {
@@ -71,17 +63,30 @@ class Trigger {
         return this.#data.name;
     }
 
-    get invalid(): boolean {
-        return this.#invalid;
-    }
-
     get tags(): string[] {
         return this.#data.tags;
+    }
+
+    get invalid(): boolean {
+        return this.#data.invalid;
     }
 
     // TODO need to actually implement that when module triggers is done
     get locked(): boolean {
         return false;
+    }
+
+    static create(
+        parent: TriggerApplication,
+        source: DeepPartial<TriggerDataSource>
+    ): Trigger | null {
+        try {
+            const data = new TriggerData({ ...source, applicationKey: parent.applicationKey });
+            return new Trigger(parent, data);
+        } catch (error) {
+            MODULE.error(`an error ocurred while trying to create a Trigger.`, error);
+            return null;
+        }
     }
 
     update(data: UpdateTriggerData): DeepPartial<TriggerDataSource> {

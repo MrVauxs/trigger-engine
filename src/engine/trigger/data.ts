@@ -16,6 +16,7 @@ class TriggerData extends abstract.DataModel<null, TriggerDataSchema> {
                 initial: () => [],
             }),
             applicationKey: new fields.StringField({
+                readonly: true,
                 required: true,
                 nullable: false,
                 blank: false,

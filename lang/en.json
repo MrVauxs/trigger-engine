@@ -30,6 +30,21 @@
                 }
             }
         },
+        "builtins": {
+            "node": {
+                "event": {
+                    "test-event": {
+                        "title": "Test Event",
+                        "subtitle": "game.trigger.test()"
+                    }
+                }
+            },
+            "tag": {
+                "debug": {
+                    "title": "Debug"
+                }
+            }
+        },
         "edit-trigger": {
             "folder": "Folder",
             "name": "Trigger Name",

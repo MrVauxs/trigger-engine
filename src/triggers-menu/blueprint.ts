@@ -34,7 +34,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
             R.pipe(
                 this.parent.getTriggersSources(),
                 R.map((source) => {
-                    const trigger = this.application.createTrigger(source);
+                    const trigger = Trigger.create(this.application, source);
                     return trigger && ([trigger.id, trigger] as const);
                 }),
                 R.filter(R.isTruthy)
@@ -125,8 +125,8 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
     addTrigger(source: DeepPartial<TriggerDataSource>) {
         if (source._id && this.triggers.has(source._id)) return;
 
-        const trigger = this.application.createTrigger(source);
-        if (!trigger || trigger.invalid) return;
+        const trigger = Trigger.create(this.application, source);
+        if (!trigger) return;
 
         this.triggers.set(trigger.id, trigger);
         this.trigger = trigger;

@@ -7,6 +7,7 @@
                 placeholder="{{@root.i18n 'search.placeholder'}}"></extended-text-input>
         </fieldset>
         {{!-- tags --}}
+        {{#if tags.length}}
         <fieldset>
             <legend>{{@root.i18n 'tags.label'}}</legend>
             <extended-multi-select name="tags">
@@ -15,6 +16,7 @@
                 {{/each}}
             </extended-multi-select>
         </fieldset>
+        {{/if}}
         <div class="scroll">
             {{> 'section' events}}
         </div>
@@ -32,7 +34,7 @@
     <legend>{{group.label}}</legend>
     <div class="nodes" data-empty="{{@root.i18n 'empty'}}">{{#each group.nodes as |node|}}<div
             class="node" data-action="select-node" data-tags="{{node.tags}}"
-            data-name="{{node.title}}">
+            data-builtin="{{node.builtin}}" data-name="{{node.title}}" data-type="{{node.type}}">
             <div class="name">{{node.title}}</div>
         </div>{{/each}}</div>
 </fieldset>

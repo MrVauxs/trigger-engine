@@ -142,7 +142,6 @@ class BlueprintApplication extends apps.ApplicationV2<
         const triggers = this.blueprint.triggers.contents;
         const groups: TriggersGroup[] = R.pipe(
             triggers,
-            R.filter((trigger) => !trigger.invalid),
             R.groupBy(R.prop("folder")),
             R.entries(),
             R.sortBy(([folder]) => folder),
