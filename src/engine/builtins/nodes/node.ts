@@ -1,12 +1,6 @@
-import { NodeData, Trigger, TriggerNode } from "engine";
+import { TriggerNode } from "engine";
 
-class BuiltInTriggerNode extends TriggerNode {
-    constructor(parent: Trigger, data: NodeData) {
-        data.builtin = true;
-
-        super(parent, data);
-    }
-}
+class BuiltInTriggerNode extends TriggerNode {}
 
 function isBuiltInNode(node: typeof TriggerNode): node is typeof BuiltInTriggerNode {
     return node.prototype instanceof BuiltInTriggerNode;

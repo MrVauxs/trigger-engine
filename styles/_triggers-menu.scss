@@ -12,7 +12,8 @@
     --height: calc(100% - 10px);
     --background: url("../../../ui/denim075.png") repeat;
     --background-color: #00000030;
-    --background-color-alternate: #ffffff22;
+    --background-color-folder: #8fd4df33;
+    --background-color-highlight: #ffffff22;
     --border: 1px solid #111111;
     --border-separator: 1px solid #ffffff3b;
     --folder-spacer-width: 6px;
@@ -139,7 +140,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: var(--background-color-alternate);
+            background: var(--background-color-folder);
             font-size: 1.2em;
             padding: 0.3rem;
             padding-left: var(--folder-spacer-width);
@@ -159,7 +160,7 @@
                         position: absolute;
                         content: "";
                         inset: 0 100% 0 auto;
-                        background: var(--background-color-alternate);
+                        background: var(--background-color-folder);
                         width: var(--folder-spacer-width);
                     }
                 }
@@ -190,7 +191,7 @@
             }
 
             &:hover {
-                background: var(--background-color-alternate);
+                background: var(--background-color-highlight);
             }
         }
     }

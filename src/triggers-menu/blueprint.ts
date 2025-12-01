@@ -1,5 +1,11 @@
-import { Trigger, TriggerApplication, TriggerDataSource, UpdateTriggerData } from "engine";
-import { distanceToPoint, dividePointBy, R, subtractPoint } from "module-helpers";
+import {
+    NodeEntry,
+    Trigger,
+    TriggerApplication,
+    TriggerDataSource,
+    UpdateTriggerData,
+} from "engine";
+import { distanceToPoint, dividePointBy, MODULE, R, subtractPoint } from "module-helpers";
 import { BlueprintApplication, BlueprintGridLayer, BlueprintLayers, BlueprintNodesMenu } from ".";
 
 class Blueprint extends PIXI.Application<HTMLCanvasElement> {
@@ -34,7 +40,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
             R.pipe(
                 this.parent.getTriggersSources(),
                 R.map((source) => {
-                    const trigger = Trigger.create(this.application, source);
+                    const trigger = this.application.createTrigger(source);
                     return trigger && ([trigger.id, trigger] as const);
                 }),
                 R.filter(R.isTruthy)
@@ -125,7 +131,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
     addTrigger(source: DeepPartial<TriggerDataSource>) {
         if (source._id && this.triggers.has(source._id)) return;
 
-        const trigger = Trigger.create(this.application, source);
+        const trigger = this.application.createTrigger(source);
         if (!trigger) return;
 
         this.triggers.set(trigger.id, trigger);
@@ -202,9 +208,23 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         }
     }
 
-    async #openNodesMenu(position: Point) {
-        const result = await BlueprintNodesMenu.wait(this.application);
-        console.log(result);
+    async #openNodesMenu({ x, y }: Point, entry?: NodeEntry) {
+        const source = await BlueprintNodesMenu.wait(this.application, entry);
+        if (!source) return;
+
+        source.position = { x, y };
+
+        try {
+            const NodeCls = this.application.nodes.get(source);
+
+            if (!NodeCls) {
+                throw new Error("Couldn't find the TriggerNode class.");
+            }
+
+            this.trigger?.addNode(NodeCls, source);
+        } catch (error) {
+            MODULE.error(`an error ocurred while trying to create a TriggerNode.`, error);
+        }
     }
 
     #onWheel(event: PIXI.FederatedWheelEvent) {

@@ -1,4 +1,10 @@
-import { TriggerApplication, TriggerData, TriggerDataSource, TriggerNode } from "engine";
+import {
+    CreateNodeDataSource,
+    TriggerApplication,
+    TriggerData,
+    TriggerDataSource,
+    TriggerNode,
+} from "engine";
 import { enrichHTML, MODULE, R } from "module-helpers";
 
 class Trigger {
@@ -76,19 +82,6 @@ class Trigger {
         return false;
     }
 
-    static create(
-        parent: TriggerApplication,
-        source: DeepPartial<TriggerDataSource>
-    ): Trigger | null {
-        try {
-            const data = new TriggerData({ ...source, applicationKey: parent.applicationKey });
-            return new Trigger(parent, data);
-        } catch (error) {
-            MODULE.error(`an error ocurred while trying to create a Trigger.`, error);
-            return null;
-        }
-    }
-
     update(data: UpdateTriggerData): DeepPartial<TriggerDataSource> {
         return this.#data.updateSource(data);
     }
@@ -102,6 +95,23 @@ class Trigger {
         } satisfies DeepPartial<TriggerDataSource>);
 
         return source.toObject();
+    }
+
+    addNode(NodeCls: typeof TriggerNode, source: CreateNodeDataSource): TriggerNode | undefined {
+        try {
+            const data = this.#data.addNode(source);
+
+            if (!data || data.invalid) {
+                throw new Error("The provided NodeData source is invalid.");
+            }
+
+            const node = new NodeCls(this, data);
+            this.#nodes.set(node.id, node);
+
+            return node;
+        } catch (error) {
+            MODULE.error(`an error ocurred while trying to add a TriggerNode.`, error);
+        }
     }
 
     toObject() {

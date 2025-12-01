@@ -1,5 +1,5 @@
 import { TriggerData } from "engine";
-import { IdField } from "module-helpers";
+import { IdField, PositionField } from "module-helpers";
 import abstract = foundry.abstract;
 import fields = foundry.data.fields;
 
@@ -13,6 +13,7 @@ class NodeData extends abstract.DataModel<TriggerData, NodeDataSchema> {
                 nullable: false,
                 initial: false,
             }),
+            position: new PositionField(),
             type: new fields.StringField({
                 required: true,
                 nullable: false,
@@ -28,13 +29,16 @@ class NodeData extends abstract.DataModel<TriggerData, NodeDataSchema> {
 
 interface NodeData extends ModelPropsFromSchema<NodeDataSchema> {}
 
+type CreateNodeDataSource = WithRequired<DeepPartial<NodeDataSource>, "type">;
+
 type NodeDataSource = SourceFromSchema<NodeDataSchema>;
 
 type NodeDataSchema = {
     _id: IdField;
     builtin: fields.BooleanField<boolean, boolean, false, false, true>;
+    position: PositionField;
     type: fields.StringField<string, string, true, false, false>;
 };
 
 export { NodeData };
-export type { NodeDataSchema, NodeDataSource };
+export type { CreateNodeDataSource, NodeDataSchema, NodeDataSource };

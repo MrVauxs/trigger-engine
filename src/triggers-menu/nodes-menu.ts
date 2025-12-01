@@ -1,4 +1,5 @@
 import {
+    CreateNodeDataSource,
     isBuiltInNode,
     localizeNodeProperty,
     localizeNodeTag,
@@ -48,21 +49,21 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         this.#resolve = resolve;
     }
 
-    static async wait(
-        application: TriggerApplication,
-        entry?: NodeEntry
-    ): Promise<BlueprintNodesMenuResult | null> {
-        return new Promise((resolve: BlueprintNodesMenuResolve, entry) => {
-            new BlueprintNodesMenu(application, resolve, entry).render(true);
-        });
-    }
-
     get key(): string {
         return "nodes-menu";
     }
 
     get application(): TriggerApplication {
         return this.#application;
+    }
+
+    static async wait(
+        application: TriggerApplication,
+        entry?: NodeEntry
+    ): Promise<CreateNodeDataSource | null> {
+        return new Promise((resolve: BlueprintNodesMenuResolve, entry) => {
+            new BlueprintNodesMenu(application, resolve, entry).render(true);
+        });
     }
 
     close(options: ApplicationClosingOptions = {}): Promise<this> {
@@ -93,6 +94,8 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
             R.sortBy(R.prop("label"))
         );
 
+        // TODO filter by entry if provided
+
         return {
             events: this.#prepareNodesGroups(events, "event"),
             groups: this.#prepareNodesGroups(nodes, "node"),
@@ -113,15 +116,14 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         return localize(this.key, ...path);
     }
 
-    protected _onClickAction(event: PointerEvent, target: HTMLElement): void {
+    protected _onClickAction(event: PointerEvent, target: HTMLElement) {
         const action = target.dataset.action as EventAction;
 
         switch (action) {
             case "select-node": {
                 const data = R.pick(datasetToData(target), ["type", "builtin"]);
-                const node = this.application.nodes.get(data);
-                console.log(node);
-                return;
+                this.#resolve(data);
+                return this.close();
             }
         }
     }
@@ -206,8 +208,6 @@ type PreparedNode = {
     type: string;
 };
 
-type BlueprintNodesMenuResolve = (value: BlueprintNodesMenuResult | null) => void;
-
-type BlueprintNodesMenuResult = {};
+type BlueprintNodesMenuResolve = (value: CreateNodeDataSource | null) => void;
 
 export { BlueprintNodesMenu };

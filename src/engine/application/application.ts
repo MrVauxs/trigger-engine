@@ -8,7 +8,7 @@ import {
     TriggerHook,
     TriggerNode,
 } from "engine";
-import { R } from "module-helpers";
+import { MODULE, R } from "module-helpers";
 import { BlueprintApplication } from "triggers-menu";
 import utils = foundry.utils;
 
@@ -111,6 +111,16 @@ class TriggerApplication {
         }
     }
 
+    createTrigger(source: DeepPartial<TriggerDataSource>): Trigger | null {
+        try {
+            const data = new TriggerData({ ...source, applicationKey: this.applicationKey });
+            return new Trigger(this, data);
+        } catch (error) {
+            MODULE.error(`an error ocurred while trying to create a Trigger.`, error);
+            return null;
+        }
+    }
+
     #getSettingApplication(): typeof BlueprintApplication | undefined {
         const menuKey = `${this.moduleId}.${this.settingMenuKey}`;
         return game.settings.menus.get(menuKey)?.type as typeof BlueprintApplication;
@@ -118,7 +128,7 @@ class TriggerApplication {
 
     #getFreeApplication(source: unknown): typeof BlueprintApplication | null {
         const self = this;
-        const test = Trigger.create(this, R.isPlainObject(source) ? source : {});
+        const test = this.createTrigger(R.isPlainObject(source) ? source : {});
         if (!test || test.invalid) return null;
 
         return class FreeBlueprintApplication extends BlueprintApplication {
