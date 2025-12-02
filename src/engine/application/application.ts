@@ -194,7 +194,7 @@ type TriggerApplicationCollections = {
 type TriggerApplicationCollection = keyof TriggerApplicationCollections;
 
 type TriggerApplicationOptions = TriggerApplicationCollections & {
-    builtins?: Record<TriggerApplicationCollection, string[]>;
+    builtins?: Record<TriggerApplicationCollection, string[] | boolean>;
     mode?: TriggerApplicationMode;
     setting?: ApplicationMenuOptions;
 };
@@ -209,4 +209,9 @@ type ApplicationMenuOptions = {
 type TriggerApplicationMode = (typeof APPLICATION_MODES)[number] | "builtin";
 
 export { TriggerApplication };
-export type { ApplicationParentType, TriggerApplicationCollection, TriggerApplicationOptions };
+export type {
+    ApplicationParentType,
+    TriggerApplicationCollection,
+    TriggerApplicationCollections,
+    TriggerApplicationOptions,
+};

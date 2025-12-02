@@ -6,14 +6,22 @@ import {
     UpdateTriggerData,
 } from "engine";
 import { distanceToPoint, dividePointBy, MODULE, R, subtractPoint } from "module-helpers";
-import { BlueprintApplication, BlueprintGridLayer, BlueprintLayers, BlueprintNodesMenu } from ".";
+import {
+    BlueprintApplication,
+    BlueprintConnectionsLayer,
+    BlueprintGridLayer,
+    BlueprintNodesLayer,
+    BlueprintNodesMenu,
+} from ".";
 
 class Blueprint extends PIXI.Application<HTMLCanvasElement> {
+    #connections: BlueprintConnectionsLayer;
     #drag: { origin: Point; dragging?: boolean } | null = null;
     #gridLayer: BlueprintGridLayer;
     #hitArea: PIXI.Rectangle;
     #initialized: boolean = false;
-    #layers: BlueprintLayers;
+    #layers: PIXI.Container;
+    #nodes: BlueprintNodesLayer;
     #parent: BlueprintApplication;
     #triggerId: string | null = null;
     #triggers: Collection<Trigger> = new Collection();
@@ -28,10 +36,15 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
 
         this.#parent = parent;
 
-        this.stage.addChild(
-            (this.#gridLayer = new BlueprintGridLayer(this)),
-            (this.#layers = new BlueprintLayers(this))
+        this.#gridLayer = new BlueprintGridLayer(this);
+        this.#layers = new PIXI.Container();
+
+        this.#layers.addChild(
+            (this.#connections = new BlueprintConnectionsLayer()),
+            (this.#nodes = new BlueprintNodesLayer())
         );
+
+        this.stage.addChild(this.#gridLayer, this.#layers);
 
         this.stage.eventMode = "static";
         this.stage.hitArea = this.#hitArea = new PIXI.Rectangle();
@@ -106,7 +119,6 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         element?.prepend(this.view);
 
         this.#initialized = true;
-        this.#layers._initialize();
         this.activateListeners();
     }
 
@@ -221,7 +233,11 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
                 throw new Error("Couldn't find the TriggerNode class.");
             }
 
-            this.trigger?.addNode(NodeCls, source);
+            const node = this.trigger?.addNode(NodeCls, source);
+
+            if (node) {
+                this.#nodes.add(node);
+            }
         } catch (error) {
             MODULE.error(`an error ocurred while trying to create a TriggerNode.`, error);
         }

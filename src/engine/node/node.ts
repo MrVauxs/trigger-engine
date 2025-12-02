@@ -47,8 +47,10 @@ class TriggerNode {
             this,
             R.mapToObj(
                 [
+                    ["getPosition", this.#getPosition],
                     ["localize", this.#localize],
                     ["rootLocalize", this.#rootLocalize],
+                    ["setPosition", this.#setPosition],
                     ["toObject", this.#toObject],
                 ] as const,
                 ([property, method]) => {
@@ -157,7 +159,7 @@ class TriggerNode {
         const node = this.constructor as typeof TriggerNode;
 
         return {
-            background: this.isEvent ? "#c40000" : "#000000",
+            background: this.isEvent ? "#C40000" : "#000000",
             title: localizeNodeProperty(application, node, "type"),
             subtitle:
                 this.localize("subtitle") ?? localizeNodeProperty(application, node, "category"),
@@ -250,11 +252,6 @@ class TriggerNode {
      */
     declare readonly setOutputValue: (output: string) => void;
 
-    /**
-     * Returns the source of this `NodeData`
-     */
-    declare readonly toObject: () => NodeDataSource;
-
     //////////////////////////////
     // ABSTRACT METHODS
     //////////////////////////////
@@ -295,8 +292,9 @@ class TriggerNode {
     // PRIVATE METHODS
     //////////////////////////////
 
-    #toObject(): NodeDataSource {
-        return this.#data.toObject();
+    #getPosition(): Point {
+        const { x, y } = this.#data.position;
+        return { x, y };
     }
 
     #localize(...args: LocalizeArgs): string | undefined {
@@ -307,11 +305,23 @@ class TriggerNode {
         const NodeCls = this.constructor as typeof TriggerNode;
         return triggerNodeLocalize(this.#parent.parent, NodeCls, ...args);
     }
+
+    #setPosition(position: Point) {
+        this.#data.updateSource({ position });
+    }
+
+    #toObject(): NodeDataSource {
+        return this.#data.toObject();
+    }
 }
 
 interface TriggerNode
     extends Pick<TriggerData, "id" | "invalid">,
-        Pick<typeof TriggerNode, "category" | "isEvent" | "type"> {}
+        Pick<typeof TriggerNode, "category" | "isEvent" | "type"> {
+    readonly getPosition: () => Point;
+    readonly setPosition: (position: Point) => void;
+    readonly toObject: () => NodeDataSource;
+}
 
 function triggerNodeLocalize(
     application: TriggerApplication,
@@ -379,9 +389,9 @@ type NodeEntryType = (typeof NODE_ENTRY_TYPES)[number];
 type NodeCustomEntryType = (typeof NODE_CUSTOM_ENTRY_TYPES)[number];
 
 type NodeHeaderSource = {
-    background?: `#${string}`;
-    icon?: IconObject;
-    title: string;
+    background?: `#${string}` | number;
+    icon?: NodeIconObject | string;
+    title?: string;
     subtitle?: string;
 };
 
@@ -392,7 +402,7 @@ type NodeCustomData = {
     types: NodeCustomEntryType[];
 };
 
-type IconObject = {
+type NodeIconObject = {
     unicode?: string;
     fontSize?: number;
     fontWeight?: TextStyleFontWeight;
@@ -449,4 +459,4 @@ type NodeOut = {
 };
 
 export { localizeNodeProperty, localizeNodeTag, TriggerNode, triggerNodeLocalize };
-export type { CreateNodeData, TriggerNodeStringProperty };
+export type { CreateNodeData, NodeHeaderSource, NodeIconObject, TriggerNodeStringProperty };

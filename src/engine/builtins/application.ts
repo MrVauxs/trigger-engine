@@ -18,7 +18,7 @@ class BuiltInApplication {
         return `${this.moduleId}.${this.applicationId}`;
     }
 
-    static nodes = R.mapToObj(
+    static nodes: Record<"test-event", NonNullable<typeof TestTriggerNode>> = R.mapToObj(
         [TestTriggerNode] as const, //
         (node) => [node.type, node] as const
     );

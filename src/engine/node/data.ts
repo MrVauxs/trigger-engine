@@ -27,7 +27,9 @@ class NodeData extends abstract.DataModel<TriggerData, NodeDataSchema> {
     }
 }
 
-interface NodeData extends ModelPropsFromSchema<NodeDataSchema> {}
+interface NodeData extends ModelPropsFromSchema<NodeDataSchema> {
+    updateSource(data: DeepPartial<NodeDataSource>): DeepPartial<NodeDataSource>;
+}
 
 type CreateNodeDataSource = WithRequired<DeepPartial<NodeDataSource>, "type">;
 

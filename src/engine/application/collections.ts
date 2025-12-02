@@ -7,19 +7,7 @@ class DualCollection<T> {
     #local: Collection<T>;
 
     constructor(options: TriggerApplicationOptions, collection: TriggerApplicationCollection) {
-        const builtins = BuiltInApplication[collection];
-
-        this.#builtin = new Collection(
-            R.pipe(
-                options.builtins?.[collection] ?? [],
-                R.map((type) => {
-                    const builtin = builtins[type as keyof typeof builtins] as T;
-                    return builtin ? ([type, builtin] as const) : undefined;
-                }),
-                R.filter(R.isTruthy)
-            )
-        );
-
+        this.#builtin = new Collection(getBuiltins(options, collection));
         this.#local = new Collection(options.nodes?.map((node) => [node.type, node as T] as const));
     }
 
@@ -31,6 +19,31 @@ class DualCollection<T> {
         const collection = builtin ? this.#builtin : this.#local;
         return collection.get(type ?? "");
     }
+}
+
+function getBuiltins<T>(
+    options: TriggerApplicationOptions,
+    collection: TriggerApplicationCollection
+): [string, T][] {
+    const option = options.builtins?.[collection];
+    const builtins = BuiltInApplication[collection] as Record<string, T>;
+
+    if (option === true) {
+        return R.entries(builtins);
+    }
+
+    if (!option || !R.isArray(option)) {
+        return [];
+    }
+
+    return R.pipe(
+        option,
+        R.map((type): [string, T] | undefined => {
+            const builtin = builtins[type as keyof typeof builtins] as T;
+            return builtin ? ([type, builtin] as const) : undefined;
+        }),
+        R.filter(R.isTruthy)
+    );
 }
 
 export { DualCollection };

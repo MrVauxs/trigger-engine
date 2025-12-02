@@ -1,4 +1,4 @@
-import { Blueprint } from "..";
+import { Blueprint } from ".";
 
 class BlueprintGridLayer extends PIXI.TilingSprite {
     static GRID_SIZE = 16;
