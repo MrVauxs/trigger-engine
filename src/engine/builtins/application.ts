@@ -1,5 +1,5 @@
 import { MODULE, R } from "module-helpers";
-import { TestTriggerNode } from ".";
+import { NumberNodeEntry, TestTriggerNode } from ".";
 
 class BuiltInApplication {
     static get moduleId(): string {
@@ -18,7 +18,12 @@ class BuiltInApplication {
         return `${this.moduleId}.${this.applicationId}`;
     }
 
-    static nodes: Record<"test-event", NonNullable<typeof TestTriggerNode>> = R.mapToObj(
+    static entries = R.mapToObj(
+        [NumberNodeEntry] as const, //
+        (entry) => [entry.type, entry] as const
+    );
+
+    static nodes = R.mapToObj(
         [TestTriggerNode] as const, //
         (node) => [node.type, node] as const
     );

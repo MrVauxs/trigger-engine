@@ -1,13 +1,21 @@
-import { NodeIconObject, TriggerNode } from "engine";
-import { R } from "module-helpers";
+import { TriggerNode } from "engine";
+import { drawRectangleMask, R } from "module-helpers";
+import { BlueprintNodesLayer } from ".";
 
 class BlueprintNode extends PIXI.Container {
+    #calculatedheight: number = 0;
+    #calculatedWith: number = 0;
+    #border: PIXI.Graphics = new PIXI.Graphics();
     #node: TriggerNode;
+    #selected: boolean = false;
 
     constructor(node: TriggerNode) {
         super();
 
         this.#node = node;
+
+        this.eventMode = "static";
+        this.on("pointerdown", this.#onPointerDown, this);
     }
 
     get fontSize(): number {
@@ -22,26 +30,115 @@ class BlueprintNode extends PIXI.Container {
         return 0.6;
     }
 
+    get backgroundColor(): ColorSource {
+        return 0x000000;
+    }
+
+    get borderRadius(): number {
+        return 10;
+    }
+
+    get borderOptions(): ILineStyleOptions {
+        return {
+            color: 0x000000,
+            width: 1.5,
+            alpha: 0.6,
+        };
+    }
+
+    get selectedBorderOptions(): ILineStyleOptions {
+        return {
+            color: 0xffd700,
+            width: 2,
+            alpha: 0.6,
+        };
+    }
+
+    get minWidth(): number {
+        return 200;
+    }
+
+    get maxWidth(): number {
+        return Infinity;
+    }
+
+    get minHeight(): number {
+        return 50;
+    }
+
+    get canDrag(): boolean {
+        return this.isLocked;
+    }
+
+    get isLocked(): boolean {
+        // TODO
+        return true;
+    }
+
+    get selected(): boolean {
+        return this.#selected;
+    }
+
+    set selected(value) {
+        if (this.selected === value) return;
+
+        this.#selected = value;
+        this.#drawBorder(value);
+    }
+
+    bringToTop() {
+        const highest = R.firstBy(this.parent.children, [R.prop("zIndex"), "desc"])?.zIndex ?? 0;
+        this.zIndex = highest + 1;
+        this.parent.sortChildren();
+    }
+
     draw() {
         const header = this.#drawHeader();
+        const body = this.#drawBody();
 
-        let height = 0;
-        let width = 0;
+        const width = Math.min(
+            Math.max(header?.calculatedWith ?? 0, body.calculatedWith, this.minWidth),
+            this.maxWidth
+        );
+        const height = body.calculatedHeight + (header?.calculatedHeight ?? 0);
 
+        this.#calculatedWith = width;
+        this.#calculatedheight = height;
+
+        // background
+        const background = new PIXI.Graphics();
+        const backgroundMask = drawRectangleMask(0, 0, width, height, this.borderRadius);
+
+        background.mask = backgroundMask;
+        background.addChild(backgroundMask);
+
+        this.addChild(background);
+
+        // header
         if (header) {
-            const color = new PIXI.Color(header.background ?? 0x0);
+            const color = new PIXI.Color(this.#node.header?.background ?? this.backgroundColor);
 
-            header.beginFill(color, this.opacity);
-            header.drawRect(0, 0, header.calculatedWith, header.calculatedHeight);
-            header.endFill();
-
-            height += header.calculatedHeight;
-            width += header.calculatedWith;
+            background.beginFill(color, this.opacity);
+            background.drawRect(0, 0, width, header.calculatedHeight);
+            background.endFill();
 
             this.addChild(header);
+
+            body.y = header.calculatedHeight;
         }
 
-        const { x, y } = this.#node.getPosition();
+        // body
+        background.beginFill(this.backgroundColor, this.opacity);
+        background.drawRect(0, body.y, width, body.calculatedHeight);
+        background.endFill();
+
+        this.addChild(body);
+
+        // border
+        this.addChild(this.#drawBorder(false));
+
+        // set position
+        const { x, y } = this.#node._data.position;
         this.position.set(x, y);
     }
 
@@ -91,14 +188,35 @@ class BlueprintNode extends PIXI.Container {
         return new foundry.canvas.containers.PreciseText(text, style);
     }
 
-    #drawHeader(): NodeHeader | undefined {
+    #drawBorder(selected: boolean): PIXI.Graphics {
+        const border = this.#border;
+        const width = this.#calculatedWith;
+        const height = this.#calculatedheight;
+
+        border.clear();
+        border.lineStyle(selected ? this.selectedBorderOptions : this.borderOptions);
+        border.drawRoundedRect(0, 0, width, height, this.borderRadius);
+
+        return this.#border;
+    }
+
+    #drawBody(): NodePart {
+        const body = new PIXI.Graphics() as NodePart;
+
+        body.calculatedWith = 0;
+        body.calculatedHeight = Math.max(0, this.minHeight);
+
+        return body;
+    }
+
+    #drawHeader(): NodePart | undefined {
         const data = this.#node.header;
         const title = this.preciseText(data?.title);
         if (!data || !title) return;
 
         const spacing = 5;
         const padding = this.outerPadding;
-        const header = new PIXI.Graphics() as NodeHeader;
+        const header = new PIXI.Graphics() as NodePart;
         const icon = this.fontAwesomeIcon(data.icon);
         const subtitle = this.preciseText(data.subtitle, {
             fontSize: this.fontSize * 0.93,
@@ -106,14 +224,8 @@ class BlueprintNode extends PIXI.Container {
             fill: "d9d9d9",
         });
 
-        const rowHeight = Math.max(icon?.height ?? 0, title.height);
-
-        let height = padding.y + title.height;
-
         if (icon) {
             icon.x = padding.x;
-            icon.y = padding.y + (rowHeight - icon.height) / 2;
-
             title.x = icon.x + icon.width + spacing;
 
             header.addChild(icon);
@@ -121,38 +233,87 @@ class BlueprintNode extends PIXI.Container {
             title.x = padding.x;
         }
 
-        title.y = padding.y + (rowHeight - title.height) / 2;
+        alignHorizontally(padding.y, icon, title);
 
         header.addChild(title);
 
         if (subtitle) {
             subtitle.x = title.x + (icon ? 0 : 2);
-            subtitle.y = height;
-
-            height += subtitle.height;
+            subtitle.y = getBottom(title);
 
             header.addChild(subtitle);
         }
 
-        const maxWidth = Math.max(
-            title.x + title.width,
-            (subtitle?.x ?? 0) + (subtitle?.width ?? 0)
-        );
+        title.getBounds();
 
-        header.background = data.background;
-        header.calculatedHeight = height + padding.y;
-        header.calculatedWith = maxWidth + padding.x;
+        header.calculatedHeight = maxBottom(title, subtitle) + padding.y;
+        header.calculatedWith = maxRight(title, subtitle) + padding.x;
 
         return header;
     }
+
+    #onPointerDown(event: PIXI.FederatedPointerEvent) {
+        event.stopPropagation();
+
+        if (event.button === 0) {
+            this.bringToTop();
+
+            if (event.shiftKey) {
+                this.selected = !this.selected;
+            } else {
+                this.parent.clearSelected();
+                this.selected = true;
+            }
+
+            if (this.canDrag) {
+                this.#onDragStart(event);
+            }
+        } else if (event.button === 2 && !this.isLocked) {
+            this.#onContextMenu(event);
+        }
+    }
+
+    #onDragStart(event: PIXI.FederatedPointerEvent) {}
+
+    async #onContextMenu(event: PIXI.FederatedPointerEvent) {}
 }
 
-type NodeHeader = PIXI.Graphics & {
-    background?: `#${string}` | number;
+interface BlueprintNode {
+    readonly parent: BlueprintNodesLayer;
+}
+
+function alignHorizontally(offset: number, ...elements: (PIXI.Container | undefined)[]) {
+    const maxHeight = Math.max(...elements.map((el) => el?.height ?? 0));
+
+    for (const el of elements) {
+        if (!el) continue;
+        el.y = (maxHeight - el.height) / 2 + offset;
+    }
+}
+
+function getRight(el?: PIXI.Container | NodePart): number {
+    if (!el) return 0;
+    return el.x + el.width;
+}
+
+function getBottom(el?: PIXI.Container | NodePart): number {
+    if (!el) return 0;
+    return el.y + el.height;
+}
+
+function maxRight(a?: PIXI.Container | NodePart, b?: PIXI.Container | NodePart): number {
+    return Math.max(getRight(a), getRight(b));
+}
+
+function maxBottom(a?: PIXI.Container | NodePart, b?: PIXI.Container | NodePart): number {
+    return Math.max(getBottom(a), getBottom(b));
+}
+
+type ILineStyleOptions = Parameters<PIXI.Graphics["lineTextureStyle"]>[0];
+
+type NodePart = PIXI.Graphics & {
     calculatedHeight: number;
     calculatedWith: number;
 };
-
-type IconObject = WithRequired<NodeIconObject, "unicode">;
 
 export { BlueprintNode };

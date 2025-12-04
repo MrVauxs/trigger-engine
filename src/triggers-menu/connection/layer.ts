@@ -1,3 +1,5 @@
-class BlueprintConnectionsLayer extends PIXI.Container {}
+class BlueprintConnectionsLayer extends PIXI.Container {
+    clear() {}
+}
 
 export { BlueprintConnectionsLayer };

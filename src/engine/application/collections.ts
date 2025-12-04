@@ -1,14 +1,22 @@
-import { BuiltInApplication } from "engine";
+import { BuiltInApplication, NodeEntry, TriggerNode } from "engine";
 import { R } from "module-helpers";
 import { TriggerApplicationCollection, TriggerApplicationOptions } from ".";
 
-class DualCollection<T> {
+class DualCollections<T> {
     #builtin: Collection<T>;
     #local: Collection<T>;
 
     constructor(options: TriggerApplicationOptions, collection: TriggerApplicationCollection) {
         this.#builtin = new Collection(getBuiltins(options, collection));
         this.#local = new Collection(options.nodes?.map((node) => [node.type, node as T] as const));
+    }
+
+    get builtin(): Collection<T> {
+        return this.#builtin;
+    }
+
+    get local(): Collection<T> {
+        return this.#local;
     }
 
     get allEntries(): T[] {
@@ -21,12 +29,28 @@ class DualCollection<T> {
     }
 }
 
+class NodesCollections extends DualCollections<typeof TriggerNode> {
+    constructor(options: TriggerApplicationOptions) {
+        super(options, "nodes");
+    }
+}
+
+class EntriesCollections extends DualCollections<typeof NodeEntry> {
+    constructor(options: TriggerApplicationOptions) {
+        super(options, "entries");
+    }
+
+    get({ type }: { type?: string }): typeof NodeEntry | undefined {
+        return this.builtin.get(type ?? "");
+    }
+}
+
 function getBuiltins<T>(
     options: TriggerApplicationOptions,
     collection: TriggerApplicationCollection
 ): [string, T][] {
     const option = options.builtins?.[collection];
-    const builtins = BuiltInApplication[collection] as Record<string, T>;
+    const builtins = BuiltInApplication[collection];
 
     if (option === true) {
         return R.entries(builtins);
@@ -46,4 +70,4 @@ function getBuiltins<T>(
     );
 }
 
-export { DualCollection };
+export { EntriesCollections, NodesCollections };

@@ -1,10 +1,50 @@
+import { NodeEntryData, TriggerNode } from "engine";
 import { MODULE, R } from "module-helpers";
+import fields = foundry.data.fields;
 
-class NodeEntry {
-    constructor() {
-        const accessors = R.pipe(
-            ["key"] as const,
-            R.mapToObj((property) => {
+class NodeEntry<TInputSchema extends fields.DataSchema | undefined = undefined> {
+    #parent: TriggerNode;
+
+    constructor(parent: TriggerNode, data: NodeEntryData) {
+        MODULE.assert(
+            parent instanceof TriggerNode && !parent.invalid,
+            "parent argument must be a valid 'TriggerNode'."
+        );
+
+        MODULE.assert(
+            data instanceof NodeEntryData && !data.invalid,
+            "schema argument must be a valid 'NodeData'."
+        );
+
+        this.#parent = parent;
+
+        Object.defineProperty(this, "_data", {
+            value: data,
+            configurable: false,
+            enumerable: false,
+            writable: false,
+        });
+
+        // from data accessors
+        Object.defineProperties(
+            this,
+            R.mapToObj(["id", "invalid"] as const, (property) => {
+                return [
+                    property,
+                    {
+                        value: data[property],
+                        configurable: false,
+                        enumerable: true,
+                        writable: false,
+                    },
+                ];
+            })
+        );
+
+        // from static accessors
+        Object.defineProperties(
+            this,
+            R.mapToObj(["type"] as const, (property) => {
                 return [
                     property,
                     {
@@ -16,14 +56,65 @@ class NodeEntry {
                 ];
             })
         );
-
-        Object.defineProperties(this, accessors);
     }
 
-    /** must be an unique key */
-    static get key(): string {
-        throw MODULE.Error("the 'key' static getter must be implemented.");
+    //////////////////////////////
+    // ABSTRACT STATIC ACCESSORS
+    //////////////////////////////
+
+    /**
+     * @abstract
+     * Must be an unique key among your registered module's entries (including the builtins)
+     *
+     * Localization path:
+     * `<module-id>.<application-id>.entry.<type>.title`
+     */
+    static get type(): string {
+        throw MODULE.Error("the 'type' static getter must be implemented.");
     }
+
+    //////////////////////////////
+    // STATIC ACCESSORS
+    //////////////////////////////
+
+    /**
+     * @abstract
+     * Defines the DataSchema for the input field that will be used in the triggers menu.
+     */
+    static get fieldSchema(): fields.DataSchema | null {
+        return null;
+    }
+
+    //////////////////////////////
+    // ACCESSORS
+    //////////////////////////////
+
+    //////////////////////////////
+    // PRIVATE METHODS
+    //////////////////////////////
 }
 
+interface NodeEntry extends Pick<NodeEntryData, "id" | "invalid">, Pick<typeof NodeEntry, "type"> {
+    readonly _data: NodeEntryData;
+}
+
+type BaseNodeEntry<TType extends string> = {
+    type: TType;
+    group?: string;
+};
+
+type BaseNodeInput<
+    TType extends string,
+    TField extends fields.DataSchema | undefined = undefined
+> = Prettify<
+    BaseNodeEntry<TType> & {
+        field?: Prettify<
+            TField extends fields.DataSchema ? DeepPartial<SourceFromSchema<TField>> : TField
+        >;
+    }
+>;
+
+type BaseNodeOutput<TType extends string> = BaseNodeEntry<TType>;
+
 export { NodeEntry };
+export type { BaseNodeEntry, BaseNodeInput, BaseNodeOutput };

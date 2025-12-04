@@ -1,7 +1,8 @@
 import {
     BuiltInApplication,
-    DualCollection,
+    EntriesCollections,
     NodeEntry,
+    NodesCollections,
     Trigger,
     TriggerData,
     TriggerDataSource,
@@ -17,11 +18,11 @@ const APPLICATION_MODES = ["setting", "free"] as const;
 class TriggerApplication {
     #applicationId: string;
     #applicationKey: string;
-    #entries: Collection<typeof NodeEntry>;
+    #entries: EntriesCollections;
     #hooks: Collection<typeof TriggerHook>;
     #mode: TriggerApplicationMode;
     #moduleId: string;
-    #nodes: DualCollection<typeof TriggerNode>;
+    #nodes: NodesCollections;
     #triggers: Collection<Trigger>;
 
     constructor(moduleId: string, applicationId: string, options: TriggerApplicationOptions = {}) {
@@ -30,9 +31,9 @@ class TriggerApplication {
         this.#applicationId = applicationId;
         this.#applicationKey = `${moduleId}:${applicationId}`;
 
-        this.#entries = new Collection();
+        this.#entries = new EntriesCollections(options);
         this.#hooks = new Collection();
-        this.#nodes = new DualCollection(options, "nodes");
+        this.#nodes = new NodesCollections(options);
         this.#triggers = new Collection();
 
         if (this.isSettingApplication) {
@@ -80,7 +81,7 @@ class TriggerApplication {
         return `${this.moduleId}.${this.applicationId}`;
     }
 
-    get nodes(): DualCollection<typeof TriggerNode> {
+    get nodes(): NodesCollections {
         return this.#nodes;
     }
 
@@ -188,10 +189,11 @@ class TriggerApplication {
 type ApplicationParentType = "setting" | "document";
 
 type TriggerApplicationCollections = {
+    entries?: (typeof NodeEntry)[];
     nodes?: (typeof TriggerNode)[];
 };
 
-type TriggerApplicationCollection = keyof TriggerApplicationCollections;
+type TriggerApplicationCollection = Prettify<keyof TriggerApplicationCollections>;
 
 type TriggerApplicationOptions = TriggerApplicationCollections & {
     builtins?: Record<TriggerApplicationCollection, string[] | boolean>;

@@ -1,30 +1,38 @@
 import {
+    BaseNodeInput,
+    BaseNodeOutput,
     BuiltInApplication,
     isBuiltInNode,
     Trigger,
     TriggerApplication,
-    TriggerData,
 } from "engine";
 import { joinStr, LocalizeArgs, LocalizeData, MODULE, R } from "module-helpers";
 import { NodeData, NodeDataSource } from ".";
 
 const NODE_ENTRY_CATEGORIES = ["inputs", "outputs"] as const;
-const NODE_ENTRY_TYPES = ["boolean", "number", "text"] as const;
-const NODE_CUSTOM_ENTRY_TYPES = NODE_ENTRY_TYPES;
-const NODE_INPUT_TEXT_TYPES = ["code", "description", "text"] as const;
 
 class TriggerNode {
-    #data: NodeData;
     #parent: Trigger;
 
     constructor(parent: Trigger, data: NodeData) {
+        MODULE.assert(
+            parent instanceof Trigger && !parent.invalid,
+            "parent argument must be a valid 'Trigger'."
+        );
+
         MODULE.assert(
             data instanceof NodeData && !data.invalid,
             "data argument must be a valid 'NodeData'."
         );
 
-        this.#data = data;
         this.#parent = parent;
+
+        Object.defineProperty(this, "_data", {
+            value: data,
+            configurable: false,
+            enumerable: false,
+            writable: false,
+        });
 
         // from data accessors
         Object.defineProperties(
@@ -47,11 +55,8 @@ class TriggerNode {
             this,
             R.mapToObj(
                 [
-                    ["getPosition", this.#getPosition],
                     ["localize", this.#localize],
                     ["rootLocalize", this.#rootLocalize],
-                    ["setPosition", this.#setPosition],
-                    ["toObject", this.#toObject],
                 ] as const,
                 ([property, method]) => {
                     return [
@@ -92,7 +97,7 @@ class TriggerNode {
      * @abstract
      * Must be an unique key among your registered module's nodes
      *
-     * Title localization path:
+     * Localization path:
      * `<module-id>.<application-id>.node.<category>.<type>.title`
      */
     static get type(): string {
@@ -106,7 +111,7 @@ class TriggerNode {
     /**
      * Used to sort nodes in the triggers menu
      *
-     * Category localization path:
+     * Localization path:
      * `<module-id>.<application-id>.category.<category>.title`
      */
     static get category(): string {
@@ -117,7 +122,7 @@ class TriggerNode {
      * Tags used to filter in the triggers menu.
      * Nodes are already displayed by `category` so this is only for extra filtering.
      *
-     * Tag localization path:
+     * Localization path:
      * `<module-id>.<application-id>.tag.<tag>.title`
      */
     static get tags(): string[] {
@@ -166,11 +171,11 @@ class TriggerNode {
         };
     }
 
-    get inputs(): NodeInput[] | null {
+    get inputsSchemas(): BaseNodeInput<string>[] | null {
         return null;
     }
 
-    get outputs(): NodeOutput[] | null {
+    get outputsSchemas(): BaseNodeOutput<string>[] | null {
         return null;
     }
 
@@ -292,11 +297,6 @@ class TriggerNode {
     // PRIVATE METHODS
     //////////////////////////////
 
-    #getPosition(): Point {
-        const { x, y } = this.#data.position;
-        return { x, y };
-    }
-
     #localize(...args: LocalizeArgs): string | undefined {
         return this.#rootLocalize("node", this.category, this.type, ...args);
     }
@@ -305,22 +305,12 @@ class TriggerNode {
         const NodeCls = this.constructor as typeof TriggerNode;
         return triggerNodeLocalize(this.#parent.parent, NodeCls, ...args);
     }
-
-    #setPosition(position: Point) {
-        this.#data.updateSource({ position });
-    }
-
-    #toObject(): NodeDataSource {
-        return this.#data.toObject();
-    }
 }
 
 interface TriggerNode
-    extends Pick<TriggerData, "id" | "invalid">,
+    extends Pick<NodeData, "id" | "invalid">,
         Pick<typeof TriggerNode, "category" | "isEvent" | "type"> {
-    readonly getPosition: () => Point;
-    readonly setPosition: (position: Point) => void;
-    readonly toObject: () => NodeDataSource;
+    readonly _data: NodeData;
 }
 
 function triggerNodeLocalize(
@@ -374,19 +364,13 @@ type TriggerNodeStringProperty = keyof {
         : never]: (typeof TriggerNode)[P];
 };
 
-type CreateNodeData = WithRequired<DeepPartial<NodeDataSource>, "type">;
+type CreateNodeData = DeepPartial<WithRequired<NodeDataSource, "type">>;
 
-type NodeInput = ValueOf<NodeInputs>;
-
-type NodeOutput = BaseNodeEntry;
+type UpdateNodeData = DeepPartial<Omit<NodeDataSource, "_id" | "builtin" | "type">>;
 
 type NodeEntryCategory = (typeof NODE_ENTRY_CATEGORIES)[number];
 
 type NodeCustomEntryCategory = NodeEntryCategory | "outs";
-
-type NodeEntryType = (typeof NODE_ENTRY_TYPES)[number];
-
-type NodeCustomEntryType = (typeof NODE_CUSTOM_ENTRY_TYPES)[number];
 
 type NodeHeaderSource = {
     background?: `#${string}` | number;
@@ -399,7 +383,7 @@ type NodeCustomData = {
     category: NodeCustomEntryCategory;
     group: string;
     key: NodeCustomDataKey;
-    types: NodeCustomEntryType[];
+    types: string[];
 };
 
 type NodeIconObject = {
@@ -416,47 +400,16 @@ type NodeCustomDataKey = {
     type: "number" | "text";
 };
 
-type NodeInputs = {
-    boolean: NodeBooleanEntry;
-    number: NodeNumberEntry;
-    text: NodeTextEntry;
-};
-
-type NodeNumberEntry = BaseNodeEntry<"number"> & {
-    choices?: number[];
-    default?: number;
-    max?: number;
-    min?: number;
-    step?: number;
-};
-
-type NodeTextEntry = BaseNodeEntry<"text"> & {
-    choices?: string[];
-    default?: string;
-    /** default 'true' */
-    trim?: boolean;
-    /** default 'text' */
-    type?: NodeTextInputType;
-};
-
-type NodeBooleanEntry = BaseNodeEntry<"boolean"> & {
-    default?: boolean;
-};
-
-type NodeTextInputType = (typeof NODE_INPUT_TEXT_TYPES)[number];
-
-type BaseNodeEntry<TType extends NodeEntryType = NodeEntryType> = {
-    key: string;
-    type: TType;
-    label?: string;
-    group?: string;
-    custom?: boolean;
-};
-
 type NodeOut = {
     key: string;
     label?: string;
 };
 
 export { localizeNodeProperty, localizeNodeTag, TriggerNode, triggerNodeLocalize };
-export type { CreateNodeData, NodeHeaderSource, NodeIconObject, TriggerNodeStringProperty };
+export type {
+    CreateNodeData,
+    NodeHeaderSource,
+    NodeIconObject,
+    TriggerNodeStringProperty,
+    UpdateNodeData,
+};

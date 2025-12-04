@@ -82,6 +82,10 @@ class Trigger {
         return false;
     }
 
+    get nodes(): Collection<TriggerNode> {
+        return this.#nodes;
+    }
+
     update(data: UpdateTriggerData): DeepPartial<TriggerDataSource> {
         return this.#data.updateSource(data);
     }
@@ -121,7 +125,7 @@ class Trigger {
 
 interface Trigger {}
 
-type UpdateTriggerData = Omit<TriggerDataSource, "_id" | "_nodes" | "applicationKey">;
+type UpdateTriggerData = DeepPartial<Omit<TriggerDataSource, "_id" | "_nodes" | "applicationKey">>;
 
 export { Trigger };
 export type { UpdateTriggerData };

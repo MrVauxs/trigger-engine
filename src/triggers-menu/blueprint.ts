@@ -10,18 +10,17 @@ import {
     BlueprintApplication,
     BlueprintConnectionsLayer,
     BlueprintGridLayer,
+    BlueprintLayers,
     BlueprintNodesLayer,
     BlueprintNodesMenu,
 } from ".";
 
 class Blueprint extends PIXI.Application<HTMLCanvasElement> {
-    #connections: BlueprintConnectionsLayer;
     #drag: { origin: Point; dragging?: boolean } | null = null;
     #gridLayer: BlueprintGridLayer;
     #hitArea: PIXI.Rectangle;
     #initialized: boolean = false;
-    #layers: PIXI.Container;
-    #nodes: BlueprintNodesLayer;
+    #layers: BlueprintLayers;
     #parent: BlueprintApplication;
     #triggerId: string | null = null;
     #triggers: Collection<Trigger> = new Collection();
@@ -36,15 +35,10 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
 
         this.#parent = parent;
 
-        this.#gridLayer = new BlueprintGridLayer(this);
-        this.#layers = new PIXI.Container();
-
-        this.#layers.addChild(
-            (this.#connections = new BlueprintConnectionsLayer()),
-            (this.#nodes = new BlueprintNodesLayer())
+        this.stage.addChild(
+            (this.#gridLayer = new BlueprintGridLayer(this)),
+            (this.#layers = new BlueprintLayers())
         );
-
-        this.stage.addChild(this.#gridLayer, this.#layers);
 
         this.stage.eventMode = "static";
         this.stage.hitArea = this.#hitArea = new PIXI.Rectangle();
@@ -74,6 +68,14 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         return this.parent.application;
     }
 
+    get connections(): BlueprintConnectionsLayer {
+        return this.#layers.connections;
+    }
+
+    get nodes(): BlueprintNodesLayer {
+        return this.#layers.nodes;
+    }
+
     get applicationKey(): string {
         return this.application.applicationKey;
     }
@@ -96,6 +98,12 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         this.scale = 1;
         this.setPosition(0, 0);
 
+        if (triggerId) {
+            this.#draw();
+        } else {
+            this.#clear();
+        }
+
         this.parent.render();
     }
 
@@ -115,11 +123,8 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         if (this.#initialized) return;
 
         const element = (this.resizeTo = this.parent.element);
-
         element?.prepend(this.view);
-
         this.#initialized = true;
-        this.activateListeners();
     }
 
     resizeAll(): void {
@@ -158,29 +163,45 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         this.parent.render();
     }
 
-    activateListeners() {
-        this.stage.on("wheel", this.#onWheel, this);
-        this.stage.on("pointerdown", this.#onPointerDown, this);
-    }
-
-    disableListeners() {
-        this.stage.removeAllListeners();
-    }
-
     getTrigger(triggerId: string): Trigger | null {
         return this.triggers.get(triggerId) ?? null;
     }
 
+    #draw() {
+        this.#clear();
+
+        const trigger = this.trigger;
+        if (!trigger) return;
+
+        for (const node of trigger.nodes) {
+            this.nodes.add(node);
+        }
+
+        // TODO add connections as well
+
+        this.stage.on("wheel", this.#onWheel, this);
+        this.stage.on("pointerdown", this.#onPointerDown, this);
+    }
+
+    #clear() {
+        this.stage.removeAllListeners();
+        this.#layers.clear();
+    }
+
     #onPointerDown(event: PIXI.FederatedPointerEvent) {
-        if (event.button !== 2) return;
+        if (event.button === 0) {
+            return this.nodes.clearSelected();
+        }
 
-        this.#drag = {
-            origin: this.#subtractPointFromEvent(event, this.#layers.position),
-        };
+        if (event.button === 2) {
+            this.#drag = {
+                origin: this.#subtractPointFromEvent(event, this.#layers.position),
+            };
 
-        this.stage.on("pointermove", this.#onDragMove, this);
-        this.stage.on("pointerup", this.#onPointerUp, this);
-        this.stage.on("pointerupoutside", this.#onPointerUp, this);
+            this.stage.on("pointermove", this.#onDragMove, this);
+            this.stage.on("pointerup", this.#onDragEnd, this);
+            this.stage.on("pointerupoutside", this.#onDragEnd, this);
+        }
     }
 
     #onDragMove(event: PIXI.FederatedPointerEvent) {
@@ -204,16 +225,16 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         this.setPosition(x, y);
     }
 
-    #onPointerUp(event: PIXI.FederatedPointerEvent) {
+    #onDragEnd(event: PIXI.FederatedPointerEvent) {
         const wasDragging = !!this.#drag?.dragging;
 
         this.#drag = null;
         this.#layers.interactiveChildren = true;
 
         this.stage.cursor = "default";
-        this.stage.off("pointerup", this.#onPointerUp, this);
-        this.stage.off("pointerupoutside", this.#onPointerUp, this);
         this.stage.off("pointermove", this.#onDragMove, this);
+        this.stage.off("pointerup", this.#onDragEnd, this);
+        this.stage.off("pointerupoutside", this.#onDragEnd, this);
 
         if (!wasDragging && this.trigger?.locked === false) {
             this.#openNodesMenu(event.global);
@@ -224,7 +245,13 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         const source = await BlueprintNodesMenu.wait(this.application, entry);
         if (!source) return;
 
-        source.position = { x, y };
+        const scale = this.scale;
+        const position = this.#layers.position;
+
+        source.position = {
+            x: x / scale - position.x,
+            y: y / scale - position.y,
+        };
 
         try {
             const NodeCls = this.application.nodes.get(source);
@@ -236,7 +263,8 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
             const node = this.trigger?.addNode(NodeCls, source);
 
             if (node) {
-                this.#nodes.add(node);
+                this.nodes.add(node);
+                // TODO add connection if entry provided
             }
         } catch (error) {
             MODULE.error(`an error ocurred while trying to create a TriggerNode.`, error);
