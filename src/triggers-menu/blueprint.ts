@@ -11,12 +11,13 @@ import {
     BlueprintConnectionsLayer,
     BlueprintGridLayer,
     BlueprintLayers,
+    BlueprintNode,
     BlueprintNodesLayer,
     BlueprintNodesMenu,
 } from ".";
 
 class Blueprint extends PIXI.Application<HTMLCanvasElement> {
-    #drag: { origin: Point; dragging?: boolean } | null = null;
+    #drag: { origin: Point; dragging?: boolean; selection?: PIXI.Graphics } | null = null;
     #gridLayer: BlueprintGridLayer;
     #hitArea: PIXI.Rectangle;
     #initialized: boolean = false;
@@ -189,54 +190,79 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
     }
 
     #onPointerDown(event: PIXI.FederatedPointerEvent) {
-        if (event.button === 0) {
-            return this.nodes.clearSelected();
+        if (!R.isIncludedIn(event.button, [0, 2])) return;
+
+        const isSelect = event.button === 0;
+
+        this.#drag = {
+            origin: this.#subtractPointFromEvent(event, this.#layers.position),
+        };
+
+        if (isSelect) {
+            this.#drag.selection = this.#layers.addChild(new PIXI.Graphics());
+            this.nodes.clearSelected();
         }
 
-        if (event.button === 2) {
-            this.#drag = {
-                origin: this.#subtractPointFromEvent(event, this.#layers.position),
-            };
-
-            this.stage.on("pointermove", this.#onDragMove, this);
-            this.stage.on("pointerup", this.#onDragEnd, this);
-            this.stage.on("pointerupoutside", this.#onDragEnd, this);
-        }
+        this.stage.on("pointermove", this.#onPointerMove, this);
+        this.stage.on("pointerup", this.#onPointerUp, this);
+        this.stage.on("pointerupoutside", this.#onPointerUp, this);
     }
 
-    #onDragMove(event: PIXI.FederatedPointerEvent) {
+    #onPointerMove(event: PIXI.FederatedPointerEvent) {
         if (!this.#drag) return;
 
-        const { origin, dragging } = this.#drag;
+        const { origin, dragging, selection } = this.#drag;
 
         if (!dragging) {
             const target = this.#subtractPointFromEvent(event, this.#layers.position);
             const distance = distanceToPoint(target, origin);
-
             if (distance < 10) return;
+
+            this.#drag.dragging = true;
+            this.#layers.interactiveChildren = false;
+
+            if (!selection) {
+                this.stage.cursor = "grabbing";
+            }
         }
 
-        this.#drag.dragging = true;
-        this.#layers.interactiveChildren = false;
+        if (selection) {
+            const target = this.#subtractPointFromEvent(event, this.#layers.position);
+            const width = Math.abs(target.x - origin.x);
+            const height = Math.abs(target.y - origin.y);
 
-        const { x, y } = this.#subtractPointFromEvent(event, origin);
+            selection.x = Math.min(origin.x, target.x);
+            selection.y = Math.min(origin.y, target.y);
 
-        this.stage.cursor = "grabbing";
-        this.setPosition(x, y);
+            selection.clear();
+            selection.lineStyle(2, BlueprintNode.SELECTED_COLOR, 0.9);
+            selection.drawRect(0, 0, width, height);
+        } else {
+            const { x, y } = this.#subtractPointFromEvent(event, origin);
+            this.setPosition(x, y);
+        }
     }
 
-    #onDragEnd(event: PIXI.FederatedPointerEvent) {
+    #onPointerUp(event: PIXI.FederatedPointerEvent) {
         const wasDragging = !!this.#drag?.dragging;
+        const selection = this.#drag?.selection;
 
         this.#drag = null;
         this.#layers.interactiveChildren = true;
 
         this.stage.cursor = "default";
-        this.stage.off("pointermove", this.#onDragMove, this);
-        this.stage.off("pointerup", this.#onDragEnd, this);
-        this.stage.off("pointerupoutside", this.#onDragEnd, this);
+        this.stage.off("pointermove", this.#onPointerMove, this);
+        this.stage.off("pointerup", this.#onPointerUp, this);
+        this.stage.off("pointerupoutside", this.#onPointerUp, this);
 
-        if (!wasDragging && this.trigger?.locked === false) {
+        if (selection) {
+            if (wasDragging) {
+                this.nodes.selectNodes(selection);
+            }
+
+            this.#layers.removeChild(selection);
+            selection.destroy();
+        } else if (!wasDragging && this.trigger?.locked === false) {
             this.#openNodesMenu(event.global);
         }
     }

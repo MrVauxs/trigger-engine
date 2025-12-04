@@ -9,6 +9,8 @@ class BlueprintNode extends PIXI.Container {
     #node: TriggerNode;
     #selected: boolean = false;
 
+    static SELECTED_COLOR: ColorSource = 0xff9829;
+
     constructor(node: TriggerNode) {
         super();
 
@@ -48,7 +50,7 @@ class BlueprintNode extends PIXI.Container {
 
     get selectedBorderOptions(): ILineStyleOptions {
         return {
-            color: 0xffd700,
+            color: BlueprintNode.SELECTED_COLOR,
             width: 2,
             alpha: 0.6,
         };

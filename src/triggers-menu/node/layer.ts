@@ -10,6 +10,16 @@ class BlueprintNodesLayer extends PIXI.Container {
         }
     }
 
+    selectNodes(selection: PIXI.Graphics) {
+        const bounds = selection.getBounds();
+
+        for (const node of this.#nodes) {
+            if (bounds.intersects(node.getBounds())) {
+                node.selected = true;
+            }
+        }
+    }
+
     add(node: TriggerNode): BlueprintNode {
         const exist = this.#nodes.get(node.id);
         if (exist) return exist;
