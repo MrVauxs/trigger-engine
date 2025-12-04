@@ -1,11 +1,13 @@
 import { TriggerNode } from "engine";
 import { drawRectangleMask, R } from "module-helpers";
 import { BlueprintNodesLayer } from ".";
+import { Blueprint } from "..";
 
 class BlueprintNode extends PIXI.Container {
     #calculatedheight: number = 0;
     #calculatedWith: number = 0;
     #border: PIXI.Graphics = new PIXI.Graphics();
+    #hitArea: PIXI.Rectangle = new PIXI.Rectangle();
     #node: TriggerNode;
     #selected: boolean = false;
 
@@ -16,8 +18,20 @@ class BlueprintNode extends PIXI.Container {
 
         this.#node = node;
 
-        this.eventMode = "static";
-        this.on("pointerdown", this.#onPointerDown, this);
+        // this.eventMode = "static";
+        // this.on("pointerdown", this.#onPointerDown, this);
+    }
+
+    get blueprint(): Blueprint {
+        return this.parent.blueprint;
+    }
+
+    get stage(): PIXI.Container {
+        return this.blueprint.stage;
+    }
+
+    get id(): string {
+        return this.#node.id;
     }
 
     get fontSize(): number {
@@ -142,6 +156,10 @@ class BlueprintNode extends PIXI.Container {
         // set position
         const { x, y } = this.#node._data.position;
         this.position.set(x, y);
+
+        // set hit area
+        this.#hitArea.width = width;
+        this.#hitArea.height = height;
     }
 
     fontAwesomeIcon(icon: unknown, fontSize?: number): PreciseText | undefined {
@@ -255,27 +273,53 @@ class BlueprintNode extends PIXI.Container {
     }
 
     #onPointerDown(event: PIXI.FederatedPointerEvent) {
-        event.stopPropagation();
-
-        if (event.button === 0) {
-            this.bringToTop();
-
-            if (event.shiftKey) {
-                this.selected = !this.selected;
-            } else {
-                this.parent.clearSelected();
-                this.selected = true;
-            }
-
-            if (this.canDrag) {
-                this.#onDragStart(event);
-            }
-        } else if (event.button === 2 && !this.isLocked) {
+        if (event.button === 2) {
+            event.stopPropagation();
             this.#onContextMenu(event);
         }
+
+        // event.stopPropagation();
+
+        // if (event.button === 0) {
+        //     this.#drag = {
+        //         origin: this.blueprint.subtractPointFromEvent(event, this.parent.parent),
+        //         shiftHeld: event.shiftKey,
+        //     };
+        //     // this.bringToTop();
+
+        //     // if (event.shiftKey) {
+        //     //     this.selected = !this.selected;
+        //     // } else {
+        //     //     this.parent.clearSelected();
+        //     //     this.selected = true;
+        //     // }
+
+        //     // if (this.canDrag) {
+        //     //     this.parent.onMoveSelectedStart(event);
+        //     // }
+
+        //     // this.stage.on("pointermove", this.#onPointerMove, this);
+        //     // this.stage.on("pointerup", this.#onPointerUp, this);
+        //     // this.stage.on("pointerupoutside", this.#onPointerUp, this);
+        // } else if (event.button === 2 && !this.isLocked) {
+        //     this.#onContextMenu(event);
+        // }
     }
 
-    #onDragStart(event: PIXI.FederatedPointerEvent) {}
+    #onPointerMove(event: PIXI.FederatedPointerEvent) {
+        //         if (!dragging) {
+        //     const target = this.subtractPointFromEvent(event, this.#layers.position);
+        //     const distance = distanceToPoint(target, origin);
+        //     if (distance < 10) return;
+        //     this.#drag.dragging = true;
+        //     this.#layers.interactiveChildren = false;
+        //     if (!selection) {
+        //         this.stage.cursor = "grabbing";
+        //     }
+        // }
+    }
+
+    #onPointerUp(event: PIXI.FederatedPointerEvent) {}
 
     async #onContextMenu(event: PIXI.FederatedPointerEvent) {}
 }

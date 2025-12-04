@@ -1,11 +1,14 @@
-import { BlueprintConnectionsLayer, BlueprintNodesLayer } from ".";
+import { Blueprint, BlueprintConnectionsLayer, BlueprintNodesLayer } from ".";
 
 class BlueprintLayers extends PIXI.Container {
+    #blueprint: Blueprint;
     #connections: BlueprintConnectionsLayer;
     #nodes: BlueprintNodesLayer;
 
-    constructor() {
+    constructor(blueprint: Blueprint) {
         super();
+
+        this.#blueprint = blueprint;
 
         this.addChild(
             (this.#connections = new BlueprintConnectionsLayer()),
@@ -21,14 +24,14 @@ class BlueprintLayers extends PIXI.Container {
         return this.#nodes;
     }
 
+    get blueprint(): Blueprint {
+        return this.#blueprint;
+    }
+
     clear() {
         this.#connections.clear();
         this.#nodes.clear();
     }
-
-    activateListeners() {}
-
-    disableListeners() {}
 }
 
 export { BlueprintLayers };

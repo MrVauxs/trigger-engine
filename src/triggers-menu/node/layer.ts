@@ -1,8 +1,17 @@
 import { TriggerNode } from "engine";
 import { BlueprintNode } from ".";
+import { Blueprint, BlueprintLayers } from "..";
 
 class BlueprintNodesLayer extends PIXI.Container {
     #nodes: Collection<BlueprintNode> = new Collection();
+
+    get blueprint(): Blueprint {
+        return this.parent.blueprint;
+    }
+
+    get stage(): PIXI.Container {
+        return this.blueprint.stage;
+    }
 
     clearSelected() {
         for (const node of this.#nodes) {
@@ -10,13 +19,11 @@ class BlueprintNodesLayer extends PIXI.Container {
         }
     }
 
-    selectNodes(selection: PIXI.Graphics) {
+    selectIntersecting(selection: PIXI.Graphics) {
         const bounds = selection.getBounds();
 
         for (const node of this.#nodes) {
-            if (bounds.intersects(node.getBounds())) {
-                node.selected = true;
-            }
+            node.selected = bounds.intersects(node.getBounds());
         }
     }
 
@@ -30,6 +37,9 @@ class BlueprintNodesLayer extends PIXI.Container {
         this.addChild(_node);
 
         _node.draw();
+
+        this.clearSelected();
+        _node.selected = true;
 
         return _node;
     }
@@ -45,6 +55,10 @@ class BlueprintNodesLayer extends PIXI.Container {
             removed[i].destroy(true);
         }
     }
+}
+
+interface BlueprintNodesLayer {
+    parent: BlueprintLayers;
 }
 
 export { BlueprintNodesLayer };
