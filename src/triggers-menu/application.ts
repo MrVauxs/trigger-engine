@@ -113,7 +113,10 @@ class BlueprintApplication extends apps.ApplicationV2<
 
         // we wait one frame before initializing the canvas
         requestAnimationFrame(() => {
-            this.blueprint._initialize();
+            const element = this.element;
+
+            this.blueprint.resizeTo = element;
+            element.prepend(this.blueprint.view);
         });
 
         this._createContextMenus();

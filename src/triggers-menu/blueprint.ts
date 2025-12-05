@@ -19,7 +19,6 @@ import {
 class Blueprint extends PIXI.Application<HTMLCanvasElement> {
     #gridLayer: BlueprintGridLayer;
     #hitArea: PIXI.Rectangle;
-    #initialized: boolean = false;
     #layers: BlueprintLayers;
     #mouseManager: MouseInteractionManager;
     #parent: BlueprintApplication;
@@ -78,7 +77,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
 
         // free application only has a single trigger so we set it right away
         if (this.application.isFreeApplication) {
-            this.#triggerId = this.#triggers.contents[0].id;
+            this.trigger = this.#triggers.contents[0];
         }
     }
 
@@ -147,15 +146,6 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
 
         this.stage.scale.set(actualValue);
         this.resizeAll();
-    }
-
-    _initialize() {
-        if (this.#initialized) return;
-
-        const element = (this.resizeTo = this.parent.element);
-        element?.prepend(this.view);
-
-        this.#initialized = true;
     }
 
     resizeAll(): void {
