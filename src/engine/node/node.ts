@@ -7,7 +7,7 @@ import {
     TriggerApplication,
 } from "engine";
 import { joinStr, LocalizeArgs, LocalizeData, MODULE, R } from "module-helpers";
-import { NodeData, NodeDataSource } from ".";
+import { NodeData } from ".";
 
 const NODE_ENTRY_CATEGORIES = ["inputs", "outputs"] as const;
 
@@ -349,10 +349,6 @@ type TriggerNodeStringProperty = keyof {
         : never]: (typeof TriggerNode)[P];
 };
 
-type CreateNodeData = DeepPartial<WithRequired<NodeDataSource, "type">>;
-
-type UpdateNodeData = DeepPartial<Omit<NodeDataSource, "_id" | "builtin" | "type">>;
-
 type NodeEntryCategory = (typeof NODE_ENTRY_CATEGORIES)[number];
 
 type NodeCustomEntryCategory = NodeEntryCategory | "outs";
@@ -391,10 +387,4 @@ type NodeOut = {
 };
 
 export { localizeNodeProperty, localizeNodeTag, TriggerNode, triggerNodeLocalize };
-export type {
-    CreateNodeData,
-    NodeHeaderSource,
-    NodeIconObject,
-    TriggerNodeStringProperty,
-    UpdateNodeData,
-};
+export type { NodeHeaderSource, NodeIconObject, TriggerNodeStringProperty };

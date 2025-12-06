@@ -4,13 +4,10 @@ import fields = foundry.data.fields;
 import { IdField, MODULE, R } from "module-helpers";
 
 class TriggerData extends abstract.DataModel<null, TriggerDataSchema> {
-    declare events: Collection<NodeData>;
-    declare nodes: Collection<NodeData>;
-
     static defineSchema(): TriggerDataSchema {
         return {
             _id: new IdField(),
-            _nodes: new fields.ArrayField(new fields.SchemaField(NodeData.defineSchema()), {
+            nodes: new fields.ArrayField(new fields.SchemaField(NodeData.defineSchema()), {
                 required: false,
                 nullable: false,
                 initial: () => [],
@@ -53,7 +50,7 @@ class TriggerData extends abstract.DataModel<null, TriggerDataSchema> {
 
         this.nodes = new Collection(
             R.pipe(
-                this._nodes,
+                this._source.nodes,
                 R.map((source) => {
                     try {
                         const node = new NodeData(source);
@@ -77,7 +74,7 @@ class TriggerData extends abstract.DataModel<null, TriggerDataSchema> {
             const data = new NodeData(source);
 
             this.nodes.set(data.id, data);
-            this._nodes.push(data.toObject());
+            this._source.nodes.push(data._source);
 
             return data;
         } catch (error) {
@@ -86,13 +83,17 @@ class TriggerData extends abstract.DataModel<null, TriggerDataSchema> {
     }
 }
 
-interface TriggerData extends ModelPropsFromSchema<TriggerDataSchema> {}
+interface TriggerData extends Omit<ModelPropsFromSchema<TriggerDataSchema>, "nodes"> {
+    nodes: Collection<NodeData>;
+}
 
 type TriggerDataSource = SourceFromSchema<TriggerDataSchema>;
 
+type UpdateTriggerData = DeepPartial<Omit<TriggerDataSource, "_id" | "_nodes" | "applicationKey">>;
+
 type TriggerDataSchema = {
     _id: IdField;
-    _nodes: fields.ArrayField<fields.SchemaField<NodeDataSchema>>;
+    nodes: fields.ArrayField<fields.SchemaField<NodeDataSchema>>;
     applicationKey: fields.StringField<string, string, true, false, false>;
     description: fields.StringField<string, string, false, false, true>;
     folder: fields.StringField<string, string, false, false, true>;
@@ -101,4 +102,4 @@ type TriggerDataSchema = {
 };
 
 export { TriggerData };
-export type { TriggerDataSource };
+export type { TriggerDataSource, UpdateTriggerData };

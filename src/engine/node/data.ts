@@ -31,7 +31,9 @@ interface NodeData extends ModelPropsFromSchema<NodeDataSchema> {
     updateSource(data: DeepPartial<NodeDataSource>): DeepPartial<NodeDataSource>;
 }
 
-type CreateNodeDataSource = WithRequired<DeepPartial<NodeDataSource>, "type">;
+type CreateNodeData = DeepPartial<WithRequired<NodeDataSource, "type">>;
+
+type UpdateNodeData = DeepPartial<Omit<NodeDataSource, "_id" | "builtin" | "type">>;
 
 type NodeDataSource = SourceFromSchema<NodeDataSchema>;
 
@@ -43,4 +45,4 @@ type NodeDataSchema = {
 };
 
 export { NodeData };
-export type { CreateNodeDataSource, NodeDataSchema, NodeDataSource };
+export type { CreateNodeData, NodeDataSchema, NodeDataSource, UpdateNodeData };

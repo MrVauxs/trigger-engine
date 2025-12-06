@@ -1,5 +1,5 @@
 import {
-    CreateNodeDataSource,
+    CreateNodeData,
     isBuiltInNode,
     localizeNodeProperty,
     localizeNodeTag,
@@ -60,7 +60,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
     static async wait(
         application: TriggerApplication,
         entry?: NodeEntry
-    ): Promise<CreateNodeDataSource | null> {
+    ): Promise<CreateNodeData | null> {
         return new Promise((resolve: BlueprintNodesMenuResolve) => {
             new BlueprintNodesMenu(application, resolve, entry).render(true);
         });
@@ -210,6 +210,6 @@ type PreparedNode = {
     type: string;
 };
 
-type BlueprintNodesMenuResolve = (value: CreateNodeDataSource | null) => void;
+type BlueprintNodesMenuResolve = (value: CreateNodeData | null) => void;
 
 export { BlueprintNodesMenu };

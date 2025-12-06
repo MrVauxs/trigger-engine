@@ -1,11 +1,12 @@
 import {
-    CreateNodeDataSource,
+    CreateNodeData,
     NodeData,
     TriggerApplication,
     TriggerData,
     TriggerDataSource,
     TriggerNode,
     UpdateNodeData,
+    UpdateTriggerData,
 } from "engine";
 import { enrichHTML, MODULE, R } from "module-helpers";
 
@@ -93,15 +94,15 @@ class Trigger {
     }
 
     duplicate(): TriggerDataSource {
-        const source = this.#data.clone({
+        const clone = this.#data.clone({
             _id: foundry.utils.randomID(),
             name: this.name ? game.i18n.format("DOCUMENT.CopyOf", { name: this.name }) : "",
         } satisfies DeepPartial<TriggerDataSource>);
 
-        return source.toObject();
+        return clone.toObject();
     }
 
-    addNode(NodeCls: typeof TriggerNode, source: CreateNodeDataSource): TriggerNode | undefined {
+    addNode(NodeCls: typeof TriggerNode, source: CreateNodeData): TriggerNode | undefined {
         try {
             const data = this.#data.addNode(source);
 
@@ -138,7 +139,4 @@ class Trigger {
 
 interface Trigger {}
 
-type UpdateTriggerData = DeepPartial<Omit<TriggerDataSource, "_id" | "_nodes" | "applicationKey">>;
-
 export { Trigger };
-export type { UpdateTriggerData };
