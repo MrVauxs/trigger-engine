@@ -54,20 +54,22 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         );
 
         const handlers: ConstructorParameters<typeof MouseInteractionManager>[3] = {
-            unclickRight: this.#onUnclickRight.bind(this),
-            dragLeftStart: this.#onDragLeftStart.bind(this),
-            dragLeftMove: this.#onDragLeftMove.bind(this),
-            dragLeftDrop: this.#onDragLeftDrop.bind(this),
-            dragRightStart: this.#onDragRightStart.bind(this),
-            dragRightMove: this.#onDragRightMove.bind(this),
+            unclickLeft: this._onUnclickLeft.bind(this),
+            unclickRight: this._onUnclickRight.bind(this),
+            dragLeftStart: this._onDragLeftStart.bind(this),
+            dragLeftMove: this._onDragLeftMove.bind(this),
+            dragLeftDrop: this._onDragLeftDrop.bind(this),
+            dragRightStart: this._onDragRightStart.bind(this),
+            dragRightMove: this._onDragRightMove.bind(this),
         };
 
         this.#mouseManager = new foundry.canvas.interaction.MouseInteractionManager(
             this.stage,
             this.stage,
             {
-                ...R.mapValues(handlers, () => this.#canHandleMouseEvent.bind(this)),
-                clickRight: this.#canHandleMouseEvent.bind(this),
+                ...R.mapValues(handlers, () => this._canHandleMouseEvent.bind(this)),
+                clickLeft: this._canHandleMouseEvent.bind(this),
+                clickRight: this._canHandleMouseEvent.bind(this),
             },
             handlers,
             { application: this }
@@ -188,8 +190,69 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         return this.triggers.get(triggerId) ?? null;
     }
 
+    cancelMouse() {
+        this.#mouseManager.cancel();
+    }
+
     subtractPointFromEvent(event: PIXI.FederatedPointerEvent, point: Point): Point {
         return subtractPoint(dividePointBy(event.global, this.scale), point);
+    }
+
+    _canHandleMouseEvent() {
+        return !!this.trigger;
+    }
+
+    _onUnclickLeft(event: FederatedEvent) {
+        this.nodes.clearSelected();
+    }
+
+    _onUnclickRight(event: FederatedEvent) {
+        this.#openNodesMenu(event);
+    }
+
+    _onDragLeftStart(event: FederatedEvent) {
+        this.nodes.clearSelected();
+
+        const interactionData = event.interactionData as InteractionData;
+
+        interactionData.layerOrigin = this.subtractPointFromEvent(event, this.#layers);
+        interactionData.selection = this.#layers.addChild(new PIXI.Graphics());
+    }
+
+    _onDragLeftMove(event: FederatedEvent) {
+        const { layerOrigin, selection } = event.interactionData as InteractionData;
+        const target = this.subtractPointFromEvent(event, this.#layers);
+
+        const width = Math.abs(target.x - layerOrigin.x);
+        const height = Math.abs(target.y - layerOrigin.y);
+        selection.x = Math.min(layerOrigin.x, target.x);
+        selection.y = Math.min(layerOrigin.y, target.y);
+
+        selection.clear();
+        selection.lineStyle(2, BlueprintNode.SELECTED_COLOR, 0.9);
+        selection.drawRect(0, 0, width, height);
+    }
+
+    _onDragLeftDrop(event: FederatedEvent) {
+        const selection = event.interactionData.selection as PIXI.Graphics | undefined;
+        if (!selection) return;
+
+        this.nodes.selectIntersecting(selection);
+
+        this.#layers.removeChild(selection);
+        selection.destroy();
+    }
+
+    _onDragRightStart(event: FederatedEvent) {
+        const interactionData = event.interactionData as InteractionData;
+        interactionData.layerOrigin = this.subtractPointFromEvent(event, this.#layers);
+    }
+
+    _onDragRightMove(event: FederatedEvent) {
+        const { layerOrigin } = event.interactionData as InteractionData;
+        const { x, y } = this.subtractPointFromEvent(event, layerOrigin);
+
+        this.setPosition(x, y);
     }
 
     #draw() {
@@ -212,68 +275,11 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         this.#layers.clear();
     }
 
-    #canHandleMouseEvent() {
-        return !!this.trigger;
-    }
-
-    #onUnclickRight(event: FederatedEvent) {
-        this.#openNodesMenu(event.interactionData.origin);
-    }
-
-    #onDragLeftStart(event: FederatedEvent) {
-        this.nodes.clearSelected();
-
-        event.interactionData.layerOrigin = this.subtractPointFromEvent(event, this.#layers);
-        event.interactionData.selection = this.#layers.addChild(new PIXI.Graphics());
-    }
-
-    #onDragLeftMove(event: FederatedEvent) {
-        const origin = event.interactionData.layerOrigin as Point;
-        const selection = event.interactionData.selection as PIXI.Graphics;
-        const target = this.subtractPointFromEvent(event, this.#layers);
-
-        const width = Math.abs(target.x - origin.x);
-        const height = Math.abs(target.y - origin.y);
-        selection.x = Math.min(origin.x, target.x);
-        selection.y = Math.min(origin.y, target.y);
-
-        selection.clear();
-        selection.lineStyle(2, BlueprintNode.SELECTED_COLOR, 0.9);
-        selection.drawRect(0, 0, width, height);
-    }
-
-    #onDragLeftDrop(event: FederatedEvent) {
-        const selection = event.interactionData.selection as PIXI.Graphics | undefined;
-        if (!selection) return;
-
-        this.nodes.selectIntersecting(selection);
-
-        this.#layers.removeChild(selection);
-        selection.destroy();
-    }
-
-    #onDragRightStart(event: FederatedEvent) {
-        event.interactionData.layerOrigin = this.subtractPointFromEvent(event, this.#layers);
-    }
-
-    #onDragRightMove(event: FederatedEvent) {
-        const origin = event.interactionData.layerOrigin as Point;
-        const { x, y } = this.subtractPointFromEvent(event, origin);
-
-        this.setPosition(x, y);
-    }
-
-    async #openNodesMenu({ x, y }: Point, entry?: NodeEntry) {
+    async #openNodesMenu(event: FederatedEvent, entry?: NodeEntry) {
         const source = await BlueprintNodesMenu.wait(this.application, entry);
         if (!source) return;
 
-        const scale = this.scale;
-        const position = this.#layers.position;
-
-        source.position = {
-            x: x / scale - position.x,
-            y: y / scale - position.y,
-        };
+        source.position = this.subtractPointFromEvent(event, this.#layers);
 
         try {
             const NodeCls = this.application.nodes.get(source);
@@ -294,6 +300,8 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
     }
 
     #onWheel(event: PIXI.FederatedWheelEvent) {
+        if (this.#mouseManager.state > this.#mouseManager.states.HOVER) return;
+
         const mult = event.deltaY < 0 ? 1 : -1;
         this.scale = this.stage.scale.x + 0.1 * mult;
     }
@@ -301,6 +309,11 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
 
 type FederatedEvent = PIXI.FederatedPointerEvent & {
     interactionData: Record<string, any>;
+};
+
+type InteractionData = {
+    layerOrigin: Point;
+    selection: PIXI.Graphics;
 };
 
 export { Blueprint };
