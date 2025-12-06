@@ -3,6 +3,7 @@ import { MODULE, R } from "module-helpers";
 import fields = foundry.data.fields;
 
 class NodeEntry<TInputSchema extends fields.DataSchema | undefined = undefined> {
+    #data: NodeEntryData;
     #parent: TriggerNode;
 
     constructor(parent: TriggerNode, data: NodeEntryData) {
@@ -16,14 +17,8 @@ class NodeEntry<TInputSchema extends fields.DataSchema | undefined = undefined> 
             "schema argument must be a valid 'NodeData'."
         );
 
+        this.#data = data;
         this.#parent = parent;
-
-        Object.defineProperty(this, "_data", {
-            value: data,
-            configurable: false,
-            enumerable: false,
-            writable: false,
-        });
 
         // from data accessors
         Object.defineProperties(
@@ -88,9 +83,7 @@ class NodeEntry<TInputSchema extends fields.DataSchema | undefined = undefined> 
     //////////////////////////////
 }
 
-interface NodeEntry extends Pick<NodeEntryData, "id" | "invalid">, Pick<typeof NodeEntry, "type"> {
-    readonly _data: NodeEntryData;
-}
+interface NodeEntry extends Pick<NodeEntryData, "id" | "invalid">, Pick<typeof NodeEntry, "type"> {}
 
 type BaseNodeEntry<TType extends string> = {
     type: TType;

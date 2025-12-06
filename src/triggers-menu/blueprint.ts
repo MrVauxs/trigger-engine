@@ -3,6 +3,7 @@ import {
     Trigger,
     TriggerApplication,
     TriggerDataSource,
+    UpdateNodeData,
     UpdateTriggerData,
 } from "engine";
 import { dividePointBy, MODULE, MouseInteractionManager, R, subtractPoint } from "module-helpers";
@@ -178,16 +179,24 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         this.trigger = trigger;
     }
 
-    editTrigger(triggerId: string, data: UpdateTriggerData) {
-        const trigger = this.triggers.get(triggerId);
+    updateTrigger(id: string, updates: UpdateTriggerData) {
+        const trigger = this.triggers.get(id);
         if (!trigger) return;
 
-        trigger.update(data);
+        trigger.update(updates);
         this.parent.render();
     }
 
-    deleteTrigger(triggerId: string) {
-        this.triggers.delete(triggerId);
+    updateNode(id: string, updates: UpdateNodeData) {
+        const trigger = this.trigger;
+        if (!trigger) return;
+
+        trigger.updateNode(id, updates);
+        this.parent.render();
+    }
+
+    deleteTrigger(id: string) {
+        this.triggers.delete(id);
         this.parent.render();
     }
 
@@ -267,7 +276,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         if (!trigger) return;
 
         for (const node of trigger.nodes) {
-            this.nodes.add(node);
+            this.nodes.add(node, false);
         }
 
         // TODO add connections as well
@@ -296,7 +305,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
             const node = this.trigger?.addNode(NodeCls, source);
 
             if (node) {
-                this.nodes.add(node);
+                this.nodes.add(node, true);
                 // TODO add connection if entry provided
             }
         } catch (error) {

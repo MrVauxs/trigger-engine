@@ -12,6 +12,7 @@ import { NodeData, NodeDataSource } from ".";
 const NODE_ENTRY_CATEGORIES = ["inputs", "outputs"] as const;
 
 class TriggerNode {
+    #data: NodeData;
     #parent: Trigger;
 
     constructor(parent: Trigger, data: NodeData) {
@@ -25,14 +26,8 @@ class TriggerNode {
             "data argument must be a valid 'NodeData'."
         );
 
+        this.#data = data;
         this.#parent = parent;
-
-        Object.defineProperty(this, "_data", {
-            value: data,
-            configurable: false,
-            enumerable: false,
-            writable: false,
-        });
 
         // from data accessors
         Object.defineProperties(
@@ -301,9 +296,7 @@ class TriggerNode {
 
 interface TriggerNode
     extends Pick<NodeData, "id" | "invalid">,
-        Pick<typeof TriggerNode, "category" | "isEvent" | "type"> {
-    readonly _data: NodeData;
-}
+        Pick<typeof TriggerNode, "category" | "isEvent" | "type"> {}
 
 function triggerNodeLocalize(
     application: TriggerApplication,

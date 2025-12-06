@@ -31,7 +31,7 @@ class BlueprintNodesLayer extends PIXI.Container {
         }
     }
 
-    add(node: TriggerNode): BlueprintNode {
+    add(node: TriggerNode, select: boolean): BlueprintNode {
         const exist = this.#nodes.get(node.id);
         if (exist) return exist;
 
@@ -42,8 +42,10 @@ class BlueprintNodesLayer extends PIXI.Container {
 
         _node.draw();
 
-        this.clearSelected();
-        _node.selected = true;
+        if (select) {
+            this.clearSelected();
+            _node.selected = true;
+        }
 
         return _node;
     }

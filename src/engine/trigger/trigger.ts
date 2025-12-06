@@ -1,9 +1,11 @@
 import {
     CreateNodeDataSource,
+    NodeData,
     TriggerApplication,
     TriggerData,
     TriggerDataSource,
     TriggerNode,
+    UpdateNodeData,
 } from "engine";
 import { enrichHTML, MODULE, R } from "module-helpers";
 
@@ -114,6 +116,19 @@ class Trigger {
         } catch (error) {
             MODULE.error(`an error ocurred while trying to add a TriggerNode.`, error);
         }
+    }
+
+    getNode(id: string): TriggerNode | undefined {
+        return this.nodes.get(id);
+    }
+
+    getNodeData(id: string): NodeData | undefined {
+        return this.#data.nodes.get(id);
+    }
+
+    updateNode(id: string, updates: UpdateNodeData) {
+        const data = this.getNodeData(id);
+        data?.updateSource(updates);
     }
 
     toObject() {

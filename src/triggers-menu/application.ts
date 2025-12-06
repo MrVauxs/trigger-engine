@@ -383,7 +383,7 @@ class BlueprintApplication extends apps.ApplicationV2<
         if (!result) return;
 
         if (isEdit) {
-            this.blueprint.editTrigger(trigger.id, result);
+            this.blueprint.updateTrigger(trigger.id, result);
         } else {
             this.blueprint.addTrigger(result);
         }

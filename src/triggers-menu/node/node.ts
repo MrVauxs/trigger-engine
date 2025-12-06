@@ -1,12 +1,13 @@
-import { TriggerNode } from "engine";
+import { NodeData, TriggerNode } from "engine";
 import { drawRectangleMask, mapToObjByKey, MouseInteractionManager, R } from "module-helpers";
 import { BlueprintNodesLayer } from ".";
 import { Blueprint } from "..";
 
 class BlueprintNode extends PIXI.Container {
+    #border: PIXI.Graphics = new PIXI.Graphics();
     #calculatedheight: number = 0;
     #calculatedWith: number = 0;
-    #border: PIXI.Graphics = new PIXI.Graphics();
+    #data?: NodeData;
     #hitArea: PIXI.Rectangle = new PIXI.Rectangle();
     #mouseManager?: MouseInteractionManager;
     #node: TriggerNode;
@@ -18,9 +19,6 @@ class BlueprintNode extends PIXI.Container {
         super();
 
         this.#node = node;
-
-        // this.eventMode = "static";
-        // this.on("pointerdown", this.#onPointerDown, this);
     }
 
     get blueprint(): Blueprint {
@@ -33,6 +31,10 @@ class BlueprintNode extends PIXI.Container {
 
     get id(): string {
         return this.#node.id;
+    }
+
+    get data(): NodeData {
+        return (this.#data ??= this.blueprint.trigger?.getNodeData(this.id)!);
     }
 
     get fontSize(): number {
@@ -155,7 +157,7 @@ class BlueprintNode extends PIXI.Container {
         this.addChild(this.#drawBorder(false));
 
         // set position
-        const { x, y } = this.#node._data.position;
+        const { x, y } = this.data.position;
         this.position.set(x, y);
 
         // set hit area
@@ -268,7 +270,13 @@ class BlueprintNode extends PIXI.Container {
         const { selected } = event.interactionData as InteractionData;
         if (!selected) return;
 
-        // TODO save the new coords
+        for (const { node } of selected) {
+            const { x, y } = node.position;
+
+            node.data.updateSource({
+                position: { x, y },
+            });
+        }
     }
 
     _onDragRightStart(event: FederatedEvent) {
