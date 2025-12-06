@@ -1,4 +1,4 @@
-import { MODULE, R } from "module-helpers";
+import { mapToObjByKey, MODULE } from "module-helpers";
 import { NumberNodeEntry, TestTriggerNode } from ".";
 
 class BuiltInApplication {
@@ -18,15 +18,9 @@ class BuiltInApplication {
         return `${this.moduleId}.${this.applicationId}`;
     }
 
-    static entries = R.mapToObj(
-        [NumberNodeEntry] as const, //
-        (entry) => [entry.type, entry] as const
-    );
+    static entries = mapToObjByKey([NumberNodeEntry] as const, "type");
 
-    static nodes = R.mapToObj(
-        [TestTriggerNode] as const, //
-        (node) => [node.type, node] as const
-    );
+    static nodes = mapToObjByKey([TestTriggerNode] as const, "type");
 }
 
 export { BuiltInApplication };

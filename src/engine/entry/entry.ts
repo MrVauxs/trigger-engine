@@ -28,32 +28,26 @@ class NodeEntry<TInputSchema extends fields.DataSchema | undefined = undefined> 
         // from data accessors
         Object.defineProperties(
             this,
-            R.mapToObj(["id", "invalid"] as const, (property) => {
-                return [
-                    property,
-                    {
-                        value: data[property],
-                        configurable: false,
-                        enumerable: true,
-                        writable: false,
-                    },
-                ];
+            R.fromKeys(["id", "invalid"] as const, (property) => {
+                return {
+                    value: data[property],
+                    configurable: false,
+                    enumerable: true,
+                    writable: false,
+                };
             })
         );
 
         // from static accessors
         Object.defineProperties(
             this,
-            R.mapToObj(["type"] as const, (property) => {
-                return [
-                    property,
-                    {
-                        value: (this.constructor as typeof NodeEntry)[property],
-                        configurable: false,
-                        enumerable: true,
-                        writable: false,
-                    },
-                ];
+            R.fromKeys(["type"] as const, (property) => {
+                return {
+                    value: (this.constructor as typeof NodeEntry)[property],
+                    configurable: false,
+                    enumerable: true,
+                    writable: false,
+                };
             })
         );
     }

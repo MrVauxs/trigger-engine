@@ -61,7 +61,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         application: TriggerApplication,
         entry?: NodeEntry
     ): Promise<CreateNodeDataSource | null> {
-        return new Promise((resolve: BlueprintNodesMenuResolve, entry) => {
+        return new Promise((resolve: BlueprintNodesMenuResolve) => {
             new BlueprintNodesMenu(application, resolve, entry).render(true);
         });
     }
@@ -117,6 +117,8 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
     }
 
     protected _onClickAction(event: PointerEvent, target: HTMLElement) {
+        if (event.button !== 0) return;
+
         const action = target.dataset.action as EventAction;
 
         switch (action) {

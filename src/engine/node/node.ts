@@ -37,54 +37,46 @@ class TriggerNode {
         // from data accessors
         Object.defineProperties(
             this,
-            R.mapToObj(["id", "invalid"] as const, (property) => {
-                return [
-                    property,
-                    {
-                        value: data[property],
-                        configurable: false,
-                        enumerable: true,
-                        writable: false,
-                    },
-                ];
+            R.fromKeys(["id", "invalid"] as const, (property) => {
+                return {
+                    value: data[property],
+                    configurable: false,
+                    enumerable: true,
+                    writable: false,
+                };
             })
         );
 
         // from private methods
         Object.defineProperties(
             this,
-            R.mapToObj(
+            R.pipe(
                 [
                     ["localize", this.#localize],
                     ["rootLocalize", this.#rootLocalize],
                 ] as const,
-                ([property, method]) => {
-                    return [
-                        property,
-                        {
-                            value: method.bind(this),
-                            configurable: false,
-                            enumerable: false,
-                            writable: false,
-                        },
-                    ];
-                }
+                R.fromEntries(),
+                R.mapValues((method) => {
+                    return {
+                        value: method.bind(this),
+                        configurable: false,
+                        enumerable: false,
+                        writable: false,
+                    };
+                })
             )
         );
 
         // from static accessors
         Object.defineProperties(
             this,
-            R.mapToObj(["isEvent", "type", "category"] as const, (property) => {
-                return [
-                    property,
-                    {
-                        value: (this.constructor as typeof TriggerNode)[property],
-                        configurable: false,
-                        enumerable: true,
-                        writable: false,
-                    },
-                ];
+            R.fromKeys(["isEvent", "type", "category"] as const, (property) => {
+                return {
+                    value: (this.constructor as typeof TriggerNode)[property],
+                    configurable: false,
+                    enumerable: true,
+                    writable: false,
+                };
             })
         );
     }
