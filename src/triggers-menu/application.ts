@@ -322,8 +322,8 @@ class BlueprintApplication extends apps.ApplicationV2<
                 icon: `<i class="fa-solid fa-trash"></i>`,
                 name: localizePath("blueprint.trigger.delete"),
                 callback: (el) => {
-                    const trigger = getTriggerFromElement(el);
-                    return trigger?.delete();
+                    const triggerId = el.dataset.id;
+                    return triggerId && this.blueprint.deleteTrigger(triggerId);
                 },
             },
         ];

@@ -90,8 +90,6 @@ class Trigger {
         return this.#data.updateSource(data);
     }
 
-    delete() {}
-
     duplicate(): TriggerDataSource {
         const source = this.#data.clone({
             _id: foundry.utils.randomID(),

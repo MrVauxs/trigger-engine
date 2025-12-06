@@ -186,6 +186,11 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         this.parent.render();
     }
 
+    deleteTrigger(triggerId: string) {
+        this.triggers.delete(triggerId);
+        this.parent.render();
+    }
+
     getTrigger(triggerId: string): Trigger | null {
         return this.triggers.get(triggerId) ?? null;
     }
