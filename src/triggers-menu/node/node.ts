@@ -1,5 +1,5 @@
 import { TriggerNode } from "engine";
-import { drawRectangleMask, R } from "module-helpers";
+import { drawRectangleMask, mapToObjByKey, MouseInteractionManager, R } from "module-helpers";
 import { BlueprintNodesLayer } from ".";
 import { Blueprint } from "..";
 
@@ -8,6 +8,7 @@ class BlueprintNode extends PIXI.Container {
     #calculatedWith: number = 0;
     #border: PIXI.Graphics = new PIXI.Graphics();
     #hitArea: PIXI.Rectangle = new PIXI.Rectangle();
+    #mouseManager?: MouseInteractionManager;
     #node: TriggerNode;
     #selected: boolean = false;
 
@@ -160,6 +161,126 @@ class BlueprintNode extends PIXI.Container {
         // set hit area
         this.#hitArea.width = width;
         this.#hitArea.height = height;
+
+        // mouse manager
+
+        this.#setupMouseManager();
+    }
+
+    #setupMouseManager() {
+        if (this.blueprint.locked) return;
+
+        const permissions: ConstructorParameters<typeof MouseInteractionManager>[2] = {};
+
+        const handlers: ConstructorParameters<typeof MouseInteractionManager>[3] = {
+            clickLeft: this._onClickLeft.bind(this),
+            clickRight: this._onClickRight.bind(this),
+            unclickLeft: this._onUnclickLeft.bind(this),
+            unclickRight: this._onUnclickRight.bind(this),
+            dragLeftStart: this._onDragLeftStart.bind(this),
+            dragLeftMove: this._onDragLeftMove.bind(this),
+            dragLeftDrop: this._onDragLeftDrop.bind(this),
+            dragRightStart: this._onDragRightStart.bind(this),
+            dragRightMove: this._onDragRightMove.bind(this),
+            dragRightDrop: this._onDragRightDrop.bind(this),
+        };
+
+        this.#mouseManager = new foundry.canvas.interaction.MouseInteractionManager(
+            this,
+            this.stage,
+            permissions,
+            handlers,
+            { application: this.blueprint }
+        );
+
+        this.#mouseManager.activate();
+    }
+
+    selectOnly() {
+        this.bringToTop();
+        this.parent.clearSelected();
+        this.selected = true;
+    }
+
+    cancelMouse() {
+        this.#mouseManager?.cancel();
+    }
+
+    _onClickLeft(event: FederatedEvent) {
+        this.blueprint.cancelMouse();
+
+        if (event.shiftKey) {
+            this.selected = !this.selected;
+        } else if (!this.selected) {
+            this.selectOnly();
+        }
+    }
+
+    _onClickRight(event: FederatedEvent) {
+        this.blueprint.cancelMouse();
+    }
+
+    _onUnclickLeft(event: FederatedEvent) {
+        this.blueprint.cancelMouse();
+
+        if (!event.shiftKey) {
+            this.selectOnly();
+        }
+    }
+
+    _onUnclickRight(event: FederatedEvent) {
+        this.blueprint.cancelMouse();
+
+        this.bringToTop();
+        this.#onContextMenu(event);
+    }
+
+    _onDragLeftStart(event: FederatedEvent) {
+        this.blueprint.cancelMouse();
+        if (event.shiftKey) return;
+
+        const selected = this.parent.selected;
+
+        const interactionData = event.interactionData as InteractionData;
+
+        interactionData.selected = R.map(selected.length ? selected : [this], (node) => {
+            return { node, origin: this.blueprint.subtractPointFromEvent(event, node) };
+        });
+
+        mapToObjByKey(selected.length ? selected : [this], "id");
+    }
+
+    _onDragLeftMove(event: FederatedEvent) {
+        this.blueprint.cancelMouse();
+
+        const { selected } = event.interactionData as InteractionData;
+        if (!selected?.length) return;
+
+        for (const { node, origin } of selected) {
+            const { x, y } = this.blueprint.subtractPointFromEvent(event, origin);
+            node.position.set(x, y);
+        }
+    }
+
+    _onDragLeftDrop(event: FederatedEvent) {
+        this.blueprint.cancelMouse();
+
+        const { selected } = event.interactionData as InteractionData;
+        if (!selected) return;
+
+        // TODO save the new coords
+    }
+
+    _onDragRightStart(event: FederatedEvent) {
+        this.blueprint._onDragRightStart(event);
+    }
+
+    _onDragRightMove(event: FederatedEvent) {
+        this.blueprint._onDragRightMove(event);
+    }
+
+    _onDragRightDrop(event: FederatedEvent) {
+        this.blueprint.cancelMouse();
     }
 
     fontAwesomeIcon(icon: unknown, fontSize?: number): PreciseText | undefined {
@@ -272,55 +393,6 @@ class BlueprintNode extends PIXI.Container {
         return header;
     }
 
-    #onPointerDown(event: PIXI.FederatedPointerEvent) {
-        if (event.button === 2) {
-            event.stopPropagation();
-            this.#onContextMenu(event);
-        }
-
-        // event.stopPropagation();
-
-        // if (event.button === 0) {
-        //     this.#drag = {
-        //         origin: this.blueprint.subtractPointFromEvent(event, this.parent.parent),
-        //         shiftHeld: event.shiftKey,
-        //     };
-        //     // this.bringToTop();
-
-        //     // if (event.shiftKey) {
-        //     //     this.selected = !this.selected;
-        //     // } else {
-        //     //     this.parent.clearSelected();
-        //     //     this.selected = true;
-        //     // }
-
-        //     // if (this.canDrag) {
-        //     //     this.parent.onMoveSelectedStart(event);
-        //     // }
-
-        //     // this.stage.on("pointermove", this.#onPointerMove, this);
-        //     // this.stage.on("pointerup", this.#onPointerUp, this);
-        //     // this.stage.on("pointerupoutside", this.#onPointerUp, this);
-        // } else if (event.button === 2 && !this.isLocked) {
-        //     this.#onContextMenu(event);
-        // }
-    }
-
-    #onPointerMove(event: PIXI.FederatedPointerEvent) {
-        //         if (!dragging) {
-        //     const target = this.subtractPointFromEvent(event, this.#layers.position);
-        //     const distance = distanceToPoint(target, origin);
-        //     if (distance < 10) return;
-        //     this.#drag.dragging = true;
-        //     this.#layers.interactiveChildren = false;
-        //     if (!selection) {
-        //         this.stage.cursor = "grabbing";
-        //     }
-        // }
-    }
-
-    #onPointerUp(event: PIXI.FederatedPointerEvent) {}
-
     async #onContextMenu(event: PIXI.FederatedPointerEvent) {}
 }
 
@@ -360,6 +432,14 @@ type ILineStyleOptions = Parameters<PIXI.Graphics["lineTextureStyle"]>[0];
 type NodePart = PIXI.Graphics & {
     calculatedHeight: number;
     calculatedWith: number;
+};
+
+type FederatedEvent = PIXI.FederatedPointerEvent & {
+    interactionData: Record<string, any>;
+};
+
+type InteractionData = {
+    selected?: { node: BlueprintNode; origin: Point }[];
 };
 
 export { BlueprintNode };

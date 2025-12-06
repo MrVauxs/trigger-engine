@@ -13,6 +13,10 @@ class BlueprintNodesLayer extends PIXI.Container {
         return this.blueprint.stage;
     }
 
+    get selected(): BlueprintNode[] {
+        return this.#nodes.filter((node) => node.selected);
+    }
+
     clearSelected() {
         for (const node of this.#nodes) {
             node.selected = false;
