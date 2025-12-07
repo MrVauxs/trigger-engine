@@ -76,7 +76,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
     }
 
     async _prepareContext(options: ApplicationRenderOptions): Promise<NodesMenuContext> {
-        const allNodes = this.application.nodes.allEntries;
+        const allNodes = this.application.nodes.contents;
         const [events, nodes] = R.partition(allNodes, (node) => node.isEvent);
         // TODO variables & gates
 

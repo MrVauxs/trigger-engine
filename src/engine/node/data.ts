@@ -31,7 +31,7 @@ interface NodeData extends ModelPropsFromSchema<NodeDataSchema> {
     updateSource(data: DeepPartial<NodeDataSource>): DeepPartial<NodeDataSource>;
 }
 
-type CreateNodeData = DeepPartial<WithRequired<NodeDataSource, "type">>;
+type CreateNodeData = Prettify<WithRequired<DeepPartial<NodeDataSource>, "type">>;
 
 type UpdateNodeData = DeepPartial<Omit<NodeDataSource, "_id" | "builtin" | "type">>;
 

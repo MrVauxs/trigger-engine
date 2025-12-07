@@ -24,7 +24,7 @@ class Trigger {
                 data.nodes.contents,
                 R.map((data) => {
                     try {
-                        const NodeCls = this.parent.nodes.get(data);
+                        const NodeCls = this.application.nodes.get(data.type);
                         if (!NodeCls) return;
 
                         const node = new NodeCls(this, data);
@@ -36,7 +36,7 @@ class Trigger {
         );
     }
 
-    get parent(): TriggerApplication {
+    get application(): TriggerApplication {
         return this.#parent;
     }
 

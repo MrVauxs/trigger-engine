@@ -1,8 +1,7 @@
 import {
     BuiltInApplication,
-    EntriesCollections,
+    createCollection,
     NodeEntry,
-    NodesCollections,
     Trigger,
     TriggerData,
     TriggerDataSource,
@@ -18,11 +17,11 @@ const APPLICATION_MODES = ["setting", "free"] as const;
 class TriggerApplication {
     #applicationId: string;
     #applicationKey: string;
-    #entries: EntriesCollections;
+    #entries: Collection<typeof NodeEntry>;
     #hooks: Collection<typeof TriggerHook>;
     #mode: TriggerApplicationMode;
     #moduleId: string;
-    #nodes: NodesCollections;
+    #nodes: Collection<typeof TriggerNode>;
     #triggers: Collection<Trigger>;
 
     constructor(moduleId: string, applicationId: string, options: TriggerApplicationOptions = {}) {
@@ -31,9 +30,9 @@ class TriggerApplication {
         this.#applicationId = applicationId;
         this.#applicationKey = `${moduleId}:${applicationId}`;
 
-        this.#entries = new EntriesCollections(options);
+        this.#entries = createCollection(options, "entries");
         this.#hooks = new Collection();
-        this.#nodes = new NodesCollections(options);
+        this.#nodes = createCollection(options, "nodes");
         this.#triggers = new Collection();
 
         if (this.isSettingApplication) {
@@ -81,7 +80,11 @@ class TriggerApplication {
         return `${this.moduleId}.${this.applicationId}`;
     }
 
-    get nodes(): NodesCollections {
+    get entries(): Collection<typeof NodeEntry> {
+        return this.#entries;
+    }
+
+    get nodes(): Collection<typeof TriggerNode> {
         return this.#nodes;
     }
 

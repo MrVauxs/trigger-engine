@@ -298,7 +298,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         source.position = this.subtractPointFromEvent(event, this.#layers);
 
         try {
-            const NodeCls = this.application.nodes.get(source);
+            const NodeCls = this.application.nodes.get(source.type);
 
             if (!NodeCls) {
                 throw new Error("Couldn't find the TriggerNode class.");
