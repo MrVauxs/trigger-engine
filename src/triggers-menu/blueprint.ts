@@ -64,14 +64,16 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
             dragRightMove: this._onDragRightMove.bind(this),
         };
 
+        const permissions: ConstructorParameters<typeof MouseInteractionManager>[2] = {
+            ...R.mapValues(handlers, () => this._canHandleMouseEvent.bind(this)),
+            clickLeft: this._canHandleMouseEvent.bind(this),
+            clickRight: this._canHandleMouseEvent.bind(this),
+        };
+
         this.#mouseManager = new foundry.canvas.interaction.MouseInteractionManager(
             this.stage,
             this.stage,
-            {
-                ...R.mapValues(handlers, () => this._canHandleMouseEvent.bind(this)),
-                clickLeft: this._canHandleMouseEvent.bind(this),
-                clickRight: this._canHandleMouseEvent.bind(this),
-            },
+            permissions,
             handlers,
             { application: this }
         );
@@ -309,7 +311,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
                 // TODO add connection if entry provided
             }
         } catch (error) {
-            MODULE.error(`an error ocurred while trying to create a TriggerNode.`, error);
+            MODULE.error(`an error ocurred while trying to create a BlueprintNode.`, error);
         }
     }
 

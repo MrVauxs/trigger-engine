@@ -1,4 +1,4 @@
-import { NodeData, TriggerNode } from "engine";
+import { IconObject, NodeData, NodeHeader, TriggerNode } from "engine";
 import { drawRectangleMask, mapToObjByKey, MouseInteractionManager, R } from "module-helpers";
 import { BlueprintNodesLayer } from ".";
 import { Blueprint } from "..";
@@ -9,6 +9,7 @@ class BlueprintNode extends PIXI.Container {
     #calculatedWith: number = 0;
     #data?: NodeData;
     #hitArea: PIXI.Rectangle = new PIXI.Rectangle();
+    #initialized: boolean = false;
     #mouseManager?: MouseInteractionManager;
     #node: TriggerNode;
     #selected: boolean = false;
@@ -105,6 +106,37 @@ class BlueprintNode extends PIXI.Container {
         this.#drawBorder(value);
     }
 
+    initialize() {
+        if (this.#initialized || this.blueprint.locked) return;
+
+        this.#initialized = true;
+
+        const handlers: ConstructorParameters<typeof MouseInteractionManager>[3] = {
+            clickLeft: this._onClickLeft.bind(this),
+            clickRight: this._onClickRight.bind(this),
+            unclickLeft: this._onUnclickLeft.bind(this),
+            unclickRight: this._onUnclickRight.bind(this),
+            dragLeftStart: this._onDragLeftStart.bind(this),
+            dragLeftMove: this._onDragLeftMove.bind(this),
+            dragLeftDrop: this._onDragLeftDrop.bind(this),
+            dragRightStart: this._onDragRightStart.bind(this),
+            dragRightMove: this._onDragRightMove.bind(this),
+            dragRightDrop: this._onDragRightDrop.bind(this),
+        };
+
+        const permissions: ConstructorParameters<typeof MouseInteractionManager>[2] = {};
+
+        this.#mouseManager = new foundry.canvas.interaction.MouseInteractionManager(
+            this,
+            this.stage,
+            permissions,
+            handlers,
+            { application: this.blueprint }
+        );
+
+        this.#mouseManager.activate();
+    }
+
     bringToTop() {
         const highest = R.firstBy(this.parent.children, [R.prop("zIndex"), "desc"])?.zIndex ?? 0;
         this.zIndex = highest + 1;
@@ -135,9 +167,7 @@ class BlueprintNode extends PIXI.Container {
 
         // header
         if (header) {
-            const color = new PIXI.Color(this.#node.header?.background ?? this.backgroundColor);
-
-            background.beginFill(color, this.opacity);
+            background.beginFill(header.background, this.opacity);
             background.drawRect(0, 0, width, header.calculatedHeight);
             background.endFill();
 
@@ -163,39 +193,6 @@ class BlueprintNode extends PIXI.Container {
         // set hit area
         this.#hitArea.width = width;
         this.#hitArea.height = height;
-
-        // mouse manager
-
-        this.#setupMouseManager();
-    }
-
-    #setupMouseManager() {
-        if (this.blueprint.locked) return;
-
-        const permissions: ConstructorParameters<typeof MouseInteractionManager>[2] = {};
-
-        const handlers: ConstructorParameters<typeof MouseInteractionManager>[3] = {
-            clickLeft: this._onClickLeft.bind(this),
-            clickRight: this._onClickRight.bind(this),
-            unclickLeft: this._onUnclickLeft.bind(this),
-            unclickRight: this._onUnclickRight.bind(this),
-            dragLeftStart: this._onDragLeftStart.bind(this),
-            dragLeftMove: this._onDragLeftMove.bind(this),
-            dragLeftDrop: this._onDragLeftDrop.bind(this),
-            dragRightStart: this._onDragRightStart.bind(this),
-            dragRightMove: this._onDragRightMove.bind(this),
-            dragRightDrop: this._onDragRightDrop.bind(this),
-        };
-
-        this.#mouseManager = new foundry.canvas.interaction.MouseInteractionManager(
-            this,
-            this.stage,
-            permissions,
-            handlers,
-            { application: this.blueprint }
-        );
-
-        this.#mouseManager.activate();
     }
 
     selectOnly() {
@@ -291,10 +288,12 @@ class BlueprintNode extends PIXI.Container {
         this.blueprint.cancelMouse();
     }
 
-    fontAwesomeIcon(icon: unknown, fontSize?: number): PreciseText | undefined {
-        icon = R.isString(icon) ? { unicode: icon } : icon;
-        if (!R.isPlainObject(icon) || !R.isString(icon?.unicode)) return;
+    fontAwesomeIcon(icon: IconObject): PreciseText;
+    fontAwesomeIcon(icon: Maybe<IconObject>): PreciseText | undefined;
+    fontAwesomeIcon(icon: Maybe<IconObject>) {
+        if (!icon) return;
 
+        const fontSize = R.isNumber(icon.fontSize) ? icon.fontSize : undefined;
         const fontWeight = (R.isString(icon.fontWeight) && icon.fontWeight) || "400";
 
         return this.preciseText(icon.unicode, {
@@ -304,7 +303,9 @@ class BlueprintNode extends PIXI.Container {
         });
     }
 
-    preciseText(text: unknown, options: Partial<PIXI.ITextStyle> = {}): PreciseText | undefined {
+    preciseText(text: string, options?: Partial<PIXI.ITextStyle>): PreciseText;
+    preciseText(text: Maybe<string>, options?: Partial<PIXI.ITextStyle>): PreciseText | undefined;
+    preciseText(text: Maybe<string>, options: Partial<PIXI.ITextStyle> = {}) {
         if (!R.isString(text)) return;
 
         if (!R.isNumber(options.fontSize)) {
@@ -358,15 +359,15 @@ class BlueprintNode extends PIXI.Container {
         return body;
     }
 
-    #drawHeader(): NodePart | undefined {
-        const data = this.#node.header;
-        const title = this.preciseText(data?.title);
-        if (!data || !title) return;
+    #drawHeader(): NodeheaderPart | undefined {
+        const data = this.#node.header && new NodeHeader(this.#node.header);
+        if (!data || data.invalid) return;
 
         const spacing = 5;
         const padding = this.outerPadding;
-        const header = new PIXI.Graphics() as NodePart;
+        const header = new PIXI.Graphics() as NodeheaderPart;
         const icon = this.fontAwesomeIcon(data.icon);
+        const title = this.preciseText(data.title);
         const subtitle = this.preciseText(data.subtitle, {
             fontSize: this.fontSize * 0.93,
             fontStyle: "italic",
@@ -395,6 +396,7 @@ class BlueprintNode extends PIXI.Container {
 
         title.getBounds();
 
+        header.background = new PIXI.Color(data.background ?? this.backgroundColor);
         header.calculatedHeight = maxBottom(title, subtitle) + padding.y;
         header.calculatedWith = maxRight(title, subtitle) + padding.x;
 
@@ -408,8 +410,8 @@ interface BlueprintNode {
     readonly parent: BlueprintNodesLayer;
 }
 
-function alignHorizontally(offset: number, ...elements: (PIXI.Container | undefined)[]) {
-    const maxHeight = Math.max(...elements.map((el) => el?.height ?? 0));
+function alignHorizontally(offset: number, ...elements: MaybeFalsy<PIXI.Container>[]) {
+    const maxHeight = Math.max(...elements.map((el) => (el ? el.height : 0)));
 
     for (const el of elements) {
         if (!el) continue;
@@ -440,6 +442,10 @@ type ILineStyleOptions = Parameters<PIXI.Graphics["lineTextureStyle"]>[0];
 type NodePart = PIXI.Graphics & {
     calculatedHeight: number;
     calculatedWith: number;
+};
+
+type NodeheaderPart = NodePart & {
+    background: PIXI.ColorSource;
 };
 
 type FederatedEvent = PIXI.FederatedPointerEvent & {

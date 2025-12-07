@@ -7,9 +7,9 @@ import {
     TriggerApplication,
 } from "engine";
 import { joinStr, LocalizeArgs, LocalizeData, MODULE, R } from "module-helpers";
-import { NodeData } from ".";
+import { NodeData, NodeHeaderData } from ".";
 
-const NODE_ENTRY_CATEGORIES = ["inputs", "outputs"] as const;
+// const NODE_ENTRY_CATEGORIES = ["inputs", "outputs"] as const;
 
 class TriggerNode {
     #data: NodeData;
@@ -125,6 +125,14 @@ class TriggerNode {
         return false;
     }
 
+    static get defineInputs(): BaseNodeInput<string>[] | null {
+        return null;
+    }
+
+    static get defineOutputs(): BaseNodeOutput<string>[] | null {
+        return null;
+    }
+
     //////////////////////////////
     // ACCESSORS
     //////////////////////////////
@@ -146,7 +154,7 @@ class TriggerNode {
     /**
      * Data to represent the node's header in the triggers menu
      */
-    get header(): NodeHeaderSource | null {
+    get header(): NodeHeaderData | null {
         const application = this.#parent.parent;
         const node = this.constructor as typeof TriggerNode;
 
@@ -156,18 +164,6 @@ class TriggerNode {
             subtitle:
                 this.localize("subtitle") ?? localizeNodeProperty(application, node, "category"),
         };
-    }
-
-    get inputsSchemas(): BaseNodeInput<string>[] | null {
-        return null;
-    }
-
-    get outputsSchemas(): BaseNodeOutput<string>[] | null {
-        return null;
-    }
-
-    get customData(): NodeCustomData[] | null {
-        return null;
     }
 
     /**
@@ -349,37 +345,37 @@ type TriggerNodeStringProperty = keyof {
         : never]: (typeof TriggerNode)[P];
 };
 
-type NodeEntryCategory = (typeof NODE_ENTRY_CATEGORIES)[number];
+// type NodeEntryCategory = (typeof NODE_ENTRY_CATEGORIES)[number];
 
-type NodeCustomEntryCategory = NodeEntryCategory | "outs";
+// type NodeCustomEntryCategory = NodeEntryCategory | "outs";
 
-type NodeHeaderSource = {
-    background?: `#${string}` | number;
-    icon?: NodeIconObject | string;
-    title?: string;
-    subtitle?: string;
-};
+// type NodeHeaderData = {
+//     background?: `#${string}` | number;
+//     icon?: NodeIconObject | string;
+//     title?: string;
+//     subtitle?: string;
+// };
 
-type NodeCustomData = {
-    category: NodeCustomEntryCategory;
-    group: string;
-    key: NodeCustomDataKey;
-    types: string[];
-};
+// type NodeCustomData = {
+//     category: NodeCustomEntryCategory;
+//     group: string;
+//     key: NodeCustomDataKey;
+//     types: string[];
+// };
 
-type NodeIconObject = {
-    unicode?: string;
-    fontSize?: number;
-    fontWeight?: TextStyleFontWeight;
-};
+// type NodeIconObject = {
+//     unicode?: string;
+//     fontSize?: number;
+//     fontWeight?: TextStyleFontWeight;
+// };
 
-type NodeCustomDataKey = {
-    label: boolean;
-    name: string;
-    prefix: string | undefined;
-    required: boolean;
-    type: "number" | "text";
-};
+// type NodeCustomDataKey = {
+//     label: boolean;
+//     name: string;
+//     prefix: string | undefined;
+//     required: boolean;
+//     type: "number" | "text";
+// };
 
 type NodeOut = {
     key: string;
@@ -387,4 +383,4 @@ type NodeOut = {
 };
 
 export { localizeNodeProperty, localizeNodeTag, TriggerNode, triggerNodeLocalize };
-export type { NodeHeaderSource, NodeIconObject, TriggerNodeStringProperty };
+export type { TriggerNodeStringProperty };

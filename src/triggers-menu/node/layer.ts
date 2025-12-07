@@ -40,6 +40,7 @@ class BlueprintNodesLayer extends PIXI.Container {
         this.#nodes.set(node.id, _node);
         this.addChild(_node);
 
+        _node.initialize();
         _node.draw();
 
         if (select) {
