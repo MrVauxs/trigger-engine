@@ -1,12 +1,17 @@
-import { NodeEntryData, TriggerNode } from "engine";
+import { BaseEntrySchema, NodeEntryData, NodeEntrySchema, TriggerNode } from "engine";
 import { MODULE, R } from "module-helpers";
+import abstract = foundry.abstract;
 import fields = foundry.data.fields;
 
-class NodeEntry<TInputSchema extends fields.DataSchema | undefined = undefined> {
-    #data: NodeEntryData;
+class NodeEntry<
+    TValue extends unknown = unknown,
+    TFieldSchema extends fields.DataSchema | undefined = undefined
+> {
+    #data: NodeEntryData | undefined;
     #parent: TriggerNode;
+    // #schema: NodeEntrySchema;
 
-    constructor(parent: TriggerNode, data: NodeEntryData) {
+    constructor(parent: TriggerNode, schema: BaseEntrySchema, data: NodeEntryData | undefined) {
         MODULE.assert(
             parent instanceof TriggerNode && !parent.invalid,
             "parent argument must be a valid 'TriggerNode'."
@@ -19,13 +24,36 @@ class NodeEntry<TInputSchema extends fields.DataSchema | undefined = undefined> 
 
         this.#data = data;
         this.#parent = parent;
+        // this.#schema = schema;
 
-        // from data accessors
+        const entryFieldSchema = (this.constructor as typeof NodeEntry).fieldSchema;
+
+        class EntryField extends abstract.DataModel {
+            static defineSchema() {
+                return entryFieldSchema ?? {};
+            }
+        }
+
+        const fieldData = "fields" in schema && R.isPlainObject(schema.fields) && schema.fields;
+        const entrySchema = new NodeEntrySchema(schema);
+        // TODO we need to actually pass the data here
+        const entryField = entryFieldSchema && fieldData ? new EntryField(fieldData as any) : null;
+
+        // Object.defineProperty(this, "field", {
+        //     value: field,
+        //     configurable: false,
+        //     enumerable: false,
+        //     writable: false,
+        // });
+
+        // Object.freeze(this.field);
+
+        // from schema accessors
         Object.defineProperties(
             this,
-            R.fromKeys(["id", "invalid"] as const, (property) => {
+            R.fromKeys(["key", "label", "group"] as const, (property) => {
                 return {
-                    value: data[property],
+                    value: entrySchema[property],
                     configurable: false,
                     enumerable: true,
                     writable: false,
@@ -36,7 +64,7 @@ class NodeEntry<TInputSchema extends fields.DataSchema | undefined = undefined> 
         // from static accessors
         Object.defineProperties(
             this,
-            R.fromKeys(["type"] as const, (property) => {
+            R.fromKeys(["type", "color"] as const, (property) => {
                 return {
                     value: (this.constructor as typeof NodeEntry)[property],
                     configurable: false,
@@ -56,10 +84,18 @@ class NodeEntry<TInputSchema extends fields.DataSchema | undefined = undefined> 
      * Must be an unique key among your registered module's entries (including the builtins)
      *
      * Localization path:
-     * `<module-id>.<application-id>.entry.<type>.title`
+     * `<module-id>.<application-id>.node.<category>.<node-type>.entry.<type>`
      */
     static get type(): string {
         throw MODULE.Error("the 'type' static getter must be implemented.");
+    }
+
+    /**
+     * @abstract
+     * The default value for this input.
+     */
+    static get default(): unknown {
+        throw MODULE.Error("the 'default' static getter must be implemented.");
     }
 
     //////////////////////////////
@@ -74,34 +110,32 @@ class NodeEntry<TInputSchema extends fields.DataSchema | undefined = undefined> 
         return null;
     }
 
+    /**
+     * The color of the node connection.
+     */
+    static get color(): ColorSource {
+        return 0x000000;
+    }
+
     //////////////////////////////
     // ACCESSORS
     //////////////////////////////
+
+    declare readonly field: EntryField<TFieldSchema>;
 
     //////////////////////////////
     // PRIVATE METHODS
     //////////////////////////////
 }
 
-interface NodeEntry extends Pick<NodeEntryData, "id" | "invalid">, Pick<typeof NodeEntry, "type"> {}
+interface NodeEntry
+    extends Pick<BaseEntrySchema, "key" | "label" | "group">,
+        Pick<typeof NodeEntry, "type" | "color"> {}
 
-type BaseNodeEntry<TType extends string> = {
-    type: TType;
-    group?: string;
-};
-
-type BaseNodeInput<
-    TType extends string,
-    TField extends fields.DataSchema | undefined = undefined
-> = Prettify<
-    BaseNodeEntry<TType> & {
-        field?: Prettify<
-            TField extends fields.DataSchema ? DeepPartial<SourceFromSchema<TField>> : TField
-        >;
-    }
->;
-
-type BaseNodeOutput<TType extends string> = BaseNodeEntry<TType>;
+type EntryField<TFieldSchema extends fields.DataSchema | undefined = undefined> =
+    TFieldSchema extends fields.DataSchema
+        ? DeepPartial<ModelPropsFromSchema<TFieldSchema>>
+        : undefined | null;
 
 export { NodeEntry };
-export type { BaseNodeEntry, BaseNodeInput, BaseNodeOutput };
+export type { EntryField };

@@ -1,4 +1,4 @@
-import { NodeHeaderSource } from "engine/node";
+import { InputEntrySchema, NodeHeaderData, NumberFieldSchema, OutputEntrySchema } from "engine";
 import { BuiltInTriggerNode } from "..";
 
 class TestTriggerNode extends BuiltInTriggerNode {
@@ -14,9 +14,32 @@ class TestTriggerNode extends BuiltInTriggerNode {
         return ["debug"];
     }
 
-    get header(): NodeHeaderSource {
+    // TODO REMOVE THAT
+    static get defineInputs(): InputEntrySchema[] {
+        return [
+            {
+                key: "entry",
+                type: "number",
+                fields: {
+                    default: 2,
+                },
+            } satisfies InputEntrySchema<NumberFieldSchema>,
+        ];
+    }
+    // TODO REMOVE THAT
+    static get defineOutputs(): OutputEntrySchema[] {
+        return [
+            {
+                key: "result",
+                label: "Result",
+                type: "number",
+            },
+        ];
+    }
+
+    get header(): NodeHeaderData {
         return {
-            ...super.header,
+            ...(super.header as NodeHeaderData),
             icon: "\ue4f3",
         };
     }

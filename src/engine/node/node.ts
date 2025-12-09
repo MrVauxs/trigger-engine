@@ -1,8 +1,13 @@
 import {
-    BaseNodeInput,
-    BaseNodeOutput,
+    BridgeSchema,
     BuiltInApplication,
+    InputEntrySchema,
     isBuiltInNode,
+    NodeBridge,
+    NodeBridgeData,
+    NodeEntry,
+    NodeEntryData,
+    OutputEntrySchema,
     Trigger,
     TriggerApplication,
 } from "engine";
@@ -13,6 +18,10 @@ import { NodeData, NodeHeaderData } from ".";
 
 class TriggerNode {
     #data: NodeData;
+    #in: NodeBridge | null;
+    #inputs: Collection<NodeEntry>;
+    #outputs: Collection<NodeEntry>;
+    #outs: Collection<NodeBridge>;
     #parent: Trigger;
 
     constructor(parent: Trigger, data: NodeData) {
@@ -74,6 +83,81 @@ class TriggerNode {
                 };
             })
         );
+
+        // entries
+
+        const thisConstructor = this.constructor as typeof TriggerNode;
+
+        const [inputs, outputs] = R.map(
+            [thisConstructor.defineInputs, thisConstructor.defineOutputs] as const,
+            (schemas) => {
+                const entries = R.pipe(
+                    schemas ?? [],
+                    R.map((schema) => {
+                        try {
+                            const EntryCls = parent.application.entries.get(schema.type);
+                            if (!EntryCls) return;
+
+                            // TODO we need to actually pass the data here
+                            const entryData = new NodeEntryData({
+                                type: schema.type,
+                                key: schema.key,
+                            });
+                            const entry = new EntryCls(this, schema, entryData);
+
+                            return [entry.key, entry] as const;
+                        } catch (error) {}
+                    }),
+                    R.filter(R.isTruthy)
+                );
+
+                return new Collection(entries);
+            }
+        );
+
+        const rawOuts = thisConstructor.outs || (this.isEvent ? "out" : []);
+        const [ins, outs] = R.map(
+            [
+                !this.isEvent && thisConstructor.hasIn ? [{ key: "in" }] : [],
+                R.isString(rawOuts) ? [{ key: rawOuts }] : rawOuts,
+            ] as const,
+            (schemas) => {
+                return R.pipe(
+                    schemas,
+                    R.map((schema) => {
+                        try {
+                            // TODO we need to actually pass the data here
+                            const bridgeData = new NodeBridgeData({
+                                key: schema.key,
+                            });
+                            const bridge = new NodeBridge(this, schema, bridgeData);
+
+                            return [bridge.key, bridge] as const;
+                        } catch (error) {}
+                    }),
+                    R.filter(R.isTruthy)
+                );
+            }
+        );
+
+        this.#in = ins.at(0)?.[1] || null;
+        this.#outs = new Collection(outs);
+        this.#inputs = inputs;
+        this.#outputs = outputs;
+
+        Object.defineProperty(this, "_entries", {
+            value: {
+                in: this.#in,
+                outs: this.#outs,
+                inputs,
+                outputs,
+            } satisfies NodeEntries,
+            configurable: false,
+            enumerable: false,
+            writable: false,
+        });
+
+        Object.freeze(this._entries);
     }
 
     //////////////////////////////
@@ -125,12 +209,60 @@ class TriggerNode {
         return false;
     }
 
-    static get defineInputs(): BaseNodeInput<string>[] | null {
+    /**
+     * @see {@link NodeEntry.fieldSchema}
+     * Define the inputs for this node if any.
+     */
+    static get defineInputs(): InputEntrySchema[] | null {
         return null;
     }
 
-    static get defineOutputs(): BaseNodeOutput<string>[] | null {
+    /**
+     * Define the outputs for this node if any.
+     */
+    static get defineOutputs(): OutputEntrySchema[] | null {
         return null;
+    }
+
+    /**
+     * Does this node have an `in` bridge connection.
+     *
+     * Localization path:
+     * `<module-id>.<application-id>.node.<category>.<type>.in`
+     */
+    static get hasIn(): boolean {
+        return true;
+    }
+
+    /**
+     * List of `out` bridge connections.
+     *
+     * Localization path:
+     * `<module-id>.<application-id>.node.<category>.<type>.out.<key>`
+     */
+    static get outs(): string | BridgeSchema[] | null {
+        return "out";
+    }
+
+    /**
+     * Adds an extra icon to the node to notify users of its special nature
+     */
+    static get canBreak(): boolean {
+        return false;
+    }
+
+    /**
+     * Adds an extra icon to the node to notify users of its special nature.
+     */
+    static get isLoop(): boolean {
+        return false;
+    }
+
+    /**
+     * Adds an extra icon to the node to notify users of its special nature
+     */
+    static get isAwait(): boolean {
+        return false;
     }
 
     //////////////////////////////
@@ -138,24 +270,10 @@ class TriggerNode {
     //////////////////////////////
 
     /**
-     * Does this node have an `in` bridge connection
-     */
-    get hasIn(): boolean {
-        return true;
-    }
-
-    /**
-     * List of `out` bridge connections
-     */
-    get outs(): string | NodeOut[] | null {
-        return "out";
-    }
-
-    /**
      * Data to represent the node's header in the triggers menu
      */
     get header(): NodeHeaderData | null {
-        const application = this.#parent.parent;
+        const application = this.#parent.application;
         const node = this.constructor as typeof TriggerNode;
 
         return {
@@ -164,27 +282,6 @@ class TriggerNode {
             subtitle:
                 this.localize("subtitle") ?? localizeNodeProperty(application, node, "category"),
         };
-    }
-
-    /**
-     * Adds an extra icon to the node to notify users of its special nature
-     */
-    get canLoop(): boolean {
-        return false;
-    }
-
-    /**
-     * Adds an extra icon to the node to notify users of its special nature
-     */
-    get canBreak(): boolean {
-        return false;
-    }
-
-    /**
-     * Adds an extra icon to the node to notify users of its special nature
-     */
-    get isAwait(): boolean {
-        return false;
     }
 
     //////////////////////////////
@@ -223,11 +320,21 @@ class TriggerNode {
 
     /**
      * Localization helper with pre-defined path and optional (last argument) data object for `game.i18n.format`
+     *
+     * It points directly to the path:
+     * `<module-id>.<application-id>.node.<category>.<type>.<...path>`
+     *
+     * @returns undefined if no key exist at that path
      */
     declare readonly localize: (...args: LocalizeArgs) => string | undefined;
 
     /**
      * @see {@link TriggerNode#localize}
+     *
+     * It points directly to the path:
+     * `<module-id>.<application-id>.<...path>`
+     *
+     * @returns undefined if no key exist at that path
      */
     declare readonly rootLocalize: (...args: LocalizeArgs) => string | undefined;
 
@@ -286,13 +393,15 @@ class TriggerNode {
 
     #rootLocalize(...args: LocalizeArgs): string | undefined {
         const NodeCls = this.constructor as typeof TriggerNode;
-        return triggerNodeLocalize(this.#parent.parent, NodeCls, ...args);
+        return triggerNodeLocalize(this.#parent.application, NodeCls, ...args);
     }
 }
 
 interface TriggerNode
     extends Pick<NodeData, "id" | "invalid">,
-        Pick<typeof TriggerNode, "category" | "isEvent" | "type"> {}
+        Pick<typeof TriggerNode, "category" | "isEvent" | "type"> {
+    _entries: NodeEntries;
+}
 
 function triggerNodeLocalize(
     application: TriggerApplication,
@@ -345,41 +454,11 @@ type TriggerNodeStringProperty = keyof {
         : never]: (typeof TriggerNode)[P];
 };
 
-// type NodeEntryCategory = (typeof NODE_ENTRY_CATEGORIES)[number];
-
-// type NodeCustomEntryCategory = NodeEntryCategory | "outs";
-
-// type NodeHeaderData = {
-//     background?: `#${string}` | number;
-//     icon?: NodeIconObject | string;
-//     title?: string;
-//     subtitle?: string;
-// };
-
-// type NodeCustomData = {
-//     category: NodeCustomEntryCategory;
-//     group: string;
-//     key: NodeCustomDataKey;
-//     types: string[];
-// };
-
-// type NodeIconObject = {
-//     unicode?: string;
-//     fontSize?: number;
-//     fontWeight?: TextStyleFontWeight;
-// };
-
-// type NodeCustomDataKey = {
-//     label: boolean;
-//     name: string;
-//     prefix: string | undefined;
-//     required: boolean;
-//     type: "number" | "text";
-// };
-
-type NodeOut = {
-    key: string;
-    label?: string;
+type NodeEntries = {
+    in: NodeBridge | null;
+    inputs: Collection<NodeEntry>;
+    outputs: Collection<NodeEntry>;
+    outs: Collection<NodeBridge>;
 };
 
 export { localizeNodeProperty, localizeNodeTag, TriggerNode, triggerNodeLocalize };

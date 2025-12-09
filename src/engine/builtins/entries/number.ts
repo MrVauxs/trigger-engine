@@ -1,10 +1,13 @@
-import { BaseNodeInput } from "engine";
 import { BuiltInNodeEntry } from ".";
 import fields = foundry.data.fields;
 
-class NumberNodeEntry extends BuiltInNodeEntry<NumberFieldSchema> {
+class NumberNodeEntry extends BuiltInNodeEntry<number, NumberFieldSchema> {
     static get type(): "number" {
         return "number";
+    }
+
+    static get color(): ColorSource {
+        return 0x07b88f;
     }
 
     static get fieldSchema(): NumberFieldSchema {
@@ -44,8 +47,6 @@ class NumberNodeEntry extends BuiltInNodeEntry<NumberFieldSchema> {
     }
 }
 
-type NumberEntry = BaseNodeInput<"number", NumberFieldSchema>;
-
 type NumberFieldSchema = {
     choices: fields.ArrayField<fields.NumberField<number, number, true, false, false>>;
     default: fields.NumberField<number, number, false, false, true>;
@@ -55,3 +56,4 @@ type NumberFieldSchema = {
 };
 
 export { NumberNodeEntry };
+export type { NumberFieldSchema };

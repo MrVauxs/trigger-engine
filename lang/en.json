@@ -59,6 +59,10 @@
                 "edit": "Edit"
             }
         },
+        "node": {
+            "in": "In",
+            "out": "Out"
+        },
         "nodes-menu": {
             "category": {
                 "event": "Events",

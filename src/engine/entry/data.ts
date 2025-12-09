@@ -1,12 +1,15 @@
-import { IdField } from "module-helpers";
 import { NodeData } from "..";
 import abstract = foundry.abstract;
 import fields = foundry.data.fields;
 
-class NodeEntryData extends abstract.DataModel<NodeData, NodeEntrySchema> {
-    static defineSchema(): NodeEntrySchema {
+class NodeEntryData extends abstract.DataModel<NodeData, EntryDataSchema> {
+    static defineSchema(): EntryDataSchema {
         return {
-            _id: new IdField(),
+            key: new fields.StringField({
+                required: true,
+                nullable: false,
+                blank: false,
+            }),
             type: new fields.StringField({
                 required: true,
                 nullable: false,
@@ -14,20 +17,16 @@ class NodeEntryData extends abstract.DataModel<NodeData, NodeEntrySchema> {
             }),
         };
     }
-
-    get id(): string {
-        return this._id;
-    }
 }
 
-interface NodeEntryData extends ModelPropsFromSchema<NodeEntrySchema> {
+interface NodeEntryData extends ModelPropsFromSchema<EntryDataSchema> {
     updateSource(data: DeepPartial<NodeEntrySource>): DeepPartial<NodeEntrySource>;
 }
 
-type NodeEntrySource = SourceFromSchema<NodeEntrySchema>;
+type NodeEntrySource = SourceFromSchema<EntryDataSchema>;
 
-type NodeEntrySchema = {
-    _id: IdField;
+type EntryDataSchema = {
+    key: fields.StringField<string, string, true, false, false>;
     type: fields.StringField<string, string, true, false, false>;
 };
 
