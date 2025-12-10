@@ -1,6 +1,8 @@
 import {
     CreateNodeData,
+    instantiateNode,
     NodeData,
+    OpenTriggerNode,
     TriggerApplication,
     TriggerData,
     TriggerDataSource,
@@ -15,7 +17,7 @@ class Trigger {
     #nodes: Collection<TriggerNode>;
     #parent: TriggerApplication;
 
-    constructor(parent: TriggerApplication, data: TriggerData) {
+    constructor(parent: TriggerApplication, data: TriggerData, open: boolean) {
         this.#data = data;
         this.#parent = parent;
 
@@ -24,11 +26,8 @@ class Trigger {
                 data.nodes.contents,
                 R.map((data) => {
                     try {
-                        const NodeCls = this.application.nodes.get(data.type);
-                        if (!NodeCls) return;
-
-                        const node = new NodeCls(this, data);
-                        return [node.id, node] as const;
+                        const node = this.instantiateNode(data, open);
+                        return node ? ([node.id, node] as const) : undefined;
                     } catch (error) {}
                 }),
                 R.filter(R.isTruthy)
@@ -102,7 +101,14 @@ class Trigger {
         return clone.toObject();
     }
 
-    addNode(NodeCls: typeof TriggerNode, source: CreateNodeData): TriggerNode | undefined {
+    instantiateNode(data: NodeData, open: true): OpenTriggerNode | undefined;
+    instantiateNode(data: NodeData, open: boolean): TriggerNode | undefined;
+    instantiateNode(data: NodeData, open: boolean) {
+        const NodeCls = this.application.nodes.get(data.type);
+        return NodeCls ? instantiateNode(this, NodeCls, data, open) : undefined;
+    }
+
+    addNode(source: CreateNodeData): OpenTriggerNode | undefined {
         try {
             const data = this.#data.addNode(source);
 
@@ -110,10 +116,12 @@ class Trigger {
                 throw new Error("The provided NodeData source is invalid.");
             }
 
-            const node = new NodeCls(this, data);
-            this.#nodes.set(node.id, node);
+            const node = this.instantiateNode(data, true);
 
-            return node;
+            if (node) {
+                this.#nodes.set(node.id, node);
+                return node;
+            }
         } catch (error) {
             MODULE.error(`an error ocurred while trying to add a TriggerNode.`, error);
         }

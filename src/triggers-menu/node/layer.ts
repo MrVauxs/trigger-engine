@@ -1,4 +1,4 @@
-import { TriggerNode } from "engine";
+import { OpenTriggerNode } from "engine";
 import { BlueprintNode } from ".";
 import { Blueprint, BlueprintLayers } from "..";
 
@@ -31,7 +31,7 @@ class BlueprintNodesLayer extends PIXI.Container {
         }
     }
 
-    add(node: TriggerNode, select: boolean): BlueprintNode {
+    add(node: OpenTriggerNode, select: boolean): BlueprintNode {
         const exist = this.#nodes.get(node.id);
         if (exist) return exist;
 

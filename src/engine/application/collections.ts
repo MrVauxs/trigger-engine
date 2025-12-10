@@ -1,10 +1,6 @@
-import { BuiltInApplication } from "engine";
+import { BuiltInApplication, NodeEntry, TriggerNode } from "engine";
 import { R } from "module-helpers";
-import {
-    TriggerApplicationCollection,
-    TriggerApplicationCollections,
-    TriggerApplicationOptions,
-} from ".";
+import { TriggerApplicationOptions } from ".";
 
 function createCollection<C extends TriggerApplicationCollection>(
     options: TriggerApplicationOptions,
@@ -41,4 +37,12 @@ function getBuiltins<T>(
     );
 }
 
+type TriggerApplicationCollections = {
+    entries?: (typeof NodeEntry)[];
+    nodes?: (typeof TriggerNode)[];
+};
+
+type TriggerApplicationCollection = Prettify<keyof TriggerApplicationCollections>;
+
 export { createCollection };
+export type { TriggerApplicationCollection, TriggerApplicationCollections };

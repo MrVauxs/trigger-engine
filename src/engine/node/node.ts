@@ -1,172 +1,15 @@
-import {
-    BridgeSchema,
-    BuiltInApplication,
-    InputEntrySchema,
-    isBuiltInNode,
-    NodeBridge,
-    NodeBridgeData,
-    NodeEntry,
-    NodeEntryData,
-    OutputEntrySchema,
-    Trigger,
-    TriggerApplication,
-} from "engine";
-import { joinStr, LocalizeArgs, LocalizeData, MODULE, R } from "module-helpers";
-import { NodeData, NodeHeaderData } from ".";
-
-// const NODE_ENTRY_CATEGORIES = ["inputs", "outputs"] as const;
+import { BridgeSchema, InputEntrySchema, NodeEntry, OutputEntrySchema } from "engine";
+import { LocalizeArgs, MODULE } from "module-helpers";
+import { IconObject, NodeData } from ".";
 
 class TriggerNode {
-    #data: NodeData;
-    #in: NodeBridge | null;
-    #inputs: Collection<NodeEntry>;
-    #outputs: Collection<NodeEntry>;
-    #outs: Collection<NodeBridge>;
-    #parent: Trigger;
-
-    constructor(parent: Trigger, data: NodeData) {
-        MODULE.assert(
-            parent instanceof Trigger && !parent.invalid,
-            "parent argument must be a valid 'Trigger'."
-        );
-
-        MODULE.assert(
-            data instanceof NodeData && !data.invalid,
-            "data argument must be a valid 'NodeData'."
-        );
-
-        this.#data = data;
-        this.#parent = parent;
-
-        // from data accessors
-        Object.defineProperties(
-            this,
-            R.fromKeys(["id", "invalid"] as const, (property) => {
-                return {
-                    value: data[property],
-                    configurable: false,
-                    enumerable: true,
-                    writable: false,
-                };
-            })
-        );
-
-        // from private methods
-        Object.defineProperties(
-            this,
-            R.pipe(
-                [
-                    ["localize", this.#localize],
-                    ["rootLocalize", this.#rootLocalize],
-                ] as const,
-                R.fromEntries(),
-                R.mapValues((method) => {
-                    return {
-                        value: method.bind(this),
-                        configurable: false,
-                        enumerable: false,
-                        writable: false,
-                    };
-                })
-            )
-        );
-
-        // from static accessors
-        Object.defineProperties(
-            this,
-            R.fromKeys(["isEvent", "type", "category"] as const, (property) => {
-                return {
-                    value: (this.constructor as typeof TriggerNode)[property],
-                    configurable: false,
-                    enumerable: true,
-                    writable: false,
-                };
-            })
-        );
-
-        // entries
-
-        const thisConstructor = this.constructor as typeof TriggerNode;
-
-        const [inputs, outputs] = R.map(
-            [thisConstructor.defineInputs, thisConstructor.defineOutputs] as const,
-            (schemas) => {
-                const entries = R.pipe(
-                    schemas ?? [],
-                    R.map((schema) => {
-                        try {
-                            const EntryCls = parent.application.entries.get(schema.type);
-                            if (!EntryCls) return;
-
-                            // TODO we need to actually pass the data here
-                            const entryData = new NodeEntryData({
-                                type: schema.type,
-                                key: schema.key,
-                            });
-                            const entry = new EntryCls(this, schema, entryData);
-
-                            return [entry.key, entry] as const;
-                        } catch (error) {}
-                    }),
-                    R.filter(R.isTruthy)
-                );
-
-                return new Collection(entries);
-            }
-        );
-
-        const rawOuts = thisConstructor.outs || (this.isEvent ? "out" : []);
-        const [ins, outs] = R.map(
-            [
-                !this.isEvent && thisConstructor.hasIn ? [{ key: "in" }] : [],
-                R.isString(rawOuts) ? [{ key: rawOuts }] : rawOuts,
-            ] as const,
-            (schemas) => {
-                return R.pipe(
-                    schemas,
-                    R.map((schema) => {
-                        try {
-                            // TODO we need to actually pass the data here
-                            const bridgeData = new NodeBridgeData({
-                                key: schema.key,
-                            });
-                            const bridge = new NodeBridge(this, schema, bridgeData);
-
-                            return [bridge.key, bridge] as const;
-                        } catch (error) {}
-                    }),
-                    R.filter(R.isTruthy)
-                );
-            }
-        );
-
-        this.#in = ins.at(0)?.[1] || null;
-        this.#outs = new Collection(outs);
-        this.#inputs = inputs;
-        this.#outputs = outputs;
-
-        Object.defineProperty(this, "_entries", {
-            value: {
-                in: this.#in,
-                outs: this.#outs,
-                inputs,
-                outputs,
-            } satisfies NodeEntries,
-            configurable: false,
-            enumerable: false,
-            writable: false,
-        });
-
-        Object.freeze(this._entries);
-    }
-
     //////////////////////////////
     // ABSTRACT STATIC ACCESSORS
     //////////////////////////////
 
     /**
      * @abstract
-     * Must be an unique key among your registered module's nodes
+     * Must be an unique key among your registered module's nodes (including builtins)
      *
      * Localization path:
      * `<module-id>.<application-id>.node.<category>.<type>.title`
@@ -270,18 +113,37 @@ class TriggerNode {
     //////////////////////////////
 
     /**
-     * Data to represent the node's header in the triggers menu
+     * The appearing title on the node.
+     *
+     * Localization path:
+     * `<module-id>.<application-id>.node.<category>.<type>.title`
      */
-    get header(): NodeHeaderData | null {
-        const application = this.#parent.application;
-        const node = this.constructor as typeof TriggerNode;
+    get title(): string | null {
+        return this.localize("title") ?? null;
+    }
 
-        return {
-            background: this.isEvent ? "#C40000" : "#000000",
-            title: localizeNodeProperty(application, node, "type"),
-            subtitle:
-                this.localize("subtitle") ?? localizeNodeProperty(application, node, "category"),
-        };
+    /**
+     * The appearing subtitle on the node. Is only used if the node has a 'title'.
+     *
+     * Localization path:
+     * `<module-id>.<application-id>.node.<category>.<type>.subtitle`
+     */
+    get subtitle(): string | null {
+        return this.localize("subtitle") ?? null;
+    }
+
+    /**
+     * The appearing icon on the node. Is only used if the node has a 'title'.
+     */
+    get icon(): string | IconObject | null {
+        return null;
+    }
+
+    /**
+     * The background color for the header. Is only used if the node has a 'title'.
+     */
+    get headerColor(): `#${string}` | number | null {
+        return this.isEvent ? "#C40000" : "#0c0c0c";
     }
 
     //////////////////////////////
@@ -382,84 +244,10 @@ class TriggerNode {
     async query(key: string): Promise<any> {
         throw MODULE.Error("the 'query' method must be implemented for `query` nodes.");
     }
-
-    //////////////////////////////
-    // PRIVATE METHODS
-    //////////////////////////////
-
-    #localize(...args: LocalizeArgs): string | undefined {
-        return this.#rootLocalize("node", this.category, this.type, ...args);
-    }
-
-    #rootLocalize(...args: LocalizeArgs): string | undefined {
-        const NodeCls = this.constructor as typeof TriggerNode;
-        return triggerNodeLocalize(this.#parent.application, NodeCls, ...args);
-    }
 }
 
 interface TriggerNode
     extends Pick<NodeData, "id" | "invalid">,
-        Pick<typeof TriggerNode, "category" | "isEvent" | "type"> {
-    _entries: NodeEntries;
-}
+        Pick<typeof TriggerNode, "category" | "isEvent" | "type"> {}
 
-function triggerNodeLocalize(
-    application: TriggerApplication,
-    node: typeof TriggerNode,
-    ...args: LocalizeArgs
-): string | undefined {
-    const AppCls = isBuiltInNode(node) ? BuiltInApplication : application;
-    const data = R.isObjectType(args.at(-1)) ? (args.pop() as LocalizeData) : undefined;
-    const path = joinStr(".", AppCls.localizePath, ...args);
-
-    if (!game.i18n.has(path, true)) return;
-    return R.isObjectType(data) ? game.i18n.format(path, data) : game.i18n.localize(path);
-}
-
-function localizeNodeTag(
-    application: TriggerApplication,
-    node: typeof TriggerNode,
-    tag: string
-): string {
-    return triggerNodeLocalize(application, node, "tag", tag, "title") ?? tag;
-}
-
-function localizeNodeProperty(
-    application: TriggerApplication,
-    node: typeof TriggerNode,
-    property: TriggerNodeStringProperty
-): string {
-    const path = getNodePropertyLocalizePath(node, property);
-    return triggerNodeLocalize(application, node, path) ?? node[property];
-}
-
-function getNodePropertyLocalizePath(
-    node: typeof TriggerNode,
-    property: TriggerNodeStringProperty
-): string {
-    switch (property) {
-        case "category": {
-            return `category.${node.category}.title`;
-        }
-
-        case "type": {
-            return `node.${node.category}.${node.type}.title`;
-        }
-    }
-}
-
-type TriggerNodeStringProperty = keyof {
-    [P in keyof typeof TriggerNode as (typeof TriggerNode)[P] extends string
-        ? P
-        : never]: (typeof TriggerNode)[P];
-};
-
-type NodeEntries = {
-    in: NodeBridge | null;
-    inputs: Collection<NodeEntry>;
-    outputs: Collection<NodeEntry>;
-    outs: Collection<NodeBridge>;
-};
-
-export { localizeNodeProperty, localizeNodeTag, TriggerNode, triggerNodeLocalize };
-export type { TriggerNodeStringProperty };
+export { TriggerNode };

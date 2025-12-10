@@ -1,4 +1,4 @@
-import { IconObject, NodeData, NodeHeader, TriggerNode } from "engine";
+import { IconObject, NodeData, NodeHeader, NodeHeaderData, OpenTriggerNode } from "engine";
 import {
     drawRectangleMask,
     LocalizeArgs,
@@ -31,14 +31,14 @@ class BlueprintNode extends PIXI.Container {
     #initialized: boolean = false;
     #inputs: Collection<BlurprintInputEntry> = new Collection();
     #mouseManager?: MouseInteractionManager;
-    #node: TriggerNode;
+    #node: OpenTriggerNode;
     #outputs: Collection<BlueprintEntry> = new Collection();
     #outs: Collection<BlueprintBridgeEntry> = new Collection();
     #selected: boolean = false;
 
     static SELECTED_COLOR: ColorSource = 0xff9829;
 
-    constructor(node: TriggerNode) {
+    constructor(node: OpenTriggerNode) {
         super();
 
         this.#node = node;
@@ -389,16 +389,13 @@ class BlueprintNode extends PIXI.Container {
 
     #drawBody(): NodePart {
         const body = new PIXI.Container() as NodePart;
-        const _entries = this.#node._entries;
-        const outs = _entries.outs.contents;
-        const inputs = _entries.inputs.contents;
-        const outputs = _entries.outputs.contents;
-        const minEntryIndex = _entries.in || outs.length ? 1 : 0;
+        const entries = this.#node.entries;
+        const outs = entries.outs.contents;
+        const inputs = entries.inputs.contents;
+        const outputs = entries.outputs.contents;
+        const minEntryIndex = entries.in || outs.length ? 1 : 0;
 
-        const nbRows = Math.max(
-            inputs.length + (_entries.in ? 1 : 0),
-            outs.length + outputs.length
-        );
+        const nbRows = Math.max(inputs.length + (entries.in ? 1 : 0), outs.length + outputs.length);
 
         const spacing = 20;
         const padding = this.outerPadding;
@@ -421,8 +418,8 @@ class BlueprintNode extends PIXI.Container {
 
         // we process all inputs first to make layout computation easier
 
-        if (_entries.in) {
-            this.#in = new BlueprintBridgeEntry(this, "inputs", _entries.in);
+        if (entries.in) {
+            this.#in = new BlueprintBridgeEntry(this, "inputs", entries.in);
             addToRow(0, this.#in);
         }
 
@@ -472,35 +469,45 @@ class BlueprintNode extends PIXI.Container {
     }
 
     #drawHeader(): NodeheaderPart | undefined {
-        const data = this.#node.header && new NodeHeader(this.#node.header);
-        if (!data || data.invalid) return;
+        const title = this.#node.title;
+        if (!R.isString(title)) return;
+
+        const headerSource: NodeHeaderData = {
+            background: this.#node.headerColor,
+            icon: this.#node.icon,
+            subtitle: this.#node.subtitle,
+            title,
+        };
+
+        const data = new NodeHeader(headerSource);
+        if (data.invalid) return;
 
         const padding = this.outerPadding;
-        const header = new PIXI.Container() as NodeheaderPart;
-        const icon = this.fontAwesomeIcon(data.icon);
-        const title = this.preciseText(data.title);
-        const subtitle = this.preciseText(data.subtitle, {
+        const headerEl = new PIXI.Container() as NodeheaderPart;
+        const iconEl = this.fontAwesomeIcon(data.icon);
+        const titleEl = this.preciseText(data.title);
+        const subtitleEl = this.preciseText(data.subtitle, {
             fontSize: this.fontSize * 0.93,
             fontStyle: "italic",
             fill: "d9d9d9",
         });
 
-        alignHorizontally(header, [icon, title], { offset: padding, spacing: 5 });
+        alignHorizontally(headerEl, [iconEl, titleEl], { offset: padding, spacing: 5 });
 
-        if (subtitle) {
-            subtitle.x = title.x + (icon ? 0 : 2);
-            subtitle.y = getBottom(title);
+        if (subtitleEl) {
+            subtitleEl.x = titleEl.x + (iconEl ? 0 : 2);
+            subtitleEl.y = getBottom(titleEl);
 
-            header.addChild(subtitle);
+            headerEl.addChild(subtitleEl);
         }
 
-        title.getBounds();
+        titleEl.getBounds();
 
-        header.background = new PIXI.Color(data.background ?? this.backgroundColor);
-        header.calculatedHeight = maxBottom(title, subtitle) + padding.y;
-        header.calculatedWith = maxRight(title, subtitle) + padding.x;
+        headerEl.background = new PIXI.Color(data.background ?? this.backgroundColor);
+        headerEl.calculatedHeight = maxBottom(titleEl, subtitleEl) + padding.y;
+        headerEl.calculatedWith = maxRight(titleEl, subtitleEl) + padding.x;
 
-        return header;
+        return headerEl;
     }
 
     async #onContextMenu(event: PIXI.FederatedPointerEvent) {}

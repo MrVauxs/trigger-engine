@@ -1,12 +1,13 @@
 import {
     NodeEntry,
+    OpenTriggerNode,
     Trigger,
     TriggerApplication,
     TriggerDataSource,
     UpdateNodeData,
     UpdateTriggerData,
 } from "engine";
-import { dividePointBy, MODULE, MouseInteractionManager, R, subtractPoint } from "module-helpers";
+import { dividePointBy, MouseInteractionManager, R, subtractPoint } from "module-helpers";
 import {
     BlueprintApplication,
     BlueprintConnectionsLayer,
@@ -47,7 +48,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
             R.pipe(
                 this.parent.getTriggersSources(),
                 R.map((source) => {
-                    const trigger = this.application.createTrigger(source);
+                    const trigger = this.application.createTrigger(source, true);
                     return trigger && ([trigger.id, trigger] as const);
                 }),
                 R.filter(R.isTruthy)
@@ -174,7 +175,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
     addTrigger(source: DeepPartial<TriggerDataSource>) {
         if (source._id && this.triggers.has(source._id)) return;
 
-        const trigger = this.application.createTrigger(source);
+        const trigger = this.application.createTrigger(source, true);
         if (!trigger) return;
 
         this.triggers.set(trigger.id, trigger);
@@ -277,7 +278,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         const trigger = this.trigger;
         if (!trigger) return;
 
-        for (const node of trigger.nodes) {
+        for (const node of trigger.nodes as Collection<OpenTriggerNode>) {
             this.nodes.add(node, false);
         }
 
@@ -297,21 +298,11 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
 
         source.position = this.subtractPointFromEvent(event, this.#layers);
 
-        try {
-            const NodeCls = this.application.nodes.get(source.type);
+        const node = this.trigger?.addNode(source);
 
-            if (!NodeCls) {
-                throw new Error("Couldn't find the TriggerNode class.");
-            }
-
-            const node = this.trigger?.addNode(NodeCls, source);
-
-            if (node) {
-                this.nodes.add(node, true);
-                // TODO add connection if entry provided
-            }
-        } catch (error) {
-            MODULE.error(`an error ocurred while trying to create a BlueprintNode.`, error);
+        if (node) {
+            this.nodes.add(node, true);
+            // TODO add connection if entry provided
         }
     }
 

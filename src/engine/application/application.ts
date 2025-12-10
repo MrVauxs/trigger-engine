@@ -3,6 +3,8 @@ import {
     createCollection,
     NodeEntry,
     Trigger,
+    TriggerApplicationCollection,
+    TriggerApplicationCollections,
     TriggerData,
     TriggerDataSource,
     TriggerHook,
@@ -115,10 +117,10 @@ class TriggerApplication {
         }
     }
 
-    createTrigger(source: DeepPartial<TriggerDataSource>): Trigger | null {
+    createTrigger(source: DeepPartial<TriggerDataSource>, open: boolean): Trigger | null {
         try {
             const data = new TriggerData({ ...source, applicationKey: this.applicationKey });
-            return new Trigger(this, data);
+            return new Trigger(this, data, true);
         } catch (error) {
             MODULE.error(`an error ocurred while trying to create a Trigger.`, error);
             return null;
@@ -132,7 +134,7 @@ class TriggerApplication {
 
     #getFreeApplication(source: unknown): typeof BlueprintApplication | null {
         const self = this;
-        const test = this.createTrigger(R.isPlainObject(source) ? source : {});
+        const test = this.createTrigger(R.isPlainObject(source) ? source : {}, true);
         if (!test || test.invalid) return null;
 
         return class FreeBlueprintApplication extends BlueprintApplication {
@@ -191,13 +193,6 @@ class TriggerApplication {
 
 type ApplicationParentType = "setting" | "document";
 
-type TriggerApplicationCollections = {
-    entries?: (typeof NodeEntry)[];
-    nodes?: (typeof TriggerNode)[];
-};
-
-type TriggerApplicationCollection = Prettify<keyof TriggerApplicationCollections>;
-
 type TriggerApplicationOptions = TriggerApplicationCollections & {
     builtins?: Record<TriggerApplicationCollection, string[] | boolean>;
     mode?: TriggerApplicationMode;
@@ -214,9 +209,4 @@ type ApplicationMenuOptions = {
 type TriggerApplicationMode = (typeof APPLICATION_MODES)[number] | "builtin";
 
 export { TriggerApplication };
-export type {
-    ApplicationParentType,
-    TriggerApplicationCollection,
-    TriggerApplicationCollections,
-    TriggerApplicationOptions,
-};
+export type { ApplicationParentType, TriggerApplicationOptions };

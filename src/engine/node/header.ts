@@ -6,21 +6,28 @@ import fields = foundry.data.fields;
 class NodeHeader extends abstract.DataModel<null, NodeHeaderSchema> {
     static defineSchema(): NodeHeaderSchema {
         return {
-            background: new DataUnionField([
-                new fields.StringField<`#${string}`, `#${string}`>({
+            background: new DataUnionField(
+                [
+                    new fields.StringField<`#${string}`, `#${string}`>({
+                        required: false,
+                        nullable: false,
+                        blank: false,
+                    }),
+                    new fields.NumberField<number, number, false, false>({
+                        required: false,
+                        nullable: false,
+                    }),
+                ] as const,
+                {
                     required: false,
-                    nullable: false,
-                    blank: false,
-                }),
-                new fields.NumberField<number, number, false, false>({
-                    required: false,
-                    nullable: false,
-                }),
-            ] as const),
+                    nullable: true,
+                    initial: "#000000",
+                }
+            ),
             icon: new NodeIconField(),
             subtitle: new fields.StringField({
                 required: false,
-                nullable: false,
+                nullable: true,
                 blank: true,
                 initial: undefined,
             }),
@@ -38,9 +45,8 @@ interface NodeHeader extends ModelPropsFromSchema<NodeHeaderSchema> {}
 type NodeHeaderSource = SourceFromSchema<NodeHeaderSchema>;
 
 type NodeHeaderData = Prettify<
-    WithPartial<Omit<NodeHeaderSource, "icon" | "background">, "subtitle"> & {
-        background: `#${string}` | number;
-        icon?: IconObject | string;
+    WithPartial<Omit<NodeHeaderSource, "icon">, "subtitle" | "background"> & {
+        icon?: IconObject | string | null;
     }
 >;
 
@@ -51,7 +57,7 @@ type NodeHeaderSchema = {
         string | number
     >;
     icon: NodeIconField;
-    subtitle: fields.StringField<string, string, false, false, false>;
+    subtitle: fields.StringField<string, string, false, true, false>;
     title: fields.StringField<string, string, true, false, false>;
 };
 

@@ -1,4 +1,4 @@
-import { InputEntrySchema, NodeHeaderData, NumberFieldSchema, OutputEntrySchema } from "engine";
+import { InputEntrySchema, NumberFieldSchema, OutputEntrySchema } from "engine";
 import { BuiltInTriggerNode } from "..";
 
 class TestTriggerNode extends BuiltInTriggerNode {
@@ -37,11 +37,8 @@ class TestTriggerNode extends BuiltInTriggerNode {
         ];
     }
 
-    get header(): NodeHeaderData {
-        return {
-            ...(super.header as NodeHeaderData),
-            icon: "\ue4f3",
-        };
+    get icon(): string {
+        return "\ue4f3";
     }
 }
 

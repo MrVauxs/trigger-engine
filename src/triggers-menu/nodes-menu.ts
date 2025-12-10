@@ -1,11 +1,9 @@
 import {
     CreateNodeData,
-    isBuiltInNode,
-    localizeNodeProperty,
-    localizeNodeTag,
     NodeEntry,
     TriggerApplication,
     TriggerNode,
+    triggerNodeLocalize,
 } from "engine";
 import {
     ApplicationClosingOptions,
@@ -148,7 +146,6 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
 
                 const nodes = Nodes.map((node): PreparedNode => {
                     return {
-                        builtin: isBuiltInNode(node),
                         tags: node.tags,
                         title: localizeNodeProperty(this.application, node, "type"),
                         type: node.type,
@@ -189,6 +186,44 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
     }
 }
 
+function localizeNodeProperty(
+    application: TriggerApplication,
+    node: typeof TriggerNode,
+    property: TriggerNodeStringProperty
+): string {
+    const path = getNodePropertyLocalizePath(node, property);
+    return triggerNodeLocalize(application, node, path) ?? node[property];
+}
+
+function getNodePropertyLocalizePath(
+    node: typeof TriggerNode,
+    property: TriggerNodeStringProperty
+): string {
+    switch (property) {
+        case "category": {
+            return `category.${node.category}.title`;
+        }
+
+        case "type": {
+            return `node.${node.category}.${node.type}.title`;
+        }
+    }
+}
+
+function localizeNodeTag(
+    application: TriggerApplication,
+    node: typeof TriggerNode,
+    tag: string
+): string {
+    return triggerNodeLocalize(application, node, "tag", tag, "title") ?? tag;
+}
+
+type TriggerNodeStringProperty = keyof {
+    [P in keyof typeof TriggerNode as (typeof TriggerNode)[P] extends string
+        ? P
+        : never]: (typeof TriggerNode)[P];
+};
+
 type EventAction = "select-node";
 
 type NodesMenuContext = {
@@ -204,7 +239,6 @@ type NodesGroup = {
 };
 
 type PreparedNode = {
-    builtin: boolean;
     tags: string[];
     title: string;
     type: string;
