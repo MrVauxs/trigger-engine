@@ -45,6 +45,19 @@ class NumberNodeEntry extends BuiltInNodeEntry<number, NumberFieldSchema> {
             }),
         };
     }
+
+    get fieldWidth(): number {
+        return 30;
+    }
+
+    createFieldElement(label: PreciseText, maxHeight: number): PIXI.Graphics | null {
+        const box = new PIXI.Graphics();
+
+        box.lineStyle({ color: this.fieldBorderColor, width: this.fieldBorderWidth });
+        box.drawRect(0, 0, this.fieldWidth, maxHeight);
+
+        return box;
+    }
 }
 
 type NumberFieldSchema = {

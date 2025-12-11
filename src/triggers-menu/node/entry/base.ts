@@ -35,6 +35,7 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
     }
 
     abstract _drawConnector(connector: PIXI.Graphics): void;
+    abstract _drawField(label: PreciseText): PIXI.Graphics | null;
 
     draw() {
         this.#connector.clear();
@@ -44,10 +45,14 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
         this._drawConnector(this.#connector);
         this.#connector.endFill();
 
+        this.#label = this.node.preciseText(this.label);
+        this.#field = this._drawField(this.#label) ?? undefined;
+
         const content = [
             this.#connector,
-            (this.#label = this.node.preciseText(this.label)),
-            (this.#field = this.#drawField()),
+            // if the field has been added to the field, we don't want to move it back at top level
+            this.#label.parent ? undefined : this.#label,
+            this.#field,
         ];
 
         alignHorizontally(this, content, {
@@ -55,10 +60,6 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
             reverse: this.isOutput,
             spacing: 5,
         });
-    }
-
-    #drawField(): PIXI.Container | undefined {
-        return;
     }
 }
 

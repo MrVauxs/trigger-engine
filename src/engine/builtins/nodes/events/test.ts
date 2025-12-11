@@ -20,7 +20,14 @@ class TestTriggerNode extends BuiltInTriggerNode {
             {
                 key: "entry",
                 type: "number",
-                fields: {
+                field: {
+                    default: 2,
+                },
+            } satisfies InputEntrySchema<NumberFieldSchema>,
+            {
+                key: "test",
+                type: "number",
+                field: {
                     default: 2,
                 },
             } satisfies InputEntrySchema<NumberFieldSchema>,
@@ -39,6 +46,14 @@ class TestTriggerNode extends BuiltInTriggerNode {
 
     get icon(): string {
         return "\ue4f3";
+    }
+
+    execute(options?: Record<string, any>): Promise<boolean> {
+        throw new Error("Method not implemented.");
+    }
+
+    query(key: string): Promise<any> {
+        throw new Error("Method not implemented.");
     }
 }
 

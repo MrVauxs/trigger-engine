@@ -12,7 +12,6 @@ import {
     BlueprintBridgeEntry,
     BlueprintEntry,
     BlueprintNodesLayer,
-    BlurprintInputEntry,
     getBottom,
     getRight,
     maxBottom,
@@ -29,7 +28,7 @@ class BlueprintNode extends PIXI.Container {
     #hitArea: PIXI.Rectangle = new PIXI.Rectangle();
     #in: BlueprintBridgeEntry | undefined;
     #initialized: boolean = false;
-    #inputs: Collection<BlurprintInputEntry> = new Collection();
+    #inputs: Collection<BlueprintEntry> = new Collection();
     #mouseManager?: MouseInteractionManager;
     #node: OpenTriggerNode;
     #outputs: Collection<BlueprintEntry> = new Collection();
@@ -68,8 +67,12 @@ class BlueprintNode extends PIXI.Container {
         return this.fontSize * 1.5;
     }
 
+    get entrySpacing(): number {
+        return 2;
+    }
+
     get outerPadding(): Point {
-        return { x: 10, y: 4 };
+        return { x: 6, y: 4 };
     }
 
     get opacity(): number {
@@ -87,7 +90,7 @@ class BlueprintNode extends PIXI.Container {
     get borderOptions(): ILineStyleOptions {
         return {
             color: 0x000000,
-            width: 1.5,
+            width: 1,
             alpha: 0.6,
         };
     }
@@ -394,12 +397,9 @@ class BlueprintNode extends PIXI.Container {
         const inputs = entries.inputs.contents;
         const outputs = entries.outputs.contents;
         const minEntryIndex = entries.in || outs.length ? 1 : 0;
-
-        const nbRows = Math.max(inputs.length + (entries.in ? 1 : 0), outs.length + outputs.length);
-
+        const nbRows = Math.max(inputs.length + minEntryIndex, outs.length + outputs.length);
         const spacing = 20;
         const padding = this.outerPadding;
-
         const rows: NodePart[] = R.times(nbRows, () => new PIXI.Container() as NodePart);
 
         const addToRow = (index: number, el: BaseBlueprintEntry) => {
@@ -426,7 +426,7 @@ class BlueprintNode extends PIXI.Container {
         const firstInputIndex = minEntryIndex;
         for (let i = 0; i < inputs.length; i++) {
             const input = inputs[i];
-            const entry = new BlurprintInputEntry(this, input);
+            const entry = new BlueprintEntry(this, input);
 
             this.#inputs.set(entry.key, entry);
             addToRow(i + firstInputIndex, entry);
@@ -445,7 +445,7 @@ class BlueprintNode extends PIXI.Container {
         const firstoutputIndex = Math.max(outs.length, minEntryIndex);
         for (let i = 0; i < outputs.length; i++) {
             const output = outputs[i];
-            const entry = new BlueprintEntry(this, "outputs", output);
+            const entry = new BlueprintEntry(this, output);
 
             this.#outputs.set(entry.key, entry);
             addToRow(i + firstoutputIndex, entry);
@@ -453,17 +453,19 @@ class BlueprintNode extends PIXI.Container {
 
         // return
 
+        const rowHeight = this.entryHeight + this.entrySpacing;
+
         for (let i = 0; i < rows.length; i++) {
             const row = rows[i];
 
             row.x = padding.x;
-            row.y = padding.y + i * this.entryHeight;
+            row.y = padding.y + i * rowHeight;
 
             body.addChild(row);
         }
 
         body.calculatedWith = padding.x * 2 + Math.max(...rows.map((row) => row.calculatedWith));
-        body.calculatedHeight = nbRows * this.entryHeight + padding.y * 2;
+        body.calculatedHeight = nbRows * rowHeight + padding.y * 2;
 
         return body;
     }

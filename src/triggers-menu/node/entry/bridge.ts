@@ -46,6 +46,10 @@ class BlueprintBridgeEntry extends BaseBlueprintEntry {
         connector.lineTo(0, 12);
         connector.lineTo(0, 0);
     }
+
+    _drawField(): null {
+        return null;
+    }
 }
 
 export { BlueprintBridgeEntry };

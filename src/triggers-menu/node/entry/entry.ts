@@ -1,12 +1,12 @@
 import { NodeEntry } from "engine";
-import { BaseBlueprintEntry, EntryCategory } from ".";
+import { BaseBlueprintEntry } from ".";
 import { BlueprintNode } from "..";
 
 class BlueprintEntry extends BaseBlueprintEntry {
     #entry: NodeEntry;
 
-    constructor(parent: BlueprintNode, category: EntryCategory, entry: NodeEntry) {
-        super(parent, category);
+    constructor(parent: BlueprintNode, entry: NodeEntry) {
+        super(parent, entry.category);
 
         this.#entry = entry;
     }
@@ -38,6 +38,10 @@ class BlueprintEntry extends BaseBlueprintEntry {
             connector.lineStyle({ color, width: 2 });
             connector.drawCircle(7, 7, 6.5);
         }
+    }
+
+    _drawField(label: PreciseText): PIXI.Graphics | null {
+        return this.isInput ? this.#entry.createFieldElement(label, this.node.entryHeight) : null;
     }
 }
 
