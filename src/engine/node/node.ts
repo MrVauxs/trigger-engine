@@ -2,7 +2,7 @@ import { BridgeSchema, InputEntrySchema, NodeEntry, OutputEntrySchema } from "en
 import { LocalizeArgs, MODULE } from "module-helpers";
 import { IconObject, NodeData } from ".";
 
-class TriggerNode {
+abstract class TriggerNode {
     //////////////////////////////
     // ABSTRACT STATIC ACCESSORS
     //////////////////////////////
@@ -228,9 +228,7 @@ class TriggerNode {
      * @see {@link TriggerNode#getInputValue}
      * @see {@link TriggerNode#setOutputValue}
      */
-    async execute(options?: Record<string, any>): Promise<boolean> {
-        throw MODULE.Error("the 'execute' method must be implemented for `executeable` nodes.");
-    }
+    abstract execute(options?: Record<string, any>): Promise<boolean>;
 
     /**
      * @abstract
@@ -241,9 +239,7 @@ class TriggerNode {
      * @returns the computed value of the output type requested by the other node.
      * If the returned value isn't compatible with the connection type, the default value will be instead be returned.
      */
-    async query(key: string): Promise<any> {
-        throw MODULE.Error("the 'query' method must be implemented for `query` nodes.");
-    }
+    abstract query(key: string): Promise<any>;
 }
 
 interface TriggerNode

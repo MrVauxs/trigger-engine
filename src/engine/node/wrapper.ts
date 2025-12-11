@@ -1,34 +1,26 @@
 import {
     BuiltInApplication,
+    instantiateEntry,
     isBuiltInNode,
     NodeBridge,
     NodeBridgeData,
     NodeEntry,
-    NodeEntryData,
     Trigger,
     TriggerApplication,
 } from "engine";
 import { joinStr, LocalizeArgs, LocalizeData, R } from "module-helpers";
 import { NodeData, TriggerNode } from ".";
 
+function instantiateNode(parent: Trigger, data: NodeData, open: true): OpenTriggerNode;
+function instantiateNode(parent: Trigger, data: NodeData, open: boolean): TriggerNode;
 function instantiateNode(
     parent: Trigger,
-    NodeCls: typeof TriggerNode,
-    data: NodeData,
-    open: true
-): OpenTriggerNode;
-function instantiateNode(
-    parent: Trigger,
-    NodeCls: typeof TriggerNode,
     data: NodeData,
     open: boolean
-): TriggerNode;
-function instantiateNode(
-    parent: Trigger,
-    NodeCls: typeof TriggerNode,
-    data: NodeData,
-    open: boolean
-): TriggerNode | OpenTriggerNode {
+): TriggerNode | OpenTriggerNode | undefined {
+    const NodeCls = parent.application.nodes.get(data.type) as typeof TriggerNode;
+    if (!NodeCls) return;
+
     function rootLocalize(...args: LocalizeArgs): string | undefined {
         return triggerNodeLocalize(parent.application, NodeCls, ...args);
     }
@@ -95,23 +87,23 @@ function instantiateNode(
             // entries
 
             const [inputs, outputs] = R.map(
-                [NodeCls.defineInputs, NodeCls.defineOutputs] as const,
-                (schemas) => {
+                [
+                    ["inputs", NodeCls.defineInputs],
+                    ["outputs", NodeCls.defineOutputs],
+                ] as const,
+                ([category, schemas]) => {
                     const entries = R.pipe(
                         schemas ?? [],
                         R.map((schema) => {
                             try {
-                                const EntryCls = parent.application.entries.get(schema.type);
-                                if (!EntryCls) return;
+                                // // TODO we need to actually pass the data here
+                                // const entryData = new NodeEntryData({
+                                //     type: schema.type,
+                                //     key: schema.key,
+                                // });
 
-                                // TODO we need to actually pass the data here
-                                const entryData = new NodeEntryData({
-                                    type: schema.type,
-                                    key: schema.key,
-                                });
-                                const entry = new EntryCls(this, schema, entryData);
-
-                                return [entry.key, entry] as const;
+                                const entry = instantiateEntry(parent, this, category, schema);
+                                return entry ? ([entry.key, entry] as const) : undefined;
                             } catch (error) {}
                         }),
                         R.filter(R.isTruthy)
@@ -169,6 +161,14 @@ function instantiateNode(
                     },
                 });
             }
+        }
+
+        execute(options?: Record<string, any>): Promise<boolean> {
+            throw new Error("Method not implemented.");
+        }
+
+        query(key: string): Promise<any> {
+            throw new Error("Method not implemented.");
         }
     }
 

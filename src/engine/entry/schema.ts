@@ -47,8 +47,8 @@ type BaseEntrySchema = Prettify<WithPartial<NodeEntrySchemaSource, "label" | "gr
 type OutputEntrySchema = BaseEntrySchema;
 
 type InputEntrySchema<TFieldSchema extends fields.DataSchema | undefined = any> =
-    OutputEntrySchema & {
-        fields?: EntryField<TFieldSchema>;
+    BaseEntrySchema & {
+        field?: EntryField<TFieldSchema>;
     };
 
 export { NodeEntrySchema };

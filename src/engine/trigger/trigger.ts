@@ -26,7 +26,7 @@ class Trigger {
                 data.nodes.contents,
                 R.map((data) => {
                     try {
-                        const node = this.instantiateNode(data, open);
+                        const node = instantiateNode(this, data, open);
                         return node ? ([node.id, node] as const) : undefined;
                     } catch (error) {}
                 }),
@@ -101,13 +101,6 @@ class Trigger {
         return clone.toObject();
     }
 
-    instantiateNode(data: NodeData, open: true): OpenTriggerNode | undefined;
-    instantiateNode(data: NodeData, open: boolean): TriggerNode | undefined;
-    instantiateNode(data: NodeData, open: boolean) {
-        const NodeCls = this.application.nodes.get(data.type);
-        return NodeCls ? instantiateNode(this, NodeCls, data, open) : undefined;
-    }
-
     addNode(source: CreateNodeData): OpenTriggerNode | undefined {
         try {
             const data = this.#data.addNode(source);
@@ -116,7 +109,7 @@ class Trigger {
                 throw new Error("The provided NodeData source is invalid.");
             }
 
-            const node = this.instantiateNode(data, true);
+            const node = instantiateNode(this, data, true);
 
             if (node) {
                 this.#nodes.set(node.id, node);
