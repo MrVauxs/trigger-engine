@@ -52,9 +52,9 @@ class BlueprintBridgeEntry extends BaseBlueprintEntry {
         connector.lineStyle({ color, width: 1.5 });
         connector.moveTo(left, 0);
         connector.lineTo(mid, 0);
-        connector.lineTo(right, 6);
-        connector.lineTo(mid, 12);
-        connector.lineTo(left, 12);
+        connector.lineTo(right, 6.25);
+        connector.lineTo(mid, 12.5);
+        connector.lineTo(left, 12.5);
         connector.lineTo(left, 0);
 
         connector.endFill();

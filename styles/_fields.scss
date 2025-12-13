@@ -2,9 +2,9 @@ body {
     > input.trigger-engine-field {
         z-index: 999999;
         position: absolute;
-        padding: 0 5px;
         line-height: 0;
         border-radius: 0;
+        outline-offset: 0;
         width: var(--origin-width);
         height: var(--origin-height);
         font-size: var(--origin-font-size);
