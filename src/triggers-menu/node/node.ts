@@ -1,10 +1,18 @@
-import { IconObject, NodeData, NodeHeader, NodeHeaderData, OpenTriggerNode } from "engine";
+import {
+    IconObject,
+    NodeData,
+    NodeHeader,
+    NodeHeaderData,
+    OpenTriggerNode,
+    TriggerNode,
+} from "engine";
 import {
     drawRectangleMask,
     LocalizeArgs,
     mapToObjByKey,
     MouseInteractionManager,
     R,
+    subtractPoint,
 } from "module-helpers";
 import {
     alignHorizontally,
@@ -59,6 +67,14 @@ class BlueprintNode extends PIXI.Container {
         return (this.#data ??= this.blueprint.trigger?.getNodeData(this.id)!);
     }
 
+    get isEvent(): boolean {
+        return this.#node.isEvent;
+    }
+
+    get inputsHaveConnector(): boolean {
+        return (this.#node.constructor as typeof TriggerNode).inputsHaveConnector;
+    }
+
     get fontSize(): number {
         return 15;
     }
@@ -67,7 +83,7 @@ class BlueprintNode extends PIXI.Container {
         return this.fontSize * 1.5;
     }
 
-    get entrySpacing(): number {
+    get rowSpacing(): number {
         return 2;
     }
 
@@ -278,12 +294,18 @@ class BlueprintNode extends PIXI.Container {
         this.blueprint.cancelMouse();
         if (event.shiftKey) return;
 
-        const selected = this.parent.selected;
+        this.interactiveChildren = false;
 
+        const selected = this.parent.selected;
         const interactionData = event.interactionData as InteractionData;
+        // we offset the distance buffer of the drag
+        const offset = this.blueprint.subtractPointFromEvent(event, interactionData.origin);
 
         interactionData.selected = R.map(selected.length ? selected : [this], (node) => {
-            return { node, origin: this.blueprint.subtractPointFromEvent(event, node) };
+            return {
+                node,
+                origin: subtractPoint(this.blueprint.subtractPointFromEvent(event, node), offset),
+            };
         });
 
         mapToObjByKey(selected.length ? selected : [this], "id");
@@ -314,6 +336,8 @@ class BlueprintNode extends PIXI.Container {
                 position: { x, y },
             });
         }
+
+        this.interactiveChildren = true;
     }
 
     _onDragRightStart(event: FederatedEvent) {
@@ -333,24 +357,23 @@ class BlueprintNode extends PIXI.Container {
     fontAwesomeIcon(icon: Maybe<IconObject>) {
         if (!icon) return;
 
-        const fontSize = R.isNumber(icon.fontSize) ? icon.fontSize : undefined;
-        const fontWeight = (R.isString(icon.fontWeight) && icon.fontWeight) || "400";
-
         return this.preciseText(icon.unicode, {
             fontFamily: "Font Awesome 6 Pro",
-            fontWeight: fontWeight as TextStyleFontWeight,
-            fontSize,
+            fontWeight: icon.fontWeight || "400",
+            fontMult: icon.fontMult || 1,
         });
     }
 
-    preciseText(text: string, options?: Partial<PIXI.ITextStyle>): PreciseText;
-    preciseText(text: Maybe<string>, options?: Partial<PIXI.ITextStyle>): PreciseText | undefined;
-    preciseText(text: Maybe<string>, options: Partial<PIXI.ITextStyle> = {}) {
+    preciseText(text: string, options?: PreciseTextOptions): PreciseText;
+    preciseText(text: Maybe<string>, options?: PreciseTextOptions): PreciseText | undefined;
+    preciseText(text: Maybe<string>, options: PreciseTextOptions = {}) {
         if (!R.isString(text)) return;
 
-        if (!R.isNumber(options.fontSize)) {
-            delete options.fontSize;
+        if (R.isNumber(options.fontMult)) {
+            options.fontSize = this.fontSize * options.fontMult;
         }
+
+        delete options.fontMult;
 
         const style = new PIXI.TextStyle(
             foundry.utils.mergeObject(
@@ -453,7 +476,7 @@ class BlueprintNode extends PIXI.Container {
 
         // return
 
-        const rowHeight = this.entryHeight + this.entrySpacing;
+        const rowHeight = this.entryHeight + this.rowSpacing;
 
         for (let i = 0; i < rows.length; i++) {
             const row = rows[i];
@@ -489,7 +512,7 @@ class BlueprintNode extends PIXI.Container {
         const iconEl = this.fontAwesomeIcon(data.icon);
         const titleEl = this.preciseText(data.title);
         const subtitleEl = this.preciseText(data.subtitle, {
-            fontSize: this.fontSize * 0.93,
+            fontMult: 0.93,
             fontStyle: "italic",
             fill: "d9d9d9",
         });
@@ -530,7 +553,13 @@ type FederatedEvent = PIXI.FederatedPointerEvent & {
 };
 
 type InteractionData = {
+    origin: PIXI.Point;
     selected?: { node: BlueprintNode; origin: Point }[];
 };
 
+type PreciseTextOptions = Partial<PIXI.ITextStyle> & {
+    fontMult?: number;
+};
+
 export { BlueprintNode };
+export type { PreciseTextOptions };

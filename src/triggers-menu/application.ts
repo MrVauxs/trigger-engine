@@ -97,6 +97,10 @@ class BlueprintApplication extends apps.ApplicationV2<
         return super.close(options);
     }
 
+    toggleUIEnabled(inert: boolean) {
+        htmlQuery(this.element, ".ui")?.toggleAttribute("inert", inert);
+    }
+
     collapseWindow(): this {
         this.element.classList.add("collapsed");
         return this;

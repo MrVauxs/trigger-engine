@@ -194,7 +194,7 @@ class TriggerApplication {
 type ApplicationParentType = "setting" | "document";
 
 type TriggerApplicationOptions = TriggerApplicationCollections & {
-    builtins?: Record<TriggerApplicationCollection, string[] | boolean>;
+    builtins?: Record<TriggerApplicationCollection, string[] | boolean> | true;
     mode?: TriggerApplicationMode;
     setting?: ApplicationMenuOptions;
 };

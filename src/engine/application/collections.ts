@@ -16,7 +16,7 @@ function getBuiltins<T>(
     options: TriggerApplicationOptions,
     collection: TriggerApplicationCollection
 ): [string, T][] {
-    const option = options.builtins?.[collection];
+    const option = options.builtins === true ? true : options.builtins?.[collection];
     const builtins = BuiltInApplication[collection];
 
     if (option === true) {

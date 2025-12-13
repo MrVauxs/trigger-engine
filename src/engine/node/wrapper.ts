@@ -3,16 +3,16 @@ import {
     instantiateEntry,
     isBuiltInNode,
     NodeBridge,
-    NodeBridgeData,
     NodeEntry,
+    OpenNodeEntry,
     Trigger,
     TriggerApplication,
 } from "engine";
-import { joinStr, LocalizeArgs, LocalizeData, R } from "module-helpers";
+import { joinStr, LocalizeArgs, LocalizeData, MODULE, R } from "module-helpers";
 import { NodeData, TriggerNode } from ".";
 
-function instantiateNode(parent: Trigger, data: NodeData, open: true): OpenTriggerNode;
-function instantiateNode(parent: Trigger, data: NodeData, open: boolean): TriggerNode;
+function instantiateNode(parent: Trigger, data: NodeData, open: true): OpenTriggerNode | undefined;
+function instantiateNode(parent: Trigger, data: NodeData, open: boolean): TriggerNode | undefined;
 function instantiateNode(
     parent: Trigger,
     data: NodeData,
@@ -86,6 +86,8 @@ function instantiateNode(
 
             // entries
 
+            const isEvent = NodeCls.isEvent;
+
             const [inputs, outputs] = R.map(
                 [
                     ["inputs", NodeCls.defineInputs],
@@ -96,15 +98,22 @@ function instantiateNode(
                         schemas ?? [],
                         R.map((schema) => {
                             try {
-                                // // TODO we need to actually pass the data here
-                                // const entryData = new NodeEntryData({
-                                //     type: schema.type,
-                                //     key: schema.key,
-                                // });
+                                const entry = instantiateEntry(
+                                    parent,
+                                    this,
+                                    category,
+                                    schema,
+                                    data,
+                                    open
+                                );
 
-                                const entry = instantiateEntry(parent, this, category, schema);
                                 return entry ? ([entry.key, entry] as const) : undefined;
-                            } catch (error) {}
+                            } catch (error) {
+                                MODULE.error(
+                                    "an error occured while instantiating a node entry",
+                                    error
+                                );
+                            }
                         }),
                         R.filter(R.isTruthy)
                     );
@@ -113,10 +122,10 @@ function instantiateNode(
                 }
             );
 
-            const rawOuts = NodeCls.outs || (NodeCls.isEvent ? "out" : []);
+            const rawOuts = NodeCls.outs || (isEvent ? "out" : []);
             const [ins, outs] = R.map(
                 [
-                    !NodeCls.isEvent && NodeCls.hasIn ? [{ key: "in" }] : [],
+                    !isEvent && NodeCls.hasIn ? [{ key: "in" }] : [],
                     R.isString(rawOuts) ? [{ key: rawOuts }] : rawOuts,
                 ] as const,
                 (schemas) => {
@@ -124,11 +133,11 @@ function instantiateNode(
                         schemas,
                         R.map((schema) => {
                             try {
-                                // TODO we need to actually pass the data here
-                                const bridgeData = new NodeBridgeData({
-                                    key: schema.key,
-                                });
-                                const bridge = new NodeBridge(this, schema, bridgeData);
+                                // // TODO we need to actually pass the data here
+                                // const bridgeData = new NodeBridgeData({
+                                //     key: schema.key,
+                                // });
+                                const bridge = new NodeBridge(parent, this, schema);
 
                                 return [bridge.key, bridge] as const;
                             } catch (error) {}
@@ -152,8 +161,8 @@ function instantiateNode(
                         value: {
                             in: this.#in,
                             outs: this.#outs,
-                            inputs,
-                            outputs,
+                            inputs: inputs as Collection<OpenNodeEntry>,
+                            outputs: outputs as Collection<OpenNodeEntry>,
                         } satisfies NodeEntries,
                     },
                     parent: {
@@ -162,14 +171,11 @@ function instantiateNode(
                 });
             }
         }
+    }
 
-        execute(options?: Record<string, any>): Promise<boolean> {
-            throw new Error("Method not implemented.");
-        }
-
-        query(key: string): Promise<any> {
-            throw new Error("Method not implemented.");
-        }
+    interface TriggerNodeWrapper {
+        execute(options?: Record<string, any>): Promise<boolean>;
+        query(key: string): Promise<any>;
     }
 
     return new TriggerNodeWrapper();
@@ -196,8 +202,8 @@ interface OpenTriggerNode extends TriggerNode {
 
 type NodeEntries = {
     in: NodeBridge | null;
-    inputs: Collection<NodeEntry>;
-    outputs: Collection<NodeEntry>;
+    inputs: Collection<OpenNodeEntry>;
+    outputs: Collection<OpenNodeEntry>;
     outs: Collection<NodeBridge>;
 };
 

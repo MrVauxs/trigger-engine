@@ -1,0 +1,20 @@
+body {
+    > input.trigger-engine-field {
+        z-index: 999999;
+        position: absolute;
+        padding: 0 5px;
+        line-height: 0;
+        border-radius: 0;
+        width: var(--origin-width);
+        height: var(--origin-height);
+        font-size: var(--origin-font-size);
+        transform: translate(-50%, -50%);
+        transition: all var(--transition-time) ease-in;
+
+        &.scale-to {
+            width: var(--target-width);
+            height: var(--target-height);
+            font-size: var(--target-font-size);
+        }
+    }
+}

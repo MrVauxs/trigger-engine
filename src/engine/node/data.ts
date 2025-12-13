@@ -1,4 +1,4 @@
-import { TriggerData } from "engine";
+import { ConnectionCategory, ConnectionId, NodeEntryField, TriggerData } from "engine";
 import { IdField, PositionField } from "module-helpers";
 import abstract = foundry.abstract;
 import fields = foundry.data.fields;
@@ -7,6 +7,8 @@ class NodeData extends abstract.DataModel<TriggerData, NodeDataSchema> {
     static defineSchema(): NodeDataSchema {
         return {
             _id: new IdField(),
+            inputs: new fields.TypedObjectField(new NodeEntryField("outputs")),
+            ins: new fields.TypedObjectField(new NodeEntryField("outs")),
             position: new PositionField(),
             type: new fields.StringField({
                 required: true,
@@ -33,9 +35,18 @@ type NodeDataSource = SourceFromSchema<NodeDataSchema>;
 
 type NodeDataSchema = {
     _id: IdField;
+    inputs: EntryFields<"outputs">;
+    ins: EntryFields<"outs">;
     position: PositionField;
     type: fields.StringField<string, string, true, false, false>;
 };
+
+type EntryFields<TCategory extends ConnectionCategory> = fields.TypedObjectField<
+    NodeEntryField<TCategory>,
+    Record<string, { connections: ConnectionId<TCategory>[]; value?: any }>,
+    Record<string, { connections: ConnectionId<TCategory>[]; value?: any }>,
+    false
+>;
 
 export { NodeData };
 export type { CreateNodeData, NodeDataSchema, NodeDataSource, UpdateNodeData };

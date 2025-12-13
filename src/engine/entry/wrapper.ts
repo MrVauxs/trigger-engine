@@ -1,39 +1,77 @@
-import { InputEntrySchema, NodeEntry, NodeEntrySchema, Trigger, TriggerNode } from "engine";
+import {
+    InputEntrySchema,
+    NodeData,
+    NodeDataSource,
+    NodeEntry,
+    NodeEntrySchema,
+    NodeField,
+    Trigger,
+    TriggerNode,
+} from "engine";
 import { R } from "module-helpers";
 import { EntryCategory } from "triggers-menu";
 import abstract = foundry.abstract;
+import fields = foundry.data.fields;
 
 function instantiateEntry(
     trigger: Trigger,
     parent: TriggerNode,
     category: EntryCategory,
-    schema: InputEntrySchema
-): NodeEntry | undefined {
+    schema: InputEntrySchema,
+    data: NodeData,
+    open: true
+): OpenNodeEntry | undefined;
+function instantiateEntry(
+    trigger: Trigger,
+    parent: TriggerNode,
+    category: EntryCategory,
+    schema: InputEntrySchema,
+    data: NodeData,
+    open: boolean
+): NodeEntry | undefined;
+function instantiateEntry(
+    trigger: Trigger,
+    parent: TriggerNode,
+    category: EntryCategory,
+    schema: InputEntrySchema,
+    data: NodeData,
+    open: boolean
+): NodeEntry | OpenNodeEntry | undefined {
     const EntryCls = trigger.application.entries.get(schema.type) as typeof NodeEntry;
     if (!EntryCls) return;
 
-    class EntryNodeWrapper extends EntryCls {
+    const fieldData = "field" in schema && R.isPlainObject(schema.field) && schema.field;
+    const entrySchema = new NodeEntrySchema(R.omit(schema, ["field"]));
+
+    class NodeEntryWrapper extends EntryCls {
         constructor() {
             super();
-
-            const fieldData = "field" in schema && R.isPlainObject(schema.field) && schema.field;
-            const entrySchema = new NodeEntrySchema(R.omit(schema, ["field"]));
 
             if (category === "inputs") {
                 let entryField: abstract.DataModel | {} = {};
 
                 try {
-                    const fieldSchema = EntryCls.fieldSchema;
+                    const FieldCls = EntryCls.FieldClass;
+
+                    if (FieldCls && !(FieldCls.prototype instanceof NodeField)) {
+                        throw new Error("invalid 'FieldCls' type.");
+                    }
+
+                    if (parent.isEvent && !FieldCls) {
+                        throw new Error("event nodes can only have inputs with a field.");
+                    }
+
+                    const fieldSchema = EntryCls.FieldClass?.defineSchema;
 
                     class EntryField extends abstract.DataModel {
-                        static defineSchema() {
+                        static defineSchema(): fields.DataSchema {
                             return fieldSchema ?? {};
                         }
                     }
 
                     const field = new EntryField((fieldSchema && (fieldData as any)) || {});
 
-                    if (field && !field.invalid) {
+                    if (!field.invalid) {
                         entryField = field;
                     }
                 } catch (error) {
@@ -75,31 +113,33 @@ function instantiateEntry(
                 })
             );
 
-            // static accessors
-            Object.defineProperties(
-                this,
-                R.pipe(
-                    [
-                        ["category", category],
-                        ["fieldBackgroundColor", 0x3b3b3b],
-                        ["fieldBorderColor", 0xffffff],
-                        ["fieldBorderWidth", 1],
-                    ] as const,
-                    R.fromEntries(),
-                    R.mapValues((value) => {
-                        return {
-                            value,
-                            configurable: false,
-                            enumerable: true,
-                            writable: false,
-                        };
-                    })
-                )
-            );
+            if (open) {
+                Object.defineProperties(this, {
+                    category: {
+                        value: category,
+                    },
+                    data: {
+                        get() {
+                            return (category === "inputs" && data.inputs[entrySchema.key]) || {};
+                        },
+                    },
+                });
+            }
         }
     }
 
-    return new EntryNodeWrapper();
+    interface NodeEntryWrapper {
+        castValue(value: unknown): unknown;
+        processValue(value: unknown): unknown;
+    }
+
+    return new NodeEntryWrapper();
+}
+
+interface OpenNodeEntry extends NodeEntry {
+    category: EntryCategory;
+    get data(): ValueOf<NodeDataSource["inputs"]>;
 }
 
 export { instantiateEntry };
+export type { OpenNodeEntry };

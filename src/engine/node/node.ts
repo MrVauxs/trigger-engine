@@ -1,4 +1,4 @@
-import { BridgeSchema, InputEntrySchema, NodeEntry, OutputEntrySchema } from "engine";
+import { BridgeSchema, InputEntrySchema, NodeField, OutputEntrySchema } from "engine";
 import { LocalizeArgs, MODULE } from "module-helpers";
 import { IconObject, NodeData } from ".";
 
@@ -53,7 +53,15 @@ abstract class TriggerNode {
     }
 
     /**
-     * @see {@link NodeEntry.fieldSchema}
+     * Some nodes may not want to only have value inputs.
+     * This can only be used in conjunction with entries with a field.
+     */
+    static get inputsHaveConnector(): boolean {
+        return true;
+    }
+
+    /**
+     * @see {@link NodeField.defineSchema}
      * Define the inputs for this node if any.
      */
     static get defineInputs(): InputEntrySchema[] | null {

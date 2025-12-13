@@ -37,14 +37,25 @@ class BlueprintBridgeEntry extends BaseBlueprintEntry {
         return 0xffffff;
     }
 
-    _drawConnector(connector: PIXI.Graphics) {
-        connector.lineStyle({ color: this.color, width: 1 });
+    _drawConnector(): PIXI.Graphics {
+        const color = this.color;
+        const connector = new PIXI.Graphics();
+
+        if (this.isConnected) {
+            connector.beginFill(color);
+        }
+
+        connector.lineStyle({ color, width: 1 });
         connector.moveTo(0, 0);
         connector.lineTo(6, 0);
         connector.lineTo(12, 6);
         connector.lineTo(6, 12);
         connector.lineTo(0, 12);
         connector.lineTo(0, 0);
+
+        connector.endFill();
+
+        return connector;
     }
 
     _drawField(): null {

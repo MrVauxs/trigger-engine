@@ -154,6 +154,11 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         this.resizeAll();
     }
 
+    toggleLocked(locked: boolean) {
+        this.stage.eventMode = locked ? "none" : "static";
+        this.parent.toggleUIEnabled(locked);
+    }
+
     resizeAll(): void {
         this.resize();
 
@@ -293,10 +298,16 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
     }
 
     async #openNodesMenu(event: FederatedEvent, entry?: NodeEntry) {
+        // we need to calculate it now
+        const position = this.subtractPointFromEvent(event, this.#layers);
+
+        this.toggleLocked(true);
         const source = await BlueprintNodesMenu.wait(this.application, entry);
+        this.toggleLocked(false);
+
         if (!source) return;
 
-        source.position = this.subtractPointFromEvent(event, this.#layers);
+        source.position = position;
 
         const node = this.trigger?.addNode(source);
 

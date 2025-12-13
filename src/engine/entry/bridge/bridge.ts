@@ -1,12 +1,10 @@
-import { TriggerNode } from "engine";
-import { BridgeSchema, NodeBridgeData } from ".";
+import { Trigger, TriggerNode } from "engine";
+import { BridgeSchema } from ".";
 
 class NodeBridge {
-    #data: NodeBridgeData | undefined;
     #schema: BridgeSchema;
 
-    constructor(parent: TriggerNode, schema: BridgeSchema, data: NodeBridgeData | undefined) {
-        this.#data = data;
+    constructor(trigger: Trigger, parent: TriggerNode, schema: BridgeSchema) {
         this.#schema = schema;
     }
 

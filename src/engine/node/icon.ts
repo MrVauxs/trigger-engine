@@ -31,12 +31,12 @@ class NodeIconField extends DataUnionField<
                             blank: false,
                             readonly: true,
                         }),
-                        fontSize: new fields.NumberField({
+                        fontMult: new fields.NumberField({
                             required: false,
                             nullable: false,
                             readonly: true,
-                            initial: undefined,
-                            min: 0.1,
+                            initial: 1,
+                            min: 0,
                         }),
                         fontWeight: new fields.StringField<
                             TextStyleFontWeight,
@@ -70,7 +70,7 @@ class NodeIconField extends DataUnionField<
         if (R.isString(value)) {
             return {
                 unicode: value,
-                fontSize: undefined,
+                fontMult: 1,
                 fontWeight: undefined,
             } satisfies IconObject;
         }
@@ -81,12 +81,12 @@ class NodeIconField extends DataUnionField<
 
 type IconObjectSchema = {
     unicode: fields.StringField<string, string, true>;
-    fontSize: fields.NumberField<number, number, false, false, false>;
+    fontMult: fields.NumberField<number, number, false, false, true>;
     fontWeight: fields.StringField<TextStyleFontWeight, TextStyleFontWeight, false, false, false>;
 };
 
 type IconObject = Prettify<
-    WithPartial<ModelPropsFromSchema<IconObjectSchema>, "fontSize" | "fontWeight">
+    WithPartial<ModelPropsFromSchema<IconObjectSchema>, "fontMult" | "fontWeight">
 >;
 
 export { NodeIconField };

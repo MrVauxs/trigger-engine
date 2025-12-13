@@ -6,6 +6,7 @@ import {
     triggerNodeLocalize,
 } from "engine";
 import {
+    addListener,
     ApplicationClosingOptions,
     ApplicationConfiguration,
     ApplicationRenderOptions,
@@ -20,6 +21,7 @@ import {
 import { filterElements } from ".";
 
 class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
+    #abortController = new AbortController();
     #application: TriggerApplication;
     #entry: NodeEntry | undefined;
     #tagsInput: ExtendedMultiSelectElement | null = null;
@@ -31,6 +33,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         id: "trigger-engine-nodes-menu",
         window: {
             frame: false,
+            positioned: false,
         },
     };
 
@@ -70,6 +73,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
     }
 
     protected _onClose(options: ApplicationClosingOptions): void {
+        this.#abortController.abort();
         this.#resolve(null);
     }
 
@@ -163,10 +167,14 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
     }
 
     #addEventListeners(html: HTMLElement) {
-        html.addEventListener("pointerdown", (event) => {
-            if (event.target !== this.element) return;
-            this.close();
-        });
+        window.addEventListener(
+            "click",
+            (event) => {
+                if (!(event.target instanceof HTMLElement) || html.contains(event.target)) return;
+                this.close();
+            },
+            { signal: this.#abortController.signal }
+        );
 
         this.#searchInput = htmlQuery<ExtendedTextInputElement>(html, `[name="search"]`);
         this.#searchInput?.addEventListener("input", () => this.#filterNodes());

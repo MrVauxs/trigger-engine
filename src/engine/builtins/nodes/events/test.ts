@@ -19,6 +19,7 @@ class TestTriggerNode extends BuiltInTriggerNode {
         return [
             {
                 key: "entry",
+                label: "Entry",
                 type: "number",
                 field: {
                     default: 2,
@@ -26,6 +27,7 @@ class TestTriggerNode extends BuiltInTriggerNode {
             } satisfies InputEntrySchema<NumberFieldSchema>,
             {
                 key: "test",
+                label: "Long Entry Label",
                 type: "number",
                 field: {
                     default: 2,

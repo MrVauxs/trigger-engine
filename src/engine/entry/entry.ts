@@ -1,7 +1,6 @@
-import { BaseEntrySchema } from "engine";
+import { BaseEntrySchema, NodeField } from "engine";
 import { MODULE } from "module-helpers";
 import fields = foundry.data.fields;
-import { EntryCategory } from "triggers-menu";
 
 abstract class NodeEntry<
     TValue extends unknown = unknown,
@@ -35,9 +34,9 @@ abstract class NodeEntry<
     //////////////////////////////
 
     /**
-     * Defines the DataSchema for the input field that will be used in the triggers menu.
+     * Class inheriting `NodeField` to represent the input field of this entry.
      */
-    static get fieldSchema(): fields.DataSchema | null {
+    static get FieldClass(): typeof NodeField<unknown, fields.DataSchema> | null {
         return null;
     }
 
@@ -49,40 +48,51 @@ abstract class NodeEntry<
     }
 
     //////////////////////////////
+    // IMMUTABLE ACCESSORS
+    //////////////////////////////
+
+    /**
+     * @see {@link NodeField.defineSchema}
+     *
+     * The field data for this instance.
+     */
+    declare readonly field: EntryField<TFieldSchema>;
+
+    //////////////////////////////
     // ACCESSORS
     //////////////////////////////
 
-    declare readonly fieldBackgroundColor: ColorSource;
-    declare readonly fieldBorderColor: ColorSource;
-    declare readonly fieldBorderWidth: number;
-    declare readonly field: EntryField<TFieldSchema>;
+    /**
+     * @see {@link NodeEntry.default}
+     *
+     * The default value of this instance.
+     */
+    get default(): TValue {
+        return (this.constructor as typeof NodeEntry).default as TValue;
+    }
 
     //////////////////////////////
     // ABSTRACT METHODS
     //////////////////////////////
 
-    //////////////////////////////
-    // METHODS
-    //////////////////////////////
+    /**
+     * Cast the incoming value into `TValue` type.
+     */
+    abstract castValue(value: unknown): TValue;
 
     /**
-     * This will only be called for input entries that have a {@link NodeEntry.fieldSchema}.
+     * Make the necessary modifications to the value to be used by the nodes.
      *
-     * @param label     the already generated label element for the entry in case you want to move
-     *                  it inside the field instead of it being next to the connector.
-     * @param maxHeight    the max height and entry row.
-     * @returns         the field element to add to the input entry.
+     * This is where you would use {@link NodeEntry#field} to customize the value.
+     *
+     * This is called after {@link NodeEntry#castValue}
      */
-    createFieldElement(label: PreciseText, maxHeight: number): PIXI.Graphics | null {
-        return null;
-    }
+    abstract processValue(value: TValue): TValue;
 }
 
 interface NodeEntry
     extends Pick<BaseEntrySchema, "key" | "label" | "group">,
-        Pick<typeof NodeEntry, "type" | "color"> {
-    readonly category: EntryCategory;
-}
+        Pick<typeof NodeEntry, "type" | "color"> {}
 
 type EntryField<TFieldSchema extends fields.DataSchema | undefined = undefined> =
     TFieldSchema extends fields.DataSchema

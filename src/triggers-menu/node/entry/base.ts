@@ -2,7 +2,7 @@ import { alignHorizontally, BlueprintNode } from "..";
 
 abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
     #category: EntryCategory;
-    #connector: PIXI.Graphics = new PIXI.Graphics();
+    #connector?: PIXI.Graphics;
     #field?: PIXI.Container;
     #label?: PreciseText;
     #parent: BlueprintNode;
@@ -34,23 +34,19 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
         return !this.isInput;
     }
 
-    abstract _drawConnector(connector: PIXI.Graphics): void;
+    abstract _drawConnector(): PIXI.Graphics | null;
     abstract _drawField(label: PreciseText): PIXI.Graphics | null;
 
     draw() {
-        this.#connector.clear();
-        if (this.isConnected) {
-            this.#connector.beginFill(this.color);
-        }
-        this._drawConnector(this.#connector);
-        this.#connector.endFill();
+        this.#clear();
 
-        this.#label = this.node.preciseText(this.label);
-        this.#field = this._drawField(this.#label) ?? undefined;
+        this.#connector = this._drawConnector() || undefined;
+        this.#label = this.#drawLabel();
+        this.#field = this._drawField(this.#label) || undefined;
 
         const content = [
             this.#connector,
-            // if the field has been added to the field, we don't want to move it back at top level
+            // if the label has been added to the field, we don't want to move it back at top level
             this.#label.parent ? undefined : this.#label,
             this.#field,
         ];
@@ -59,6 +55,24 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
             height: this.node.entryHeight,
             reverse: this.isOutput,
             spacing: 5,
+        });
+    }
+
+    #clear() {
+        this.removeChildren();
+
+        this.#connector?.destroy(true);
+        this.#label?.destroy(true);
+        this.#field?.destroy(true);
+
+        this.#connector = undefined;
+        this.#label = undefined;
+        this.#field = undefined;
+    }
+
+    #drawLabel(): PreciseText {
+        return this.node.preciseText(this.label, {
+            lineHeight: this.node.entryHeight,
         });
     }
 }

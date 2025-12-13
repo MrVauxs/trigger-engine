@@ -1,5 +1,5 @@
 import { mapToObjByKey, MODULE } from "module-helpers";
-import { NumberNodeEntry, TestTriggerNode } from ".";
+import { NumberEntry, TestTriggerNode } from ".";
 
 class BuiltInApplication {
     static get moduleId(): string {
@@ -18,7 +18,7 @@ class BuiltInApplication {
         return `${this.moduleId}.${this.applicationId}`;
     }
 
-    static entries = mapToObjByKey([NumberNodeEntry] as const, "type");
+    static entries = mapToObjByKey([NumberEntry] as const, "type");
 
     static nodes = mapToObjByKey([TestTriggerNode] as const, "type");
 }
