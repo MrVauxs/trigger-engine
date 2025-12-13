@@ -45,13 +45,17 @@ class BlueprintBridgeEntry extends BaseBlueprintEntry {
             connector.beginFill(color);
         }
 
-        connector.lineStyle({ color, width: 1 });
-        connector.moveTo(0, 0);
-        connector.lineTo(6, 0);
-        connector.lineTo(12, 6);
-        connector.lineTo(6, 12);
-        connector.lineTo(0, 12);
-        connector.lineTo(0, 0);
+        const left = this.isInput ? 1.5 : 0;
+        const mid = 6 + left;
+        const right = 12 + left;
+
+        connector.lineStyle({ color, width: 1.5 });
+        connector.moveTo(left, 0);
+        connector.lineTo(mid, 0);
+        connector.lineTo(right, 6);
+        connector.lineTo(mid, 12);
+        connector.lineTo(left, 12);
+        connector.lineTo(left, 0);
 
         connector.endFill();
 

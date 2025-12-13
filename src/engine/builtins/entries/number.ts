@@ -168,7 +168,7 @@ class NumberEntry extends BuiltInNodeEntry<number, NumberFieldSchema> {
         return 0x07b88f;
     }
 
-    static get FieldCls(): typeof NumberField {
+    static get FieldClass(): typeof NumberField {
         return NumberField;
     }
 
