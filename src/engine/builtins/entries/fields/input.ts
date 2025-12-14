@@ -8,6 +8,7 @@ abstract class InputField<
 > extends BuiltInEntryField<TValue, TFieldSchema> {
     abstract get fontSize(): number;
     abstract get targetWidth(): number;
+    abstract get toDisplay(): string;
 
     get cursor(): PIXI.Cursor {
         return "text";
@@ -45,7 +46,7 @@ abstract class InputField<
         if (this.isConnected) {
             this.beginFill(this.fieldBackgroundColor);
         } else {
-            const valueElement = this.createPreciseText(String(this.value), {
+            const valueElement = this.createPreciseText(this.toDisplay, {
                 fontSize: this.fontSize,
                 lineHeight: this.lineHeight,
             });
@@ -64,6 +65,8 @@ abstract class InputField<
     }
 
     abstract createInput(): HTMLInputElement;
+    abstract afterRender(input: HTMLInputElement): void;
+    abstract afterAnimation(input: HTMLInputElement): void;
 
     onClick(): Promise<TValue> {
         const { center, width, height } = this.getGlobalBounds();
@@ -90,29 +93,29 @@ abstract class InputField<
             top: `${center.y}px`,
         });
 
-        this.afterInputRender(input);
+        this.afterRender(input);
 
         input.classList.add("scale-to");
+        setTimeout(() => {
+            input.classList.add("scaled");
+            this.afterAnimation(input);
+        }, transitionTime);
 
         return new Promise((resolve) => {
             const returnValue = async (value: TValue) => {
+                input.classList.remove("scaled");
                 input.classList.remove("scale-to");
                 setTimeout(() => {
                     input.remove();
                     resolve(value);
-                }, transitionTime);
+                }, transitionTime + 10);
             };
 
-            this.addEventListeners(input, returnValue);
+            this.activateEventListeners(input, returnValue);
         });
     }
 
-    afterInputRender(input: HTMLInputElement): void {
-        input.focus();
-        input.select();
-    }
-
-    addEventListeners(
+    activateEventListeners(
         input: HTMLInputElement,
         returnValue: (value: TValue) => Promise<void>
     ): void {

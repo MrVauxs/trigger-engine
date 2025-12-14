@@ -22,7 +22,7 @@ class TextEntry extends BuiltInNodeEntry<string, TextFieldSchema> {
     }
 
     processValue(value: string): string {
-        return this.field.trim ? value.trim() : value;
+        return this.field.trim !== false ? value.trim() : value;
     }
 }
 

@@ -50,6 +50,10 @@ class NumberField extends InputField<number, NumberFieldSchema> {
         return 80;
     }
 
+    get toDisplay(): string {
+        return String(this.value);
+    }
+
     createInput(): HTMLInputElement {
         const { min, max, step } = this.field;
 
@@ -61,6 +65,14 @@ class NumberField extends InputField<number, NumberFieldSchema> {
             max,
             step,
         });
+    }
+
+    afterRender(input: HTMLInputElement): void {
+        input.focus();
+    }
+
+    afterAnimation(input: HTMLInputElement): void {
+        input.select();
     }
 }
 
