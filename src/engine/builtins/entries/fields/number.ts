@@ -18,7 +18,7 @@ class NumberField extends InputField<number, NumberFieldSchema> {
             default: new fields.NumberField({
                 required: false,
                 nullable: false,
-                initial: 0,
+                initial: undefined,
             }),
             max: new fields.NumberField({
                 required: false,
@@ -78,7 +78,7 @@ class NumberField extends InputField<number, NumberFieldSchema> {
 
 type NumberFieldSchema = {
     choices: fields.ArrayField<fields.NumberField<number, number, true, false, false>>;
-    default: fields.NumberField<number, number, false, false, true>;
+    default: fields.NumberField<number, number, false, false, false>;
     max: fields.NumberField<number, number, false, false, false>;
     min: fields.NumberField<number, number, false, false, false>;
     step: fields.NumberField<number, number, false, false, true>;
