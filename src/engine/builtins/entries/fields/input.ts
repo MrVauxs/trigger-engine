@@ -44,7 +44,7 @@ abstract class InputField<
 
     draw(): void {
         if (this.isConnected) {
-            this.beginFill(this.fieldBackgroundColor);
+            this.beginFill(this.backgroundColor);
         } else {
             const valueElement = this.createPreciseText(this.toDisplay, {
                 fontSize: this.fontSize,
@@ -58,7 +58,7 @@ abstract class InputField<
             this.addChild(valueElement);
         }
 
-        this.lineStyle({ color: this.fieldBorderColor, width: this.fieldBorderWidth });
+        this.lineStyle({ color: this.borderColor, width: this.borderWidth });
         this.drawRect(0, 0, this.width, this.height);
 
         this.endFill();

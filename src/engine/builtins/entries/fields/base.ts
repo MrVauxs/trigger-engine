@@ -5,15 +5,15 @@ abstract class BuiltInEntryField<
     TValue extends unknown,
     TFieldSchema extends fields.DataSchema
 > extends NodeField<TValue, TFieldSchema> {
-    get fieldBorderColor(): ColorSource {
-        return 0xffffff;
-    }
-
-    get fieldBackgroundColor(): ColorSource {
+    get backgroundColor(): ColorSource {
         return 0x3b3b3b;
     }
 
-    get fieldBorderWidth(): number {
+    get borderColor(): ColorSource {
+        return 0xffffff;
+    }
+
+    get borderWidth(): number {
         return 1;
     }
 }
