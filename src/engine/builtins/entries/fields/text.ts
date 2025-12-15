@@ -1,7 +1,7 @@
+import { htmlQuery } from "module-helpers";
 import { InputField } from ".";
 import elements = foundry.applications.elements;
 import fields = foundry.data.fields;
-import { htmlQuery, R } from "module-helpers";
 
 const NODE_INPUT_CODE_TYPES = ["javascript", "json"] as const;
 const NODE_INPUT_TEXT_TYPES = ["enriched", ...NODE_INPUT_CODE_TYPES] as const;
@@ -9,6 +9,11 @@ const NODE_INPUT_TEXT_TYPES = ["enriched", ...NODE_INPUT_CODE_TYPES] as const;
 class TextField extends InputField<string, TextFieldSchema> {
     static get defineSchema(): TextFieldSchema {
         return {
+            default: new fields.StringField({
+                required: false,
+                nullable: false,
+                initial: undefined,
+            }),
             trim: new fields.BooleanField({
                 required: false,
                 nullable: false,
@@ -40,6 +45,10 @@ class TextField extends InputField<string, TextFieldSchema> {
         return this.field.type === "enriched";
     }
 
+    get isJSON(): boolean {
+        return this.field.type === "json";
+    }
+
     get targetFontSize(): number {
         return this.isSimpleInput ? super.targetFontSize : 15;
     }
@@ -57,6 +66,10 @@ class TextField extends InputField<string, TextFieldSchema> {
     }
 
     get toDisplay(): string {
+        if (this.isJSON && this.value === this.default) {
+            return "";
+        }
+
         return this.isSimpleInput
             ? this.value
             : this.isEnrichedInput
@@ -74,7 +87,7 @@ class TextField extends InputField<string, TextFieldSchema> {
         label.position.set(this.innerPadding, 0);
         label.style.fontSize = this.fontSize;
         label.style.lineHeight = this.lineHeight;
-        label.alpha = this.isConnected || !this.value ? 0.5 : 0;
+        label.alpha = this.isConnected || this.value === this.default ? 0.5 : 0;
 
         this.addRectangleMask(label, 0, 0, this.width - padding * 2, this.height);
         this.addChild(label);
@@ -170,11 +183,10 @@ class TextField extends InputField<string, TextFieldSchema> {
     }
 }
 
-type TextEntryCode = (typeof NODE_INPUT_CODE_TYPES)[number];
-
 type TextEntryType = (typeof NODE_INPUT_TEXT_TYPES)[number];
 
 type TextFieldSchema = {
+    default: fields.StringField<string, string, false, false, false>;
     trim: fields.BooleanField<boolean, boolean, false, false, true>;
     type: fields.StringField<TextEntryType, TextEntryType, false, false, false>;
 };
