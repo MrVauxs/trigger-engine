@@ -25,10 +25,6 @@ class BooleanEntry extends BuiltInNodeEntry<boolean, BooleanFieldSchema> {
     isValidType(value: unknown): value is boolean {
         return R.isBoolean(value);
     }
-
-    processValue(value: boolean): boolean {
-        return value;
-    }
 }
 
 export { BooleanEntry };

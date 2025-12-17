@@ -80,12 +80,16 @@ abstract class NodeEntry<
      */
     abstract isValidType(value: unknown): value is TValue;
 
+    //////////////////////////////
+    // METHODS
+    //////////////////////////////
+
     /**
      * Make the necessary modifications to the value to be used by the nodes.
-     *
-     * This is where you would use {@link NodeEntry#field} to customize the value.
      */
-    abstract processValue(value: TValue): TValue;
+    processValue(value: TValue): TValue {
+        return value;
+    }
 }
 
 interface NodeEntry

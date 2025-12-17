@@ -130,7 +130,6 @@ function instantiateEntry(
 
     interface NodeEntryWrapper {
         isValidType(value: unknown): value is unknown;
-        processValue(value: unknown): unknown;
     }
 
     return new NodeEntryWrapper();
