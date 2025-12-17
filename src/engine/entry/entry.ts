@@ -76,23 +76,23 @@ abstract class NodeEntry<
     //////////////////////////////
 
     /**
-     * Cast the incoming value into `TValue` type.
+     * @returns true if the provided value is of type `TValue`
      */
-    abstract castValue(value: unknown): TValue;
+    abstract isValidType(value: unknown): value is TValue;
 
     /**
      * Make the necessary modifications to the value to be used by the nodes.
      *
      * This is where you would use {@link NodeEntry#field} to customize the value.
-     *
-     * This is called after {@link NodeEntry#castValue}
      */
     abstract processValue(value: TValue): TValue;
 }
 
 interface NodeEntry
     extends Pick<BaseEntrySchema, "key" | "label" | "group">,
-        Pick<typeof NodeEntry, "type" | "color"> {}
+        Pick<typeof NodeEntry, "type" | "color"> {
+    readonly isArray: boolean;
+}
 
 type EntryField<TFieldSchema extends fields.DataSchema | undefined = undefined> =
     TFieldSchema extends fields.DataSchema

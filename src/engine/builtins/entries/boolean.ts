@@ -1,3 +1,4 @@
+import { R } from "module-helpers";
 import { BooleanField, BooleanFieldSchema, BuiltInNodeEntry } from ".";
 
 class BooleanEntry extends BuiltInNodeEntry<boolean, BooleanFieldSchema> {
@@ -21,8 +22,8 @@ class BooleanEntry extends BuiltInNodeEntry<boolean, BooleanFieldSchema> {
         return this.field.default ?? super.default;
     }
 
-    castValue(value: unknown): boolean {
-        return !!value;
+    isValidType(value: unknown): value is boolean {
+        return R.isBoolean(value);
     }
 
     processValue(value: boolean): boolean {

@@ -31,6 +31,10 @@ class BlueprintEntry extends BaseBlueprintEntry {
         return label ? game.i18n.localize(label) : this.node.localize("entry", key) ?? key;
     }
 
+    get isArray() {
+        return this.#entry.isArray;
+    }
+
     get isCustom(): boolean {
         return false;
     }
@@ -52,11 +56,18 @@ class BlueprintEntry extends BaseBlueprintEntry {
         );
     }
 
-    _drawConnector(): PIXI.Graphics | null {
-        if (!this.hasConnector) return null;
+    get canConnect(): boolean {
+        return this.isOutput || !this.isConnected;
+    }
 
+    _drawConnector(): PIXI.Graphics {
         const color = this.color;
         const connector = new PIXI.Graphics();
+
+        if (this.isArray) {
+            connector.lineStyle({ color, width: 1 });
+            connector.drawCircle(7, 7, 7.5);
+        }
 
         if (this.isConnected) {
             connector.beginFill(this.color);
@@ -65,9 +76,12 @@ class BlueprintEntry extends BaseBlueprintEntry {
         if (this.isCustom) {
             connector.lineStyle({ color, width: 2 });
             connector.drawRoundedRect(0, 0, 12.5, 12.5, 2.5);
+        } else if (this.isArray) {
+            connector.lineStyle({ color, width: 1 });
+            connector.drawCircle(7, 7, 5.5);
         } else {
             connector.lineStyle({ color, width: 2 });
-            connector.drawCircle(7, 7, 6.5);
+            connector.drawCircle(7, 7, 7);
         }
 
         connector.endFill();
@@ -76,11 +90,16 @@ class BlueprintEntry extends BaseBlueprintEntry {
     }
 
     _drawField(label: PreciseText): PIXI.Graphics | null {
-        if (!this.isInput) return null;
+        if (!this.isInput || this.isArray) return null;
 
         const entry = this.#entry;
         const FieldCls = this.FieldCls;
         if (!FieldCls) return null;
+
+        const processValue = (value: unknown): unknown => {
+            const validValue = entry.isValidType(value) ? value : entry.default;
+            return entry.processValue(validValue);
+        };
 
         const node = this.node;
         const rawValue = entry.data.value;
@@ -92,8 +111,8 @@ class BlueprintEntry extends BaseBlueprintEntry {
             field: entry.field as any,
             isConnected,
             label,
-            maxHeight: node.entryHeight - node.rowSpacing,
-            value: entry.processValue(entry.castValue(rawValue ?? defaultValue)),
+            maxHeight: this.maxHeight,
+            value: processValue(rawValue),
         };
 
         const fieldElement = instantiateField(FieldCls, node, options);
@@ -118,7 +137,7 @@ class BlueprintEntry extends BaseBlueprintEntry {
 
             if (value === rawValue) return;
 
-            const newValue = entry.processValue(entry.castValue(value));
+            const newValue = processValue(value);
             if (newValue === rawValue) return;
 
             this.node.data.updateSource({

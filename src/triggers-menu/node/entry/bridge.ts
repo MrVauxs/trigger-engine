@@ -37,6 +37,14 @@ class BlueprintBridgeEntry extends BaseBlueprintEntry {
         return 0xffffff;
     }
 
+    get hasConnector(): boolean {
+        return true;
+    }
+
+    get canConnect(): boolean {
+        return this.isInput || !this.isConnected;
+    }
+
     _drawConnector(): PIXI.Graphics {
         const color = this.color;
         const connector = new PIXI.Graphics();
@@ -45,17 +53,13 @@ class BlueprintBridgeEntry extends BaseBlueprintEntry {
             connector.beginFill(color);
         }
 
-        const left = this.isInput ? 1.5 : 0;
-        const mid = 6 + left;
-        const right = 12 + left;
-
         connector.lineStyle({ color, width: 1.5 });
-        connector.moveTo(left, 0);
-        connector.lineTo(mid, 0);
-        connector.lineTo(right, 6.25);
-        connector.lineTo(mid, 12.5);
-        connector.lineTo(left, 12.5);
-        connector.lineTo(left, 0);
+        connector.moveTo(0, 0);
+        connector.lineTo(6, 0);
+        connector.lineTo(11.5, 6.25);
+        connector.lineTo(6, 12.5);
+        connector.lineTo(0, 12.5);
+        connector.lineTo(0, 0);
 
         connector.endFill();
 

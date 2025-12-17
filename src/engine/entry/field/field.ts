@@ -62,7 +62,7 @@ abstract class NodeField<
     declare readonly default: TValue;
 
     /**
-     * The current value of this input after going through {@link NodeEntry#castValue} & {@link NodeEntry#processValue}
+     * The current value of this input after going through {@link NodeEntry#isValidType} & {@link NodeEntry#processValue}
      */
     declare readonly value: TValue;
 

@@ -5,6 +5,11 @@ import fields = foundry.data.fields;
 class NodeEntrySchema extends abstract.DataModel<null, EntrySchemaSchema> {
     static defineSchema(): EntrySchemaSchema {
         return {
+            isArray: new fields.BooleanField({
+                required: false,
+                nullable: false,
+                initial: false,
+            }),
             key: new fields.StringField({
                 required: true,
                 nullable: false,
@@ -36,6 +41,7 @@ interface NodeEntrySchema extends ModelPropsFromSchema<EntrySchemaSchema> {}
 type NodeEntrySchemaSource = SourceFromSchema<EntrySchemaSchema>;
 
 type EntrySchemaSchema = {
+    isArray: fields.BooleanField<boolean, boolean, false, false, true>;
     key: fields.StringField<string, string, true, false, false>;
     label: fields.StringField<string, string, false, false, false>;
     group: fields.StringField<string, string, false, false, false>;

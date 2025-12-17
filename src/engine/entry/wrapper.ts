@@ -47,7 +47,7 @@ function instantiateEntry(
         constructor() {
             super();
 
-            if (category === "inputs") {
+            if (category === "inputs" && !entrySchema.isArray) {
                 let entryField: abstract.DataModel | {} = {};
 
                 try {
@@ -90,7 +90,7 @@ function instantiateEntry(
             // from schema accessors
             Object.defineProperties(
                 this,
-                R.fromKeys(["key", "label", "group"] as const, (property) => {
+                R.fromKeys(["isArray", "key", "label", "group"] as const, (property) => {
                     return {
                         value: entrySchema[property],
                         configurable: false,
@@ -129,7 +129,7 @@ function instantiateEntry(
     }
 
     interface NodeEntryWrapper {
-        castValue(value: unknown): unknown;
+        isValidType(value: unknown): value is unknown;
         processValue(value: unknown): unknown;
     }
 

@@ -17,6 +17,8 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
     abstract get key(): string;
     abstract get label(): string;
     abstract get color(): ColorSource;
+    abstract get canConnect(): boolean;
+    abstract get hasConnector(): boolean;
 
     get node() {
         return this.#parent;
@@ -26,12 +28,20 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
         return false;
     }
 
-    get isInput() {
+    get isInput(): boolean {
         return this.#category === "inputs";
     }
 
-    get isOutput() {
+    get isOutput(): boolean {
         return !this.isInput;
+    }
+
+    get maxHeight(): number {
+        return this.node.entryHeight - this.node.rowSpacing;
+    }
+
+    get connectorWidth(): number {
+        return 16;
     }
 
     abstract _drawConnector(): PIXI.Graphics | null;
@@ -40,7 +50,7 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
     draw() {
         this.#clear();
 
-        this.#connector = this._drawConnector() || undefined;
+        this.#connector = this.#drawConnector();
         this.#label = this.#drawLabel();
         this.#field = this._drawField(this.#label) || undefined;
 
@@ -68,6 +78,23 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
         this.#connector = undefined;
         this.#label = undefined;
         this.#field = undefined;
+    }
+
+    #drawConnector(): PIXI.Graphics | undefined {
+        if (!this.hasConnector) return;
+
+        const connector = this._drawConnector();
+
+        if (!connector || !this.canConnect) {
+            return connector ?? undefined;
+        }
+
+        connector.width = this.connectorWidth;
+        connector.cursor = "alias";
+        connector.eventMode = "static";
+        connector.hitArea = new PIXI.Rectangle(0, 0, this.connectorWidth, this.maxHeight);
+
+        return connector;
     }
 
     #drawLabel(): PreciseText {

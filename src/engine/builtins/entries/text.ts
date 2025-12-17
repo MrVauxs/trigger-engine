@@ -1,5 +1,6 @@
 import { BuiltInNodeEntry, TextField, TextFieldSchema } from ".";
 import validators = foundry.data.validators;
+import { R } from "module-helpers";
 
 class TextEntry extends BuiltInNodeEntry<string, TextFieldSchema> {
     static get type(): "text" {
@@ -29,8 +30,8 @@ class TextEntry extends BuiltInNodeEntry<string, TextFieldSchema> {
         );
     }
 
-    castValue(value: unknown): string {
-        return String(value);
+    isValidType(value: unknown): value is string {
+        return R.isString(value);
     }
 
     processValue(value: string): string {
