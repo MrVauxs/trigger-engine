@@ -1,6 +1,7 @@
 import {
     BuiltInApplication,
     createCollection,
+    EntryConvertor,
     NodeEntry,
     Trigger,
     TriggerApplicationCollection,
@@ -19,6 +20,7 @@ const APPLICATION_MODES = ["setting", "free"] as const;
 class TriggerApplication {
     #applicationId: string;
     #applicationKey: string;
+    #convertors: Collection<EntryConvertor>;
     #entries: Collection<typeof NodeEntry>;
     #hooks: Collection<typeof TriggerHook>;
     #mode: TriggerApplicationMode;
@@ -32,6 +34,7 @@ class TriggerApplication {
         this.#applicationId = applicationId;
         this.#applicationKey = `${moduleId}:${applicationId}`;
 
+        this.#convertors = createCollection(options, "convertors");
         this.#entries = createCollection(options, "entries");
         this.#hooks = new Collection();
         this.#nodes = createCollection(options, "nodes");
@@ -194,9 +197,13 @@ class TriggerApplication {
 type ApplicationParentType = "setting" | "document";
 
 type TriggerApplicationOptions = TriggerApplicationCollections & {
-    builtins?: Record<TriggerApplicationCollection, string[] | boolean> | true;
+    builtins?: BuiltInOptions | true;
     mode?: TriggerApplicationMode;
     setting?: ApplicationMenuOptions;
+};
+
+type BuiltInOptions = {
+    [k in TriggerApplicationCollection]: true | (typeof BuiltInApplication)[k][number][0][];
 };
 
 type ApplicationMenuOptions = {

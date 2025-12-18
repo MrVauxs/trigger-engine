@@ -1,5 +1,6 @@
-import { mapToObjByKey, MODULE } from "module-helpers";
-import { BooleanEntry, NumberEntry, TestTriggerNode, TextEntry } from ".";
+import { mapConvertors } from "engine";
+import { MODULE, R } from "module-helpers";
+import { BooleanEntry, convertors, NumberEntry, TestTriggerNode, TextEntry } from ".";
 
 class BuiltInApplication {
     static get moduleId(): string {
@@ -18,9 +19,14 @@ class BuiltInApplication {
         return `${this.moduleId}.${this.applicationId}`;
     }
 
-    static entries = mapToObjByKey([BooleanEntry, NumberEntry, TextEntry] as const, "type");
+    static entries = R.map(
+        [BooleanEntry, NumberEntry, TextEntry],
+        (entry) => [entry.type, entry] as const
+    );
 
-    static nodes = mapToObjByKey([TestTriggerNode] as const, "type");
+    static nodes = R.map([TestTriggerNode], (node) => [node.type, node] as const);
+
+    static convertors = mapConvertors(convertors);
 }
 
 export { BuiltInApplication };
