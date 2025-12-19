@@ -43,7 +43,7 @@ function maxBottom(a?: PIXI.Container | NodePart, b?: PIXI.Container | NodePart)
     return Math.max(getBottom(a), getBottom(b));
 }
 
-type NodePart = PIXI.Container & {
+type NodePart<T extends PIXI.DisplayObject = PIXI.DisplayObject> = PIXI.Container<T> & {
     calculatedHeight: number;
     calculatedWith: number;
 };

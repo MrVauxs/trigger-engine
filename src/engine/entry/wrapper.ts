@@ -5,6 +5,8 @@ import {
     NodeEntry,
     NodeEntrySchema,
     NodeField,
+    OpenTrigger,
+    OpenTriggerNode,
     Trigger,
     TriggerNode,
 } from "engine";
@@ -14,8 +16,8 @@ import abstract = foundry.abstract;
 import fields = foundry.data.fields;
 
 function instantiateEntry(
-    trigger: Trigger,
-    parent: TriggerNode,
+    trigger: OpenTrigger,
+    parent: OpenTriggerNode,
     category: EntryCategory,
     schema: InputEntrySchema,
     data: NodeData,

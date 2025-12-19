@@ -1,9 +1,10 @@
 import {
     BuiltInApplication,
     createCollection,
+    createConvertorKey,
     EntryConvertor,
     NodeEntry,
-    Trigger,
+    OpenTrigger,
     TriggerApplicationCollection,
     TriggerApplicationCollections,
     TriggerData,
@@ -26,7 +27,6 @@ class TriggerApplication {
     #mode: TriggerApplicationMode;
     #moduleId: string;
     #nodes: Collection<typeof TriggerNode>;
-    #triggers: Collection<Trigger>;
 
     constructor(moduleId: string, applicationId: string, options: TriggerApplicationOptions = {}) {
         this.#mode = R.isIncludedIn(options.mode, APPLICATION_MODES) ? options.mode : "setting";
@@ -38,7 +38,6 @@ class TriggerApplication {
         this.#entries = createCollection(options, "entries");
         this.#hooks = new Collection();
         this.#nodes = createCollection(options, "nodes");
-        this.#triggers = new Collection();
 
         if (this.isSettingApplication) {
             this.#setupSetting(options.setting);
@@ -69,10 +68,6 @@ class TriggerApplication {
         return this.#moduleId;
     }
 
-    get triggers(): Collection<Trigger> {
-        return this.#triggers;
-    }
-
     get settingMenuKey(): string {
         return `${this.applicationId}-menu`;
     }
@@ -91,12 +86,6 @@ class TriggerApplication {
 
     get nodes(): Collection<typeof TriggerNode> {
         return this.#nodes;
-    }
-
-    initialize(triggers?: TriggerData[]) {
-        this.#triggers.clear();
-
-        // TODO
     }
 
     async openMenu(arg?: TriggerDataSource): Promise<BlueprintApplication | undefined> {
@@ -120,14 +109,19 @@ class TriggerApplication {
         }
     }
 
-    createTrigger(source: DeepPartial<TriggerDataSource>, open: boolean): Trigger | null {
+    createTrigger(source: DeepPartial<TriggerDataSource>, open: boolean): OpenTrigger | null {
         try {
             const data = new TriggerData({ ...source, applicationKey: this.applicationKey });
-            return new Trigger(this, data, true);
+            return new OpenTrigger(this, data);
         } catch (error) {
             MODULE.error(`an error ocurred while trying to create a Trigger.`, error);
             return null;
         }
+    }
+
+    getConvertor(output: string, input: string): EntryConvertor | undefined {
+        const key = createConvertorKey(output, input);
+        return this.#convertors.get(key);
     }
 
     #getSettingApplication(): typeof BlueprintApplication | undefined {
@@ -164,7 +158,7 @@ class TriggerApplication {
             config: false,
             name: settingKey,
             onChange: () => {
-                // prepareTriggers(R.values(APPLICATIONS));
+                // TODO prepareTriggers(R.values(APPLICATIONS));
             },
         });
 

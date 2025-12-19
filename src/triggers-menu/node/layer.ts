@@ -2,7 +2,7 @@ import { OpenTriggerNode } from "engine";
 import { BlueprintNode } from ".";
 import { Blueprint, BlueprintLayers } from "..";
 
-class BlueprintNodesLayer extends PIXI.Container {
+class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
     #nodes: Collection<BlueprintNode> = new Collection();
 
     get blueprint(): Blueprint {
@@ -20,6 +20,21 @@ class BlueprintNodesLayer extends PIXI.Container {
     clearSelected() {
         for (const node of this.#nodes) {
             node.selected = false;
+        }
+    }
+
+    get(id: string): BlueprintNode | undefined {
+        return this.#nodes.get(id);
+    }
+
+    getAtPosition({ x, y }: Point): BlueprintNode | undefined {
+        const nodes = this.children;
+        for (let i = nodes.length - 1; i >= 0; i--) {
+            const node = nodes[i];
+
+            if (node.getBounds().contains(x, y)) {
+                return node;
+            }
         }
     }
 

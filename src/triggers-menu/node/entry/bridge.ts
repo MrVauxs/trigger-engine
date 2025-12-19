@@ -1,6 +1,6 @@
 import { NodeBridge } from "engine";
 import { localize } from "module-helpers";
-import { BaseBlueprintEntry, EntryCategory } from ".";
+import { BaseBlueprintEntry, EntryCategory, PreciseEntryCategory } from ".";
 import { BlueprintNode } from "..";
 
 class BlueprintBridgeEntry extends BaseBlueprintEntry {
@@ -10,6 +10,14 @@ class BlueprintBridgeEntry extends BaseBlueprintEntry {
         super(parent, category);
 
         this.#data = data;
+    }
+
+    get preciseCategory(): PreciseEntryCategory {
+        return this.isInput ? "ins" : "outs";
+    }
+
+    get oppositePreciseCategory(): PreciseEntryCategory {
+        return this.isInput ? "outs" : "ins";
     }
 
     get key(): string {
@@ -45,11 +53,10 @@ class BlueprintBridgeEntry extends BaseBlueprintEntry {
         return this.isInput || !this.isConnected;
     }
 
-    _drawConnector(): PIXI.Graphics {
+    _drawConnector(connector: PIXI.Graphics, isConnected: boolean) {
         const color = this.color;
-        const connector = new PIXI.Graphics();
 
-        if (this.isConnected) {
+        if (isConnected) {
             connector.beginFill(color);
         }
 
@@ -62,8 +69,6 @@ class BlueprintBridgeEntry extends BaseBlueprintEntry {
         connector.lineTo(0, 0);
 
         connector.endFill();
-
-        return connector;
     }
 
     _drawField(): null {

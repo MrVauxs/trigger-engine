@@ -1,4 +1,4 @@
-import { assignStyle, R, setStyleProperties } from "module-helpers";
+import { assignStyle, getInputValue, R, setStyleProperties } from "module-helpers";
 import { BuiltInEntryField } from ".";
 import fields = foundry.data.fields;
 
@@ -120,7 +120,7 @@ abstract class InputField<
         returnValue: (value: TValue) => Promise<void>
     ): void {
         const onBlur = () => {
-            returnValue(input.value as TValue);
+            returnValue(getInputValue(input) as TValue);
         };
 
         input.addEventListener("blur", onBlur, { once: true });

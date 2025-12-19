@@ -1,4 +1,4 @@
-import { Trigger, TriggerApplication, TriggerDataSource, UpdateTriggerData } from "engine";
+import { OpenTrigger, TriggerApplication, TriggerDataSource, UpdateTriggerData } from "engine";
 import {
     addEnterKeyListeners,
     addListener,
@@ -290,7 +290,7 @@ class BlueprintApplication extends apps.ApplicationV2<
     }
 
     _getTriggerContextOptions(): ContextMenuEntry[] {
-        const getTriggerFromElement = (el: HTMLElement): Trigger | null => {
+        const getTriggerFromElement = (el: HTMLElement): OpenTrigger | null => {
             const triggerId = el.dataset.id;
             return triggerId ? this.blueprint.getTrigger(triggerId) : null;
         };
@@ -362,7 +362,7 @@ class BlueprintApplication extends apps.ApplicationV2<
         }
     }
 
-    async #editTrigger(folder?: string, trigger?: Trigger) {
+    async #editTrigger(folder?: string, trigger?: OpenTrigger) {
         const isEdit = !!trigger;
 
         const result = await waitDialog<UpdateTriggerData>({
@@ -440,7 +440,7 @@ type BlueprintContext = TriggersContext | TriggerContext;
 
 type TriggerContext = {
     isFree: boolean;
-    trigger: Trigger;
+    trigger: OpenTrigger;
 };
 
 type TriggersContext = {
@@ -455,11 +455,11 @@ type TriggersContext = {
 
 type TriggersGroup = {
     folder: string;
-    triggers: Trigger[];
+    triggers: OpenTrigger[];
 };
 
 type BlueprintRenderOptions = ApplicationRenderOptions & {
-    trigger: Trigger | undefined;
+    trigger: OpenTrigger | undefined;
 };
 
 export { BlueprintApplication, filterElements };

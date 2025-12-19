@@ -1,3 +1,4 @@
+import { dividePointBy, subtractPoint } from "module-helpers";
 import { Blueprint, BlueprintConnectionsLayer, BlueprintNodesLayer } from ".";
 
 class BlueprintLayers extends PIXI.Container {
@@ -11,7 +12,7 @@ class BlueprintLayers extends PIXI.Container {
         this.#blueprint = blueprint;
 
         this.addChild(
-            (this.#connections = new BlueprintConnectionsLayer()),
+            (this.#connections = new BlueprintConnectionsLayer(blueprint)),
             (this.#nodes = new BlueprintNodesLayer())
         );
     }
@@ -31,6 +32,10 @@ class BlueprintLayers extends PIXI.Container {
     clear() {
         this.#connections.clear();
         this.#nodes.clear();
+    }
+
+    fromPoint(point: Point): Point {
+        return subtractPoint(dividePointBy(point, this.blueprint.scale), this);
     }
 }
 

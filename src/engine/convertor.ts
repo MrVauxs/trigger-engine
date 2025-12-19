@@ -9,9 +9,13 @@ function mapConvertors<T extends EntryConvertor>(
             return R.isString(input) && R.isString(output) && R.isFunction(convertToInput);
         }),
         R.map((convertor) => {
-            return [`${convertor.output}-to-${convertor.input}`, convertor] as const;
+            return [createConvertorKey(convertor.output, convertor.input), convertor] as const;
         })
     ) as [ExtractConvertorsKeys<T>, T][];
+}
+
+function createConvertorKey(output: string, input: string): `${string}-to-${string}` {
+    return `${output}-to-${input}`;
 }
 
 type ExtractConvertorsKeys<T extends EntryConvertor> = T extends {
@@ -27,5 +31,5 @@ type EntryConvertor<TInput extends any = any, TOutput extends any = any> = {
     convertToInput: (value: TOutput) => TInput;
 };
 
-export { mapConvertors };
+export { createConvertorKey, mapConvertors };
 export type { EntryConvertor };

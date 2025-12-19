@@ -1,82 +1,33 @@
-import {
-    CreateNodeData,
-    instantiateNode,
-    NodeData,
-    OpenTriggerNode,
-    TriggerApplication,
-    TriggerData,
-    TriggerDataSource,
-    TriggerNode,
-    UpdateNodeData,
-    UpdateTriggerData,
-} from "engine";
-import { enrichHTML, MODULE, R } from "module-helpers";
+import { TriggerApplication, TriggerData, TriggerNode } from "engine";
 
-class Trigger {
+class Trigger<TNode extends TriggerNode = TriggerNode> {
     #data: TriggerData;
-    #nodes: Collection<TriggerNode>;
+    #nodes: Collection<TNode> = new Collection();
     #parent: TriggerApplication;
 
-    constructor(parent: TriggerApplication, data: TriggerData, open: boolean) {
+    constructor(parent: TriggerApplication, data: TriggerData) {
         this.#data = data;
         this.#parent = parent;
-
-        this.#nodes = new Collection(
-            R.pipe(
-                data.nodes.contents,
-                R.map((data) => {
-                    try {
-                        const node = instantiateNode(this, data, open);
-                        return node ? ([node.id, node] as const) : undefined;
-                    } catch (error) {}
-                }),
-                R.filter(R.isTruthy)
-            )
-        );
     }
 
     get application(): TriggerApplication {
         return this.#parent;
     }
 
-    get applicationKey(): string {
-        return this.#data.applicationKey;
-    }
-
-    get path(): string {
-        return `${this.applicationKey}:${this.id}`;
+    get data(): TriggerData {
+        return this.#data;
     }
 
     get id(): string {
-        return this.#data.id;
-    }
-
-    get description(): string {
-        return this.#data.description;
-    }
-
-    get enrichedDescription(): Promise<string> {
-        return enrichHTML(this.description);
-    }
-
-    get folder(): string {
-        return this.#data.folder;
-    }
-
-    get label(): string {
-        return this.name || this.id;
+        return this.data.id;
     }
 
     get name(): string {
-        return this.#data.name;
-    }
-
-    get tags(): string[] {
-        return this.#data.tags;
+        return this.data.name;
     }
 
     get invalid(): boolean {
-        return this.#data.invalid;
+        return this.data.invalid;
     }
 
     // TODO need to actually implement that when module triggers is done
@@ -84,60 +35,14 @@ class Trigger {
         return false;
     }
 
-    get nodes(): Collection<TriggerNode> {
+    get nodes(): Collection<TNode> {
         return this.#nodes;
     }
 
-    update(data: UpdateTriggerData): DeepPartial<TriggerDataSource> {
-        return this.#data.updateSource(data);
-    }
-
-    duplicate(): TriggerDataSource {
-        const clone = this.#data.clone({
-            _id: foundry.utils.randomID(),
-            name: this.name ? game.i18n.format("DOCUMENT.CopyOf", { name: this.name }) : "",
-        } satisfies DeepPartial<TriggerDataSource>);
-
-        return clone.toObject();
-    }
-
-    addNode(source: CreateNodeData): OpenTriggerNode | undefined {
-        try {
-            const data = this.#data.addNode(source);
-
-            if (!data || data.invalid) {
-                throw new Error("The provided NodeData source is invalid.");
-            }
-
-            const node = instantiateNode(this, data, true);
-
-            if (node) {
-                this.#nodes.set(node.id, node);
-                return node;
-            }
-        } catch (error) {
-            MODULE.error(`an error ocurred while trying to add a TriggerNode.`, error);
-        }
-    }
-
-    getNode(id: string): TriggerNode | undefined {
+    getNode(id: string): TNode | undefined {
+        // TODO we need to instantiate the node
         return this.nodes.get(id);
     }
-
-    getNodeData(id: string): NodeData | undefined {
-        return this.#data.nodes.get(id);
-    }
-
-    updateNode(id: string, updates: UpdateNodeData) {
-        const data = this.getNodeData(id);
-        data?.updateSource(updates);
-    }
-
-    toObject() {
-        return this.#data.toObject();
-    }
 }
-
-interface Trigger {}
 
 export { Trigger };

@@ -1,17 +1,23 @@
 import {
+    BridgeSchema,
     BuiltInApplication,
     instantiateEntry,
     isBuiltInNode,
     NodeBridge,
     NodeEntry,
     OpenNodeEntry,
+    OpenTrigger,
     Trigger,
     TriggerApplication,
 } from "engine";
 import { joinStr, LocalizeArgs, LocalizeData, MODULE, R } from "module-helpers";
 import { NodeData, TriggerNode } from ".";
 
-function instantiateNode(parent: Trigger, data: NodeData, open: true): OpenTriggerNode | undefined;
+function instantiateNode(
+    parent: OpenTrigger,
+    data: NodeData,
+    open: true
+): OpenTriggerNode | undefined;
 function instantiateNode(parent: Trigger, data: NodeData, open: boolean): TriggerNode | undefined;
 function instantiateNode(
     parent: Trigger,
@@ -122,12 +128,8 @@ function instantiateNode(
                 }
             );
 
-            const rawOuts = NodeCls.outs || (isEvent ? "out" : []);
             const [ins, outs] = R.map(
-                [
-                    !isEvent && NodeCls.hasIn ? [{ key: "in" }] : [],
-                    R.isString(rawOuts) ? [{ key: rawOuts }] : rawOuts,
-                ] as const,
+                [!isEvent && NodeCls.hasIn ? [{ key: "in" }] : [], getNodeOuts(NodeCls)] as const,
                 (schemas) => {
                     return R.pipe(
                         schemas,
@@ -181,6 +183,12 @@ function instantiateNode(
     return new TriggerNodeWrapper();
 }
 
+// TODO this needs to also return custom outs
+function getNodeOuts(NodeCls: typeof TriggerNode): BridgeSchema[] {
+    const rawOuts = NodeCls.outs || (NodeCls.isEvent ? "out" : []);
+    return R.isString(rawOuts) ? [{ key: rawOuts }] : rawOuts;
+}
+
 function triggerNodeLocalize(
     application: TriggerApplication,
     node: typeof TriggerNode,
@@ -197,7 +205,7 @@ function triggerNodeLocalize(
 interface OpenTriggerNode extends TriggerNode {
     data: NodeData;
     entries: NodeEntries;
-    parent: Trigger;
+    parent: OpenTrigger;
 }
 
 type NodeEntries = {
@@ -207,5 +215,5 @@ type NodeEntries = {
     outs: Collection<NodeBridge>;
 };
 
-export { instantiateNode, triggerNodeLocalize };
+export { getNodeOuts, instantiateNode, triggerNodeLocalize };
 export type { OpenTriggerNode };

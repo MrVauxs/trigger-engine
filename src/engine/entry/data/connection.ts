@@ -38,8 +38,7 @@ interface EntryConnectionField {
     options: EntryConnectionFieldOptions;
 }
 
-type ConnectionId<TCategory extends ConnectionCategory = ConnectionCategory> =
-    `${string}:${TCategory}:${string}`;
+type ConnectionId = `${string}:${ConnectionCategory}:${string}`;
 
 type ConnectionCategory = (typeof CONNECTION_CATEGORIES)[number];
 

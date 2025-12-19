@@ -43,8 +43,8 @@ type NodeDataSchema = {
 
 type EntryFields<TCategory extends ConnectionCategory> = fields.TypedObjectField<
     NodeEntryField<TCategory>,
-    Record<string, { connections: ConnectionId<TCategory>[]; value?: any }>,
-    Record<string, { connections: ConnectionId<TCategory>[]; value?: any }>,
+    Record<string, { connections?: ConnectionId[]; value?: any }>,
+    Record<string, { connections?: ConnectionId[]; value?: any }>,
     false
 >;
 

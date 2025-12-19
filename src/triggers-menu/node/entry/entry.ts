@@ -22,6 +22,10 @@ class BlueprintEntry extends BaseBlueprintEntry {
         return this.node.blueprint;
     }
 
+    get type(): string {
+        return this.#entry.type;
+    }
+
     get key(): string {
         return this.#entry.key;
     }
@@ -60,16 +64,26 @@ class BlueprintEntry extends BaseBlueprintEntry {
         return this.isOutput || !this.isConnected;
     }
 
-    _drawConnector(): PIXI.Graphics {
+    canConvertWith(other: BlueprintEntry): boolean {
+        if (this.type === other.type) return true;
+
+        const [input, output] = this.isInput ? [this.type, other.type] : [other.type, this.type];
+        return !!this.blueprint.application.getConvertor(output, input);
+    }
+
+    canConnectTo(other: BlueprintEntry): boolean {
+        return super.canConnectTo(other) && this.canConvertWith(other);
+    }
+
+    _drawConnector(connector: PIXI.Graphics, isConnected: boolean) {
         const color = this.color;
-        const connector = new PIXI.Graphics();
 
         if (this.isArray) {
             connector.lineStyle({ color, width: 1 });
             connector.drawCircle(7, 7, 7.5);
         }
 
-        if (this.isConnected) {
+        if (isConnected) {
             connector.beginFill(this.color);
         }
 
@@ -85,8 +99,6 @@ class BlueprintEntry extends BaseBlueprintEntry {
         }
 
         connector.endFill();
-
-        return connector;
     }
 
     _drawField(label: PreciseText): PIXI.Graphics | null {
@@ -140,9 +152,14 @@ class BlueprintEntry extends BaseBlueprintEntry {
             const newValue = processValue(value);
             if (newValue === rawValue) return;
 
+            const update = {
+                connections: [],
+                value: newValue,
+            };
+
             this.node.data.updateSource({
                 inputs: {
-                    [this.key]: newValue === defaultValue ? undefined : { value: newValue },
+                    [this.key]: newValue === defaultValue ? undefined : update,
                 },
             });
 

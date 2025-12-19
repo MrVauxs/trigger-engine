@@ -1,3 +1,4 @@
+import { Blueprint } from "triggers-menu";
 import { alignHorizontally, BlueprintNode } from "..";
 
 abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
@@ -20,12 +21,40 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
     abstract get canConnect(): boolean;
     abstract get hasConnector(): boolean;
 
-    get node() {
+    get id(): EntryId {
+        return `${this.node.id}:${this.preciseCategory}:${this.key}`;
+    }
+
+    get category(): EntryCategory {
+        return this.#category;
+    }
+
+    get preciseCategory(): PreciseEntryCategory {
+        return this.category;
+    }
+
+    get oppositeCategory(): EntryCategory {
+        return this.isInput ? "outputs" : "inputs";
+    }
+
+    get oppositePreciseCategory(): PreciseEntryCategory {
+        return this.oppositeCategory;
+    }
+
+    get node(): BlueprintNode {
         return this.#parent;
     }
 
+    get blueprint(): Blueprint {
+        return this.node.blueprint;
+    }
+
+    get stage(): PIXI.Container {
+        return this.blueprint.stage;
+    }
+
     get isConnected(): boolean {
-        return false;
+        return this.blueprint.getComputedConnection(this.id);
     }
 
     get isInput(): boolean {
@@ -44,7 +73,20 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
         return 16;
     }
 
-    abstract _drawConnector(): PIXI.Graphics | null;
+    get connectorCenter(): Point {
+        if (!this.#connector) {
+            return { x: 0, y: 0 };
+        }
+
+        const bounds = this.#connector.getBounds();
+
+        return {
+            x: bounds.x + bounds.width / 2,
+            y: bounds.y + bounds.height / 2,
+        };
+    }
+
+    abstract _drawConnector(connector: PIXI.Graphics, isConnected: boolean): void;
     abstract _drawField(label: PreciseText): PIXI.Graphics | null;
 
     draw() {
@@ -68,6 +110,22 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
         });
     }
 
+    redrawConnector(isConnected: boolean) {
+        const connector = this.#connector;
+        if (!connector) return;
+
+        connector.clear();
+        this._drawConnector(connector, isConnected);
+    }
+
+    canConnectTo(other: BaseBlueprintEntry) {
+        return (
+            this.hasConnector &&
+            this.canConnect &&
+            this.preciseCategory === other.oppositePreciseCategory
+        );
+    }
+
     #clear() {
         this.removeChildren();
 
@@ -83,16 +141,23 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
     #drawConnector(): PIXI.Graphics | undefined {
         if (!this.hasConnector) return;
 
-        const connector = this._drawConnector();
+        const connector = new PIXI.Graphics();
 
-        if (!connector || !this.canConnect) {
-            return connector ?? undefined;
-        }
+        this._drawConnector(connector, this.isConnected);
 
         connector.width = this.connectorWidth;
-        connector.cursor = "alias";
         connector.eventMode = "static";
         connector.hitArea = new PIXI.Rectangle(0, 0, this.connectorWidth, this.maxHeight);
+
+        if (this.canConnect) {
+            connector.cursor = "alias";
+
+            connector.on("pointerdown", this.#onConnectorPointerDown, this);
+            connector.on("pointerup", this.#onConnectorPointerUp, this);
+        } else {
+            connector.on("pointerdown", (event) => event.stopPropagation(), this);
+            connector.on("pointerup", (event) => event.stopPropagation(), this);
+        }
 
         return connector;
     }
@@ -102,9 +167,23 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
             lineHeight: this.node.entryHeight,
         });
     }
+
+    #onConnectorPointerDown(event: PIXI.FederatedPointerEvent) {
+        event.stopPropagation();
+
+        if (event.button === 0) {
+            this.blueprint.connections.start(event, this);
+        }
+    }
+
+    #onConnectorPointerUp(event: PIXI.FederatedPointerEvent) {}
 }
 
 type EntryCategory = "inputs" | "outputs";
 
+type PreciseEntryCategory = "inputs" | "outputs" | "ins" | "outs";
+
+type EntryId = `${string}:${PreciseEntryCategory}:${string}`;
+
 export { BaseBlueprintEntry };
-export type { EntryCategory };
+export type { EntryCategory, EntryId, PreciseEntryCategory };

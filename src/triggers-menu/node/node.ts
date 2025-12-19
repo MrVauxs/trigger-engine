@@ -1,4 +1,5 @@
 import {
+    ConnectionId,
     IconObject,
     NodeData,
     NodeHeader,
@@ -29,10 +30,10 @@ import {
 import { Blueprint } from "..";
 
 class BlueprintNode extends PIXI.Container {
-    #border: PIXI.Graphics = new PIXI.Graphics();
     #calculatedheight: number = 0;
     #calculatedWith: number = 0;
     #data?: NodeData;
+    #entries: BaseBlueprintEntry[] = [];
     #hitArea: PIXI.Rectangle = new PIXI.Rectangle();
     #in: BlueprintBridgeEntry | undefined;
     #initialized: boolean = false;
@@ -51,6 +52,14 @@ class BlueprintNode extends PIXI.Container {
         this.#node = node;
     }
 
+    get outs(): Collection<BaseBlueprintEntry> {
+        return this.#outs;
+    }
+
+    get outputs(): Collection<BaseBlueprintEntry> {
+        return this.#outputs;
+    }
+
     get blueprint(): Blueprint {
         return this.parent.blueprint;
     }
@@ -64,7 +73,7 @@ class BlueprintNode extends PIXI.Container {
     }
 
     get data(): NodeData {
-        return (this.#data ??= this.blueprint.trigger?.getNodeData(this.id)!);
+        return this.#node.data;
     }
 
     get isEvent(): boolean {
@@ -147,6 +156,10 @@ class BlueprintNode extends PIXI.Container {
         this.#drawBorder(value);
     }
 
+    get entries(): BaseBlueprintEntry[] {
+        return this.#entries;
+    }
+
     initialize() {
         if (this.#initialized || this.blueprint.locked) return;
 
@@ -184,7 +197,23 @@ class BlueprintNode extends PIXI.Container {
         this.parent.sortChildren();
     }
 
+    clear() {
+        this.#in = undefined;
+        this.#entries = [];
+        this.#outs.clear();
+        this.#inputs.clear();
+        this.#outputs.clear();
+
+        const removed = this.removeChildren();
+
+        for (let i = 0; i < removed.length; ++i) {
+            removed[i].destroy(true);
+        }
+    }
+
     draw() {
+        this.clear();
+
         const header = this.#drawHeader();
         const body = this.#drawBody();
 
@@ -401,8 +430,13 @@ class BlueprintNode extends PIXI.Container {
         return new foundry.canvas.containers.PreciseText(text, style);
     }
 
+    getConnectionsFromEntry(inputEntry: BaseBlueprintEntry): ConnectionId[] {
+        const category = inputEntry.preciseCategory as "ins" | "inputs";
+        return this.data[category][inputEntry.key]?.connections?.slice() ?? [];
+    }
+
     #drawBorder(selected: boolean): PIXI.Graphics {
-        const border = this.#border;
+        const border = new PIXI.Graphics();
         const width = this.#calculatedWith;
         const height = this.#calculatedheight;
 
@@ -410,7 +444,7 @@ class BlueprintNode extends PIXI.Container {
         border.lineStyle(selected ? this.selectedBorderOptions : this.borderOptions);
         border.drawRoundedRect(0, 0, width, height, this.borderRadius);
 
-        return this.#border;
+        return border;
     }
 
     #drawBody(): NodePart {
@@ -443,6 +477,8 @@ class BlueprintNode extends PIXI.Container {
 
         if (entries.in) {
             this.#in = new BlueprintBridgeEntry(this, "inputs", entries.in);
+            this.#entries.push(this.#in);
+
             addToRow(0, this.#in);
         }
 
@@ -452,6 +488,8 @@ class BlueprintNode extends PIXI.Container {
             const entry = new BlueprintEntry(this, input);
 
             this.#inputs.set(entry.key, entry);
+            this.#entries.push(entry);
+
             addToRow(i + firstInputIndex, entry);
         }
 
@@ -462,6 +500,8 @@ class BlueprintNode extends PIXI.Container {
             const entry = new BlueprintBridgeEntry(this, "outputs", out);
 
             this.#outs.set(entry.key, entry);
+            this.#entries.push(entry);
+
             addToRow(i, entry);
         }
 
@@ -471,6 +511,8 @@ class BlueprintNode extends PIXI.Container {
             const entry = new BlueprintEntry(this, output);
 
             this.#outputs.set(entry.key, entry);
+            this.#entries.push(entry);
+
             addToRow(i + firstoutputIndex, entry);
         }
 
@@ -546,10 +588,6 @@ type ILineStyleOptions = Parameters<PIXI.Graphics["lineTextureStyle"]>[0];
 
 type NodeheaderPart = NodePart & {
     background: PIXI.ColorSource;
-};
-
-type FederatedEvent = PIXI.FederatedPointerEvent & {
-    interactionData: Record<string, any>;
 };
 
 type InteractionData = {

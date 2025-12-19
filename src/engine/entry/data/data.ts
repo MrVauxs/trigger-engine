@@ -1,5 +1,6 @@
 import { ConnectionCategory, EntryConnectionField } from ".";
 import fields = foundry.data.fields;
+import { ArrayField } from "module-helpers";
 
 class NodeEntryField<TCategory extends ConnectionCategory> extends fields.SchemaField {
     constructor(
@@ -12,7 +13,7 @@ class NodeEntryField<TCategory extends ConnectionCategory> extends fields.Schema
                 connections: new fields.ArrayField(new EntryConnectionField({ category }), {
                     required: false,
                     nullable: false,
-                    initial: () => [],
+                    initial: undefined,
                 }),
                 value: new fields.AnyField({
                     required: false,
@@ -34,7 +35,7 @@ class NodeEntryField<TCategory extends ConnectionCategory> extends fields.Schema
 }
 
 type EntryDataSchema = {
-    connections: fields.ArrayField<EntryConnectionField>;
+    connections: ArrayField<EntryConnectionField, false, false, false>;
     value: fields.AnyField<false, true, false>;
 };
 

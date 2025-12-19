@@ -1,9 +1,11 @@
 import {
+    getNodeOuts,
     NodeEntry,
+    OpenTrigger,
     OpenTriggerNode,
-    Trigger,
     TriggerApplication,
     TriggerDataSource,
+    TriggerNode,
     UpdateNodeData,
     UpdateTriggerData,
 } from "engine";
@@ -16,16 +18,18 @@ import {
     BlueprintNode,
     BlueprintNodesLayer,
     BlueprintNodesMenu,
+    EntryId,
 } from ".";
 
 class Blueprint extends PIXI.Application<HTMLCanvasElement> {
+    #computedConnections: Record<EntryId, boolean> = {};
     #gridLayer: BlueprintGridLayer;
     #hitArea: PIXI.Rectangle;
     #layers: BlueprintLayers;
     #mouseManager: MouseInteractionManager;
     #parent: BlueprintApplication;
     #triggerId: string | null = null;
-    #triggers: Collection<Trigger> = new Collection();
+    #triggers: Collection<OpenTrigger> = new Collection();
 
     constructor(parent: BlueprintApplication) {
         super({
@@ -111,16 +115,16 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         return this.application.applicationKey;
     }
 
-    get triggers(): Collection<Trigger> {
+    get triggers(): Collection<OpenTrigger> {
         return this.#triggers;
     }
 
-    get trigger(): Trigger | undefined {
+    get trigger(): OpenTrigger | undefined {
         return this.#triggerId ? this.triggers.get(this.#triggerId) : undefined;
     }
 
-    set trigger(value: string | Trigger | null) {
-        const triggerId = value instanceof Trigger ? value.id : value;
+    set trigger(value: string | OpenTrigger | null) {
+        const triggerId = value instanceof OpenTrigger ? value.id : value;
         if (this.#triggerId === triggerId) return;
         if (triggerId && !this.triggers.has(triggerId)) return;
 
@@ -152,6 +156,18 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
 
         this.stage.scale.set(actualValue);
         this.resizeAll();
+    }
+
+    addComputedConnection(id: EntryId) {
+        this.#computedConnections[id] = true;
+    }
+
+    removeComputedConnection(id: EntryId) {
+        delete this.#computedConnections[id];
+    }
+
+    getComputedConnection(id: EntryId): boolean {
+        return !!this.#computedConnections[id];
     }
 
     toggleLocked(locked: boolean) {
@@ -208,7 +224,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         this.parent.render();
     }
 
-    getTrigger(triggerId: string): Trigger | null {
+    getTrigger(triggerId: string): OpenTrigger | null {
         return this.triggers.get(triggerId) ?? null;
     }
 
@@ -218,6 +234,77 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
 
     subtractPointFromEvent(event: PIXI.FederatedPointerEvent, point: Point): Point {
         return subtractPoint(dividePointBy(event.global, this.scale), point);
+    }
+
+    computeConnections() {
+        const trigger = this.trigger;
+        if (!trigger) return;
+
+        this.#computedConnections = {};
+
+        for (const inputNode of trigger.nodes) {
+            const InputNodeCls = inputNode.constructor as typeof TriggerNode;
+            const nodeInputs = InputNodeCls.defineInputs ?? [];
+
+            const ins = R.pipe(
+                R.values(inputNode.data.ins),
+                R.map(({ connections }) => ["bridge", "in", connections] as const)
+            );
+
+            const inputs = R.pipe(
+                R.entries(inputNode.data.inputs),
+                R.map(([inputKey, { connections }]) => {
+                    // TODO also check for custom inputs
+                    const input = nodeInputs.find(({ key }) => key === inputKey);
+                    if (!R.isObjectType(input) || !R.isString(input.type)) return;
+
+                    return [input.type, inputKey, connections] as const;
+                }),
+                R.filter(R.isTruthy)
+            );
+
+            const inputConnections = R.pipe(
+                [...ins, ...inputs],
+                R.flatMap(([type, key, connections]) => {
+                    if (!connections?.length) return;
+                    return connections.map((connection) => [type, key, connection] as const);
+                }),
+                R.filter(R.isTruthy)
+            );
+
+            for (const [inputType, inputKey, outputId] of inputConnections) {
+                const [outputNodeId, outputCategory, outputEntryKey] = R.split(outputId, ":");
+                const outputNode = trigger.getNode(outputNodeId);
+                if (!outputNode) continue;
+
+                const OutputNodeCls = outputNode.constructor as typeof TriggerNode;
+
+                if (outputCategory === "outs") {
+                    // TODO also check for customs outs
+                    const outs = getNodeOuts(OutputNodeCls);
+                    const out = outs.find(({ key }) => key === outputEntryKey);
+
+                    if (!out) continue;
+                } else {
+                    // TODO also check for customs outputs
+                    const outputs = OutputNodeCls.defineOutputs ?? [];
+                    const output = outputs.find(({ key, type }) => {
+                        return (
+                            key === outputEntryKey &&
+                            (type === inputType || !!this.application.getConvertor(type, inputType))
+                        );
+                    });
+
+                    if (!output) continue;
+                }
+
+                const inputCategory = outputCategory === "outs" ? "ins" : "inputs";
+                const inputId: EntryId = `${inputNode.id}:${inputCategory}:${inputKey}`;
+
+                this.#computedConnections[inputId] = true;
+                this.#computedConnections[outputId] = true;
+            }
+        }
     }
 
     _canHandleMouseEvent() {
@@ -283,6 +370,8 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         const trigger = this.trigger;
         if (!trigger) return;
 
+        this.computeConnections();
+
         for (const node of trigger.nodes as Collection<OpenTriggerNode>) {
             this.nodes.add(node, false);
         }
@@ -293,8 +382,9 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
     }
 
     #clear() {
-        this.stage.off("wheel", this.#onWheel, this);
+        this.#computedConnections = {};
         this.#layers.clear();
+        this.stage.off("wheel", this.#onWheel, this);
     }
 
     async #openNodesMenu(event: FederatedEvent, entry?: NodeEntry) {
