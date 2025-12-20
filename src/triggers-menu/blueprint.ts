@@ -223,8 +223,12 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         this.#mouseManager.cancel();
     }
 
+    unscalePoint(point: Point): Point {
+        return dividePointBy(point, this.scale);
+    }
+
     subtractPointFromEvent(event: PIXI.FederatedPointerEvent, point: Point): Point {
-        return subtractPoint(dividePointBy(event.global, this.scale), point);
+        return subtractPoint(this.unscalePoint(event.global), point);
     }
 
     async openNodesMenu(
@@ -281,7 +285,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
                 );
                 selectedIdSuffix = otherEntry ? `outputs:${otherEntry.key}` : undefined;
             } else {
-                const out = getOutsSchemas(OtherCls).at(0);
+                const out = getOutsSchemas(OtherCls).at(0)?.key;
                 selectedIdSuffix = out ? `outs:${out}` : undefined;
             }
         }

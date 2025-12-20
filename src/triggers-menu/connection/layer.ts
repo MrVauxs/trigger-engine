@@ -1,5 +1,5 @@
 import { ConnectionId } from "engine";
-import { dividePointBy, subtractPoint } from "module-helpers";
+import { subtractPoint } from "module-helpers";
 import {
     BaseBlueprintEntry,
     Blueprint,
@@ -66,7 +66,7 @@ class BlueprintConnectionsLayer extends PIXI.Container {
     }
 
     fromPoint(point: Point): Point {
-        return subtractPoint(dividePointBy(point, this.blueprint.scale), this.parent);
+        return subtractPoint(this.blueprint.unscalePoint(point), this.parent);
     }
 
     refreshConnection(entry: BaseBlueprintEntry) {
@@ -110,9 +110,9 @@ class BlueprintConnectionsLayer extends PIXI.Container {
         if (!targetNode || targetNode === originNode) {
             if (!targetNode) {
                 const result = await this.blueprint.openNodesMenu(event, originEntry);
-                const targetNode = result?.node;
+                const newNode = result?.node;
 
-                if (targetNode) {
+                if (newNode) {
                     connector.origin.entry = undefined;
 
                     const targetEntry = result.selectedId
@@ -120,11 +120,8 @@ class BlueprintConnectionsLayer extends PIXI.Container {
                         : undefined;
 
                     if (targetEntry) {
-                        const { x, y } = dividePointBy(
-                            targetEntry.connectorOffset,
-                            this.blueprint.scale
-                        );
-                        targetNode.setPosition(targetNode.x - x, targetNode.y - y);
+                        const { x, y } = this.blueprint.unscalePoint(targetEntry.connectorOffset);
+                        newNode.setPosition(newNode.x - x, newNode.y - y);
                     }
                 }
             }
