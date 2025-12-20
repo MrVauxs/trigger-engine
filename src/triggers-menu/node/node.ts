@@ -367,6 +367,7 @@ class BlueprintNode extends PIXI.Container {
 
     setPosition(x: number, y: number) {
         this.position.set(x, y);
+        this.data.updateSource({ position: { x, y } });
 
         for (const entry of this.entries) {
             this.blueprint.connections.refreshConnection(entry);
@@ -375,15 +376,6 @@ class BlueprintNode extends PIXI.Container {
 
     _onDragLeftDrop(event: FederatedEvent) {
         this.blueprint.cancelMouse();
-
-        const { selected } = event.interactionData as InteractionData;
-        if (!selected) return;
-
-        for (const { node } of selected) {
-            const { x, y } = node.position;
-            node.data.updateSource({ position: { x, y } });
-        }
-
         this.interactiveChildren = true;
     }
 
