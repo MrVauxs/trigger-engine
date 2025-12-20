@@ -1,6 +1,7 @@
 import {
     BridgeSchema,
     BuiltInApplication,
+    InputEntrySchema,
     instantiateEntry,
     isBuiltInNode,
     NodeBridge,
@@ -94,6 +95,7 @@ function instantiateNode(
 
             const isEvent = NodeCls.isEvent;
 
+            // TODO also add customs
             const [inputs, outputs] = R.map(
                 [
                     ["inputs", NodeCls.defineInputs],
@@ -129,7 +131,10 @@ function instantiateNode(
             );
 
             const [ins, outs] = R.map(
-                [!isEvent && NodeCls.hasIn ? [{ key: "in" }] : [], getNodeOuts(NodeCls)] as const,
+                [
+                    !isEvent && NodeCls.hasIn ? [{ key: "in" }] : [],
+                    getOutsSchemas(NodeCls),
+                ] as const,
                 (schemas) => {
                     return R.pipe(
                         schemas,
@@ -184,9 +189,19 @@ function instantiateNode(
 }
 
 // TODO this needs to also return custom outs
-function getNodeOuts(NodeCls: typeof TriggerNode): BridgeSchema[] {
+function getOutsSchemas(NodeCls: typeof TriggerNode): BridgeSchema[] {
     const rawOuts = NodeCls.outs || (NodeCls.isEvent ? "out" : []);
     return R.isString(rawOuts) ? [{ key: rawOuts }] : rawOuts;
+}
+
+// TODO this needs to also return custom inputs
+function getInputsSchemas(NodeCls: typeof TriggerNode): InputEntrySchema[] {
+    return NodeCls.defineInputs ?? [];
+}
+
+// TODO this needs to also return custom inputs
+function getOutputsSchemas(NodeCls: typeof TriggerNode): InputEntrySchema[] {
+    return NodeCls.defineOutputs ?? [];
 }
 
 function triggerNodeLocalize(
@@ -215,5 +230,11 @@ type NodeEntries = {
     outs: Collection<NodeBridge>;
 };
 
-export { getNodeOuts, instantiateNode, triggerNodeLocalize };
+export {
+    getInputsSchemas,
+    getOutputsSchemas,
+    getOutsSchemas,
+    instantiateNode,
+    triggerNodeLocalize,
+};
 export type { OpenTriggerNode };

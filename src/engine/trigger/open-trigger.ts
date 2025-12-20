@@ -1,6 +1,8 @@
 import {
     CreateNodeData,
-    getNodeOuts,
+    getInputsSchemas,
+    getOutputsSchemas,
+    getOutsSchemas,
     instantiateNode,
     OpenTriggerNode,
     Trigger,
@@ -12,7 +14,7 @@ import {
     UpdateTriggerData,
 } from "engine";
 import { enrichHTML, MODULE, R } from "module-helpers";
-import { EntryId, TwoWaysEntryId } from "triggers-menu";
+import { BaseBlueprintEntry, EntryId, TwoWaysEntryId } from "triggers-menu";
 
 class OpenTrigger extends Trigger<OpenTriggerNode> {
     #computed: boolean = false;
@@ -124,7 +126,7 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
 
         for (const inputNode of this.nodes) {
             const InputNodeCls = inputNode.constructor as typeof TriggerNode;
-            const nodeInputs = InputNodeCls.defineInputs ?? [];
+            const nodeInputs = getInputsSchemas(InputNodeCls);
 
             const ins = R.pipe(
                 R.values(inputNode.data.ins),
@@ -134,7 +136,6 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
             const inputs = R.pipe(
                 R.entries(inputNode.data.inputs),
                 R.map(([inputKey, { connections }]) => {
-                    // TODO also check for custom inputs
                     const input = nodeInputs.find(({ key }) => key === inputKey);
                     if (!R.isObjectType(input) || !R.isString(input.type)) return;
 
@@ -160,14 +161,12 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
                 const OutputNodeCls = outputNode.constructor as typeof TriggerNode;
 
                 if (outputCategory === "outs") {
-                    // TODO also check for customs outs
-                    const outs = getNodeOuts(OutputNodeCls);
+                    const outs = getOutsSchemas(OutputNodeCls);
                     const out = outs.find(({ key }) => key === outputEntryKey);
 
                     if (!out) continue;
                 } else {
-                    // TODO also check for customs outputs
-                    const outputs = OutputNodeCls.defineOutputs ?? [];
+                    const outputs = getOutputsSchemas(OutputNodeCls);
                     const output = outputs.find(({ key, type }) => {
                         return (
                             key === outputEntryKey &&

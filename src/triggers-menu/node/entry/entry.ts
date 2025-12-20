@@ -170,6 +170,10 @@ class BlueprintEntry extends BaseBlueprintEntry {
     }
 }
 
+function isBlueprintEntry(entry: BaseBlueprintEntry): entry is BlueprintEntry {
+    return entry instanceof BlueprintEntry;
+}
+
 type NodeFieldOptions = {
     baseFontSize: number;
     default: unknown;
@@ -184,5 +188,5 @@ type OnFieldClickOptions<TValue extends unknown = unknown> = {
     setValue: (value: TValue) => void;
 };
 
-export { BlueprintEntry };
+export { BlueprintEntry, isBlueprintEntry };
 export type { NodeFieldOptions, OnFieldClickOptions };

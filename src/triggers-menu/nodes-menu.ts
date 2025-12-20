@@ -1,12 +1,13 @@
 import {
     CreateNodeData,
-    NodeEntry,
+    getInputsSchemas,
+    getOutputsSchemas,
+    getOutsSchemas,
     TriggerApplication,
     TriggerNode,
     triggerNodeLocalize,
 } from "engine";
 import {
-    addListener,
     ApplicationClosingOptions,
     ApplicationConfiguration,
     ApplicationRenderOptions,
@@ -18,12 +19,12 @@ import {
     R,
     render,
 } from "module-helpers";
-import { filterElements } from ".";
+import { BaseBlueprintEntry, filterElements, isBlueprintEntry } from ".";
 
 class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
     #abortController = new AbortController();
     #application: TriggerApplication;
-    #entry: NodeEntry | undefined;
+    #entry: BaseBlueprintEntry | undefined;
     #tagsInput: ExtendedMultiSelectElement | null = null;
     #resolve: BlueprintNodesMenuResolve;
     #searchInput: ExtendedTextInputElement | null = null;
@@ -40,7 +41,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
     constructor(
         application: TriggerApplication,
         resolve: BlueprintNodesMenuResolve,
-        entry: NodeEntry | undefined,
+        entry: BaseBlueprintEntry | undefined,
         options?: DeepPartial<ApplicationConfiguration>
     ) {
         super(options);
@@ -60,7 +61,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
 
     static async wait(
         application: TriggerApplication,
-        entry?: NodeEntry
+        entry?: BaseBlueprintEntry
     ): Promise<CreateNodeData | null> {
         return new Promise((resolve: BlueprintNodesMenuResolve) => {
             new BlueprintNodesMenu(application, resolve, entry).render(true);
@@ -78,7 +79,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
     }
 
     async _prepareContext(options: ApplicationRenderOptions): Promise<NodesMenuContext> {
-        const allNodes = this.application.nodes.contents;
+        const allNodes = this.#getNodes();
         const [events, nodes] = R.partition(allNodes, (node) => node.isEvent);
         // TODO variables & gates
 
@@ -95,8 +96,6 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
             R.uniqueBy(R.prop("label")),
             R.sortBy(R.prop("label"))
         );
-
-        // TODO filter by entry if provided
 
         return {
             events: this.#prepareNodesGroups(events, "event"),
@@ -130,6 +129,32 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
                 return this.close();
             }
         }
+    }
+
+    #getNodes(): (typeof TriggerNode)[] {
+        const entry = this.#entry;
+
+        let nodes = this.application.nodes.contents;
+
+        if (!entry) {
+            return nodes;
+        }
+
+        if (entry.isOutput) {
+            // events never have inputs so we get rid of them all
+            nodes = nodes.filter((node) => !node.isEvent);
+        }
+
+        if (!isBlueprintEntry(entry)) {
+            return entry.isInput
+                ? nodes.filter((node) => getOutsSchemas(node).length)
+                : nodes.filter((node) => node.hasIn);
+        }
+
+        return nodes.filter((node) => {
+            const entries = entry.isInput ? getOutputsSchemas(node) : getInputsSchemas(node);
+            return entries.some((other) => other.type === entry.type);
+        });
     }
 
     #prepareNodesGroups(nodes: (typeof TriggerNode)[], empty: string): NodesGroup[] {
@@ -167,14 +192,17 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
     }
 
     #addEventListeners(html: HTMLElement) {
-        window.addEventListener(
-            "click",
-            (event) => {
-                if (!(event.target instanceof HTMLElement) || html.contains(event.target)) return;
-                this.close();
-            },
-            { signal: this.#abortController.signal }
-        );
+        requestAnimationFrame(() => {
+            window.addEventListener(
+                "click",
+                (event) => {
+                    if (!(event.target instanceof HTMLElement) || html.contains(event.target))
+                        return;
+                    this.close();
+                },
+                { signal: this.#abortController.signal }
+            );
+        });
 
         this.#searchInput = htmlQuery<ExtendedTextInputElement>(html, `[name="search"]`);
         this.#searchInput?.addEventListener("input", () => this.#filterNodes());

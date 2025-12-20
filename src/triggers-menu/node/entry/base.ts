@@ -86,6 +86,20 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
         };
     }
 
+    get connectorOffset(): Point {
+        if (!this.#connector) {
+            return { x: 0, y: 0 };
+        }
+
+        const center = this.connectorCenter;
+        const bounds = this.node.getBounds();
+
+        return {
+            x: center.x - bounds.x,
+            y: center.y - bounds.y,
+        };
+    }
+
     abstract _drawConnector(connector: PIXI.Graphics, isConnected: boolean): void;
     abstract _drawField(label: PreciseText): PIXI.Graphics | null;
 

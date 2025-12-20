@@ -1,13 +1,18 @@
 import {
-    NodeEntry,
+    ConnectionId,
+    getInputsSchemas,
+    getOutputsSchemas,
+    getOutsSchemas,
     OpenTrigger,
     TriggerApplication,
     TriggerDataSource,
+    TriggerNode,
     UpdateNodeData,
     UpdateTriggerData,
 } from "engine";
 import { dividePointBy, MouseInteractionManager, R, subtractPoint } from "module-helpers";
 import {
+    BaseBlueprintEntry,
     BlueprintApplication,
     BlueprintConnectionsLayer,
     BlueprintGridLayer,
@@ -15,6 +20,9 @@ import {
     BlueprintNode,
     BlueprintNodesLayer,
     BlueprintNodesMenu,
+    EntryId,
+    isBlueprintEntry,
+    PreciseEntryCategory,
 } from ".";
 
 class Blueprint extends PIXI.Application<HTMLCanvasElement> {
@@ -219,6 +227,87 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         return subtractPoint(dividePointBy(event.global, this.scale), point);
     }
 
+    async openNodesMenu(
+        event: PIXI.FederatedPointerEvent,
+        entry?: BaseBlueprintEntry
+    ): Promise<{ node: BlueprintNode; selectedId: EntryId | undefined } | undefined> {
+        // we need to calculate it now as FederatedEvent will be reused
+        const position = this.subtractPointFromEvent(event, this.#layers);
+
+        this.toggleLocked(true);
+        const source = await BlueprintNodesMenu.wait(this.application, entry);
+        this.toggleLocked(false);
+
+        if (!source) return;
+
+        const OtherCls = this.application.nodes.get(source.type) as typeof TriggerNode;
+        if (!OtherCls) return;
+
+        source.position = position;
+
+        let selectedIdSuffix: `${PreciseEntryCategory}:${string}` | undefined;
+
+        if (entry?.isOutput) {
+            if (isBlueprintEntry(entry)) {
+                const otherEntry = getInputsSchemas(OtherCls).find(
+                    (other) => other.type === entry.type
+                );
+
+                if (otherEntry) {
+                    selectedIdSuffix = `inputs:${otherEntry.key}`;
+                    source.inputs = {
+                        [otherEntry.key]: {
+                            connections: [entry.id as ConnectionId],
+                        },
+                    };
+                }
+            } else {
+                selectedIdSuffix = "ins:in";
+                source.ins = {
+                    in: {
+                        connections: [entry.id as ConnectionId],
+                    },
+                };
+            }
+        }
+
+        const node = this.trigger?.addNode(source);
+        if (!node) return;
+
+        if (entry?.isInput) {
+            if (isBlueprintEntry(entry)) {
+                const otherEntry = getOutputsSchemas(OtherCls).find(
+                    (other) => other.type === entry.type
+                );
+                selectedIdSuffix = otherEntry ? `outputs:${otherEntry.key}` : undefined;
+            } else {
+                const out = getOutsSchemas(OtherCls).at(0);
+                selectedIdSuffix = out ? `outs:${out}` : undefined;
+            }
+        }
+
+        const selectedId: EntryId | undefined = selectedIdSuffix
+            ? `${node.id}:${selectedIdSuffix}`
+            : undefined;
+
+        if (entry && selectedId) {
+            // we do it before creating the node so we don't have to update it
+            this.trigger?.addComputedConnections(entry.id, selectedId);
+        }
+
+        const blueprintNode = this.nodes.add(node, true);
+
+        if (entry && selectedId) {
+            this.connections.addConnection(entry.id, selectedId);
+        }
+
+        if (entry?.isInput) {
+            entry.node.draw();
+        }
+
+        return { node: blueprintNode, selectedId };
+    }
+
     _canHandleMouseEvent() {
         return !!this.trigger;
     }
@@ -228,7 +317,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
     }
 
     _onUnclickRight(event: FederatedEvent) {
-        this.#openNodesMenu(event);
+        this.openNodesMenu(event);
     }
 
     _onDragLeftStart(event: FederatedEvent) {
@@ -294,7 +383,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
             const target = this.nodes.getEntryFromId(targetId);
 
             if (origin && target) {
-                this.connections.addConnection(origin, target);
+                this.connections.addConnection(origin.id, target.id);
             }
         }
 
@@ -304,26 +393,6 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
     #clear() {
         this.#layers.clear();
         this.stage.off("wheel", this.#onWheel, this);
-    }
-
-    async #openNodesMenu(event: FederatedEvent, entry?: NodeEntry) {
-        // we need to calculate it now
-        const position = this.subtractPointFromEvent(event, this.#layers);
-
-        this.toggleLocked(true);
-        const source = await BlueprintNodesMenu.wait(this.application, entry);
-        this.toggleLocked(false);
-
-        if (!source) return;
-
-        source.position = position;
-
-        const node = this.trigger?.addNode(source);
-
-        if (node) {
-            this.nodes.add(node, true);
-            // TODO add connection if entry provided
-        }
     }
 
     #onWheel(event: PIXI.FederatedWheelEvent) {

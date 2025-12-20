@@ -1,5 +1,5 @@
 import { calculateMidPoint } from "module-helpers";
-import { BaseBlueprintEntry, BlueprintEntry, EntryId } from "triggers-menu";
+import { BaseBlueprintEntry, BlueprintEntry, EntryId, isBlueprintEntry } from "triggers-menu";
 import { BlueprintConnectionsLayer } from ".";
 
 class BlueprintConnection extends PIXI.Graphics {
@@ -7,11 +7,11 @@ class BlueprintConnection extends PIXI.Graphics {
     #origin: EntryId;
     #target: EntryId;
 
-    constructor(origin: BaseBlueprintEntry, target: BaseBlueprintEntry) {
+    constructor(origin: EntryId, target: EntryId) {
         super();
 
-        this.#origin = origin.id;
-        this.#target = target.id;
+        this.#origin = origin;
+        this.#target = target;
     }
 
     hasEntry(entry: BaseBlueprintEntry): boolean {
@@ -35,8 +35,7 @@ class BlueprintConnection extends PIXI.Graphics {
         ]);
 
         // we don't need a converter
-        if (!(origin instanceof BlueprintEntry) || origin.type === (target as BlueprintEntry).type)
-            return;
+        if (!isBlueprintEntry(origin) || origin.type === (target as BlueprintEntry).type) return;
 
         const converter = (this.#converter ??= (() => {
             const padding = { x: 4, y: 2 };

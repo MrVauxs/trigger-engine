@@ -76,4 +76,8 @@ class BlueprintBridgeEntry extends BaseBlueprintEntry {
     }
 }
 
-export { BlueprintBridgeEntry };
+function isBlueprintBridgeEntry(entry: BaseBlueprintEntry): entry is BlueprintBridgeEntry {
+    return entry instanceof BlueprintBridgeEntry;
+}
+
+export { BlueprintBridgeEntry, isBlueprintBridgeEntry };

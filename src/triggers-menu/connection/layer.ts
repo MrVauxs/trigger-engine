@@ -77,13 +77,13 @@ class BlueprintConnectionsLayer extends PIXI.Container {
         }
     }
 
-    addConnection(origin: BaseBlueprintEntry, target: BaseBlueprintEntry) {
+    addConnection(origin: EntryId, target: EntryId) {
         const connection = this.addChild(new BlueprintConnection(origin, target));
 
         connection.draw();
 
-        this.#connections.set(`${origin.id}-${target.id}`, connection);
-        this.#connections.set(`${target.id}-${origin.id}`, connection);
+        this.#connections.set(`${origin}-${target}`, connection);
+        this.#connections.set(`${target}-${origin}`, connection);
     }
 
     #onPointerMove(event: PIXI.FederatedPointerEvent) {
@@ -109,7 +109,24 @@ class BlueprintConnectionsLayer extends PIXI.Container {
 
         if (!targetNode || targetNode === originNode) {
             if (!targetNode) {
-                // TODO open nodes menu
+                const result = await this.blueprint.openNodesMenu(event, originEntry);
+                const targetNode = result?.node;
+
+                if (targetNode) {
+                    connector.origin.entry = undefined;
+
+                    const targetEntry = result.selectedId
+                        ? this.blueprint.nodes.getEntryFromId(result.selectedId)
+                        : undefined;
+
+                    if (targetEntry) {
+                        const { x, y } = dividePointBy(
+                            targetEntry.connectorOffset,
+                            this.blueprint.scale
+                        );
+                        targetNode.setPosition(targetNode.x - x, targetNode.y - y);
+                    }
+                }
             }
 
             this.#terminateConnection();
@@ -140,7 +157,7 @@ class BlueprintConnectionsLayer extends PIXI.Container {
             });
 
             this.blueprint.trigger?.addComputedConnections(inputEntry.id, outputEntry.id);
-            this.addConnection(inputEntry, outputEntry);
+            this.addConnection(inputEntry.id, outputEntry.id);
 
             inputNode.draw();
             outputNode.draw();

@@ -359,12 +359,15 @@ class BlueprintNode extends PIXI.Container {
 
         for (const { node, origin } of selected) {
             const { x, y } = this.blueprint.subtractPointFromEvent(event, origin);
+            node.setPosition(x, y);
+        }
+    }
 
-            node.position.set(x, y);
+    setPosition(x: number, y: number) {
+        this.position.set(x, y);
 
-            for (const entry of this.entries) {
-                this.blueprint.connections.refreshConnection(entry);
-            }
+        for (const entry of this.entries) {
+            this.blueprint.connections.refreshConnection(entry);
         }
     }
 
