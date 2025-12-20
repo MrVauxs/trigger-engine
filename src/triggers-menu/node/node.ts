@@ -4,6 +4,7 @@ import {
     NodeData,
     NodeHeader,
     NodeHeaderData,
+    OpenTrigger,
     OpenTriggerNode,
     TriggerNode,
 } from "engine";
@@ -32,7 +33,6 @@ import { Blueprint } from "..";
 class BlueprintNode extends PIXI.Container {
     #calculatedheight: number = 0;
     #calculatedWith: number = 0;
-    #data?: NodeData;
     #entries: BaseBlueprintEntry[] = [];
     #hitArea: PIXI.Rectangle = new PIXI.Rectangle();
     #in: BlueprintBridgeEntry | undefined;
@@ -52,8 +52,16 @@ class BlueprintNode extends PIXI.Container {
         this.#node = node;
     }
 
+    get ins(): Collection<BaseBlueprintEntry> {
+        return new Collection(this.#in ? [["in", this.#in]] : undefined);
+    }
+
     get outs(): Collection<BaseBlueprintEntry> {
         return this.#outs;
+    }
+
+    get inputs(): Collection<BaseBlueprintEntry> {
+        return this.#inputs;
     }
 
     get outputs(): Collection<BaseBlueprintEntry> {
@@ -66,6 +74,10 @@ class BlueprintNode extends PIXI.Container {
 
     get stage(): PIXI.Container {
         return this.blueprint.stage;
+    }
+
+    get trigger(): OpenTrigger {
+        return this.#node.parent;
     }
 
     get id(): string {
@@ -141,8 +153,7 @@ class BlueprintNode extends PIXI.Container {
     }
 
     get isLocked(): boolean {
-        // TODO
-        return true;
+        return this.blueprint.locked;
     }
 
     get selected(): boolean {
@@ -348,7 +359,12 @@ class BlueprintNode extends PIXI.Container {
 
         for (const { node, origin } of selected) {
             const { x, y } = this.blueprint.subtractPointFromEvent(event, origin);
+
             node.position.set(x, y);
+
+            for (const entry of this.entries) {
+                this.blueprint.connections.refreshConnection(entry);
+            }
         }
     }
 
@@ -360,10 +376,7 @@ class BlueprintNode extends PIXI.Container {
 
         for (const { node } of selected) {
             const { x, y } = node.position;
-
-            node.data.updateSource({
-                position: { x, y },
-            });
+            node.data.updateSource({ position: { x, y } });
         }
 
         this.interactiveChildren = true;

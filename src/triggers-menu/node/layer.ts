@@ -1,6 +1,7 @@
 import { OpenTriggerNode } from "engine";
-import { BlueprintNode } from ".";
+import { BaseBlueprintEntry, BlueprintNode, EntryId } from ".";
 import { Blueprint, BlueprintLayers } from "..";
+import { R } from "module-helpers";
 
 class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
     #nodes: Collection<BlueprintNode> = new Collection();
@@ -36,6 +37,11 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
                 return node;
             }
         }
+    }
+
+    getEntryFromId(id: EntryId): BaseBlueprintEntry | undefined {
+        const [nodeId, category, key] = R.split(id, ":");
+        return this.get(nodeId)?.[category].get(key);
     }
 
     selectIntersecting(selection: PIXI.Graphics) {

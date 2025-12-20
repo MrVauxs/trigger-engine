@@ -1,17 +1,24 @@
 import {
     CreateNodeData,
+    getNodeOuts,
     instantiateNode,
     OpenTriggerNode,
     Trigger,
     TriggerApplication,
     TriggerData,
     TriggerDataSource,
+    TriggerNode,
     UpdateNodeData,
     UpdateTriggerData,
 } from "engine";
-import { enrichHTML, MODULE } from "module-helpers";
+import { enrichHTML, MODULE, R } from "module-helpers";
+import { EntryId, TwoWaysEntryId } from "triggers-menu";
 
 class OpenTrigger extends Trigger<OpenTriggerNode> {
+    #computed: boolean = false;
+    #computedConnections: Record<EntryId, boolean> = {};
+    #linkedConnections: Set<TwoWaysEntryId> = new Set();
+
     constructor(parent: TriggerApplication, data: TriggerData) {
         super(parent, data);
 
@@ -31,6 +38,10 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
 
     get path(): string {
         return `${this.applicationKey}:${this.id}`;
+    }
+
+    get linkedConnections(): Set<TwoWaysEntryId> {
+        return this.#linkedConnections;
     }
 
     get description(): string {
@@ -94,8 +105,85 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
         }
     }
 
-    toObject() {
-        return this.data.toObject();
+    addComputedConnections(origin: EntryId, target: EntryId) {
+        this.#computedConnections[origin] = true;
+        this.#computedConnections[target] = true;
+        this.#linkedConnections.add(`${origin}-${target}`);
+    }
+
+    entryIsConnected(id: EntryId): boolean {
+        return !!this.#computedConnections[id];
+    }
+
+    computeConnections(force?: boolean) {
+        if (!force && this.#computed) return;
+
+        this.#computed = true;
+        this.#computedConnections = {};
+        this.#linkedConnections.clear();
+
+        for (const inputNode of this.nodes) {
+            const InputNodeCls = inputNode.constructor as typeof TriggerNode;
+            const nodeInputs = InputNodeCls.defineInputs ?? [];
+
+            const ins = R.pipe(
+                R.values(inputNode.data.ins),
+                R.map(({ connections }) => ["bridge", "in", connections] as const)
+            );
+
+            const inputs = R.pipe(
+                R.entries(inputNode.data.inputs),
+                R.map(([inputKey, { connections }]) => {
+                    // TODO also check for custom inputs
+                    const input = nodeInputs.find(({ key }) => key === inputKey);
+                    if (!R.isObjectType(input) || !R.isString(input.type)) return;
+
+                    return [input.type, inputKey, connections] as const;
+                }),
+                R.filter(R.isTruthy)
+            );
+
+            const inputConnections = R.pipe(
+                [...ins, ...inputs],
+                R.flatMap(([type, key, connections]) => {
+                    if (!connections?.length) return;
+                    return connections.map((connection) => [type, key, connection] as const);
+                }),
+                R.filter(R.isTruthy)
+            );
+
+            for (const [inputType, inputKey, outputId] of inputConnections) {
+                const [outputNodeId, outputCategory, outputEntryKey] = R.split(outputId, ":");
+                const outputNode = this.getNode(outputNodeId);
+                if (!outputNode) continue;
+
+                const OutputNodeCls = outputNode.constructor as typeof TriggerNode;
+
+                if (outputCategory === "outs") {
+                    // TODO also check for customs outs
+                    const outs = getNodeOuts(OutputNodeCls);
+                    const out = outs.find(({ key }) => key === outputEntryKey);
+
+                    if (!out) continue;
+                } else {
+                    // TODO also check for customs outputs
+                    const outputs = OutputNodeCls.defineOutputs ?? [];
+                    const output = outputs.find(({ key, type }) => {
+                        return (
+                            key === outputEntryKey &&
+                            (type === inputType || !!this.application.getConvertor(type, inputType))
+                        );
+                    });
+
+                    if (!output) continue;
+                }
+
+                const inputCategory = outputCategory === "outs" ? "ins" : "inputs";
+                const inputId: EntryId = `${inputNode.id}:${inputCategory}:${inputKey}`;
+
+                this.addComputedConnections(inputId, outputId);
+            }
+        }
     }
 }
 

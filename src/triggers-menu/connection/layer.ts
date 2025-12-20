@@ -1,8 +1,17 @@
 import { ConnectionId } from "engine";
-import { BaseBlueprintEntry, Blueprint, BlueprintLayers } from "triggers-menu";
+import { dividePointBy, subtractPoint } from "module-helpers";
+import {
+    BaseBlueprintEntry,
+    Blueprint,
+    BlueprintConnection,
+    BlueprintLayers,
+    drawCurvedLine,
+    EntryId,
+} from "triggers-menu";
 
 class BlueprintConnectionsLayer extends PIXI.Container {
     #blueprint: Blueprint;
+    #connections = new Collection<BlueprintConnection, TwoWaysEntryId>();
     #connector?: FreeConnector;
 
     constructor(blueprint: Blueprint) {
@@ -20,7 +29,9 @@ class BlueprintConnectionsLayer extends PIXI.Container {
     }
 
     clear() {
+        this.#connections.clear();
         this.#terminateConnection();
+
         this.removeAllListeners();
 
         const removed = this.removeChildren();
@@ -45,7 +56,7 @@ class BlueprintConnectionsLayer extends PIXI.Container {
         this.#connector.origin = {
             color: entry.color,
             entry,
-            position: this.parent.fromPoint(entry.connectorCenter),
+            position: this.fromPoint(entry.connectorCenter),
             wasConnected: alreadyConnected,
         };
 
@@ -54,17 +65,36 @@ class BlueprintConnectionsLayer extends PIXI.Container {
         this.stage.on("pointerupoutside", this.#terminateConnection, this);
     }
 
+    fromPoint(point: Point): Point {
+        return subtractPoint(dividePointBy(point, this.blueprint.scale), this.parent);
+    }
+
+    refreshConnection(entry: BaseBlueprintEntry) {
+        for (const connection of this.#connections) {
+            if (connection.hasEntry(entry)) {
+                connection.draw();
+            }
+        }
+    }
+
+    addConnection(origin: BaseBlueprintEntry, target: BaseBlueprintEntry) {
+        const connection = this.addChild(new BlueprintConnection(origin, target));
+
+        connection.draw();
+
+        this.#connections.set(`${origin.id}-${target.id}`, connection);
+        this.#connections.set(`${target.id}-${origin.id}`, connection);
+    }
+
     #onPointerMove(event: PIXI.FederatedPointerEvent) {
         const connector = this.#connector;
         if (!connector) return;
 
         const origin = connector.origin.position;
-        const target = this.parent.fromPoint(event.global);
+        const target = this.fromPoint(event.global);
 
         connector.clear();
-        connector.moveTo(origin.x, origin.y);
-        connector.lineStyle(6, connector.origin.color, 1, 0.5);
-        connector.lineTo(target.x, target.y);
+        drawCurvedLine(connector, origin, target, [connector.origin.color]);
     }
 
     async #onPointerUp(event: PIXI.FederatedPointerEvent) {
@@ -73,7 +103,8 @@ class BlueprintConnectionsLayer extends PIXI.Container {
 
         const originEntry = connector.origin.entry as BaseBlueprintEntry;
         const originNode = originEntry.node;
-        const { x, y } = this.parent.fromPoint(event.global);
+        const { x, y } = event.global;
+
         const targetNode = this.blueprint.nodes.getAtPosition({ x, y });
 
         if (!targetNode || targetNode === originNode) {
@@ -108,8 +139,8 @@ class BlueprintConnectionsLayer extends PIXI.Container {
                 },
             });
 
-            this.blueprint.addComputedConnection(inputEntry.id);
-            this.blueprint.addComputedConnection(outputEntry.id);
+            this.blueprint.trigger?.addComputedConnections(inputEntry.id, outputEntry.id);
+            this.addConnection(inputEntry, outputEntry);
 
             inputNode.draw();
             outputNode.draw();
@@ -143,6 +174,8 @@ interface BlueprintConnectionsLayer {
     parent: BlueprintLayers;
 }
 
+type TwoWaysEntryId = `${EntryId}-${EntryId}`;
+
 type FreeConnector = PIXI.Graphics & {
     origin: {
         color: ColorSource;
@@ -153,3 +186,4 @@ type FreeConnector = PIXI.Graphics & {
 };
 
 export { BlueprintConnectionsLayer };
+export type { TwoWaysEntryId };

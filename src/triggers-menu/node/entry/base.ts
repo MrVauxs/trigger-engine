@@ -54,7 +54,7 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
     }
 
     get isConnected(): boolean {
-        return this.blueprint.getComputedConnection(this.id);
+        return this.node.trigger.entryIsConnected(this.id);
     }
 
     get isInput(): boolean {

@@ -43,6 +43,10 @@ class Trigger<TNode extends TriggerNode = TriggerNode> {
         // TODO we need to instantiate the node
         return this.nodes.get(id);
     }
+
+    toObject() {
+        return this.data.toObject();
+    }
 }
 
 export { Trigger };

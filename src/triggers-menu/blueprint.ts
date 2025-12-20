@@ -1,11 +1,8 @@
 import {
-    getNodeOuts,
     NodeEntry,
     OpenTrigger,
-    OpenTriggerNode,
     TriggerApplication,
     TriggerDataSource,
-    TriggerNode,
     UpdateNodeData,
     UpdateTriggerData,
 } from "engine";
@@ -18,11 +15,9 @@ import {
     BlueprintNode,
     BlueprintNodesLayer,
     BlueprintNodesMenu,
-    EntryId,
 } from ".";
 
 class Blueprint extends PIXI.Application<HTMLCanvasElement> {
-    #computedConnections: Record<EntryId, boolean> = {};
     #gridLayer: BlueprintGridLayer;
     #hitArea: PIXI.Rectangle;
     #layers: BlueprintLayers;
@@ -158,18 +153,6 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         this.resizeAll();
     }
 
-    addComputedConnection(id: EntryId) {
-        this.#computedConnections[id] = true;
-    }
-
-    removeComputedConnection(id: EntryId) {
-        delete this.#computedConnections[id];
-    }
-
-    getComputedConnection(id: EntryId): boolean {
-        return !!this.#computedConnections[id];
-    }
-
     toggleLocked(locked: boolean) {
         this.stage.eventMode = locked ? "none" : "static";
         this.parent.toggleUIEnabled(locked);
@@ -236,77 +219,6 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         return subtractPoint(dividePointBy(event.global, this.scale), point);
     }
 
-    computeConnections() {
-        const trigger = this.trigger;
-        if (!trigger) return;
-
-        this.#computedConnections = {};
-
-        for (const inputNode of trigger.nodes) {
-            const InputNodeCls = inputNode.constructor as typeof TriggerNode;
-            const nodeInputs = InputNodeCls.defineInputs ?? [];
-
-            const ins = R.pipe(
-                R.values(inputNode.data.ins),
-                R.map(({ connections }) => ["bridge", "in", connections] as const)
-            );
-
-            const inputs = R.pipe(
-                R.entries(inputNode.data.inputs),
-                R.map(([inputKey, { connections }]) => {
-                    // TODO also check for custom inputs
-                    const input = nodeInputs.find(({ key }) => key === inputKey);
-                    if (!R.isObjectType(input) || !R.isString(input.type)) return;
-
-                    return [input.type, inputKey, connections] as const;
-                }),
-                R.filter(R.isTruthy)
-            );
-
-            const inputConnections = R.pipe(
-                [...ins, ...inputs],
-                R.flatMap(([type, key, connections]) => {
-                    if (!connections?.length) return;
-                    return connections.map((connection) => [type, key, connection] as const);
-                }),
-                R.filter(R.isTruthy)
-            );
-
-            for (const [inputType, inputKey, outputId] of inputConnections) {
-                const [outputNodeId, outputCategory, outputEntryKey] = R.split(outputId, ":");
-                const outputNode = trigger.getNode(outputNodeId);
-                if (!outputNode) continue;
-
-                const OutputNodeCls = outputNode.constructor as typeof TriggerNode;
-
-                if (outputCategory === "outs") {
-                    // TODO also check for customs outs
-                    const outs = getNodeOuts(OutputNodeCls);
-                    const out = outs.find(({ key }) => key === outputEntryKey);
-
-                    if (!out) continue;
-                } else {
-                    // TODO also check for customs outputs
-                    const outputs = OutputNodeCls.defineOutputs ?? [];
-                    const output = outputs.find(({ key, type }) => {
-                        return (
-                            key === outputEntryKey &&
-                            (type === inputType || !!this.application.getConvertor(type, inputType))
-                        );
-                    });
-
-                    if (!output) continue;
-                }
-
-                const inputCategory = outputCategory === "outs" ? "ins" : "inputs";
-                const inputId: EntryId = `${inputNode.id}:${inputCategory}:${inputKey}`;
-
-                this.#computedConnections[inputId] = true;
-                this.#computedConnections[outputId] = true;
-            }
-        }
-    }
-
     _canHandleMouseEvent() {
         return !!this.trigger;
     }
@@ -370,19 +282,26 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         const trigger = this.trigger;
         if (!trigger) return;
 
-        this.computeConnections();
+        trigger.computeConnections();
 
-        for (const node of trigger.nodes as Collection<OpenTriggerNode>) {
+        for (const node of trigger.nodes) {
             this.nodes.add(node, false);
         }
 
-        // TODO add connections as well
+        for (const twoWays of trigger.linkedConnections) {
+            const [originId, targetId] = R.split(twoWays, "-");
+            const origin = this.nodes.getEntryFromId(originId);
+            const target = this.nodes.getEntryFromId(targetId);
+
+            if (origin && target) {
+                this.connections.addConnection(origin, target);
+            }
+        }
 
         this.stage.on("wheel", this.#onWheel, this);
     }
 
     #clear() {
-        this.#computedConnections = {};
         this.#layers.clear();
         this.stage.off("wheel", this.#onWheel, this);
     }
