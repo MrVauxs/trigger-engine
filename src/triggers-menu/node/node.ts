@@ -31,6 +31,7 @@ import {
 import { Blueprint } from "..";
 
 class BlueprintNode extends PIXI.Container {
+    #border?: PIXI.Graphics;
     #calculatedheight: number = 0;
     #calculatedWith: number = 0;
     #entries: BaseBlueprintEntry[] = [];
@@ -164,7 +165,7 @@ class BlueprintNode extends PIXI.Container {
         if (this.selected === value) return;
 
         this.#selected = value;
-        this.#drawBorder(value);
+        this.#drawBorder();
     }
 
     get entries(): BaseBlueprintEntry[] {
@@ -225,7 +226,7 @@ class BlueprintNode extends PIXI.Container {
     draw() {
         this.clear();
 
-        const header = this.#drawHeader();
+        const header = this.#createHeader();
         const body = this.#drawBody();
 
         const width = Math.min(
@@ -276,7 +277,8 @@ class BlueprintNode extends PIXI.Container {
         this.addChild(body);
 
         // border
-        this.addChild(this.#drawBorder(false));
+        this.addChild((this.#border = new PIXI.Graphics()));
+        this.#drawBorder();
 
         // set position
         const { x, y } = this.data.position;
@@ -451,16 +453,16 @@ class BlueprintNode extends PIXI.Container {
         return this.data[category][inputEntry.key]?.connections?.slice() ?? [];
     }
 
-    #drawBorder(selected: boolean): PIXI.Graphics {
-        const border = new PIXI.Graphics();
+    #drawBorder() {
+        const border = this.#border;
+        if (!border) return;
+
         const width = this.#calculatedWith;
         const height = this.#calculatedheight;
 
         border.clear();
-        border.lineStyle(selected ? this.selectedBorderOptions : this.borderOptions);
+        border.lineStyle(this.selected ? this.selectedBorderOptions : this.borderOptions);
         border.drawRoundedRect(0, 0, width, height, this.borderRadius);
-
-        return border;
     }
 
     #drawBody(): NodePart {
@@ -551,7 +553,7 @@ class BlueprintNode extends PIXI.Container {
         return body;
     }
 
-    #drawHeader(): NodeheaderPart | undefined {
+    #createHeader(): NodeheaderPart | undefined {
         const title = this.#node.title;
         if (!R.isString(title)) return;
 
