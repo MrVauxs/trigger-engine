@@ -14,7 +14,7 @@ import {
     UpdateTriggerData,
 } from "engine";
 import { enrichHTML, MODULE, R } from "module-helpers";
-import { BaseBlueprintEntry, EntryId, TwoWaysEntryId } from "triggers-menu";
+import { EntryId, TwoWaysEntryId } from "triggers-menu";
 
 class OpenTrigger extends Trigger<OpenTriggerNode> {
     #computed: boolean = false;

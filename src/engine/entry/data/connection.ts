@@ -1,7 +1,9 @@
-import { MODULE } from "module-helpers";
+import { MODULE, R } from "module-helpers";
+import { EntryId, PreciseEntryCategory } from "triggers-menu";
 import fields = foundry.data.fields;
 
 const CONNECTION_CATEGORIES = ["outputs", "outs"] as const;
+const OPPOSITE_CONNECTION_CATEGORY = ["inputs", "ins"] as const;
 
 class EntryConnectionField<
     TCategory extends ConnectionCategory = ConnectionCategory
@@ -38,13 +40,24 @@ interface EntryConnectionField {
     options: EntryConnectionFieldOptions;
 }
 
+function isOppositeConnection(
+    category: PreciseEntryCategory
+): category is OppositeConnectionCategory {
+    return R.isIncludedIn(category, OPPOSITE_CONNECTION_CATEGORY);
+}
+
+function isConnectionId(id: EntryId): id is ConnectionId {
+    return R.isIncludedIn(R.split(id, ":").at(1), CONNECTION_CATEGORIES);
+}
+
 type ConnectionId = `${string}:${ConnectionCategory}:${string}`;
 
 type ConnectionCategory = (typeof CONNECTION_CATEGORIES)[number];
+type OppositeConnectionCategory = (typeof OPPOSITE_CONNECTION_CATEGORY)[number];
 
 type EntryConnectionFieldOptions = fields.StringFieldOptions<ConnectionId, true, false, false> & {
     category: ConnectionCategory;
 };
 
-export { EntryConnectionField };
-export type { ConnectionCategory, ConnectionId };
+export { EntryConnectionField, isConnectionId, isOppositeConnection };
+export type { ConnectionCategory, ConnectionId, OppositeConnectionCategory };

@@ -1,6 +1,7 @@
 import {
-    ConnectionId,
     IconObject,
+    isConnectionId,
+    isOppositeConnection,
     NodeData,
     NodeHeader,
     NodeHeaderData,
@@ -25,11 +26,13 @@ import {
     BlueprintBridgeEntry,
     BlueprintEntry,
     BlueprintNodesLayer,
+    EntryId,
     getBottom,
     getRight,
     maxBottom,
     maxRight,
     NodePart,
+    PreciseEntryCategory,
 } from ".";
 import { Blueprint } from "..";
 
@@ -323,6 +326,24 @@ class BlueprintNode extends PIXI.Container {
         }
     }
 
+    addConnection(category: PreciseEntryCategory, key: string, targetId: EntryId) {
+        if (!isOppositeConnection(category) || !isConnectionId(targetId)) return;
+
+        const connections = this.data[category][key]?.connections?.slice() ?? [];
+        if (connections.includes(targetId)) return;
+
+        connections.push(targetId);
+
+        this.data.updateSource({
+            [category]: {
+                [key]: {
+                    connections,
+                    value: undefined,
+                },
+            },
+        });
+    }
+
     _onClickLeft(event: FederatedEvent) {
         this.blueprint.cancelMouse();
 
@@ -354,7 +375,7 @@ class BlueprintNode extends PIXI.Container {
             this.selectOnly();
         }
 
-        this.#onContextMenu(event);
+        this.#onNodeContextMenu(event);
     }
 
     _onDragLeftStart(event: FederatedEvent) {
@@ -454,11 +475,6 @@ class BlueprintNode extends PIXI.Container {
         );
 
         return new foundry.canvas.containers.PreciseText(text, style);
-    }
-
-    getConnectionsFromEntry(inputEntry: BaseBlueprintEntry): ConnectionId[] {
-        const category = inputEntry.preciseCategory as "ins" | "inputs";
-        return this.data[category][inputEntry.key]?.connections?.slice() ?? [];
     }
 
     #drawBorder() {
@@ -600,7 +616,12 @@ class BlueprintNode extends PIXI.Container {
         return headerEl;
     }
 
-    async #onContextMenu(event: PIXI.FederatedPointerEvent) {
+    async createContextMenu(
+        event: PIXI.FederatedPointerEvent,
+        entries: Omit<ContextMenuEntry, "condition">[]
+    ) {
+        if (!entries.length) return;
+
         const anchor = createHTMLElement("div", {
             id: "trigger-engine-context-menu",
             style: {
@@ -612,21 +633,6 @@ class BlueprintNode extends PIXI.Container {
         });
 
         document.body.appendChild(anchor);
-
-        const selected = this.parent.selected;
-        const multiSelect = selected.length > 1;
-
-        const entries: ContextMenuEntry[] = [
-            {
-                name: localizePath(`blueprint.node.delete.${multiSelect ? "multi" : "single"}`),
-                icon: `<i class="fa-solid fa-trash fa-fw"></i>`,
-                condition: true,
-                callback: async () => {
-                    const confirm = await confirmDialog("blueprint.node.delete.confirm");
-                    return confirm && this.parent.deleteSelected();
-                },
-            },
-        ];
 
         const menu = new foundry.applications.ux.ContextMenu.implementation(anchor, "", entries, {
             fixed: true,
@@ -647,6 +653,26 @@ class BlueprintNode extends PIXI.Container {
             anchor.remove();
             menu.close();
         });
+    }
+
+    async #onNodeContextMenu(event: PIXI.FederatedPointerEvent) {
+        const selected = this.parent.selected;
+        const multiSelect = selected.length > 1;
+
+        const entries: Omit<ContextMenuEntry, "condition">[] = [];
+
+        if (!this.isLocked) {
+            entries.push({
+                name: localizePath(`blueprint.node.delete.${multiSelect ? "multi" : "single"}`),
+                icon: `<i class="fa-solid fa-trash fa-fw"></i>`,
+                callback: async () => {
+                    const confirm = await confirmDialog("blueprint.node.delete.confirm");
+                    return confirm && this.parent.deleteSelected();
+                },
+            });
+        }
+
+        this.createContextMenu(event, entries);
     }
 }
 

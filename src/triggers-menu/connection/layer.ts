@@ -77,7 +77,7 @@ class BlueprintConnectionsLayer extends PIXI.Container {
         }
     }
 
-    addConnection(origin: EntryId, target: EntryId) {
+    add(origin: EntryId, target: EntryId) {
         const connection = this.addChild(new BlueprintConnection(origin, target));
 
         connection.draw();
@@ -85,6 +85,8 @@ class BlueprintConnectionsLayer extends PIXI.Container {
         this.#connections.set(`${origin}-${target}`, connection);
         this.#connections.set(`${target}-${origin}`, connection);
     }
+
+    remove() {}
 
     #onPointerMove(event: PIXI.FederatedPointerEvent) {
         const connector = this.#connector;
@@ -139,22 +141,10 @@ class BlueprintConnectionsLayer extends PIXI.Container {
                 ? [originNode, originEntry, targetNode, targetEntry]
                 : [targetNode, targetEntry, originNode, originEntry];
 
-            const category = inputEntry.preciseCategory as "ins" | "inputs";
-
-            const connections = inputNode.getConnectionsFromEntry(inputEntry);
-            connections.push(outputEntry.id as ConnectionId);
-
-            inputNode.data.updateSource({
-                [category]: {
-                    [inputEntry.key]: {
-                        connections,
-                        value: undefined,
-                    },
-                },
-            });
+            inputNode.addConnection(inputEntry.preciseCategory, inputEntry.key, outputEntry.id);
 
             this.blueprint.trigger?.addComputedConnections(inputEntry.id, outputEntry.id);
-            this.addConnection(inputEntry.id, outputEntry.id);
+            this.add(inputEntry.id, outputEntry.id);
 
             inputNode.draw();
             outputNode.draw();

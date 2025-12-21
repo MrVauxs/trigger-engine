@@ -262,7 +262,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
 
         source.position = position;
 
-        let selectedIdSuffix: `${PreciseEntryCategory}:${string}` | undefined;
+        let otherIdSuffix: `${PreciseEntryCategory}:${string}` | undefined;
 
         if (entry?.isOutput) {
             if (isBlueprintEntry(entry)) {
@@ -271,7 +271,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
                 );
 
                 if (otherEntry) {
-                    selectedIdSuffix = `inputs:${otherEntry.key}`;
+                    otherIdSuffix = `inputs:${otherEntry.key}`;
                     source.inputs = {
                         [otherEntry.key]: {
                             connections: [entry.id as ConnectionId],
@@ -279,7 +279,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
                     };
                 }
             } else {
-                selectedIdSuffix = "ins:in";
+                otherIdSuffix = "ins:in";
                 source.ins = {
                     in: {
                         connections: [entry.id as ConnectionId],
@@ -288,41 +288,42 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
             }
         }
 
-        const node = this.trigger?.addNode(source);
-        if (!node) return;
+        const newNode = this.trigger?.addNode(source);
+        if (!newNode) return;
 
         if (entry?.isInput) {
             if (isBlueprintEntry(entry)) {
                 const otherEntry = getOutputsSchemas(OtherCls).find(
                     (other) => other.type === entry.type
                 );
-                selectedIdSuffix = otherEntry ? `outputs:${otherEntry.key}` : undefined;
+                otherIdSuffix = otherEntry ? `outputs:${otherEntry.key}` : undefined;
             } else {
                 const out = getOutsSchemas(OtherCls).at(0)?.key;
-                selectedIdSuffix = out ? `outs:${out}` : undefined;
+                otherIdSuffix = out ? `outs:${out}` : undefined;
             }
         }
 
-        const selectedId: EntryId | undefined = selectedIdSuffix
-            ? `${node.id}:${selectedIdSuffix}`
+        const otherId: EntryId | undefined = otherIdSuffix
+            ? `${newNode.id}:${otherIdSuffix}`
             : undefined;
 
-        if (entry && selectedId) {
+        if (entry && otherId) {
             // we do it before creating the node so we don't have to update it
-            this.trigger?.addComputedConnections(entry.id, selectedId);
+            this.trigger?.addComputedConnections(entry.id, otherId);
         }
 
-        const blueprintNode = this.nodes.add(node, true);
+        const blueprintNode = this.nodes.add(newNode, true);
 
-        if (entry && selectedId) {
-            this.connections.addConnection(entry.id, selectedId);
+        if (entry && otherId) {
+            this.connections.add(entry.id, otherId);
+
+            if (entry.isInput) {
+                entry.node.addConnection(entry.preciseCategory, entry.key, otherId);
+                entry.node.draw();
+            }
         }
 
-        if (entry?.isInput) {
-            entry.node.draw();
-        }
-
-        return { node: blueprintNode, selectedId };
+        return { node: blueprintNode, selectedId: otherId };
     }
 
     draw(forceComputeConnections?: boolean) {
@@ -343,7 +344,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
             const target = this.nodes.getEntryFromId(targetId);
 
             if (origin && target) {
-                this.connections.addConnection(origin.id, target.id);
+                this.connections.add(origin.id, target.id);
             }
         }
 
