@@ -142,28 +142,30 @@ class BlueprintEntry extends BaseBlueprintEntry {
             this.node.selectOnly();
         });
 
-        fieldElement.on("pointerup", async () => {
-            this.blueprint.toggleLocked(true);
-            const value = await fieldElement.onClick();
-            this.blueprint.toggleLocked(false);
+        fieldElement.on("pointerup", async (event) => {
+            if (event.button === 0) {
+                this.blueprint.toggleLocked(true);
+                const value = await fieldElement.onClick();
+                this.blueprint.toggleLocked(false);
 
-            if (value === rawValue) return;
+                if (value === rawValue) return;
 
-            const newValue = processValue(value);
-            if (newValue === rawValue) return;
+                const newValue = processValue(value);
+                if (newValue === rawValue) return;
 
-            const update = {
-                connections: [],
-                value: newValue,
-            };
+                const update = {
+                    connections: [],
+                    value: newValue,
+                };
 
-            this.node.data.updateSource({
-                inputs: {
-                    [this.key]: newValue === defaultValue ? undefined : update,
-                },
-            });
+                this.node.data.updateSource({
+                    inputs: {
+                        [this.key]: newValue === defaultValue ? undefined : update,
+                    },
+                });
 
-            this.draw();
+                this.draw();
+            }
         });
 
         return fieldElement;

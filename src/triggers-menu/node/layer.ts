@@ -72,6 +72,21 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
         return _node;
     }
 
+    deleteSelected() {
+        for (const node of this.#nodes) {
+            if (!node.selected) continue;
+
+            this.blueprint.trigger?.deleteNode(node.id);
+            this.#nodes.delete(node.id);
+            this.removeChild(node);
+
+            node.eventMode = "none";
+            node.destroy(true);
+        }
+
+        this.blueprint.draw(true);
+    }
+
     clear() {
         this.removeAllListeners();
 

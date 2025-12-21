@@ -74,7 +74,7 @@ abstract class InputField<
         const scale = targetHeight / height;
 
         const input = this.createInput();
-        input.classList.add("trigger-engine-field");
+        input.id = "trigger-engine-field";
 
         document.body.appendChild(input);
 

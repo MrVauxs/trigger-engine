@@ -81,6 +81,11 @@ class TriggerData extends abstract.DataModel<null, TriggerDataSchema> {
             MODULE.error(`an error ocurred while trying to add a NodeData: ${source.type}`, error);
         }
     }
+
+    removeNode(id: string): boolean {
+        this._source.nodes.findSplice((node) => node._id === id);
+        return this.nodes.delete(id);
+    }
 }
 
 interface TriggerData extends Omit<ModelPropsFromSchema<TriggerDataSchema>, "nodes"> {

@@ -107,6 +107,11 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
         }
     }
 
+    deleteNode(id: string) {
+        this.data.removeNode(id);
+        this.nodes.delete(id);
+    }
+
     addComputedConnections(origin: EntryId, target: EntryId) {
         this.#computedConnections[origin] = true;
         this.#computedConnections[target] = true;

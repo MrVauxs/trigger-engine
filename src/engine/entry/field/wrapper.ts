@@ -80,16 +80,7 @@ function instantiateField(
         }
 
         #getGlobalBounds(): PIXI.Rectangle {
-            const scale = node.stage.scale;
-            const position = this.getGlobalPosition();
-            const viewBounds = node.blueprint.view.getBoundingClientRect();
-
-            const x = position.x + viewBounds.x;
-            const y = position.y + viewBounds.y;
-            const width = this.width * scale.x;
-            const height = this.height * scale.y;
-
-            return new PIXI.Rectangle(x, y, width, height);
+            return node.blueprint.getGlobalBounds(this);
         }
     }
 

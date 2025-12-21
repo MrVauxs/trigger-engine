@@ -137,7 +137,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         this.setPosition(0, 0);
 
         if (triggerId) {
-            this.#draw();
+            this.draw();
         } else {
             this.#clear();
         }
@@ -231,6 +231,19 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         return subtractPoint(this.unscalePoint(event.global), point);
     }
 
+    getGlobalBounds(element: PIXI.Container): PIXI.Rectangle {
+        const scale = this.stage.scale;
+        const position = element.getGlobalPosition();
+        const viewBounds = this.view.getBoundingClientRect();
+
+        const x = position.x + viewBounds.x;
+        const y = position.y + viewBounds.y;
+        const width = element.width * scale.x;
+        const height = element.height * scale.y;
+
+        return new PIXI.Rectangle(x, y, width, height);
+    }
+
     async openNodesMenu(
         event: PIXI.FederatedPointerEvent,
         entry?: BaseBlueprintEntry
@@ -312,6 +325,31 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         return { node: blueprintNode, selectedId };
     }
 
+    draw(forceComputeConnections?: boolean) {
+        this.#clear();
+
+        const trigger = this.trigger;
+        if (!trigger) return;
+
+        trigger.computeConnections(forceComputeConnections);
+
+        for (const node of trigger.nodes) {
+            this.nodes.add(node, false);
+        }
+
+        for (const twoWays of trigger.linkedConnections) {
+            const [originId, targetId] = R.split(twoWays, "-");
+            const origin = this.nodes.getEntryFromId(originId);
+            const target = this.nodes.getEntryFromId(targetId);
+
+            if (origin && target) {
+                this.connections.addConnection(origin.id, target.id);
+            }
+        }
+
+        this.stage.on("wheel", this.#onWheel, this);
+    }
+
     _canHandleMouseEvent() {
         return !!this.trigger;
     }
@@ -367,31 +405,6 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         const { x, y } = this.subtractPointFromEvent(event, layerOrigin);
 
         this.setPosition(x, y);
-    }
-
-    #draw() {
-        this.#clear();
-
-        const trigger = this.trigger;
-        if (!trigger) return;
-
-        trigger.computeConnections();
-
-        for (const node of trigger.nodes) {
-            this.nodes.add(node, false);
-        }
-
-        for (const twoWays of trigger.linkedConnections) {
-            const [originId, targetId] = R.split(twoWays, "-");
-            const origin = this.nodes.getEntryFromId(originId);
-            const target = this.nodes.getEntryFromId(targetId);
-
-            if (origin && target) {
-                this.connections.addConnection(origin.id, target.id);
-            }
-        }
-
-        this.stage.on("wheel", this.#onWheel, this);
     }
 
     #clear() {

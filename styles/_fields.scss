@@ -1,84 +1,82 @@
-body {
-    > .trigger-engine-field {
-        z-index: 100;
-        position: absolute;
+#trigger-engine-field {
+    z-index: 100;
+    position: absolute;
+    border-radius: 0;
+    outline-offset: 0;
+    width: var(--origin-width);
+    height: var(--origin-height);
+    font-size: var(--origin-font-size);
+    transform: translate(-50%, -50%);
+    transition: all var(--transition-time) ease-in;
+
+    &.scale-to {
+        width: var(--target-width);
+        height: var(--target-height);
+        font-size: var(--target-font-size);
+    }
+}
+
+input#trigger-engine-field {
+    line-height: 0;
+}
+
+prose-mirror#trigger-engine-field {
+    gap: 0;
+    outline: 2px solid var(--color-cool-3);
+    border-radius: 4px;
+    min-height: 0;
+
+    .editor-menu {
         border-radius: 0;
-        outline-offset: 0;
-        width: var(--origin-width);
-        height: var(--origin-height);
-        font-size: var(--origin-font-size);
-        transform: translate(-50%, -50%);
-        transition: all var(--transition-time) ease-in;
+        padding: 0.1em 0 0;
+        justify-content: end;
+        padding-right: 0.1em;
+    }
 
-        &.scale-to {
-            width: var(--target-width);
-            height: var(--target-height);
-            font-size: var(--target-font-size);
+    .editor-container {
+        background: var(--menu-background);
+        border-top: 1px solid var(--color-cool-3);
+
+        .editor-content {
+            padding-inline: 0.5rem;
+
+            h1,
+            h2,
+            h3,
+            h4 {
+                font-size: var(--origin-font-size);
+                transition: all var(--transition-time) ease-in;
+            }
         }
     }
 
-    > input.trigger-engine-field {
-        line-height: 0;
+    &.scale-to {
+        .editor-content {
+            h1 {
+                font-size: var(--font-h1-size);
+            }
+
+            h2 {
+                font-size: var(--font-h2-size);
+            }
+
+            h2 {
+                font-size: var(--font-h2-size);
+            }
+
+            h3 {
+                font-size: var(--font-h3-size);
+            }
+        }
     }
 
-    > prose-mirror.trigger-engine-field {
-        gap: 0;
-        outline: 2px solid var(--color-cool-3);
-        border-radius: 4px;
-        min-height: 0;
-
+    &:not(.scaled) {
         .editor-menu {
-            border-radius: 0;
-            padding: 0.1em 0 0;
-            justify-content: end;
-            padding-right: 0.1em;
-        }
-
-        .editor-container {
-            background: var(--menu-background);
-            border-top: 1px solid var(--color-cool-3);
-
-            .editor-content {
-                padding-inline: 0.5rem;
-
-                h1,
-                h2,
-                h3,
-                h4 {
-                    font-size: var(--origin-font-size);
-                    transition: all var(--transition-time) ease-in;
-                }
-            }
-        }
-
-        &.scale-to {
-            .editor-content {
-                h1 {
-                    font-size: var(--font-h1-size);
-                }
-
-                h2 {
-                    font-size: var(--font-h2-size);
-                }
-
-                h2 {
-                    font-size: var(--font-h2-size);
-                }
-
-                h3 {
-                    font-size: var(--font-h3-size);
-                }
-            }
-        }
-
-        &:not(.scaled) {
-            .editor-menu {
-                display: none;
-            }
+            display: none;
         }
     }
+}
 
-    > code-mirror.trigger-engine-field {
-        min-height: 0;
-    }
+code-mirror#trigger-engine-field {
+    min-height: 0;
 }

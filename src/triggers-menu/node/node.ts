@@ -9,8 +9,11 @@ import {
     TriggerNode,
 } from "engine";
 import {
+    confirmDialog,
+    createHTMLElement,
     drawRectangleMask,
     LocalizeArgs,
+    localizePath,
     mapToObjByKey,
     MouseInteractionManager,
     R,
@@ -147,6 +150,14 @@ class BlueprintNode extends PIXI.Container {
 
     get maxWidth(): number {
         return Infinity;
+    }
+
+    get width(): number {
+        return this.#calculatedWith || super.width;
+    }
+
+    get height(): number {
+        return this.#calculatedheight || super.height;
     }
 
     get canDrag(): boolean {
@@ -303,6 +314,15 @@ class BlueprintNode extends PIXI.Container {
         this.#mouseManager?.cancel();
     }
 
+    setPosition(x: number, y: number) {
+        this.position.set(x, y);
+        this.data.updateSource({ position: { x, y } });
+
+        for (const entry of this.entries) {
+            this.blueprint.connections.refreshConnection(entry);
+        }
+    }
+
     _onClickLeft(event: FederatedEvent) {
         this.blueprint.cancelMouse();
 
@@ -329,6 +349,11 @@ class BlueprintNode extends PIXI.Container {
         this.blueprint.cancelMouse();
 
         this.bringToTop();
+
+        if (!this.selected) {
+            this.selectOnly();
+        }
+
         this.#onContextMenu(event);
     }
 
@@ -336,7 +361,7 @@ class BlueprintNode extends PIXI.Container {
         this.blueprint.cancelMouse();
         if (event.shiftKey) return;
 
-        this.interactiveChildren = false;
+        this.parent.interactiveChildren = false;
 
         const selected = this.parent.selected;
         const interactionData = event.interactionData as InteractionData;
@@ -365,18 +390,9 @@ class BlueprintNode extends PIXI.Container {
         }
     }
 
-    setPosition(x: number, y: number) {
-        this.position.set(x, y);
-        this.data.updateSource({ position: { x, y } });
-
-        for (const entry of this.entries) {
-            this.blueprint.connections.refreshConnection(entry);
-        }
-    }
-
     _onDragLeftDrop(event: FederatedEvent) {
         this.blueprint.cancelMouse();
-        this.interactiveChildren = true;
+        this.parent.interactiveChildren = true;
     }
 
     _onDragRightStart(event: FederatedEvent) {
@@ -449,12 +465,9 @@ class BlueprintNode extends PIXI.Container {
         const border = this.#border;
         if (!border) return;
 
-        const width = this.#calculatedWith;
-        const height = this.#calculatedheight;
-
         border.clear();
         border.lineStyle(this.selected ? this.selectedBorderOptions : this.borderOptions);
-        border.drawRoundedRect(0, 0, width, height, this.borderRadius);
+        border.drawRoundedRect(0, 0, this.width, this.height, this.borderRadius);
     }
 
     #drawBody(): NodePart {
@@ -587,7 +600,54 @@ class BlueprintNode extends PIXI.Container {
         return headerEl;
     }
 
-    async #onContextMenu(event: PIXI.FederatedPointerEvent) {}
+    async #onContextMenu(event: PIXI.FederatedPointerEvent) {
+        const anchor = createHTMLElement("div", {
+            id: "trigger-engine-context-menu",
+            style: {
+                left: `${event.globalX}px`,
+                top: `${event.globalY}px`,
+                position: "absolute",
+                zIndex: "100",
+            },
+        });
+
+        document.body.appendChild(anchor);
+
+        const selected = this.parent.selected;
+        const multiSelect = selected.length > 1;
+
+        const entries: ContextMenuEntry[] = [
+            {
+                name: localizePath(`blueprint.node.delete.${multiSelect ? "multi" : "single"}`),
+                icon: `<i class="fa-solid fa-trash fa-fw"></i>`,
+                condition: true,
+                callback: async () => {
+                    const confirm = await confirmDialog("blueprint.node.delete.confirm");
+                    return confirm && this.parent.deleteSelected();
+                },
+            },
+        ];
+
+        const menu = new foundry.applications.ux.ContextMenu.implementation(anchor, "", entries, {
+            fixed: true,
+            jQuery: false,
+            onClose: () => {
+                menu.close();
+            },
+        });
+
+        await menu.render(anchor, {
+            event: new PointerEvent("contextmenu", {
+                clientX: event.globalX - 20,
+                clientY: event.globalY - 10,
+            }),
+        });
+
+        menu.element.addEventListener("pointerleave", () => {
+            anchor.remove();
+            menu.close();
+        });
+    }
 }
 
 interface BlueprintNode {
