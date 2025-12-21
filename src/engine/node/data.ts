@@ -24,7 +24,9 @@ class NodeData extends abstract.DataModel<TriggerData, NodeDataSchema> {
 }
 
 interface NodeData extends ModelPropsFromSchema<NodeDataSchema> {
-    updateSource(data: DeepPartial<NodeDataSource>): DeepPartial<NodeDataSource>;
+    updateSource(
+        data: DeepPartial<NodeDataSource> | { [x: string]: { [x: string]: null } }
+    ): DeepPartial<NodeDataSource>;
 }
 
 type CreateNodeData = Prettify<WithRequired<DeepPartial<NodeDataSource>, "type">>;

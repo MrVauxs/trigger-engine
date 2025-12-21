@@ -1,6 +1,9 @@
 {
     "trigger-engine": {
         "blueprint": {
+            "entry": {
+                "disconnect": "Disconnect Entry"
+            },
             "node": {
                 "delete": {
                     "confirm": {

@@ -1,5 +1,7 @@
 import { Blueprint } from "triggers-menu";
 import { alignHorizontally, BlueprintNode } from "..";
+import { localizePath, R } from "module-helpers";
+import { ConnectionId } from "engine";
 
 abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
     #category: EntryCategory;
@@ -100,6 +102,10 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
         };
     }
 
+    get connections(): ConnectionId[] {
+        return this.node.getEntryConnections(this.preciseCategory, this.key);
+    }
+
     abstract _drawConnector(connector: PIXI.Graphics, isConnected: boolean): void;
     abstract _drawField(label: PreciseText): PIXI.Graphics | null;
 
@@ -140,6 +146,34 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
         );
     }
 
+    disconnect() {
+        const category = this.preciseCategory;
+
+        if (this.isInput) {
+            for (const otherId of this.connections) {
+                this.node.removeConnection(category, this.key, otherId);
+            }
+        } else {
+            const entryId = this.id;
+
+            for (const twoWays of this.node.trigger.linkedConnections) {
+                const [originId, targetId] = R.split(twoWays, "-");
+                const otherId =
+                    originId === entryId ? targetId : targetId === entryId ? originId : undefined;
+                const otherEntry = otherId && this.blueprint.nodes.getEntryFromId(otherId);
+                if (!otherEntry) continue;
+
+                otherEntry.node.removeConnection(
+                    otherEntry.preciseCategory,
+                    otherEntry.key,
+                    entryId
+                );
+            }
+        }
+
+        this.blueprint.draw(true);
+    }
+
     #clear() {
         this.removeChildren();
 
@@ -165,13 +199,12 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
 
         if (this.canConnect) {
             connector.cursor = "alias";
-
             connector.on("pointerdown", this.#onConnectorPointerDown, this);
-            connector.on("pointerup", this.#onConnectorPointerUp, this);
         } else {
             connector.on("pointerdown", (event) => event.stopPropagation(), this);
-            connector.on("pointerup", (event) => event.stopPropagation(), this);
         }
+
+        connector.on("pointerup", this.#onConnectorPointerUp, this);
 
         return connector;
     }
@@ -190,7 +223,24 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
         }
     }
 
-    #onConnectorPointerUp(event: PIXI.FederatedPointerEvent) {}
+    #onConnectorPointerUp(event: PIXI.FederatedPointerEvent) {
+        if (event.button !== 2) return;
+        if (this.node.isLocked) return;
+
+        const entries: Omit<ContextMenuEntry, "condition">[] = [];
+
+        if (this.isConnected) {
+            entries.push({
+                name: localizePath("blueprint.entry.disconnect"),
+                icon: `<i class="fa-solid fa-link-horizontal-slash"></i>`,
+                callback: async () => {
+                    this.disconnect();
+                },
+            });
+        }
+
+        this.node.createContextMenu(event, entries);
+    }
 }
 
 type EntryCategory = "inputs" | "outputs";

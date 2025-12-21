@@ -1,4 +1,3 @@
-import { ConnectionId } from "engine";
 import { subtractPoint } from "module-helpers";
 import {
     BaseBlueprintEntry,
@@ -85,8 +84,6 @@ class BlueprintConnectionsLayer extends PIXI.Container {
         this.#connections.set(`${origin}-${target}`, connection);
         this.#connections.set(`${target}-${origin}`, connection);
     }
-
-    remove() {}
 
     #onPointerMove(event: PIXI.FederatedPointerEvent) {
         const connector = this.#connector;

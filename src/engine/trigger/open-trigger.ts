@@ -135,7 +135,7 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
 
             const ins = R.pipe(
                 R.values(inputNode.data.ins),
-                R.map(({ connections }) => ["bridge", "in", connections] as const)
+                R.map(({ connections }) => ["ins", "bridge", "in", connections] as const)
             );
 
             const inputs = R.pipe(
@@ -144,24 +144,44 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
                     const input = nodeInputs.find(({ key }) => key === inputKey);
                     if (!R.isObjectType(input) || !R.isString(input.type)) return;
 
-                    return [input.type, inputKey, connections] as const;
+                    return ["inputs", input.type, inputKey, connections] as const;
                 }),
                 R.filter(R.isTruthy)
             );
 
             const inputConnections = R.pipe(
                 [...ins, ...inputs],
-                R.flatMap(([type, key, connections]) => {
+                R.flatMap(([category, type, key, connections]) => {
                     if (!connections?.length) return;
-                    return connections.map((connection) => [type, key, connection] as const);
+                    return connections.map(
+                        (connection) => [category, type, key, connection] as const
+                    );
                 }),
                 R.filter(R.isTruthy)
             );
 
-            for (const [inputType, inputKey, outputId] of inputConnections) {
+            for (const [category, inputType, inputKey, outputId] of inputConnections) {
                 const [outputNodeId, outputCategory, outputEntryKey] = R.split(outputId, ":");
                 const outputNode = this.getNode(outputNodeId);
-                if (!outputNode) continue;
+
+                /**
+                 * we delete stale connections for next save this way we don't have to maunally
+                 * update every node when connections are removed (from deleting nodes or disconnecting)
+                 */
+                const deleteData = () => {
+                    const connections = inputNode.data[category]?.[inputKey]?.connections;
+
+                    connections?.findSplice((connection) => connection === outputId);
+
+                    if (!connections?.length) {
+                        delete inputNode.data[category]?.[inputKey];
+                    }
+                };
+
+                if (!outputNode) {
+                    deleteData();
+                    continue;
+                }
 
                 const OutputNodeCls = outputNode.constructor as typeof TriggerNode;
 
@@ -169,7 +189,10 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
                     const outs = getOutsSchemas(OutputNodeCls);
                     const out = outs.find(({ key }) => key === outputEntryKey);
 
-                    if (!out) continue;
+                    if (!out) {
+                        deleteData();
+                        continue;
+                    }
                 } else {
                     const outputs = getOutputsSchemas(OutputNodeCls);
                     const output = outputs.find(({ key, type }) => {
@@ -179,7 +202,10 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
                         );
                     });
 
-                    if (!output) continue;
+                    if (!output) {
+                        deleteData();
+                        continue;
+                    }
                 }
 
                 const inputCategory = outputCategory === "outs" ? "ins" : "inputs";

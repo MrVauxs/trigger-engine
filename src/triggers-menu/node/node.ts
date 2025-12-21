@@ -1,4 +1,5 @@
 import {
+    ConnectionId,
     IconObject,
     isConnectionId,
     isOppositeConnection,
@@ -326,10 +327,16 @@ class BlueprintNode extends PIXI.Container {
         }
     }
 
-    addConnection(category: PreciseEntryCategory, key: string, targetId: EntryId) {
-        if (!isOppositeConnection(category) || !isConnectionId(targetId)) return;
+    getEntryConnections(category: PreciseEntryCategory, key: string): ConnectionId[] {
+        return (
+            (isOppositeConnection(category) && this.data[category][key]?.connections?.slice()) || []
+        );
+    }
 
-        const connections = this.data[category][key]?.connections?.slice() ?? [];
+    addConnection(category: PreciseEntryCategory, key: string, targetId: EntryId) {
+        if (!isConnectionId(targetId)) return;
+
+        const connections = this.getEntryConnections(category, key);
         if (connections.includes(targetId)) return;
 
         connections.push(targetId);
@@ -342,6 +349,31 @@ class BlueprintNode extends PIXI.Container {
                 },
             },
         });
+    }
+
+    removeConnection(category: PreciseEntryCategory, key: string, targetId: EntryId) {
+        if (!isConnectionId(targetId)) return;
+
+        const connections = this.getEntryConnections(category, key);
+        const exist = connections.findSplice((id) => id === targetId);
+        if (!exist) return;
+
+        if (connections.length) {
+            this.data.updateSource({
+                [category]: {
+                    [key]: {
+                        connections,
+                        "-=value": null,
+                    },
+                },
+            });
+        } else {
+            this.data.updateSource({
+                [category]: {
+                    [`-=${key}`]: null,
+                },
+            });
+        }
     }
 
     _onClickLeft(event: FederatedEvent) {

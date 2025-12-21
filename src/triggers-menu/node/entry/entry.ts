@@ -143,29 +143,35 @@ class BlueprintEntry extends BaseBlueprintEntry {
         });
 
         fieldElement.on("pointerup", async (event) => {
-            if (event.button === 0) {
-                this.blueprint.toggleLocked(true);
-                const value = await fieldElement.onClick();
-                this.blueprint.toggleLocked(false);
+            if (event.button !== 0) return;
 
-                if (value === rawValue) return;
+            this.blueprint.toggleLocked(true);
+            const value = await fieldElement.onClick();
+            this.blueprint.toggleLocked(false);
 
-                const newValue = processValue(value);
-                if (newValue === rawValue) return;
+            if (value === rawValue) return;
 
-                const update = {
-                    connections: [],
-                    value: newValue,
-                };
+            const newValue = processValue(value);
+            if (newValue === rawValue) return;
 
+            if (newValue === defaultValue) {
                 this.node.data.updateSource({
                     inputs: {
-                        [this.key]: newValue === defaultValue ? undefined : update,
+                        [`-=${this.key}`]: null,
                     },
                 });
-
-                this.draw();
+            } else {
+                this.node.data.updateSource({
+                    inputs: {
+                        [this.key]: {
+                            connections: [],
+                            value: newValue,
+                        },
+                    },
+                });
             }
+
+            this.draw();
         });
 
         return fieldElement;
@@ -186,9 +192,5 @@ type NodeFieldOptions = {
     value: unknown;
 };
 
-type OnFieldClickOptions<TValue extends unknown = unknown> = {
-    setValue: (value: TValue) => void;
-};
-
 export { BlueprintEntry, isBlueprintEntry };
-export type { NodeFieldOptions, OnFieldClickOptions };
+export type { NodeFieldOptions };
