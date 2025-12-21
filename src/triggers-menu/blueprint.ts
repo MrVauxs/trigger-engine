@@ -72,10 +72,14 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
             dragRightMove: this._onDragRightMove.bind(this),
         };
 
+        const canHandleMouse = () => {
+            return !!this.trigger;
+        };
+
         const permissions: ConstructorParameters<typeof MouseInteractionManager>[2] = {
-            ...R.mapValues(handlers, () => this._canHandleMouseEvent.bind(this)),
-            clickLeft: this._canHandleMouseEvent.bind(this),
-            clickRight: this._canHandleMouseEvent.bind(this),
+            ...R.mapValues(handlers, () => canHandleMouse),
+            clickLeft: canHandleMouse,
+            clickRight: canHandleMouse,
         };
 
         this.#mouseManager = new foundry.canvas.interaction.MouseInteractionManager(
@@ -248,6 +252,8 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         event: PIXI.FederatedPointerEvent,
         entry?: BaseBlueprintEntry
     ): Promise<{ node: BlueprintNode; selectedId: EntryId | undefined } | undefined> {
+        if (this.locked) return;
+
         // we need to calculate it now as FederatedEvent will be reused
         const position = this.subtractPointFromEvent(event, this.#layers);
 
@@ -349,10 +355,6 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         }
 
         this.stage.on("wheel", this.#onWheel, this);
-    }
-
-    _canHandleMouseEvent() {
-        return !!this.trigger;
     }
 
     _onUnclickLeft(event: FederatedEvent) {

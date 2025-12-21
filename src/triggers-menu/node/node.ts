@@ -164,10 +164,6 @@ class BlueprintNode extends PIXI.Container {
         return this.#calculatedheight || super.height;
     }
 
-    get canDrag(): boolean {
-        return this.isLocked;
-    }
-
     get isLocked(): boolean {
         return this.blueprint.locked;
     }
@@ -188,7 +184,7 @@ class BlueprintNode extends PIXI.Container {
     }
 
     initialize() {
-        if (this.#initialized || this.blueprint.locked) return;
+        if (this.#initialized) return;
 
         this.#initialized = true;
 
@@ -205,7 +201,12 @@ class BlueprintNode extends PIXI.Container {
             dragRightDrop: this._onDragRightDrop.bind(this),
         };
 
-        const permissions: ConstructorParameters<typeof MouseInteractionManager>[2] = {};
+        const permissions: ConstructorParameters<typeof MouseInteractionManager>[2] = R.fromKeys(
+            ["dragLeftStart", "dragLeftMove", "dragLeftDrop"] as const,
+            () => {
+                return !this.isLocked;
+            }
+        );
 
         this.#mouseManager = new foundry.canvas.interaction.MouseInteractionManager(
             this,

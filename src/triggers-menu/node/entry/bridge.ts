@@ -50,7 +50,7 @@ class BlueprintBridgeEntry extends BaseBlueprintEntry {
     }
 
     get canConnect(): boolean {
-        return this.isInput || !this.isConnected;
+        return !this.node.isLocked && (this.isInput || !this.isConnected);
     }
 
     _drawConnector(connector: PIXI.Graphics, isConnected: boolean) {

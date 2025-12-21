@@ -61,7 +61,7 @@ class BlueprintEntry extends BaseBlueprintEntry {
     }
 
     get canConnect(): boolean {
-        return this.isOutput || !this.isConnected;
+        return !this.node.isLocked && (this.isOutput || !this.isConnected);
     }
 
     canConvertWith(other: BlueprintEntry): boolean {
@@ -130,7 +130,7 @@ class BlueprintEntry extends BaseBlueprintEntry {
         const fieldElement = instantiateField(FieldCls, node, options);
         fieldElement.draw();
 
-        if (isConnected) {
+        if (isConnected || !this.canConnect) {
             return fieldElement;
         }
 
