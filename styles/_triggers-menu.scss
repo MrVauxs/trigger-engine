@@ -109,6 +109,28 @@
         .scroll {
             flex: 1;
             overflow: auto;
+
+            .list {
+                > * {
+                    position: relative;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.3em;
+                    padding: 0.3rem;
+                    cursor: pointer;
+
+                    .controls {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 0.3em;
+                    }
+
+                    &:hover {
+                        background: var(--background-color-highlight);
+                    }
+                }
+            }
         }
     }
 
@@ -173,26 +195,8 @@
         }
 
         .trigger {
-            position: relative;
-            display: flex;
-            align-items: center;
-            gap: 0.3em;
-            padding: 0.3rem;
-            cursor: pointer;
-
-            .controls {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 0.3em;
-            }
-
             .trigger-description {
                 display: none;
-            }
-
-            &:hover {
-                background: var(--background-color-highlight);
             }
         }
     }

@@ -30,7 +30,13 @@
         {{@root.i18n 'events'}}
     </div>
     <div class="scroll">
-
+        <div class="list">
+            {{#each events as |event|}}
+            <div class="event" data-id="{{event.id}}" data-action="select-event">
+                {{event.label}}
+            </div>
+            {{/each}}
+        </div>
     </div>
     <div class="header sub">
         {{@root.i18n 'gates'}}

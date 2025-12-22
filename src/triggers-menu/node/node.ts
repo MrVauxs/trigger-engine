@@ -104,6 +104,10 @@ class BlueprintNode extends PIXI.Container {
         return this.#node.isEvent;
     }
 
+    get label(): string {
+        return this.#node.title ?? this.#node.id;
+    }
+
     get inputsHaveConnector(): boolean {
         return (this.#node.constructor as typeof TriggerNode).inputsHaveConnector;
     }

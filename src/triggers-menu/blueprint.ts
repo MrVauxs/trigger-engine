@@ -5,7 +5,13 @@ import {
     UpdateNodeData,
     UpdateTriggerData,
 } from "engine";
-import { dividePointBy, MouseInteractionManager, R, subtractPoint } from "module-helpers";
+import {
+    distanceToPoint,
+    dividePointBy,
+    MouseInteractionManager,
+    R,
+    subtractPoint,
+} from "module-helpers";
 import {
     BaseBlueprintEntry,
     BlueprintApplication,
@@ -178,6 +184,52 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
     setPosition(x: number, y: number) {
         this.#layers.position.set(x, y);
         this.#gridLayer.tilePosition.set(x, y);
+    }
+
+    moveToNode(nodeId: string, select: boolean) {
+        const node = this.nodes.get(nodeId);
+        if (!node) return;
+
+        const nodePosition = node.position;
+        const layerPosition = this.#layers.position;
+        const targetPosition = subtractPoint({ x: 400, y: 180 }, nodePosition);
+        const distance = distanceToPoint(layerPosition, targetPosition);
+        const tilePosition = this.#gridLayer.tilePosition;
+
+        foundry.canvas.animation.CanvasAnimation.animate(
+            [
+                {
+                    parent: layerPosition,
+                    attribute: "x",
+                    to: targetPosition.x,
+                },
+                {
+                    parent: layerPosition,
+                    attribute: "y",
+                    to: targetPosition.y,
+                },
+                {
+                    parent: tilePosition,
+                    attribute: "x",
+                    to: targetPosition.x,
+                },
+                {
+                    parent: tilePosition,
+                    attribute: "y",
+                    to: targetPosition.y,
+                },
+                {
+                    parent: this,
+                    attribute: "scale",
+                    to: 1,
+                },
+            ],
+            { duration: Math.min(distance / 4, 500) }
+        );
+
+        if (select) {
+            node.selectOnly();
+        }
     }
 
     addTrigger(source: DeepPartial<TriggerDataSource>) {

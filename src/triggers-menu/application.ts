@@ -20,7 +20,7 @@ import {
     render,
     waitDialog,
 } from "module-helpers";
-import { Blueprint } from ".";
+import { Blueprint, BlueprintNode } from ".";
 import apps = foundry.applications.api;
 
 class BlueprintApplication extends apps.ApplicationV2<
@@ -138,14 +138,24 @@ class BlueprintApplication extends apps.ApplicationV2<
     }
 
     async _prepareContext(options: BlueprintRenderOptions): Promise<BlueprintContext> {
-        if (options.trigger) {
-            this.#search = "";
-            return {
-                isFree: this.application.isFreeApplication,
-                trigger: options.trigger,
-            } satisfies TriggerContext;
-        }
+        return options.trigger
+            ? this.#prepareTriggerContext(options.trigger)
+            : this.#prepareTriggersContext(options);
+    }
 
+    #prepareTriggerContext(trigger: OpenTrigger): TriggerContext {
+        this.#search = "";
+
+        const events = this.blueprint.nodes.filter((node) => node.isEvent);
+
+        return {
+            events,
+            isFree: this.application.isFreeApplication,
+            trigger: trigger,
+        };
+    }
+
+    #prepareTriggersContext(options: BlueprintRenderOptions): TriggersContext {
         const triggers = this.blueprint.triggers.contents;
         const groups: TriggersGroup[] = R.pipe(
             triggers,
@@ -186,7 +196,7 @@ class BlueprintApplication extends apps.ApplicationV2<
                 mode: this.tagsMode,
                 selected: this.tags,
             },
-        } satisfies TriggersContext;
+        };
     }
 
     async _preFirstRender(
@@ -276,6 +286,11 @@ class BlueprintApplication extends apps.ApplicationV2<
 
             case "save-triggers": {
                 return;
+            }
+
+            case "select-event": {
+                const nodeId = target.dataset.id ?? "";
+                return this.blueprint.moveToNode(nodeId, true);
             }
 
             case "select-trigger": {
@@ -434,11 +449,13 @@ type EventAction =
     | "import-triggers"
     | "reset-trigger"
     | "save-triggers"
+    | "select-event"
     | "select-trigger";
 
 type BlueprintContext = TriggersContext | TriggerContext;
 
 type TriggerContext = {
+    events: BlueprintNode[];
     isFree: boolean;
     trigger: OpenTrigger;
 };
