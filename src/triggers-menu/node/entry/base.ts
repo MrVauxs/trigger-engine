@@ -171,7 +171,7 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
             }
         }
 
-        this.blueprint.draw(true);
+        this.blueprint.draw({ forceComputeConnections: true });
     }
 
     #clear() {

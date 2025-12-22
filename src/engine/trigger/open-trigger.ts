@@ -107,6 +107,19 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
         }
     }
 
+    refreshNode(id: string) {
+        const current = this.getNode(id);
+        if (!current) return;
+
+        try {
+            const node = instantiateNode(this, current.data, true);
+
+            if (node) {
+                this.nodes.set(node.id, node);
+            }
+        } catch (error) {}
+    }
+
     deleteNode(id: string) {
         this.data.removeNode(id);
         this.nodes.delete(id);
@@ -131,7 +144,7 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
 
         for (const inputNode of this.nodes) {
             const InputNodeCls = inputNode.constructor as typeof TriggerNode;
-            const nodeInputs = getInputsSchemas(InputNodeCls);
+            const nodeInputs = getInputsSchemas(InputNodeCls, inputNode.state);
 
             const ins = R.pipe(
                 R.values(inputNode.data.ins),
@@ -169,12 +182,14 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
                  * update every node when connections are removed (from deleting nodes or disconnecting)
                  */
                 const deleteData = () => {
-                    const connections = inputNode.data[category]?.[inputKey]?.connections;
+                    for (const data of [inputNode.data, inputNode.data._source] as const) {
+                        const connections = data[category]?.[inputKey]?.connections;
 
-                    connections?.findSplice((connection) => connection === outputId);
+                        connections?.findSplice((connection) => connection === outputId);
 
-                    if (!connections?.length) {
-                        delete inputNode.data[category]?.[inputKey];
+                        if (!connections?.length) {
+                            delete data[category]?.[inputKey];
+                        }
                     }
                 };
 
@@ -186,7 +201,7 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
                 const OutputNodeCls = outputNode.constructor as typeof TriggerNode;
 
                 if (outputCategory === "outs") {
-                    const outs = getOutsSchemas(OutputNodeCls);
+                    const outs = getOutsSchemas(OutputNodeCls, outputNode.state);
                     const out = outs.find(({ key }) => key === outputEntryKey);
 
                     if (!out) {
@@ -194,7 +209,7 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
                         continue;
                     }
                 } else {
-                    const outputs = getOutputsSchemas(OutputNodeCls);
+                    const outputs = getOutputsSchemas(OutputNodeCls, outputNode.state);
                     const output = outputs.find(({ key, type }) => {
                         return (
                             key === outputEntryKey &&

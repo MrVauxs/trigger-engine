@@ -700,8 +700,34 @@ class BlueprintNode extends PIXI.Container {
     }
 
     async #onNodeContextMenu(event: PIXI.FederatedPointerEvent) {
+        const locked = this.isLocked;
         const selected = this.parent.selected;
         const entries: Omit<ContextMenuEntry, "condition">[] = [];
+
+        if (!locked && this.#node.states && this.#node.state) {
+            entries.push(
+                ...R.pipe(
+                    this.#node.states,
+                    R.filter((state) => state !== this.#node.state),
+                    R.map((state) => {
+                        return {
+                            name: this.#node.localize("state", state) ?? state,
+                            icon: `<i class="fa-sharp fa-solid fa-arrows-repeat"></i>`,
+                            callback: async () => {
+                                this.data.updateSource({ state });
+                                this.trigger.refreshNode(this.id);
+                                // TODO we gonna want to delete variables
+                                this.blueprint.draw({
+                                    forceComputeConnections: true,
+                                    renderApplication: true,
+                                    selectNodes: [this.id],
+                                });
+                            },
+                        };
+                    })
+                )
+            );
+        }
 
         if (this.isDuplicable) {
             const filtered = selected.filter((node) => node.isDuplicable);
@@ -715,7 +741,7 @@ class BlueprintNode extends PIXI.Container {
                 },
             });
 
-            if (!this.isLocked) {
+            if (!locked) {
                 entries.push({
                     name: localizePath(`blueprint.node.duplicate.${multiSelect}`),
                     icon: `<i class="fa-solid fa-copy"></i>`,
@@ -726,13 +752,14 @@ class BlueprintNode extends PIXI.Container {
             }
         }
 
-        if (!this.isLocked) {
+        if (!locked) {
             const multiSelect = selected.length > 1 ? "multi" : "single";
 
             entries.push({
                 name: localizePath(`blueprint.node.delete.${multiSelect}`),
                 icon: `<i class="fa-solid fa-trash fa-fw"></i>`,
                 callback: async () => {
+                    // TODO we gonna want to delete variables
                     const confirm = await confirmDialog("blueprint.node.delete.confirm");
                     return confirm && this.parent.delete(selected);
                 },

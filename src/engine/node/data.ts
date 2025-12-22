@@ -10,6 +10,12 @@ class NodeData extends abstract.DataModel<TriggerData, NodeDataSchema> {
             inputs: new fields.TypedObjectField(new NodeEntryField("outputs")),
             ins: new fields.TypedObjectField(new NodeEntryField("outs")),
             position: new PositionField(),
+            state: new fields.StringField({
+                required: false,
+                nullable: false,
+                blank: false,
+                initial: undefined,
+            }),
             type: new fields.StringField({
                 required: true,
                 nullable: false,
@@ -40,6 +46,7 @@ type NodeDataSchema = {
     inputs: EntryFields<"outputs">;
     ins: EntryFields<"outs">;
     position: PositionField;
+    state: fields.StringField<string, string, false, false, false>;
     type: fields.StringField<string, string, true, false, false>;
 };
 

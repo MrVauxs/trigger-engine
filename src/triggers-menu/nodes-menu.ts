@@ -1,7 +1,10 @@
 import {
+    BaseEntrySchema,
+    BridgeSchema,
     ConnectionId,
     CreateNodeData,
     getInputsSchemas,
+    getNodeStates,
     getOutputsSchemas,
     getOutsSchemas,
     NodeData,
@@ -164,8 +167,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
 
             case "select-node": {
                 const source = R.pick(datasetToData(target), ["type", "builtin"]);
-                // this.#resolve(data);
-                return this.#selectNode(source);
+                return this.#selectNode(foundry.utils.deepClone(source));
             }
         }
     }
@@ -182,11 +184,41 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         let otherIdSuffix: `${PreciseEntryCategory}:${string}` | undefined;
 
         const entry = this.#entry;
+        const nodeStates = getNodeStates(OtherCls) ?? [null];
 
-        if (entry?.isOutput) {
+        const getSchemaEntry = <T extends BaseEntrySchema | BridgeSchema>(
+            schemaFn: (NodeCls: typeof TriggerNode, state?: Maybe<string>) => T[],
+            callback: (entries: T[]) => T | undefined
+        ): T | undefined => {
+            for (const state of nodeStates) {
+                const schema = schemaFn(OtherCls, state);
+                const result = callback(schema);
+
+                if (result) {
+                    if (state) {
+                        source.state = state;
+                    } else {
+                        delete source.state;
+                    }
+                    return result;
+                }
+            }
+        };
+
+        if (entry?.isInput) {
             if (isBlueprintEntry(entry)) {
-                const otherEntry = getInputsSchemas(OtherCls).find(
-                    (other) => other.type === entry.type
+                const otherEntry = getSchemaEntry(getOutputsSchemas, (entries) =>
+                    entries.find((other) => other.type === entry.type)
+                );
+                otherIdSuffix = otherEntry ? `outputs:${otherEntry.key}` : undefined;
+            } else {
+                const out = getSchemaEntry(getOutsSchemas, (entries) => entries.at(0))?.key;
+                otherIdSuffix = out ? `outs:${out}` : undefined;
+            }
+        } else if (entry?.isOutput) {
+            if (isBlueprintEntry(entry)) {
+                const otherEntry = getSchemaEntry(getInputsSchemas, (entries) =>
+                    entries.find((other) => other.type === entry.type)
                 );
 
                 if (otherEntry) {
@@ -209,18 +241,6 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
 
         const newNode = trigger.addNode(source);
         if (!newNode) return;
-
-        if (entry?.isInput) {
-            if (isBlueprintEntry(entry)) {
-                const otherEntry = getOutputsSchemas(OtherCls).find(
-                    (other) => other.type === entry.type
-                );
-                otherIdSuffix = otherEntry ? `outputs:${otherEntry.key}` : undefined;
-            } else {
-                const out = getOutsSchemas(OtherCls).at(0)?.key;
-                otherIdSuffix = out ? `outs:${out}` : undefined;
-            }
-        }
 
         const otherId: EntryId | undefined = otherIdSuffix
             ? `${newNode.id}:${otherIdSuffix}`

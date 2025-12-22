@@ -1,4 +1,4 @@
-import { EntryField } from "./entry";
+import { EntryField } from ".";
 import abstract = foundry.abstract;
 import fields = foundry.data.fields;
 
@@ -27,6 +27,12 @@ class NodeEntrySchema extends abstract.DataModel<null, EntrySchemaSchema> {
                 blank: false,
                 initial: undefined,
             }),
+            state: new fields.StringField({
+                required: false,
+                nullable: false,
+                blank: false,
+                initial: undefined,
+            }),
             type: new fields.StringField({
                 required: true,
                 nullable: false,
@@ -45,6 +51,7 @@ type EntrySchemaSchema = {
     key: fields.StringField<string, string, true, false, false>;
     label: fields.StringField<string, string, false, false, false>;
     group: fields.StringField<string, string, false, false, false>;
+    state: fields.StringField<string, string, false, false, false>;
     type: fields.StringField<string, string, true, false, false>;
 };
 
@@ -58,4 +65,4 @@ type InputEntrySchema<TFieldSchema extends fields.DataSchema | undefined = any> 
     };
 
 export { NodeEntrySchema };
-export type { BaseEntrySchema, NodeEntrySchemaSource, InputEntrySchema, OutputEntrySchema };
+export type { BaseEntrySchema, InputEntrySchema, NodeEntrySchemaSource, OutputEntrySchema };

@@ -48,6 +48,16 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
         return this.get(nodeId)?.[category].get(key);
     }
 
+    selectNodes(ids: string[]) {
+        for (const nodeId of ids) {
+            const node = this.#nodes.get(nodeId);
+
+            if (node) {
+                node.selected = true;
+            }
+        }
+    }
+
     selectIntersecting(selection: PIXI.Graphics) {
         const bounds = selection.getBounds();
 
@@ -87,8 +97,7 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
             trigger.deleteNode(node.id);
         }
 
-        this.blueprint.draw(true);
-        this.blueprint.parent.render();
+        this.blueprint.draw({ forceComputeConnections: true, renderApplication: true });
     }
 
     copySelected(nodes: BlueprintNode[]) {
@@ -141,17 +150,11 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
             }
         }
 
-        this.blueprint.draw(true);
-        this.blueprint.parent.render();
-
-        for (const nodeId of addedNodes) {
-            const node = this.#nodes.get(nodeId);
-
-            if (node) {
-                node.bringToTop();
-                node.selected = true;
-            }
-        }
+        this.blueprint.draw({
+            forceComputeConnections: true,
+            renderApplication: true,
+            selectNodes: addedNodes,
+        });
     }
 
     clear() {

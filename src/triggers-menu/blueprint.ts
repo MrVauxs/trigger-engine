@@ -312,7 +312,15 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         return !!result;
     }
 
-    draw(forceComputeConnections?: boolean) {
+    draw({
+        forceComputeConnections,
+        renderApplication,
+        selectNodes,
+    }: {
+        forceComputeConnections?: boolean;
+        renderApplication?: boolean;
+        selectNodes?: string[];
+    } = {}) {
         this.#clear();
 
         const trigger = this.trigger;
@@ -335,6 +343,14 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         }
 
         this.stage.on("wheel", this.#onWheel, this);
+
+        if (selectNodes) {
+            this.nodes.selectNodes(selectNodes);
+        }
+
+        if (renderApplication) {
+            this.parent.render();
+        }
     }
 
     _onUnclickLeft(event: FederatedEvent) {

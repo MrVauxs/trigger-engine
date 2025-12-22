@@ -33,6 +33,16 @@ abstract class TriggerNode {
     }
 
     /**
+     * A node can have multiple layout states. Must at least contain 2 states if used.
+     *
+     * Localization path:
+     * `<module-id>.<application-id>.node.<category>.<type>.state.<state>`
+     */
+    static get states(): string[] | null {
+        return null;
+    }
+
+    /**
      * Tags used to filter in the triggers menu.
      * Nodes are already displayed by `category` so this is only for extra filtering.
      *
@@ -61,21 +71,6 @@ abstract class TriggerNode {
     }
 
     /**
-     * @see {@link NodeField.defineSchema}
-     * Define the inputs for this node if any.
-     */
-    static get defineInputs(): InputEntrySchema[] | null {
-        return null;
-    }
-
-    /**
-     * Define the outputs for this node if any.
-     */
-    static get defineOutputs(): OutputEntrySchema[] | null {
-        return null;
-    }
-
-    /**
      * Does this node have an `in` bridge connection.
      *
      * Localization path:
@@ -91,8 +86,38 @@ abstract class TriggerNode {
      * Localization path:
      * `<module-id>.<application-id>.node.<category>.<type>.out.<key>`
      */
-    static get outs(): string | BridgeSchema[] | null {
+    static get defineOuts(): string | BridgeSchema[] | null {
         return "out";
+    }
+
+    /**
+     * @see {@link NodeField.defineSchema}
+     * Define the inputs for this node if any.
+     */
+    static get defineInputs(): InputEntrySchema[] | null {
+        return null;
+    }
+
+    /**
+     * Define the outputs for this node if any.
+     */
+    static get defineOutputs(): OutputEntrySchema[] | null {
+        return null;
+    }
+
+    // TODO
+    static get defineCustomOuts() {
+        return null;
+    }
+
+    // TODO
+    static get defineCustomInputs() {
+        return null;
+    }
+
+    // TODO
+    static get defineCustomOutputs() {
+        return null;
     }
 
     /**

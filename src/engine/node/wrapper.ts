@@ -36,6 +36,13 @@ function instantiateNode(
         return rootLocalize("node", NodeCls.category, NodeCls.type, ...args);
     }
 
+    const nodeStates = getNodeStates(NodeCls);
+    const nodeState = !nodeStates
+        ? null
+        : R.isString(data.state) && R.isIncludedIn(data.state, nodeStates)
+        ? data.state
+        : nodeStates[0];
+
     class TriggerNodeWrapper extends NodeCls {
         #in: NodeBridge | null;
         #inputs: Collection<NodeEntry>;
@@ -98,12 +105,12 @@ function instantiateNode(
             // TODO also add customs
             const [inputs, outputs] = R.map(
                 [
-                    ["inputs", NodeCls.defineInputs],
-                    ["outputs", NodeCls.defineOutputs],
+                    ["inputs", getInputsSchemas(NodeCls, nodeState)],
+                    ["outputs", getOutputsSchemas(NodeCls, nodeState)],
                 ] as const,
                 ([category, schemas]) => {
                     const entries = R.pipe(
-                        schemas ?? [],
+                        schemas,
                         R.map((schema) => {
                             try {
                                 const entry = instantiateEntry(
@@ -132,8 +139,8 @@ function instantiateNode(
 
             const [ins, outs] = R.map(
                 [
-                    !isEvent && NodeCls.hasIn ? [{ key: "in" }] : [],
-                    getOutsSchemas(NodeCls),
+                    !isEvent && NodeCls.hasIn ? [{ key: "in", state: undefined }] : [],
+                    getOutsSchemas(NodeCls, nodeState),
                 ] as const,
                 (schemas) => {
                     return R.pipe(
@@ -175,6 +182,12 @@ function instantiateNode(
                     parent: {
                         value: parent,
                     },
+                    state: {
+                        value: nodeState,
+                    },
+                    states: {
+                        value: nodeStates,
+                    },
                 });
             }
         }
@@ -188,20 +201,34 @@ function instantiateNode(
     return new TriggerNodeWrapper();
 }
 
+function filterSchemasByState<T extends { state?: string }>(
+    schemas: T[],
+    state: Maybe<string>
+): T[] {
+    return state ? schemas.filter((schema) => !schema.state || schema.state === state) : schemas;
+}
+
 // TODO this needs to also return custom outs
-function getOutsSchemas(NodeCls: typeof TriggerNode): BridgeSchema[] {
-    const rawOuts = NodeCls.outs || (NodeCls.isEvent ? "out" : []);
-    return R.isString(rawOuts) ? [{ key: rawOuts }] : rawOuts;
+function getOutsSchemas(NodeCls: typeof TriggerNode, state?: Maybe<string>): BridgeSchema[] {
+    const rawOuts = NodeCls.defineOuts || (NodeCls.isEvent ? "out" : []);
+    return R.isString(rawOuts) ? [{ key: rawOuts }] : filterSchemasByState(rawOuts, state);
 }
 
 // TODO this needs to also return custom inputs
-function getInputsSchemas(NodeCls: typeof TriggerNode): InputEntrySchema[] {
-    return NodeCls.defineInputs ?? [];
+function getInputsSchemas(NodeCls: typeof TriggerNode, state?: Maybe<string>): InputEntrySchema[] {
+    return filterSchemasByState(NodeCls.defineInputs ?? [], state);
 }
 
 // TODO this needs to also return custom inputs
-function getOutputsSchemas(NodeCls: typeof TriggerNode): InputEntrySchema[] {
-    return NodeCls.defineOutputs ?? [];
+function getOutputsSchemas(NodeCls: typeof TriggerNode, state?: Maybe<string>): InputEntrySchema[] {
+    return filterSchemasByState(NodeCls.defineOutputs ?? [], state);
+}
+
+function getNodeStates(NodeCls: typeof TriggerNode): string[] | null {
+    if (!R.isArray(NodeCls.states)) return null;
+
+    const rawStates = NodeCls.states.filter((state) => R.isString(state));
+    return rawStates.length >= 2 ? rawStates : null;
 }
 
 function triggerNodeLocalize(
@@ -221,6 +248,8 @@ interface OpenTriggerNode extends TriggerNode {
     data: NodeData;
     entries: NodeEntries;
     parent: OpenTrigger;
+    state: string | null;
+    states: string[] | null;
 }
 
 type NodeEntries = {
@@ -232,6 +261,7 @@ type NodeEntries = {
 
 export {
     getInputsSchemas,
+    getNodeStates,
     getOutputsSchemas,
     getOutsSchemas,
     instantiateNode,
