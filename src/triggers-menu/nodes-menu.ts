@@ -1,8 +1,11 @@
 import {
+    ConnectionId,
     CreateNodeData,
     getInputsSchemas,
     getOutputsSchemas,
     getOutsSchemas,
+    NodeData,
+    NodeDataSource,
     TriggerApplication,
     TriggerNode,
     triggerNodeLocalize,
@@ -19,15 +22,24 @@ import {
     R,
     render,
 } from "module-helpers";
-import { BaseBlueprintEntry, filterElements, isBlueprintEntry } from ".";
+import {
+    BaseBlueprintEntry,
+    Blueprint,
+    EntryId,
+    filterElements,
+    isBlueprintEntry,
+    PreciseEntryCategory,
+} from ".";
 
 class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
     #abortController = new AbortController();
-    #application: TriggerApplication;
+    #blueprint: Blueprint;
     #entry: BaseBlueprintEntry | undefined;
-    #tagsInput: ExtendedMultiSelectElement | null = null;
+    #inClipboard: NodeDataSource[] = [];
+    #position: Point;
     #resolve: BlueprintNodesMenuResolve;
     #searchInput: ExtendedTextInputElement | null = null;
+    #tagsInput: ExtendedMultiSelectElement | null = null;
 
     static DEFAULT_OPTIONS: DeepPartial<ApplicationConfiguration> = {
         classes: ["application"],
@@ -39,15 +51,17 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
     };
 
     constructor(
-        application: TriggerApplication,
+        blueprint: Blueprint,
+        position: Point,
         resolve: BlueprintNodesMenuResolve,
         entry: BaseBlueprintEntry | undefined,
         options?: DeepPartial<ApplicationConfiguration>
     ) {
         super(options);
 
-        this.#application = application;
+        this.#blueprint = blueprint;
         this.#entry = entry;
+        this.#position = position;
         this.#resolve = resolve;
     }
 
@@ -55,16 +69,21 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         return "nodes-menu";
     }
 
+    get blueprint(): Blueprint {
+        return this.#blueprint;
+    }
+
     get application(): TriggerApplication {
-        return this.#application;
+        return this.blueprint.application;
     }
 
     static async wait(
-        application: TriggerApplication,
+        blueprint: Blueprint,
+        position: Point,
         entry?: BaseBlueprintEntry
-    ): Promise<CreateNodeData | null> {
+    ): Promise<boolean | null> {
         return new Promise((resolve: BlueprintNodesMenuResolve) => {
-            new BlueprintNodesMenu(application, resolve, entry).render(true);
+            new BlueprintNodesMenu(blueprint, position, resolve, entry).render(true);
         });
     }
 
@@ -97,9 +116,12 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
             R.sortBy(R.prop("label"))
         );
 
+        this.#inClipboard = await this.#nodesFromClipboard();
+
         return {
             events: this.#prepareNodesGroups(events, "event"),
             groups: this.#prepareNodesGroups(nodes, "node"),
+            inClipboard: this.#inClipboard.length > 0,
             tags,
         };
     }
@@ -123,11 +145,142 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         const action = target.dataset.action as EventAction;
 
         switch (action) {
-            case "select-node": {
-                const data = R.pick(datasetToData(target), ["type", "builtin"]);
-                this.#resolve(data);
-                return this.close();
+            case "paste-nodes": {
+                return this.#pasteFromClipboard();
             }
+
+            case "select-node": {
+                const source = R.pick(datasetToData(target), ["type", "builtin"]);
+                // this.#resolve(data);
+                return this.#selectNode(source);
+            }
+        }
+    }
+
+    #selectNode(source: CreateNodeData) {
+        const trigger = this.blueprint.trigger;
+        if (!trigger) return;
+
+        const OtherCls = this.application.nodes.get(source.type) as typeof TriggerNode;
+        if (!OtherCls) return;
+
+        source.position = this.#position;
+
+        let otherIdSuffix: `${PreciseEntryCategory}:${string}` | undefined;
+
+        const entry = this.#entry;
+
+        if (entry?.isOutput) {
+            if (isBlueprintEntry(entry)) {
+                const otherEntry = getInputsSchemas(OtherCls).find(
+                    (other) => other.type === entry.type
+                );
+
+                if (otherEntry) {
+                    otherIdSuffix = `inputs:${otherEntry.key}`;
+                    source.inputs = {
+                        [otherEntry.key]: {
+                            connections: [entry.id as ConnectionId],
+                        },
+                    };
+                }
+            } else {
+                otherIdSuffix = "ins:in";
+                source.ins = {
+                    in: {
+                        connections: [entry.id as ConnectionId],
+                    },
+                };
+            }
+        }
+
+        const newNode = trigger.addNode(source);
+        if (!newNode) return;
+
+        if (entry?.isInput) {
+            if (isBlueprintEntry(entry)) {
+                const otherEntry = getOutputsSchemas(OtherCls).find(
+                    (other) => other.type === entry.type
+                );
+                otherIdSuffix = otherEntry ? `outputs:${otherEntry.key}` : undefined;
+            } else {
+                const out = getOutsSchemas(OtherCls).at(0)?.key;
+                otherIdSuffix = out ? `outs:${out}` : undefined;
+            }
+        }
+
+        const otherId: EntryId | undefined = otherIdSuffix
+            ? `${newNode.id}:${otherIdSuffix}`
+            : undefined;
+
+        if (entry && otherId) {
+            // we do it before creating the node so we don't have to update it
+            trigger.addComputedConnections(entry.id, otherId);
+        }
+
+        const blueprintNode = this.blueprint.nodes.add(newNode, true);
+
+        if (entry && otherId) {
+            this.blueprint.connections.add(entry.id, otherId);
+
+            if (entry.isInput) {
+                entry.node.addConnection(entry.preciseCategory, entry.key, otherId);
+                entry.node.draw();
+            }
+
+            const targetEntry = this.blueprint.nodes.getEntryFromId(otherId);
+
+            if (targetEntry) {
+                const { x, y } = this.blueprint.unscalePoint(targetEntry.connectorOffset);
+                blueprintNode.setPosition(blueprintNode.x - x, blueprintNode.y - y);
+            }
+        }
+
+        this.#resolve(true);
+        this.close();
+    }
+
+    #pasteFromClipboard() {
+        const sources = this.#inClipboard;
+
+        if (!sources.length) {
+            return this.close();
+        }
+
+        const offset: Point = {
+            x: this.#position.x - sources[0].position.x,
+            y: this.#position.y - sources[0].position.y,
+        };
+
+        for (const source of sources) {
+            source.position.x += offset.x;
+            source.position.y += offset.y;
+        }
+
+        this.blueprint.nodes.addFromSources(sources);
+        this.close();
+    }
+
+    async #nodesFromClipboard(): Promise<NodeDataSource[]> {
+        if (this.#entry) return [];
+
+        try {
+            const str = await navigator.clipboard.readText();
+            const data = JSON.parse(str);
+            if (!R.isArray(data)) return [];
+
+            const nodes: NodeDataSource[] = [];
+
+            for (const entry of data) {
+                const node = new NodeData(entry as NodeDataSource);
+                if (node.invalid) continue;
+
+                nodes.push(node.toObject());
+            }
+
+            return nodes;
+        } catch (error) {
+            return [];
         }
     }
 
@@ -260,11 +413,12 @@ type TriggerNodeStringProperty = keyof {
         : never]: (typeof TriggerNode)[P];
 };
 
-type EventAction = "select-node";
+type EventAction = "paste-nodes" | "select-node";
 
 type NodesMenuContext = {
     events: NodesGroup[];
     groups: NodesGroup[];
+    inClipboard: boolean;
     tags: RequiredSelectOptions;
 };
 
@@ -280,6 +434,6 @@ type PreparedNode = {
     type: string;
 };
 
-type BlueprintNodesMenuResolve = (value: CreateNodeData | null) => void;
+type BlueprintNodesMenuResolve = (result: boolean | null) => void;
 
 export { BlueprintNodesMenu };

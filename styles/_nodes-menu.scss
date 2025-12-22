@@ -29,42 +29,42 @@
                 display: flex;
                 flex-direction: column;
                 gap: 0.3em;
+            }
 
-                fieldset {
-                    .legend {
-                        font-size: 1.2em;
+            fieldset {
+                .legend {
+                    font-size: 1.2em;
+                }
+
+                .nodes {
+                    &:not(:has(.node:not(.hidden))) {
+                        text-align: center;
+
+                        &::after {
+                            content: attr(data-empty);
+                            opacity: 0.5;
+                        }
                     }
+                }
 
-                    .nodes {
-                        &:not(:has(.node:not(.hidden))) {
-                            text-align: center;
+                .selectable {
+                    position: relative;
+                    font-size: 1.1em;
+                    padding-block: 0.2em;
+                    cursor: pointer;
 
-                            &::after {
-                                content: attr(data-empty);
-                                opacity: 0.5;
-                            }
+                    &:hover {
+                        &::before {
+                            content: "";
+                            position: absolute;
+                            inset: 0 -5px 0 -5px;
+                            background: var(--color-fieldset-border);
+                            opacity: 0.4;
+                            z-index: -1;
                         }
 
-                        .node {
-                            position: relative;
-                            font-size: 1.1em;
-                            padding-block: 0.2em;
-                            cursor: pointer;
-
-                            &:hover {
-                                &::before {
-                                    content: "";
-                                    position: absolute;
-                                    inset: 0 -5px 0 -5px;
-                                    background: var(--color-fieldset-border);
-                                    opacity: 0.4;
-                                    z-index: -1;
-                                }
-
-                                .name {
-                                    filter: brightness(1.1);
-                                }
-                            }
+                        .name {
+                            filter: brightness(1.1);
                         }
                     }
                 }

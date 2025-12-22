@@ -108,20 +108,8 @@ class BlueprintConnectionsLayer extends PIXI.Container {
 
         if (!targetNode || targetNode === originNode) {
             if (!targetNode) {
-                const result = await this.blueprint.openNodesMenu(event, originEntry);
-                const newNode = result?.node;
-
-                if (newNode) {
+                if (await this.blueprint.openNodesMenu(event, originEntry)) {
                     connector.origin.entry = undefined;
-
-                    const targetEntry = result.selectedId
-                        ? this.blueprint.nodes.getEntryFromId(result.selectedId)
-                        : undefined;
-
-                    if (targetEntry) {
-                        const { x, y } = this.blueprint.unscalePoint(targetEntry.connectorOffset);
-                        newNode.setPosition(newNode.x - x, newNode.y - y);
-                    }
                 }
             }
 

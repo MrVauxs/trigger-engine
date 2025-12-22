@@ -17,6 +17,14 @@
             </extended-multi-select>
         </fieldset>
         {{/if}}
+        {{#if inClipboard}}
+        <fieldset>
+            <legend>{{@root.i18n 'clipboard.title'}}</legend>
+            <div class="selectable" data-action="paste-nodes">
+                {{@root.i18n 'clipboard.paste'}}
+            </div>
+        </fieldset>
+        {{/if}}
         <div class="scroll">
             {{> 'section' events}}
         </div>
@@ -33,7 +41,7 @@
 <fieldset>
     <legend>{{group.label}}</legend>
     <div class="nodes" data-empty="{{@root.i18n 'empty'}}">{{#each group.nodes as |node|}}<div
-            class="node" data-action="select-node" data-tags="{{node.tags}}"
+            class="selectable node" data-action="select-node" data-tags="{{node.tags}}"
             data-name="{{node.title}}" data-type="{{node.type}}">
             <div class="name">{{node.title}}</div>
         </div>{{/each}}</div>

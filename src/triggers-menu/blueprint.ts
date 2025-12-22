@@ -1,12 +1,7 @@
 import {
-    ConnectionId,
-    getInputsSchemas,
-    getOutputsSchemas,
-    getOutsSchemas,
     OpenTrigger,
     TriggerApplication,
     TriggerDataSource,
-    TriggerNode,
     UpdateNodeData,
     UpdateTriggerData,
 } from "engine";
@@ -20,9 +15,6 @@ import {
     BlueprintNode,
     BlueprintNodesLayer,
     BlueprintNodesMenu,
-    EntryId,
-    isBlueprintEntry,
-    PreciseEntryCategory,
 } from ".";
 
 class Blueprint extends PIXI.Application<HTMLCanvasElement> {
@@ -251,85 +243,17 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
     async openNodesMenu(
         event: PIXI.FederatedPointerEvent,
         entry?: BaseBlueprintEntry
-    ): Promise<{ node: BlueprintNode; selectedId: EntryId | undefined } | undefined> {
+    ): Promise<boolean | undefined> {
         if (this.locked) return;
 
         // we need to calculate it now as FederatedEvent will be reused
         const position = this.subtractPointFromEvent(event, this.#layers);
 
         this.toggleLocked(true);
-        const source = await BlueprintNodesMenu.wait(this.application, entry);
+        const result = await BlueprintNodesMenu.wait(this, position, entry);
         this.toggleLocked(false);
 
-        if (!source) return;
-
-        const OtherCls = this.application.nodes.get(source.type) as typeof TriggerNode;
-        if (!OtherCls) return;
-
-        source.position = position;
-
-        let otherIdSuffix: `${PreciseEntryCategory}:${string}` | undefined;
-
-        if (entry?.isOutput) {
-            if (isBlueprintEntry(entry)) {
-                const otherEntry = getInputsSchemas(OtherCls).find(
-                    (other) => other.type === entry.type
-                );
-
-                if (otherEntry) {
-                    otherIdSuffix = `inputs:${otherEntry.key}`;
-                    source.inputs = {
-                        [otherEntry.key]: {
-                            connections: [entry.id as ConnectionId],
-                        },
-                    };
-                }
-            } else {
-                otherIdSuffix = "ins:in";
-                source.ins = {
-                    in: {
-                        connections: [entry.id as ConnectionId],
-                    },
-                };
-            }
-        }
-
-        const newNode = this.trigger?.addNode(source);
-        if (!newNode) return;
-
-        if (entry?.isInput) {
-            if (isBlueprintEntry(entry)) {
-                const otherEntry = getOutputsSchemas(OtherCls).find(
-                    (other) => other.type === entry.type
-                );
-                otherIdSuffix = otherEntry ? `outputs:${otherEntry.key}` : undefined;
-            } else {
-                const out = getOutsSchemas(OtherCls).at(0)?.key;
-                otherIdSuffix = out ? `outs:${out}` : undefined;
-            }
-        }
-
-        const otherId: EntryId | undefined = otherIdSuffix
-            ? `${newNode.id}:${otherIdSuffix}`
-            : undefined;
-
-        if (entry && otherId) {
-            // we do it before creating the node so we don't have to update it
-            this.trigger?.addComputedConnections(entry.id, otherId);
-        }
-
-        const blueprintNode = this.nodes.add(newNode, true);
-
-        if (entry && otherId) {
-            this.connections.add(entry.id, otherId);
-
-            if (entry.isInput) {
-                entry.node.addConnection(entry.preciseCategory, entry.key, otherId);
-                entry.node.draw();
-            }
-        }
-
-        return { node: blueprintNode, selectedId: otherId };
+        return !!result;
     }
 
     draw(forceComputeConnections?: boolean) {

@@ -5,6 +5,11 @@
                 "disconnect": "Disconnect Entry"
             },
             "node": {
+                "copy": {
+                    "copied": "The selection has been copied to the clipboard.",
+                    "multi": "Copy Selected Nodes",
+                    "single": "Copy Node"
+                },
                 "delete": {
                     "confirm": {
                         "content": "Are you sure you want to delete the selected node(s)?",
@@ -12,6 +17,10 @@
                     },
                     "multi": "Delete Selected Nodes",
                     "single": "Delete Node"
+                },
+                "duplicate": {
+                    "multi": "Duplicate Selected Nodes",
+                    "single": "Duplicate Node"
                 }
             },
             "trigger": {
@@ -80,6 +89,10 @@
             "category": {
                 "event": "Events",
                 "node": "Nodes"
+            },
+            "clipboard": {
+                "paste": "Paste Node(s) from Clipboard",
+                "title": "Clipboard"
             },
             "empty": "No Matching Nodes",
             "event": "Event",

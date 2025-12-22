@@ -1,7 +1,7 @@
-import { OpenTriggerNode } from "engine";
+import { ConnectionId, NodeDataSource, OpenTriggerNode } from "engine";
+import { info, R } from "module-helpers";
 import { BaseBlueprintEntry, BlueprintNode, EntryId } from ".";
 import { Blueprint, BlueprintLayers } from "..";
-import { R } from "module-helpers";
 
 class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
     #nodes: Collection<BlueprintNode> = new Collection();
@@ -72,15 +72,80 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
         return _node;
     }
 
-    deleteSelected() {
-        for (const node of this.#nodes) {
+    delete(nodes: BlueprintNode[]) {
+        const trigger = this.blueprint.trigger;
+        if (!trigger) return;
+
+        for (const node of nodes) {
             if (!node.selected) continue;
 
             node.eventMode = "none";
-            this.blueprint.trigger?.deleteNode(node.id);
+            trigger.deleteNode(node.id);
         }
 
         this.blueprint.draw(true);
+    }
+
+    copySelected(nodes: BlueprintNode[]) {
+        const sources = this.#duplicateSelectedSources(nodes);
+        if (!sources.length) return;
+
+        const str = JSON.stringify(sources);
+
+        game.clipboard.copyPlainText(str);
+        info("blueprint.node.copy.copied");
+    }
+
+    duplicateSelected(nodes: BlueprintNode[]) {
+        const sources = this.#duplicateSelectedSources(nodes);
+        if (!sources.length) return;
+
+        this.addFromSources(sources);
+    }
+
+    addFromSources(sources: NodeDataSource[]) {
+        const trigger = this.blueprint.trigger;
+        if (!trigger) return;
+
+        const addedNodes: string[] = [];
+        const replacementIds = R.pipe(
+            sources,
+            R.map((source) => source._id),
+            R.fromKeys(() => foundry.utils.randomID())
+        );
+
+        for (const source of sources) {
+            source._id = replacementIds[source._id];
+
+            for (const category of ["ins", "inputs"] as const) {
+                for (const entry of R.values(source[category])) {
+                    if (entry?.connections?.length) {
+                        entry.connections = entry.connections.map((connection): ConnectionId => {
+                            const [nodeId, category, key] = R.split(connection, ":");
+                            const newId = replacementIds[nodeId];
+                            return `${newId}:${category}:${key}`;
+                        });
+                    }
+                }
+            }
+
+            const newNode = trigger.addNode(source);
+
+            if (newNode) {
+                addedNodes.push(newNode.id);
+            }
+        }
+
+        this.blueprint.draw(true);
+
+        for (const nodeId of addedNodes) {
+            const node = this.#nodes.get(nodeId);
+
+            if (node) {
+                node.bringToTop();
+                node.selected = true;
+            }
+        }
     }
 
     clear() {
@@ -93,6 +158,56 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
         for (let i = 0; i < removed.length; ++i) {
             removed[i].destroy(true);
         }
+    }
+
+    #duplicateSelectedSources(nodes: BlueprintNode[]): NodeDataSource[] {
+        const trigger = this.blueprint.trigger;
+        if (!trigger) return [];
+
+        const sources: NodeDataSource[] = [];
+        const nodeIds = nodes.map((node) => node.id);
+        // const replacementIds = R.pipe(
+        //     nodes,
+        //     R.map((node) => node.id),
+        //     R.fromKeys(() => foundry.utils.randomID())
+        // );
+
+        for (const node of nodes) {
+            const source = node.data.toObject();
+
+            // source._id = replacementIds[source._id];
+
+            source.position.x += 200;
+            source.position.y += 100;
+
+            for (const category of ["ins", "inputs"] as const) {
+                for (const [key, entry] of R.entries(source[category])) {
+                    if (entry?.connections?.length) {
+                        entry.connections = R.pipe(
+                            entry.connections,
+                            R.filter((connection) => {
+                                const nodeId = R.split(connection, ":")[0];
+                                return R.isIncludedIn(nodeId, nodeIds);
+                            })
+                            // R.map((connection): ConnectionId | undefined => {
+                            //     const [nodeId, category, key] = R.split(connection, ":");
+                            //     const newId = replacementIds[nodeId];
+                            //     return newId ? `${newId}:${category}:${key}` : undefined;
+                            // }),
+                            // R.filter(R.isTruthy)
+                        );
+
+                        if (!entry.connections) {
+                            delete source[category][key];
+                        }
+                    }
+                }
+            }
+
+            sources.push(source);
+        }
+
+        return sources;
     }
 }
 
