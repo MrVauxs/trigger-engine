@@ -60,6 +60,10 @@ class BlueprintNode extends PIXI.Container {
         this.#node = node;
     }
 
+    get type(): string {
+        return this.#node.type;
+    }
+
     get ins(): Collection<BaseBlueprintEntry> {
         return new Collection(this.#in ? [["in", this.#in]] : undefined);
     }

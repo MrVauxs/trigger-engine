@@ -6,6 +6,7 @@ import {
     getOutsSchemas,
     NodeData,
     NodeDataSource,
+    OpenTrigger,
     TriggerApplication,
     TriggerNode,
     triggerNodeLocalize,
@@ -77,6 +78,10 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         return this.blueprint.application;
     }
 
+    get trigger(): OpenTrigger | undefined {
+        return this.blueprint.trigger;
+    }
+
     static async wait(
         blueprint: Blueprint,
         position: Point,
@@ -99,7 +104,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
 
     async _prepareContext(options: ApplicationRenderOptions): Promise<NodesMenuContext> {
         const allNodes = this.#getNodes();
-        const [events, nodes] = R.partition(allNodes, (node) => node.isEvent);
+        const [allEvents, nodes] = R.partition(allNodes, (node) => node.isEvent);
         // TODO variables & gates
 
         const tags: RequiredSelectOptions = R.pipe(
@@ -115,6 +120,14 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
             R.uniqueBy(R.prop("label")),
             R.sortBy(R.prop("label"))
         );
+
+        const existingEvents = R.pipe(
+            this.trigger?.nodes.contents ?? [],
+            R.filter((node) => node.isEvent),
+            R.map((node) => node.type)
+        );
+
+        const events = allEvents.filter((event) => !R.isIncludedIn(event.type, existingEvents));
 
         this.#inClipboard = await this.#nodesFromClipboard();
 
@@ -158,7 +171,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
     }
 
     #selectNode(source: CreateNodeData) {
-        const trigger = this.blueprint.trigger;
+        const trigger = this.trigger;
         if (!trigger) return;
 
         const OtherCls = this.application.nodes.get(source.type) as typeof TriggerNode;
