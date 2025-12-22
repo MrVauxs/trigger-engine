@@ -305,6 +305,10 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         const result = await BlueprintNodesMenu.wait(this, position, entry);
         this.toggleLocked(false);
 
+        if (result) {
+            this.parent.render();
+        }
+
         return !!result;
     }
 

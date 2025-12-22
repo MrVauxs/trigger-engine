@@ -88,6 +88,7 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
         }
 
         this.blueprint.draw(true);
+        this.blueprint.parent.render();
     }
 
     copySelected(nodes: BlueprintNode[]) {
@@ -141,6 +142,7 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
         }
 
         this.blueprint.draw(true);
+        this.blueprint.parent.render();
 
         for (const nodeId of addedNodes) {
             const node = this.#nodes.get(nodeId);

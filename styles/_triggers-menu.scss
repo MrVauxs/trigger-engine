@@ -93,10 +93,6 @@
             &.sub {
                 border-top: 0;
                 border-bottom: 0;
-
-                &:not(.folder) {
-                    justify-content: center;
-                }
             }
         }
 
@@ -130,6 +126,20 @@
                         background: var(--background-color-highlight);
                     }
                 }
+            }
+        }
+    }
+
+    .sidebar.trigger {
+        .header {
+            &.sub {
+                justify-content: center;
+            }
+        }
+
+        .scroll {
+            &.variables {
+                flex: 2;
             }
         }
     }

@@ -143,62 +143,6 @@ class BlueprintApplication extends apps.ApplicationV2<
             : this.#prepareTriggersContext(options);
     }
 
-    #prepareTriggerContext(trigger: OpenTrigger): TriggerContext {
-        this.#search = "";
-
-        const events = this.blueprint.nodes.filter((node) => node.isEvent);
-
-        return {
-            events,
-            isFree: this.application.isFreeApplication,
-            trigger: trigger,
-        };
-    }
-
-    #prepareTriggersContext(options: BlueprintRenderOptions): TriggersContext {
-        const triggers = this.blueprint.triggers.contents;
-        const groups: TriggersGroup[] = R.pipe(
-            triggers,
-            R.groupBy(R.prop("folder")),
-            R.entries(),
-            R.sortBy(([folder]) => folder),
-            R.map(([folder, triggers]): TriggersGroup => {
-                return { folder, triggers };
-            })
-        );
-
-        // we move the folderless group at the end
-        if (groups.length > 1 && groups[0].folder === "") {
-            groups.push(groups.shift()!);
-        }
-
-        const tags = R.pipe(
-            triggers,
-            R.flatMap((trigger) => {
-                return trigger.tags;
-            }),
-            R.unique(),
-            R.map((tag): Required<SelectOption> => {
-                return {
-                    label: tag,
-                    value: tag,
-                };
-            }),
-            R.unique(),
-            R.sortBy(R.identity())
-        );
-
-        return {
-            groups,
-            search: this.#search,
-            tags: {
-                list: tags,
-                mode: this.tagsMode,
-                selected: this.tags,
-            },
-        };
-    }
-
     async _preFirstRender(
         context: Record<string, unknown>,
         options: BlueprintRenderOptions
@@ -355,6 +299,62 @@ class BlueprintApplication extends apps.ApplicationV2<
             this.tags,
             this.tagsMode
         );
+    }
+
+    #prepareTriggerContext(trigger: OpenTrigger): TriggerContext {
+        this.#search = "";
+
+        const events = this.blueprint.nodes.filter((node) => node.isEvent);
+
+        return {
+            events,
+            isFree: this.application.isFreeApplication,
+            trigger: trigger,
+        };
+    }
+
+    #prepareTriggersContext(options: BlueprintRenderOptions): TriggersContext {
+        const triggers = this.blueprint.triggers.contents;
+        const groups: TriggersGroup[] = R.pipe(
+            triggers,
+            R.groupBy(R.prop("folder")),
+            R.entries(),
+            R.sortBy(([folder]) => folder),
+            R.map(([folder, triggers]): TriggersGroup => {
+                return { folder, triggers };
+            })
+        );
+
+        // we move the folderless group at the end
+        if (groups.length > 1 && groups[0].folder === "") {
+            groups.push(groups.shift()!);
+        }
+
+        const tags = R.pipe(
+            triggers,
+            R.flatMap((trigger) => {
+                return trigger.tags;
+            }),
+            R.unique(),
+            R.map((tag): Required<SelectOption> => {
+                return {
+                    label: tag,
+                    value: tag,
+                };
+            }),
+            R.unique(),
+            R.sortBy(R.identity())
+        );
+
+        return {
+            groups,
+            search: this.#search,
+            tags: {
+                list: tags,
+                mode: this.tagsMode,
+                selected: this.tags,
+            },
+        };
     }
 
     #activateListeners(html: HTMLElement) {
