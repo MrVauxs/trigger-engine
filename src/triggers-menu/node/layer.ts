@@ -170,16 +170,11 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
 
         const sources: NodeDataSource[] = [];
         const nodeIds = nodes.map((node) => node.id);
-        // const replacementIds = R.pipe(
-        //     nodes,
-        //     R.map((node) => node.id),
-        //     R.fromKeys(() => foundry.utils.randomID())
-        // );
 
         for (const node of nodes) {
-            const source = node.data.toObject();
+            if (!node.isDuplicable) continue;
 
-            // source._id = replacementIds[source._id];
+            const source = node.data.toObject();
 
             source.position.x += 200;
             source.position.y += 100;
@@ -193,12 +188,6 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
                                 const nodeId = R.split(connection, ":")[0];
                                 return R.isIncludedIn(nodeId, nodeIds);
                             })
-                            // R.map((connection): ConnectionId | undefined => {
-                            //     const [nodeId, category, key] = R.split(connection, ":");
-                            //     const newId = replacementIds[nodeId];
-                            //     return newId ? `${newId}:${category}:${key}` : undefined;
-                            // }),
-                            // R.filter(R.isTruthy)
                         );
 
                         if (!entry.connections) {

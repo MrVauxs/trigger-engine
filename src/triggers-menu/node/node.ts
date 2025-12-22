@@ -104,6 +104,11 @@ class BlueprintNode extends PIXI.Container {
         return this.#node.isEvent;
     }
 
+    get isDuplicable(): boolean {
+        // TODO also exclude variables & gate exist
+        return !this.isEvent;
+    }
+
     get label(): string {
         return this.#node.title ?? this.#node.id;
     }
@@ -696,36 +701,42 @@ class BlueprintNode extends PIXI.Container {
 
     async #onNodeContextMenu(event: PIXI.FederatedPointerEvent) {
         const selected = this.parent.selected;
-        const multiSelect = selected.length > 1 ? "multi" : "single";
+        const entries: Omit<ContextMenuEntry, "condition">[] = [];
 
-        const entries: Omit<ContextMenuEntry, "condition">[] = [
-            {
+        if (this.isDuplicable) {
+            const filtered = selected.filter((node) => node.isDuplicable);
+            const multiSelect = filtered.length > 1 ? "multi" : "single";
+
+            entries.push({
                 name: localizePath(`blueprint.node.copy.${multiSelect}`),
                 icon: `<i class="fa-solid fa-clipboard"></i>`,
                 callback: async () => {
                     this.parent.copySelected(selected);
                 },
-            },
-        ];
+            });
 
-        if (!this.isLocked) {
-            entries.push(
-                {
+            if (!this.isLocked) {
+                entries.push({
                     name: localizePath(`blueprint.node.duplicate.${multiSelect}`),
                     icon: `<i class="fa-solid fa-copy"></i>`,
                     callback: async () => {
                         this.parent.duplicateSelected(selected);
                     },
+                });
+            }
+        }
+
+        if (!this.isLocked) {
+            const multiSelect = selected.length > 1 ? "multi" : "single";
+
+            entries.push({
+                name: localizePath(`blueprint.node.delete.${multiSelect}`),
+                icon: `<i class="fa-solid fa-trash fa-fw"></i>`,
+                callback: async () => {
+                    const confirm = await confirmDialog("blueprint.node.delete.confirm");
+                    return confirm && this.parent.delete(selected);
                 },
-                {
-                    name: localizePath(`blueprint.node.delete.${multiSelect}`),
-                    icon: `<i class="fa-solid fa-trash fa-fw"></i>`,
-                    callback: async () => {
-                        const confirm = await confirmDialog("blueprint.node.delete.confirm");
-                        return confirm && this.parent.delete(selected);
-                    },
-                }
-            );
+            });
         }
 
         this.createContextMenu(event, entries);
