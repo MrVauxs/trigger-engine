@@ -34,9 +34,12 @@
                 "delete": "Delete Trigger",
                 "duplicate": "Duplicate Trigger",
                 "edit": "Edit Trigger",
+                "events": "Events",
                 "expand": "Restore Triggers Window",
+                "gates": "Gates",
                 "reset": "Reset Trigger",
-                "save": "Save Triggers"
+                "save": "Save Triggers",
+                "variables": "Variables"
             },
             "triggers": {
                 "close": "Close Window",

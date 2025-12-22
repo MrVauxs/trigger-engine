@@ -11,9 +11,8 @@
     --width: calc(100% - ((var(--sidebar-width) + 16px + 48px) * var(--ui-scale)));
     --height: calc(100% - 10px);
     --background: url("../../../ui/denim075.png") repeat;
-    --background-color: #00000030;
-    --background-color-folder: #8fd4df33;
-    --background-color-highlight: #ffffff22;
+    --background-color: #00000059;
+    --background-color-highlight: #ffffff14;
     --border: 1px solid #111111;
     --border-separator: 1px solid #ffffff3b;
     --folder-spacer-width: 6px;
@@ -90,6 +89,15 @@
                     width: 1.2em;
                 }
             }
+
+            &.sub {
+                border-top: 0;
+                border-bottom: 0;
+
+                &:not(.folder) {
+                    justify-content: center;
+                }
+            }
         }
 
         .label {
@@ -97,13 +105,17 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
+
+        .scroll {
+            flex: 1;
+            overflow: auto;
+        }
     }
 
     .sidebar.triggers {
         [name="search"] {
             @include utils.text-input();
 
-            background-color: var(--background-color);
             border-bottom: var(--border-separator);
             padding: 0.3rem;
 
@@ -131,18 +143,7 @@
             }
         }
 
-        .scroll {
-            flex: 1;
-            overflow: auto;
-        }
-
         .folder {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: var(--background-color-folder);
-            font-size: 1.2em;
-            padding: 0.3rem;
             padding-left: var(--folder-spacer-width);
 
             .title {
@@ -160,7 +161,7 @@
                         position: absolute;
                         content: "";
                         inset: 0 100% 0 auto;
-                        background: var(--background-color-folder);
+                        background: var(--background-color);
                         width: var(--folder-spacer-width);
                     }
                 }
