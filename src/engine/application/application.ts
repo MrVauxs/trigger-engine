@@ -113,7 +113,7 @@ class TriggerApplication {
         try {
             const data = new TriggerData({ ...source, applicationKey: this.applicationKey });
             return new OpenTrigger(this, data);
-        } catch (error) {
+        } catch (error: any) {
             MODULE.error(`an error ocurred while trying to create a Trigger.`, error);
             return null;
         }

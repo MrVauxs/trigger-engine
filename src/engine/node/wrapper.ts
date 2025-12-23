@@ -123,7 +123,7 @@ function instantiateNode(
                                 );
 
                                 return entry ? ([entry.key, entry] as const) : undefined;
-                            } catch (error) {
+                            } catch (error: any) {
                                 MODULE.error(
                                     "an error occured while instantiating a node entry",
                                     error

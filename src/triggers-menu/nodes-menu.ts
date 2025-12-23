@@ -339,7 +339,10 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
 
         return nodes.filter((node) => {
             const entries = entry.isInput ? getOutputsSchemas(node) : getInputsSchemas(node);
-            return entries.some((other) => other.type === entry.type);
+            return entries.some(
+                // TODO test arrays
+                (other) => other.type === entry.type && entry.isArray === other.isArray
+            );
         });
     }
 

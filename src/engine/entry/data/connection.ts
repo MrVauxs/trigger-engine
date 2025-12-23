@@ -1,5 +1,5 @@
 import { MODULE, R } from "module-helpers";
-import { EntryId, PreciseEntryCategory } from "triggers-menu";
+import { PreciseEntryCategory } from "triggers-menu";
 import fields = foundry.data.fields;
 
 const CONNECTION_CATEGORIES = ["outputs", "outs"] as const;
@@ -46,8 +46,9 @@ function isOppositeConnection(
     return R.isIncludedIn(category, OPPOSITE_CONNECTION_CATEGORY);
 }
 
-function isConnectionId(id: EntryId): id is ConnectionId {
-    return R.isIncludedIn(R.split(id, ":").at(1), CONNECTION_CATEGORIES);
+function isConnectionId(id: string): id is ConnectionId {
+    const args = R.split(id, ":");
+    return args.length === 3 && R.isIncludedIn(args.at(1), CONNECTION_CATEGORIES);
 }
 
 type ConnectionId = `${string}:${ConnectionCategory}:${string}`;

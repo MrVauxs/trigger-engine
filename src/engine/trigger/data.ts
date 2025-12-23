@@ -55,7 +55,7 @@ class TriggerData extends abstract.DataModel<null, TriggerDataSchema> {
                     try {
                         const node = new NodeData(source);
                         return [node.id, node] as const;
-                    } catch (error) {
+                    } catch (error: any) {
                         MODULE.error(
                             `an error ocurred during initialization of NodeData: ${source.type}`,
                             error
@@ -77,7 +77,7 @@ class TriggerData extends abstract.DataModel<null, TriggerDataSchema> {
             this._source.nodes.push(data._source);
 
             return data;
-        } catch (error) {
+        } catch (error: any) {
             MODULE.error(`an error ocurred while trying to add a NodeData: ${source.type}`, error);
         }
     }

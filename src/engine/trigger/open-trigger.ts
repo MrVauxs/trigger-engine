@@ -102,7 +102,7 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
                 this.nodes.set(node.id, node);
                 return node;
             }
-        } catch (error) {
+        } catch (error: any) {
             MODULE.error(`an error ocurred while trying to add a TriggerNode.`, error);
         }
     }
