@@ -3,19 +3,17 @@ import { R, z } from "module-helpers";
 const CONNECTION_CATEGORIES = ["outputs", "outs"] as const;
 const OPPOSITE_CONNECTION_CATEGORY = ["inputs", "ins"] as const;
 
-function zEntryDataSchema() {
-    return z
-        .record(
-            z.string(),
-            z.object({
-                value: z.unknown().optional(),
-                connections: z.array(
-                    z.string().trim().refine(isConnectionId) as zTypedString<ConnectionId>
-                ),
-            })
-        )
-        .default({});
-}
+const zEntryDataSchema = z
+    .record(
+        z.string(),
+        z.object({
+            value: z.unknown().optional(),
+            connections: z.array(
+                z.string().trim().refine(isConnectionId) as zTypedString<ConnectionId>
+            ),
+        })
+    )
+    .default({});
 
 function isOppositeConnection(
     category: PreciseEntryCategory

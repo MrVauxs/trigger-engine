@@ -42,7 +42,7 @@ function instantiateEntry(
     if (!EntryCls) return;
 
     const fieldData = "field" in schema && R.isPlainObject(schema.field) && schema.field;
-    const entrySchema = zNodeEntrySchema().parse(R.omit(schema as InputEntrySchema, ["field"]));
+    const entrySchema = zNodeEntrySchema.parse(R.omit(schema as InputEntrySchema, ["field"]));
 
     class NodeEntryWrapper extends EntryCls {
         constructor() {

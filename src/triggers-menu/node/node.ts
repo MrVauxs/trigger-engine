@@ -629,7 +629,7 @@ class BlueprintNode extends PIXI.Container {
             title,
         };
 
-        const { data } = zNodeHeaderData().safeParse(headerSource);
+        const { data } = zNodeHeaderData.safeParse(headerSource);
         if (!data) return;
 
         const padding = this.outerPadding;

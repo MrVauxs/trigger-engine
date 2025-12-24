@@ -3,7 +3,7 @@ import { z, zDocument, zID, zPosition } from "module-helpers";
 
 class NodeData extends zDocument<NodeDataSchema> {
     static get defineSchema() {
-        return zNodeDataSchema();
+        return zNodeDataSchema;
     }
 }
 
@@ -11,21 +11,19 @@ interface NodeData extends z.output<NodeDataSchema> {
     readonly _source: NodeDataInput;
 }
 
-function zNodeDataSchema() {
-    return z.object({
-        id: zID(),
-        inputs: zEntryDataSchema(),
-        ins: zEntryDataSchema(),
-        position: zPosition(),
-        state: z.string().trim().optional(),
-        type: z.string().trim().readonly(),
-    });
-}
+const zNodeDataSchema = z.object({
+    id: zID,
+    inputs: zEntryDataSchema,
+    ins: zEntryDataSchema,
+    position: zPosition,
+    state: z.string().trim().optional(),
+    type: z.string().trim().readonly(),
+});
 
 type NodeDataInput = z.input<NodeDataSchema>;
 type NodeDataOutput = z.output<NodeDataSchema>;
 
-type NodeDataSchema = ReturnType<typeof zNodeDataSchema>;
+type NodeDataSchema = typeof zNodeDataSchema;
 
 type CreateNodeData = z.input<NodeDataSchema>;
 

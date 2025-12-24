@@ -3,7 +3,7 @@ import { z, zCollection, zDocument, zID } from "module-helpers";
 
 class TriggerData extends zDocument<TriggerDataSchema> {
     static get defineSchema() {
-        return zTriggerDataSchema();
+        return zTriggerDataSchema;
     }
 
     static get collections() {
@@ -18,23 +18,21 @@ interface TriggerData extends Omit<z.output<TriggerDataSchema>, "nodes"> {
     readonly nodes: zCollection<TriggerData, NodeDataSchema, NodeData>;
 }
 
-function zTriggerDataSchema() {
-    return z.object({
-        id: zID(),
-        description: z.string().trim().default(""),
-        folder: z.string().trim().default(""),
-        name: z.string().trim().default(""),
-        nodes: z.array(zNodeDataSchema()).default([]),
-        tags: z.array(z.string().trim()).default([]),
-    });
-}
+const zTriggerDataSchema = z.object({
+    id: zID,
+    description: z.string().trim().default(""),
+    folder: z.string().trim().default(""),
+    name: z.string().trim().default(""),
+    nodes: z.array(zNodeDataSchema).default([]),
+    tags: z.array(z.string().trim()).default([]),
+});
 
 type TriggerDataInput = z.input<TriggerDataSchema>;
 type TriggerDataOutput = z.output<TriggerDataSchema>;
 
 type UpdateTriggerData = Omit<TriggerDataInput, "nodes" | "id">;
 
-type TriggerDataSchema = ReturnType<typeof zTriggerDataSchema>;
+type TriggerDataSchema = typeof zTriggerDataSchema;
 
 export { TriggerData };
 export type { TriggerDataOutput, TriggerDataInput, UpdateTriggerData };

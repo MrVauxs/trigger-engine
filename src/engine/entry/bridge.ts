@@ -5,7 +5,7 @@ class NodeBridge {
     #schema: BridgeSchema;
 
     constructor(trigger: Trigger, parent: TriggerNode, schema: BridgeSchema) {
-        this.#schema = zNodeBridgeSchema().parse(schema);
+        this.#schema = zNodeBridgeSchema.parse(schema);
     }
 
     get key(): string {
@@ -17,15 +17,13 @@ class NodeBridge {
     }
 }
 
-function zNodeBridgeSchema() {
-    return z.object({
-        key: zString(),
-        label: zString().optional().catch(undefined),
-        state: zString().optional().catch(undefined),
-    });
-}
+const zNodeBridgeSchema = z.object({
+    key: zString,
+    label: zString.optional().catch(undefined),
+    state: zString.optional().catch(undefined),
+});
 
-type BridgeSchema = z.infer<ReturnType<typeof zNodeBridgeSchema>>;
+type BridgeSchema = z.infer<typeof zNodeBridgeSchema>;
 
-export { NodeBridge, zNodeBridgeSchema };
+export { NodeBridge };
 export type { BridgeSchema };
