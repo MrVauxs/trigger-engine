@@ -2,13 +2,13 @@ import {
     BaseEntrySchema,
     BridgeSchema,
     ConnectionId,
-    CreateNodeData,
     getInputsSchemas,
     getNodeStates,
     getOutputsSchemas,
     getOutsSchemas,
     NodeData,
-    NodeDataSource,
+    NodeDataInput,
+    NodeDataOutput,
     OpenTrigger,
     TriggerApplication,
     TriggerNode,
@@ -29,6 +29,7 @@ import {
 import {
     BaseBlueprintEntry,
     Blueprint,
+    BlueprintEntry,
     EntryId,
     filterElements,
     isBlueprintEntry,
@@ -39,7 +40,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
     #abortController = new AbortController();
     #blueprint: Blueprint;
     #entry: BaseBlueprintEntry | undefined;
-    #inClipboard: NodeDataSource[] = [];
+    #inClipboard: NodeDataOutput[] = [];
     #position: Point;
     #resolve: BlueprintNodesMenuResolve;
     #searchInput: ExtendedTextInputElement | null = null;
@@ -167,12 +168,12 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
 
             case "select-node": {
                 const source = R.pick(datasetToData(target), ["type", "builtin"]);
-                return this.#selectNode(foundry.utils.deepClone(source));
+                return this.#selectNode(source);
             }
         }
     }
 
-    #selectNode(source: CreateNodeData) {
+    #selectNode(source: NodeDataInput) {
         const trigger = this.trigger;
         if (!trigger) return;
 
@@ -186,7 +187,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         const entry = this.#entry;
         const nodeStates = getNodeStates(OtherCls) ?? [null];
 
-        const getSchemaEntry = <T extends BaseEntrySchema | BridgeSchema>(
+        const getSchema = <T extends BaseEntrySchema | BridgeSchema>(
             schemaFn: (NodeCls: typeof TriggerNode, state?: Maybe<string>) => T[],
             callback: (entries: T[]) => T | undefined
         ): T | undefined => {
@@ -205,21 +206,30 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
             }
         };
 
+        const getEntrySchema = <T extends BaseEntrySchema>(
+            schemaFn: (NodeCls: typeof TriggerNode, state?: Maybe<string>) => T[]
+        ) => {
+            const isArray = !!(entry as BlueprintEntry).isArray;
+            const entryType = (entry as BlueprintEntry).type;
+
+            return getSchema(schemaFn, (entries) => {
+                return entries.find((other) => {
+                    return other.type === entryType && isArray === !!other.isArray;
+                });
+            });
+        };
+
         if (entry?.isInput) {
             if (isBlueprintEntry(entry)) {
-                const otherEntry = getSchemaEntry(getOutputsSchemas, (entries) =>
-                    entries.find((other) => other.type === entry.type)
-                );
+                const otherEntry = getEntrySchema(getOutputsSchemas);
                 otherIdSuffix = otherEntry ? `outputs:${otherEntry.key}` : undefined;
             } else {
-                const out = getSchemaEntry(getOutsSchemas, (entries) => entries.at(0))?.key;
+                const out = getSchema(getOutsSchemas, (entries) => entries.at(0))?.key;
                 otherIdSuffix = out ? `outs:${out}` : undefined;
             }
         } else if (entry?.isOutput) {
             if (isBlueprintEntry(entry)) {
-                const otherEntry = getSchemaEntry(getInputsSchemas, (entries) =>
-                    entries.find((other) => other.type === entry.type)
-                );
+                const otherEntry = getEntrySchema(getInputsSchemas);
 
                 if (otherEntry) {
                     otherIdSuffix = `inputs:${otherEntry.key}`;
@@ -294,7 +304,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         this.close();
     }
 
-    async #nodesFromClipboard(): Promise<NodeDataSource[]> {
+    async #nodesFromClipboard(): Promise<NodeDataOutput[]> {
         if (this.#entry) return [];
 
         try {
@@ -302,10 +312,10 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
             const data = JSON.parse(str);
             if (!R.isArray(data)) return [];
 
-            const nodes: NodeDataSource[] = [];
+            const nodes: NodeDataOutput[] = [];
 
             for (const entry of data) {
-                const node = new NodeData(entry as NodeDataSource);
+                const node = new NodeData(entry as NodeDataOutput);
                 if (node.invalid) continue;
 
                 nodes.push(node.toObject());
@@ -337,12 +347,13 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
                 : nodes.filter((node) => node.hasIn);
         }
 
+        const isArray = !!entry.isArray;
+
         return nodes.filter((node) => {
             const entries = entry.isInput ? getOutputsSchemas(node) : getInputsSchemas(node);
-            return entries.some(
-                // TODO test arrays
-                (other) => other.type === entry.type && entry.isArray === other.isArray
-            );
+            return entries.some((other) => {
+                return other.type === entry.type && isArray === !!other.isArray;
+            });
         });
     }
 

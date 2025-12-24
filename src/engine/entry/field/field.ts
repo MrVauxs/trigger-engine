@@ -1,11 +1,11 @@
-import { IconObject, NodeEntry } from "engine";
-import { MODULE } from "module-helpers";
-import fields = foundry.data.fields;
+import { IconObject } from "_zod";
+import { NodeEntry } from "engine";
+import { MODULE, z } from "module-helpers";
 import { PreciseTextOptions } from "triggers-menu";
 
 abstract class NodeField<
     TValue extends unknown = unknown,
-    TSchema extends fields.DataSchema = fields.DataSchema
+    TFieldSchema extends Record<string, any> = Record<string, any>
 > extends PIXI.Graphics {
     //////////////////////////////
     // STATIC ACCESSORS
@@ -16,7 +16,7 @@ abstract class NodeField<
      *
      * Defines the DataSchema for the input field that will be used in the triggers menu.
      */
-    static get defineSchema(): fields.DataSchema {
+    static get defineSchema(): z.core.JSONSchema.ObjectSchema {
         throw MODULE.Error("the 'defineSchema' static getter must be implemented.");
     }
 
@@ -29,7 +29,7 @@ abstract class NodeField<
      *
      * The field data for this instance.
      */
-    declare readonly field: SourceFromSchema<TSchema>;
+    declare readonly field: TFieldSchema;
 
     /**
      * The already generated entry label in case you want to add it to the field instead of

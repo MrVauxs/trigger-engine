@@ -8,7 +8,7 @@ import {
     TriggerApplicationCollection,
     TriggerApplicationCollections,
     TriggerData,
-    TriggerDataSource,
+    TriggerDataInput,
     TriggerHook,
     TriggerNode,
 } from "engine";
@@ -88,7 +88,7 @@ class TriggerApplication {
         return this.#nodes;
     }
 
-    async openMenu(arg?: TriggerDataSource): Promise<BlueprintApplication | undefined> {
+    async openMenu(arg?: TriggerDataInput): Promise<BlueprintApplication | undefined> {
         if (this instanceof BuiltInApplication) return;
 
         const menuId = BlueprintApplication.APPLICATION_ID;
@@ -109,9 +109,9 @@ class TriggerApplication {
         }
     }
 
-    createTrigger(source: DeepPartial<TriggerDataSource>, open: boolean): OpenTrigger | null {
+    createTrigger(source: DeepPartial<TriggerDataInput>, open: boolean): OpenTrigger | null {
         try {
-            const data = new TriggerData({ ...source, applicationKey: this.applicationKey });
+            const data = new TriggerData(source);
             return new OpenTrigger(this, data);
         } catch (error: any) {
             MODULE.error(`an error ocurred while trying to create a Trigger.`, error);
@@ -139,7 +139,7 @@ class TriggerApplication {
                 return self;
             }
 
-            getTriggersSources(): TriggerDataSource[] {
+            getTriggersSources(): TriggerDataInput[] {
                 return [test.toObject()];
             }
         };
@@ -167,8 +167,8 @@ class TriggerApplication {
                 return self;
             }
 
-            getTriggersSources(): TriggerDataSource[] {
-                const settings = game.settings.get<TriggerDataSource[]>(moduleId, settingKey);
+            getTriggersSources(): TriggerDataInput[] {
+                const settings = game.settings.get<TriggerDataInput[]>(moduleId, settingKey);
                 return utils.deepClone(settings) ?? [];
             }
         }

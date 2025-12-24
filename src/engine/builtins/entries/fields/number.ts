@@ -1,40 +1,16 @@
+import { z } from "module-helpers";
 import { InputField } from ".";
-import fields = foundry.data.fields;
 
 class NumberField extends InputField<number, NumberFieldSchema> {
-    static get defineSchema(): NumberFieldSchema {
+    static get defineSchema(): z.core.JSONSchema.ObjectSchema {
         return {
-            choices: new fields.ArrayField(
-                new fields.NumberField({
-                    required: true,
-                    nullable: false,
-                }),
-                {
-                    required: false,
-                    nullable: false,
-                    initial: () => [],
-                }
-            ),
-            default: new fields.NumberField({
-                required: false,
-                nullable: false,
-                initial: undefined,
-            }),
-            max: new fields.NumberField({
-                required: false,
-                nullable: false,
-                initial: undefined,
-            }),
-            min: new fields.NumberField({
-                required: false,
-                nullable: false,
-                initial: undefined,
-            }),
-            step: new fields.NumberField({
-                required: false,
-                nullable: false,
-                initial: 1,
-            }),
+            type: "object",
+            properties: {
+                default: { type: "number" },
+                min: { type: "number" },
+                max: { type: "number" },
+                step: { default: 1, type: "number" },
+            },
         };
     }
 
@@ -77,11 +53,10 @@ class NumberField extends InputField<number, NumberFieldSchema> {
 }
 
 type NumberFieldSchema = {
-    choices: fields.ArrayField<fields.NumberField<number, number, true, false, false>>;
-    default: fields.NumberField<number, number, false, false, false>;
-    max: fields.NumberField<number, number, false, false, false>;
-    min: fields.NumberField<number, number, false, false, false>;
-    step: fields.NumberField<number, number, false, false, true>;
+    default?: number;
+    max?: number;
+    min?: number;
+    step: number;
 };
 
 export { NumberField };

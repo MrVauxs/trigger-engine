@@ -1,6 +1,7 @@
+import { IconObject } from "_zod";
 import { BridgeSchema, InputEntrySchema, NodeField, OutputEntrySchema } from "engine";
 import { LocalizeArgs, MODULE } from "module-helpers";
-import { IconObject, NodeData } from ".";
+import { NodeData } from ".";
 
 abstract class TriggerNode {
     //////////////////////////////
@@ -91,8 +92,7 @@ abstract class TriggerNode {
     }
 
     /**
-     * @see {@link NodeField.defineSchema}
-     * Define the inputs for this node if any.
+     * Define the inputs for this node if any. Inputs can make use of {@link NodeField.defineSchema}.
      */
     static get defineInputs(): InputEntrySchema[] | null {
         return null;

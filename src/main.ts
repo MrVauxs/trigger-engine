@@ -5,7 +5,7 @@ import {
     TriggerHook,
     TriggerNode,
 } from "engine";
-import { MODULE } from "module-helpers";
+import { MODULE, z } from "module-helpers";
 
 MODULE.register("trigger-engine", { game: "triggerEngine" });
 
@@ -33,3 +33,5 @@ globalThis.triggerEngine = {
     TriggerNode,
     openBlueprintMenu,
 };
+
+globalThis.z = z;

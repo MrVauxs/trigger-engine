@@ -1,31 +1,22 @@
-import { htmlQuery } from "module-helpers";
+import { htmlQuery, z } from "module-helpers";
 import { InputField } from ".";
 import elements = foundry.applications.elements;
-import fields = foundry.data.fields;
 
 const NODE_INPUT_CODE_TYPES = ["javascript", "json"] as const;
 const NODE_INPUT_TEXT_TYPES = ["enriched", ...NODE_INPUT_CODE_TYPES] as const;
 
 class TextField extends InputField<string, TextFieldSchema> {
-    static get defineSchema(): TextFieldSchema {
+    static get defineSchema(): z.core.JSONSchema.ObjectSchema {
         return {
-            default: new fields.StringField({
-                required: false,
-                nullable: false,
-                initial: undefined,
-            }),
-            trim: new fields.BooleanField({
-                required: false,
-                nullable: false,
-                initial: true,
-            }),
-            type: new fields.StringField({
-                required: false,
-                nullable: false,
-                blank: false,
-                choices: NODE_INPUT_TEXT_TYPES,
-                initial: undefined,
-            }),
+            type: "object",
+            properties: {
+                default: { type: "string" },
+                trim: { default: true, type: "boolean" },
+                type: {
+                    type: "string",
+                    enum: NODE_INPUT_TEXT_TYPES as any,
+                },
+            },
         };
     }
 
@@ -186,9 +177,9 @@ class TextField extends InputField<string, TextFieldSchema> {
 type TextEntryType = (typeof NODE_INPUT_TEXT_TYPES)[number];
 
 type TextFieldSchema = {
-    default: fields.StringField<string, string, false, false, false>;
-    trim: fields.BooleanField<boolean, boolean, false, false, true>;
-    type: fields.StringField<TextEntryType, TextEntryType, false, false, false>;
+    default?: string;
+    trim: boolean;
+    type?: TextEntryType;
 };
 
 export { TextField };

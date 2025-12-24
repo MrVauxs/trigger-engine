@@ -1,10 +1,9 @@
 import { BaseEntrySchema, NodeField } from "engine";
 import { MODULE } from "module-helpers";
-import fields = foundry.data.fields;
 
 abstract class NodeEntry<
     TValue extends unknown = unknown,
-    TFieldSchema extends fields.DataSchema | undefined = undefined
+    TFieldSchema extends Record<string, any> | undefined = undefined
 > {
     //////////////////////////////
     // ABSTRACT STATIC ACCESSORS
@@ -36,7 +35,7 @@ abstract class NodeEntry<
     /**
      * Class inheriting `NodeField` to represent the input field of this entry.
      */
-    static get FieldClass(): typeof NodeField<unknown, fields.DataSchema> | null {
+    static get FieldClass(): typeof NodeField<unknown, Record<string, any>> | null {
         return null;
     }
 
@@ -56,7 +55,7 @@ abstract class NodeEntry<
      *
      * The field data for this instance.
      */
-    declare readonly field: EntryField<TFieldSchema>;
+    declare readonly field: TFieldSchema;
 
     //////////////////////////////
     // ACCESSORS
@@ -98,10 +97,4 @@ interface NodeEntry
     readonly isArray: boolean;
 }
 
-type EntryField<TFieldSchema extends fields.DataSchema | undefined = undefined> =
-    TFieldSchema extends fields.DataSchema
-        ? DeepPartial<ModelPropsFromSchema<TFieldSchema>>
-        : undefined | null;
-
 export { NodeEntry };
-export type { EntryField };

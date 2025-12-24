@@ -1,11 +1,10 @@
 import { assignStyle, getInputValue, R, setStyleProperties } from "module-helpers";
 import { BuiltInEntryField } from ".";
-import fields = foundry.data.fields;
 
 abstract class InputField<
     TValue extends unknown,
-    TFieldSchema extends fields.DataSchema
-> extends BuiltInEntryField<TValue, TFieldSchema> {
+    TSchema extends Record<string, any>
+> extends BuiltInEntryField<TValue, TSchema> {
     abstract get fontSize(): number;
     abstract get targetWidth(): number;
     abstract get toDisplay(): string;

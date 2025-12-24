@@ -1,6 +1,3 @@
-import { EntryField } from "..";
-import fields = foundry.data.fields;
-
 // out
 
 type CustomOutDataSchema = BaseCustomDataSchema;

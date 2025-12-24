@@ -1,61 +1,33 @@
-import { ConnectionCategory, ConnectionId, NodeEntryField, TriggerData } from "engine";
-import { IdField, PositionField } from "module-helpers";
-import abstract = foundry.abstract;
-import fields = foundry.data.fields;
+import { zEntryDataSchema } from "engine";
+import { z, zDocument, zID, zPosition } from "module-helpers";
 
-class NodeData extends abstract.DataModel<TriggerData, NodeDataSchema> {
-    static defineSchema(): NodeDataSchema {
-        return {
-            _id: new IdField(),
-            inputs: new fields.TypedObjectField(new NodeEntryField("outputs")),
-            ins: new fields.TypedObjectField(new NodeEntryField("outs")),
-            position: new PositionField(),
-            state: new fields.StringField({
-                required: false,
-                nullable: false,
-                blank: false,
-                initial: undefined,
-            }),
-            type: new fields.StringField({
-                required: true,
-                nullable: false,
-                blank: false,
-            }),
-        };
-    }
-
-    get id(): string {
-        return this._id;
+class NodeData extends zDocument<NodeDataSchema> {
+    static get defineSchema() {
+        return zNodeDataSchema();
     }
 }
 
-interface NodeData extends ModelPropsFromSchema<NodeDataSchema> {
-    updateSource(
-        data: DeepPartial<NodeDataSource> | { [x: string]: { [x: string]: null } }
-    ): DeepPartial<NodeDataSource>;
+interface NodeData extends z.output<NodeDataSchema> {
+    readonly _source: NodeDataInput;
 }
 
-type CreateNodeData = Prettify<WithRequired<DeepPartial<NodeDataSource>, "type">>;
+function zNodeDataSchema() {
+    return z.object({
+        id: zID(),
+        inputs: zEntryDataSchema(),
+        ins: zEntryDataSchema(),
+        position: zPosition(),
+        state: z.string().trim().optional(),
+        type: z.string().trim().readonly(),
+    });
+}
 
-type UpdateNodeData = DeepPartial<Omit<NodeDataSource, "_id" | "builtin" | "type">>;
+type NodeDataInput = z.input<NodeDataSchema>;
+type NodeDataOutput = z.output<NodeDataSchema>;
 
-type NodeDataSource = SourceFromSchema<NodeDataSchema>;
+type NodeDataSchema = ReturnType<typeof zNodeDataSchema>;
 
-type NodeDataSchema = {
-    _id: IdField;
-    inputs: EntryFields<"outputs">;
-    ins: EntryFields<"outs">;
-    position: PositionField;
-    state: fields.StringField<string, string, false, false, false>;
-    type: fields.StringField<string, string, true, false, false>;
-};
+type CreateNodeData = z.input<NodeDataSchema>;
 
-type EntryFields<TCategory extends ConnectionCategory> = fields.TypedObjectField<
-    NodeEntryField<TCategory>,
-    Record<string, { connections?: ConnectionId[]; value?: any }>,
-    Record<string, { connections?: ConnectionId[]; value?: any }>,
-    false
->;
-
-export { NodeData };
-export type { CreateNodeData, NodeDataSchema, NodeDataSource, UpdateNodeData };
+export { NodeData, zNodeDataSchema };
+export type { CreateNodeData, NodeDataInput, NodeDataOutput, NodeDataSchema };

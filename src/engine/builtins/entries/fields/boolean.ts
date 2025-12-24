@@ -1,14 +1,13 @@
+import { z } from "module-helpers";
 import { BuiltInEntryField } from ".";
-import fields = foundry.data.fields;
 
 class BooleanField extends BuiltInEntryField<boolean, BooleanFieldSchema> {
-    static get defineSchema(): BooleanFieldSchema {
+    static get defineSchema(): z.core.JSONSchema.ObjectSchema {
         return {
-            default: new fields.BooleanField({
-                required: false,
-                nullable: false,
-                initial: undefined,
-            }),
+            type: "object",
+            properties: {
+                default: { type: "boolean" },
+            },
         };
     }
 
@@ -45,7 +44,7 @@ class BooleanField extends BuiltInEntryField<boolean, BooleanFieldSchema> {
 }
 
 type BooleanFieldSchema = {
-    default: fields.BooleanField<boolean, boolean, false, false, false>;
+    default?: boolean;
 };
 
 export { BooleanField };

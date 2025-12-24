@@ -1,68 +1,27 @@
-import { EntryField } from ".";
-import abstract = foundry.abstract;
-import fields = foundry.data.fields;
+import { z, zString } from "module-helpers";
 
-class NodeEntrySchema extends abstract.DataModel<null, EntrySchemaSchema> {
-    static defineSchema(): EntrySchemaSchema {
-        return {
-            isArray: new fields.BooleanField({
-                required: false,
-                nullable: false,
-                initial: false,
-            }),
-            key: new fields.StringField({
-                required: true,
-                nullable: false,
-                blank: false,
-            }),
-            label: new fields.StringField({
-                required: false,
-                nullable: false,
-                blank: false,
-                initial: undefined,
-            }),
-            group: new fields.StringField({
-                required: false,
-                nullable: false,
-                blank: false,
-                initial: undefined,
-            }),
-            state: new fields.StringField({
-                required: false,
-                nullable: false,
-                blank: false,
-                initial: undefined,
-            }),
-            type: new fields.StringField({
-                required: true,
-                nullable: false,
-                blank: false,
-            }),
-        };
-    }
+function zNodeEntrySchema() {
+    return z.object({
+        isArray: z.boolean().optional().catch(false),
+        key: zString(),
+        label: zString().optional().catch(undefined),
+        group: zString().optional().catch(undefined),
+        state: zString().optional().catch(undefined),
+        type: zString(),
+    });
 }
 
-interface NodeEntrySchema extends ModelPropsFromSchema<EntrySchemaSchema> {}
+type NodeEntrySchemaSource = z.input<ReturnType<typeof zNodeEntrySchema>>;
 
-type NodeEntrySchemaSource = SourceFromSchema<EntrySchemaSchema>;
-
-type EntrySchemaSchema = {
-    isArray: fields.BooleanField<boolean, boolean, false, false, true>;
-    key: fields.StringField<string, string, true, false, false>;
-    label: fields.StringField<string, string, false, false, false>;
-    group: fields.StringField<string, string, false, false, false>;
-    state: fields.StringField<string, string, false, false, false>;
-    type: fields.StringField<string, string, true, false, false>;
-};
-
-type BaseEntrySchema = Prettify<WithPartial<NodeEntrySchemaSource, "label" | "group">>;
+type BaseEntrySchema = NodeEntrySchemaSource;
 
 type OutputEntrySchema = BaseEntrySchema;
 
-type InputEntrySchema<TFieldSchema extends fields.DataSchema | undefined = any> =
+type InputEntrySchema<TField extends Record<string, any> | undefined = any> = Prettify<
     BaseEntrySchema & {
-        field?: EntryField<TFieldSchema>;
-    };
+        field?: TField;
+    }
+>;
 
-export { NodeEntrySchema };
+export { zNodeEntrySchema };
 export type { BaseEntrySchema, InputEntrySchema, NodeEntrySchemaSource, OutputEntrySchema };

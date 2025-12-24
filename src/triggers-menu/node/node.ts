@@ -1,11 +1,9 @@
+import { IconObject } from "_zod";
 import {
     ConnectionId,
-    IconObject,
     isConnectionId,
     isOppositeConnection,
     NodeData,
-    NodeHeader,
-    NodeHeaderData,
     OpenTrigger,
     OpenTriggerNode,
     TriggerNode,
@@ -32,8 +30,10 @@ import {
     getRight,
     maxBottom,
     maxRight,
+    NodeHeaderSource,
     NodePart,
     PreciseEntryCategory,
+    zNodeHeaderData,
 } from ".";
 import { Blueprint } from "..";
 
@@ -332,7 +332,7 @@ class BlueprintNode extends PIXI.Container {
 
     setPosition(x: number, y: number) {
         this.position.set(x, y);
-        this.data.updateSource({ position: { x, y } });
+        this.data.update({ position: { x, y } });
 
         for (const entry of this.entries) {
             this.blueprint.connections.refreshConnection(entry);
@@ -353,7 +353,7 @@ class BlueprintNode extends PIXI.Container {
 
         connections.push(targetId);
 
-        this.data.updateSource({
+        this.data.update({
             [category]: {
                 [key]: {
                     connections,
@@ -371,18 +371,18 @@ class BlueprintNode extends PIXI.Container {
         if (!exist) return;
 
         if (connections.length) {
-            this.data.updateSource({
+            this.data.update({
                 [category]: {
                     [key]: {
                         connections,
-                        "-=value": null,
+                        value: undefined,
                     },
                 },
             });
         } else {
-            this.data.updateSource({
+            this.data.update({
                 [category]: {
-                    [`-=${key}`]: null,
+                    [key]: undefined,
                 },
             });
         }
@@ -622,15 +622,15 @@ class BlueprintNode extends PIXI.Container {
         const title = this.#node.title;
         if (!R.isString(title)) return;
 
-        const headerSource: NodeHeaderData = {
+        const headerSource: NodeHeaderSource = {
             background: this.#node.headerColor,
             icon: this.#node.icon,
             subtitle: this.#node.subtitle,
             title,
         };
 
-        const data = new NodeHeader(headerSource);
-        if (data.invalid) return;
+        const { data } = zNodeHeaderData().safeParse(headerSource);
+        if (!data) return;
 
         const padding = this.outerPadding;
         const headerEl = new PIXI.Container() as NodeheaderPart;
@@ -714,7 +714,7 @@ class BlueprintNode extends PIXI.Container {
                             name: this.#node.localize("state", state) ?? state,
                             icon: `<i class="fa-sharp fa-solid fa-arrows-repeat"></i>`,
                             callback: async () => {
-                                this.data.updateSource({ state });
+                                this.data.update({ state });
                                 this.trigger.refreshNode(this.id);
                                 // TODO we gonna want to delete variables
                                 this.blueprint.draw({

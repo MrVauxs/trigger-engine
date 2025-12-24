@@ -8,6 +8,7 @@ import {
     NodeEntry,
     OpenNodeEntry,
     OpenTrigger,
+    OutputEntrySchema,
     Trigger,
     TriggerApplication,
 } from "engine";
@@ -147,12 +148,7 @@ function instantiateNode(
                         schemas,
                         R.map((schema) => {
                             try {
-                                // // TODO we need to actually pass the data here
-                                // const bridgeData = new NodeBridgeData({
-                                //     key: schema.key,
-                                // });
                                 const bridge = new NodeBridge(parent, this, schema);
-
                                 return [bridge.key, bridge] as const;
                             } catch (error) {}
                         }),
@@ -220,7 +216,10 @@ function getInputsSchemas(NodeCls: typeof TriggerNode, state?: Maybe<string>): I
 }
 
 // TODO this needs to also return custom inputs
-function getOutputsSchemas(NodeCls: typeof TriggerNode, state?: Maybe<string>): InputEntrySchema[] {
+function getOutputsSchemas(
+    NodeCls: typeof TriggerNode,
+    state?: Maybe<string>
+): OutputEntrySchema[] {
     return filterSchemasByState(NodeCls.defineOutputs ?? [], state);
 }
 

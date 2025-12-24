@@ -1,5 +1,4 @@
-import { EntryField, instantiateField, NodeEntry, NodeField, OpenNodeEntry } from "engine";
-import { DataSchema } from "module-helpers";
+import { instantiateField, NodeEntry, NodeField, OpenNodeEntry } from "engine";
 import { BaseBlueprintEntry } from ".";
 import { BlueprintNode } from "..";
 
@@ -155,13 +154,13 @@ class BlueprintEntry extends BaseBlueprintEntry {
             if (newValue === rawValue) return;
 
             if (newValue === defaultValue) {
-                this.node.data.updateSource({
+                this.node.data.update({
                     inputs: {
-                        [`-=${this.key}`]: null,
+                        [this.key]: undefined,
                     },
                 });
             } else {
-                this.node.data.updateSource({
+                this.node.data.update({
                     inputs: {
                         [this.key]: {
                             connections: [],
@@ -185,7 +184,7 @@ function isBlueprintEntry(entry: BaseBlueprintEntry): entry is BlueprintEntry {
 type NodeFieldOptions = {
     baseFontSize: number;
     default: unknown;
-    field: EntryField<DataSchema>;
+    field: Record<string, any>;
     isConnected: boolean;
     label: PreciseText;
     maxHeight: number;

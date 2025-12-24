@@ -1,4 +1,4 @@
-import { ConnectionId, NodeDataSource, OpenTriggerNode } from "engine";
+import { ConnectionId, NodeDataOutput, OpenTriggerNode } from "engine";
 import { info, R } from "module-helpers";
 import { BaseBlueprintEntry, BlueprintNode, EntryId } from ".";
 import { Blueprint, BlueprintLayers } from "..";
@@ -117,19 +117,19 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
         this.addFromSources(sources);
     }
 
-    addFromSources(sources: NodeDataSource[]) {
+    addFromSources(sources: NodeDataOutput[]) {
         const trigger = this.blueprint.trigger;
         if (!trigger) return;
 
         const addedNodes: string[] = [];
         const replacementIds = R.pipe(
             sources,
-            R.map((source) => source._id),
+            R.map((source) => source.id),
             R.fromKeys(() => foundry.utils.randomID())
         );
 
         for (const source of sources) {
-            source._id = replacementIds[source._id];
+            source.id = replacementIds[source.id];
 
             for (const category of ["ins", "inputs"] as const) {
                 for (const entry of R.values(source[category])) {
@@ -169,11 +169,11 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
         }
     }
 
-    #duplicateSelectedSources(nodes: BlueprintNode[]): NodeDataSource[] {
+    #duplicateSelectedSources(nodes: BlueprintNode[]): NodeDataOutput[] {
         const trigger = this.blueprint.trigger;
         if (!trigger) return [];
 
-        const sources: NodeDataSource[] = [];
+        const sources: NodeDataOutput[] = [];
         const nodeIds = nodes.map((node) => node.id);
 
         for (const node of nodes) {

@@ -1,10 +1,4 @@
-import {
-    OpenTrigger,
-    TriggerApplication,
-    TriggerDataSource,
-    UpdateNodeData,
-    UpdateTriggerData,
-} from "engine";
+import { OpenTrigger, TriggerApplication, TriggerDataInput, UpdateTriggerData } from "engine";
 import {
     distanceToPoint,
     dividePointBy,
@@ -114,10 +108,6 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
 
     get nodes(): BlueprintNodesLayer {
         return this.#layers.nodes;
-    }
-
-    get applicationKey(): string {
-        return this.application.applicationKey;
     }
 
     get triggers(): Collection<OpenTrigger> {
@@ -232,8 +222,8 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         }
     }
 
-    addTrigger(source: DeepPartial<TriggerDataSource>) {
-        if (source._id && this.triggers.has(source._id)) return;
+    addTrigger(source: DeepPartial<TriggerDataInput>) {
+        if (source.id && this.triggers.has(source.id)) return;
 
         const trigger = this.application.createTrigger(source, true);
         if (!trigger) return;
@@ -247,14 +237,6 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         if (!trigger) return;
 
         trigger.update(updates);
-        this.parent.render();
-    }
-
-    updateNode(id: string, updates: UpdateNodeData) {
-        const trigger = this.trigger;
-        if (!trigger) return;
-
-        trigger.updateNode(id, updates);
         this.parent.render();
     }
 

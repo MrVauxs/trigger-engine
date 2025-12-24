@@ -1,4 +1,4 @@
-import { OpenTrigger, TriggerApplication, TriggerDataSource, UpdateTriggerData } from "engine";
+import { OpenTrigger, TriggerApplication, TriggerDataInput, UpdateTriggerData } from "engine";
 import {
     addEnterKeyListeners,
     addListener,
@@ -51,10 +51,6 @@ class BlueprintApplication extends apps.ApplicationV2<
 
         this.blueprint.resizeAll();
     });
-
-    get applicationKey(): string {
-        return this.application.applicationKey;
-    }
 
     get blueprint(): Blueprint {
         return this.#blueprint;
@@ -411,7 +407,7 @@ class BlueprintApplication extends apps.ApplicationV2<
 
 interface BlueprintApplication {
     get application(): TriggerApplication;
-    getTriggersSources(): TriggerDataSource[];
+    getTriggersSources(): TriggerDataInput[];
 }
 
 function filterElements(

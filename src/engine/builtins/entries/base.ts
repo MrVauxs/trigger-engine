@@ -1,9 +1,8 @@
 import { NodeEntry } from "engine";
-import fields = foundry.data.fields;
 
 abstract class BuiltInNodeEntry<
     TValue extends unknown,
-    TFieldSchema extends fields.DataSchema | undefined
+    TFieldSchema extends Record<string, any> | undefined
 > extends NodeEntry<TValue, TFieldSchema> {
     get fieldBorderColor(): ColorSource {
         return 0xffffff;

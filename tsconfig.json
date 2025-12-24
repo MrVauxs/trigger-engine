@@ -12,6 +12,7 @@
         "noUnusedParameters": false,
         "noUnusedLocals": true,
         "noFallthroughCasesInSwitch": true,
+        "strict": true,
         "strictFunctionTypes": true,
         "strictNullChecks": true,
         "strictPropertyInitialization": true,

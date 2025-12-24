@@ -1,4 +1,4 @@
-import { TriggerApplication, TriggerApplicationOptions, TriggerDataSource } from "engine";
+import { TriggerApplication, TriggerApplicationOptions, TriggerDataInput } from "engine";
 import { MODULE, R } from "module-helpers";
 import { BlueprintApplication } from "triggers-menu";
 
@@ -21,7 +21,7 @@ function registerApplication(
 async function openBlueprintMenu(
     moduleId: string,
     applicationId: string,
-    source?: TriggerDataSource
+    source?: TriggerDataInput
 ): Promise<BlueprintApplication | undefined> {
     const app = getApplication(moduleId, applicationId);
     return app?.openMenu(source);

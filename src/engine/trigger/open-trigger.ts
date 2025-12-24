@@ -8,9 +8,8 @@ import {
     Trigger,
     TriggerApplication,
     TriggerData,
-    TriggerDataSource,
+    TriggerDataOutput,
     TriggerNode,
-    UpdateNodeData,
     UpdateTriggerData,
 } from "engine";
 import { enrichHTML, MODULE, R } from "module-helpers";
@@ -35,7 +34,7 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
     }
 
     get applicationKey(): string {
-        return this.data.applicationKey;
+        return this.application.applicationKey;
     }
 
     get path(): string {
@@ -70,27 +69,22 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
         return this.nodes.get(id);
     }
 
-    update(data: UpdateTriggerData): DeepPartial<TriggerDataSource> {
-        return this.data.updateSource(data);
+    update(data: UpdateTriggerData): TriggerData {
+        return this.data.update(data);
     }
 
-    updateNode(id: string, updates: UpdateNodeData) {
-        const data = this.data.nodes.get(id);
-        data?.updateSource(updates);
-    }
+    duplicate(): TriggerDataOutput {
+        const source = this.data.toObject();
 
-    duplicate(): TriggerDataSource {
-        const clone = this.data.clone({
-            _id: foundry.utils.randomID(),
-            name: this.name ? game.i18n.format("DOCUMENT.CopyOf", { name: this.name }) : "",
-        } satisfies DeepPartial<TriggerDataSource>);
+        source.id = foundry.utils.randomID();
+        source.name = this.name ? game.i18n.format("DOCUMENT.CopyOf", { name: this.name }) : "";
 
-        return clone.toObject();
+        return source;
     }
 
     addNode(source: CreateNodeData): OpenTriggerNode | undefined {
         try {
-            const data = this.data.addNode(source);
+            const data = this.data.nodes.addFromSource(source);
 
             if (!data || data.invalid) {
                 throw new Error("The provided NodeData source is invalid.");
@@ -121,7 +115,7 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
     }
 
     deleteNode(id: string) {
-        this.data.removeNode(id);
+        this.data.nodes.delete(id);
         this.nodes.delete(id);
     }
 
