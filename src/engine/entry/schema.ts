@@ -1,6 +1,7 @@
 import { z, zString } from "module-helpers";
 
 const zNodeEntrySchema = z.object({
+    hidden: z.boolean().optional().catch(false),
     isArray: z.boolean().optional().catch(false),
     key: zString,
     label: zString.optional().catch(undefined),
@@ -9,9 +10,7 @@ const zNodeEntrySchema = z.object({
     type: zString,
 });
 
-type NodeEntrySchemaSource = z.input<typeof zNodeEntrySchema>;
-
-type BaseEntrySchema = NodeEntrySchemaSource;
+type BaseEntrySchema = z.input<typeof zNodeEntrySchema>;
 
 type OutputEntrySchema = BaseEntrySchema;
 
@@ -22,4 +21,4 @@ type InputEntrySchema<TField extends Record<string, any> | undefined = any> = Pr
 >;
 
 export { zNodeEntrySchema };
-export type { BaseEntrySchema, InputEntrySchema, NodeEntrySchemaSource, OutputEntrySchema };
+export type { BaseEntrySchema, InputEntrySchema, OutputEntrySchema };

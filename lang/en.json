@@ -5,6 +5,7 @@
                 "disconnect": "Disconnect Entry"
             },
             "node": {
+                "add": "Add: {entry}",
                 "copy": {
                     "copied": "The selection has been copied to the clipboard.",
                     "multi": "Copy Selected Nodes",

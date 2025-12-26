@@ -138,7 +138,7 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
 
         for (const inputNode of this.nodes) {
             const InputNodeCls = inputNode.constructor as typeof TriggerNode;
-            const nodeInputs = getInputsSchemas(InputNodeCls, inputNode.state);
+            const nodeInputs = getInputsSchemas(InputNodeCls, inputNode);
 
             const ins = R.pipe(
                 R.values(inputNode.data.ins),
@@ -195,7 +195,7 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
                 const OutputNodeCls = outputNode.constructor as typeof TriggerNode;
 
                 if (outputCategory === "outs") {
-                    const outs = getOutsSchemas(OutputNodeCls, outputNode.state);
+                    const outs = getOutsSchemas(OutputNodeCls, outputNode);
                     const out = outs.find(({ key }) => key === outputEntryKey);
 
                     if (!out) {
@@ -203,7 +203,7 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
                         continue;
                     }
                 } else {
-                    const outputs = getOutputsSchemas(OutputNodeCls, outputNode.state);
+                    const outputs = getOutputsSchemas(OutputNodeCls, outputNode);
                     const output = outputs.find(({ key, type }) => {
                         return (
                             key === outputEntryKey &&

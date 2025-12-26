@@ -12,6 +12,7 @@ import {
     confirmDialog,
     createHTMLElement,
     drawRectangleMask,
+    localize,
     LocalizeArgs,
     localizePath,
     mapToObjByKey,
@@ -714,7 +715,10 @@ class BlueprintNode extends PIXI.Container {
                             name: this.#node.localize("state", state) ?? state,
                             icon: `<i class="fa-sharp fa-solid fa-arrows-repeat"></i>`,
                             callback: async () => {
-                                this.data.update({ state });
+                                this.data.update({
+                                    revealed: undefined,
+                                    state,
+                                });
                                 this.trigger.refreshNode(this.id);
                                 // TODO we gonna want to delete variables
                                 this.blueprint.draw({
@@ -727,6 +731,46 @@ class BlueprintNode extends PIXI.Container {
                     })
                 )
             );
+        }
+
+        if (!locked) {
+            const categories = [
+                ["inputs", "defineInputs"],
+                ["outputs", "defineOutputs"],
+            ] as const;
+
+            for (const [category, method] of categories) {
+                const allSchemas = (this.#node.constructor as typeof TriggerNode)[method] ?? [];
+                const schemas = allSchemas.filter((schema) => {
+                    return (
+                        !!schema.hidden &&
+                        (!schema.state || schema.state === this.#node.state) &&
+                        !this.data.revealed?.[category]?.[schema.key]
+                    );
+                });
+
+                for (const schema of schemas) {
+                    const label = schema.label
+                        ? game.i18n.localize(schema.label)
+                        : this.localize("entry", schema.key) ?? schema.key;
+
+                    entries.push({
+                        name: localize("blueprint.node.add", { entry: label }),
+                        icon: `<i class="fa-solid fa-pen-line"></i>`,
+                        callback: async () => {
+                            this.data.update({
+                                revealed: {
+                                    [category]: { [schema.key]: true },
+                                },
+                            });
+                            this.trigger.refreshNode(this.id);
+                            this.blueprint.draw({
+                                selectNodes: [this.id],
+                            });
+                        },
+                    });
+                }
+            }
         }
 
         if (this.isDuplicable) {

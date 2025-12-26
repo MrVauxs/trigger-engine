@@ -188,48 +188,77 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         const nodeStates = getNodeStates(OtherCls) ?? [null];
 
         const getSchema = <T extends BaseEntrySchema | BridgeSchema>(
-            schemaFn: (NodeCls: typeof TriggerNode, state?: Maybe<string>) => T[],
+            category: "outs" | "inputs" | "outputs",
             callback: (entries: T[]) => T | undefined
         ): T | undefined => {
-            for (const state of nodeStates) {
-                const schema = schemaFn(OtherCls, state);
-                const result = callback(schema);
+            let hidden: { state: string | null; schema: T } | undefined;
 
-                if (result) {
+            const schemaFn =
+                category === "outs"
+                    ? getOutsSchemas
+                    : category === "inputs"
+                    ? getInputsSchemas
+                    : getOutputsSchemas;
+
+            for (const state of nodeStates) {
+                const schemas = schemaFn(OtherCls, { revealed: true, state }) as T[];
+                const schema = callback(schemas);
+
+                if (schema) {
+                    if ((schema as BaseEntrySchema).hidden) {
+                        hidden ??= { schema, state };
+                        continue;
+                    }
+
                     if (state) {
                         source.state = state;
                     } else {
                         delete source.state;
                     }
-                    return result;
+
+                    return schema;
                 }
+            }
+
+            if (hidden) {
+                if (hidden.state) {
+                    source.state = hidden.state;
+                } else {
+                    delete source.state;
+                }
+
+                source.revealed = {
+                    [category]: {
+                        [hidden.schema.key]: true,
+                    },
+                };
+
+                return hidden.schema;
             }
         };
 
-        const getEntrySchema = <T extends BaseEntrySchema>(
-            schemaFn: (NodeCls: typeof TriggerNode, state?: Maybe<string>) => T[]
-        ) => {
+        const getEntrySchema = (category: "inputs" | "outputs") => {
             const isArray = !!(entry as BlueprintEntry).isArray;
             const entryType = (entry as BlueprintEntry).type;
 
-            return getSchema(schemaFn, (entries) => {
-                return entries.find((other) => {
-                    return other.type === entryType && isArray === !!other.isArray;
+            return getSchema<BaseEntrySchema>(category, (schemas) => {
+                return schemas.find((schema) => {
+                    return schema.type === entryType && isArray === !!schema.isArray;
                 });
             });
         };
 
         if (entry?.isInput) {
             if (isBlueprintEntry(entry)) {
-                const otherEntry = getEntrySchema(getOutputsSchemas);
+                const otherEntry = getEntrySchema("outputs");
                 otherIdSuffix = otherEntry ? `outputs:${otherEntry.key}` : undefined;
             } else {
-                const out = getSchema(getOutsSchemas, (entries) => entries.at(0))?.key;
+                const out = getSchema("outs", (schemas) => schemas.at(0))?.key;
                 otherIdSuffix = out ? `outs:${out}` : undefined;
             }
         } else if (entry?.isOutput) {
             if (isBlueprintEntry(entry)) {
-                const otherEntry = getEntrySchema(getInputsSchemas);
+                const otherEntry = getEntrySchema("inputs");
 
                 if (otherEntry) {
                     otherIdSuffix = `inputs:${otherEntry.key}`;
@@ -350,7 +379,9 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         const isArray = !!entry.isArray;
 
         return nodes.filter((node) => {
-            const entries = entry.isInput ? getOutputsSchemas(node) : getInputsSchemas(node);
+            const schemasFn = entry.isInput ? getOutputsSchemas : getInputsSchemas;
+            const entries = schemasFn(node, { revealed: true });
+
             return entries.some((other) => {
                 return other.type === entry.type && isArray === !!other.isArray;
             });
