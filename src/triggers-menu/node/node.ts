@@ -712,7 +712,7 @@ class BlueprintNode extends PIXI.Container {
                     R.filter((state) => state !== this.#node.state),
                     R.map((state) => {
                         return {
-                            name: this.#node.localize("state", state) ?? state,
+                            name: this.#node.localize("states", state) ?? state,
                             icon: `<i class="fa-sharp fa-solid fa-arrows-repeat"></i>`,
                             callback: async () => {
                                 this.data.update({
@@ -752,7 +752,7 @@ class BlueprintNode extends PIXI.Container {
                 for (const schema of schemas) {
                     const label = schema.label
                         ? game.i18n.localize(schema.label)
-                        : this.localize("entry", schema.key) ?? schema.key;
+                        : this.localize(category, schema.key) ?? schema.key;
 
                     entries.push({
                         name: localize("blueprint.node.add", { entry: label }),

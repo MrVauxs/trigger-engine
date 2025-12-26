@@ -36,7 +36,7 @@ class BlueprintBridgeEntry extends BaseBlueprintEntry {
         }
 
         return (
-            this.node.localize("out", key) ?? //
+            this.node.localize("outs", key) ?? //
             (key === "out" ? localize("node.out") : key)
         );
     }

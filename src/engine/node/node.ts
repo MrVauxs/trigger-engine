@@ -1,5 +1,13 @@
 import { IconObject } from "_zod";
-import { BridgeSchema, InputEntrySchema, NodeField, OutputEntrySchema } from "engine";
+import {
+    BridgeSchema,
+    CustomInputSchema,
+    CustomOutputSchema,
+    CustomOutSchema,
+    InputEntrySchema,
+    NodeField,
+    OutputEntrySchema,
+} from "engine";
 import { LocalizeArgs, MODULE } from "module-helpers";
 import { NodeData } from ".";
 
@@ -37,7 +45,7 @@ abstract class TriggerNode {
      * A node can have multiple layout states. Must at least contain 2 states if used.
      *
      * Localization path:
-     * `<module-id>.<application-id>.node.<category>.<type>.state.<state>`
+     * `<module-id>.<application-id>.node.<category>.<type>.states.<state>`
      */
     static get states(): string[] | null {
         return null;
@@ -85,7 +93,7 @@ abstract class TriggerNode {
      * List of `out` bridge connections.
      *
      * Localization path:
-     * `<module-id>.<application-id>.node.<category>.<type>.out.<key>`
+     * `<module-id>.<application-id>.node.<category>.<type>.outs.<key>`
      */
     static get defineOuts(): string | BridgeSchema[] | null {
         return "out";
@@ -93,6 +101,9 @@ abstract class TriggerNode {
 
     /**
      * Define the inputs for this node if any. Inputs can make use of {@link NodeField.defineSchema}.
+     *
+     * Localization path:
+     * `<module-id>.<application-id>.node.<category>.<type>.inputs.<key>`
      */
     static get defineInputs(): InputEntrySchema[] | null {
         return null;
@@ -100,23 +111,26 @@ abstract class TriggerNode {
 
     /**
      * Define the outputs for this node if any.
+     *
+     * Localization path:
+     * `<module-id>.<application-id>.node.<category>.<type>.outputs.<key>`
      */
     static get defineOutputs(): OutputEntrySchema[] | null {
         return null;
     }
 
     // TODO
-    static get defineCustomOuts() {
+    static get defineCustomOuts(): CustomOutSchema[] | null {
         return null;
     }
 
     // TODO
-    static get defineCustomInputs() {
+    static get defineCustomInputs(): CustomInputSchema[] | null {
         return null;
     }
 
     // TODO
-    static get defineCustomOutputs() {
+    static get defineCustomOutputs(): CustomOutputSchema[] | null {
         return null;
     }
 
