@@ -38,8 +38,12 @@ class BlueprintEntry extends BaseBlueprintEntry {
         return this.#entry.isArray;
     }
 
+    get isRevealed(): boolean {
+        return !!this.#entry.schema.hidden;
+    }
+
     get isCustom(): boolean {
-        return false;
+        return this.isRevealed || !!this.#entry.schema.slug;
     }
 
     get color(): ColorSource {
@@ -76,24 +80,33 @@ class BlueprintEntry extends BaseBlueprintEntry {
 
     _drawConnector(connector: PIXI.Graphics, isConnected: boolean) {
         const color = this.color;
+        const isArray = this.isArray;
+        const isCustom = this.isCustom;
 
-        if (this.isArray) {
+        if (isArray) {
             connector.lineStyle({ color, width: 1 });
-            connector.drawCircle(7, 7, 7.5);
+            if (isCustom) {
+                connector.drawRoundedRect(0, 0, 13, 14.5, 2.5);
+            } else {
+                connector.drawCircle(7, 7, 7.5);
+            }
         }
 
         if (isConnected) {
             connector.beginFill(this.color);
         }
 
-        if (this.isCustom) {
-            connector.lineStyle({ color, width: 2 });
-            connector.drawRoundedRect(0, 0, 12.5, 12.5, 2.5);
-        } else if (this.isArray) {
-            connector.lineStyle({ color, width: 1 });
+        connector.lineStyle({ color, width: isArray ? 1 : 2 });
+
+        if (isCustom) {
+            if (isArray) {
+                connector.drawRoundedRect(2, 2, 9, 10.5, 2.5);
+            } else {
+                connector.drawRoundedRect(0, 0, 12.5, 14, 2.5);
+            }
+        } else if (isArray) {
             connector.drawCircle(7, 7, 5.5);
         } else {
-            connector.lineStyle({ color, width: 2 });
             connector.drawCircle(7, 7, 7);
         }
 

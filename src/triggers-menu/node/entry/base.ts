@@ -22,6 +22,7 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
     abstract get color(): ColorSource;
     abstract get canConnect(): boolean;
     abstract get hasConnector(): boolean;
+    abstract get isCustom(): boolean;
 
     get id(): EntryId {
         return `${this.node.id}:${this.preciseCategory}:${this.key}`;

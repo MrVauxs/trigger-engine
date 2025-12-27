@@ -117,6 +117,11 @@ function instantiateEntry(
                             );
                         },
                     },
+                    schema: {
+                        get() {
+                            return entrySchema;
+                        },
+                    },
                 });
             }
         }
@@ -132,6 +137,7 @@ function instantiateEntry(
 interface OpenNodeEntry extends NodeEntry {
     category: EntryCategory;
     get data(): ValueOf<NodeDataOutput["inputs"]>;
+    get schema(): BaseEntrySchemaInput;
 }
 
 export { instantiateEntry };
