@@ -1,6 +1,6 @@
 import { IconObject } from "_zod";
 import {
-    BridgeSchema,
+    BridgeSchemaInput,
     CustomInputSchema,
     CustomOutputSchema,
     CustomOutSchema,
@@ -95,7 +95,7 @@ abstract class TriggerNode {
      * Localization path:
      * `<module-id>.<application-id>.node.<category>.<type>.outs.<key>`
      */
-    static get defineOuts(): string | BridgeSchema[] | null {
+    static get defineOuts(): string | BridgeSchemaInput[] | null {
         return "out";
     }
 

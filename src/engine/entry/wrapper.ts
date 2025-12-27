@@ -8,7 +8,6 @@ import {
     OpenTriggerNode,
     Trigger,
     TriggerNode,
-    zNodeEntrySchema,
 } from "engine";
 import { R, z, zForceSafeParse } from "module-helpers";
 import { EntryCategory } from "triggers-menu";
@@ -17,7 +16,7 @@ function instantiateEntry(
     trigger: OpenTrigger,
     parent: OpenTriggerNode,
     category: EntryCategory,
-    schema: BaseEntrySchema,
+    entrySchema: BaseEntrySchema,
     nodeData: NodeData,
     open: true
 ): OpenNodeEntry | undefined;
@@ -25,7 +24,7 @@ function instantiateEntry(
     trigger: Trigger,
     parent: TriggerNode,
     category: EntryCategory,
-    schema: BaseEntrySchema,
+    entrySchema: BaseEntrySchema,
     nodeData: NodeData,
     open: boolean
 ): NodeEntry | undefined;
@@ -33,15 +32,15 @@ function instantiateEntry(
     trigger: Trigger,
     parent: TriggerNode,
     category: EntryCategory,
-    schema: BaseEntrySchema,
+    entrySchema: BaseEntrySchema,
     nodeData: NodeData,
     open: boolean
 ): NodeEntry | OpenNodeEntry | undefined {
-    const EntryCls = trigger.application.entries.get(schema.type) as typeof NodeEntry;
+    const EntryCls = trigger.application.entries.get(entrySchema.type) as typeof NodeEntry;
     if (!EntryCls) return;
 
-    const fieldData = "field" in schema && R.isPlainObject(schema.field) && schema.field;
-    const entrySchema = zNodeEntrySchema.parse(schema);
+    const fieldData =
+        "field" in entrySchema && R.isPlainObject(entrySchema.field) && entrySchema.field;
 
     class NodeEntryWrapper extends EntryCls {
         constructor() {

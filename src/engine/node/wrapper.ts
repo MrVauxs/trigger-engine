@@ -1,17 +1,20 @@
 import {
-    BaseEntrySchema,
-    BridgeSchema,
-    InputEntrySchema,
     instantiateEntry,
     NodeBridge,
     NodeEntry,
     OpenNodeEntry,
     OpenTrigger,
-    OutputEntrySchema,
     Trigger,
 } from "engine";
 import { LocalizeArgs, MODULE, R } from "module-helpers";
-import { NodeData, TriggerNode } from ".";
+import {
+    getInputsSchemas,
+    getNodeStates,
+    getOutputsSchemas,
+    getOutsSchemas,
+    NodeData,
+    TriggerNode,
+} from ".";
 
 function instantiateNode(
     parent: OpenTrigger,
@@ -101,6 +104,25 @@ function instantiateNode(
 
             const isEvent = NodeCls.isEvent;
 
+            const [ins, outs] = R.map(
+                [
+                    !isEvent && NodeCls.hasIn ? [{ key: "in", state: undefined }] : [],
+                    getOutsSchemas(NodeCls, { state: nodeState }),
+                ] as const,
+                (schemas) => {
+                    return R.pipe(
+                        schemas,
+                        R.map((schema) => {
+                            try {
+                                const bridge = new NodeBridge(parent, this, schema);
+                                return [bridge.key, bridge] as const;
+                            } catch (error) {}
+                        }),
+                        R.filter(R.isTruthy)
+                    );
+                }
+            );
+
             // TODO also add customs
             const [inputs, outputs] = R.map(
                 [
@@ -133,25 +155,6 @@ function instantiateNode(
                     );
 
                     return new Collection(entries);
-                }
-            );
-
-            const [ins, outs] = R.map(
-                [
-                    !isEvent && NodeCls.hasIn ? [{ key: "in", state: undefined }] : [],
-                    getOutsSchemas(NodeCls, { state: nodeState }),
-                ] as const,
-                (schemas) => {
-                    return R.pipe(
-                        schemas,
-                        R.map((schema) => {
-                            try {
-                                const bridge = new NodeBridge(parent, this, schema);
-                                return [bridge.key, bridge] as const;
-                            } catch (error) {}
-                        }),
-                        R.filter(R.isTruthy)
-                    );
                 }
             );
 
@@ -203,62 +206,6 @@ interface OpenTriggerNode extends TriggerNode {
     states: string[] | null;
 }
 
-function filterSchemasByState<T extends { state?: string }>(
-    schemas: T[],
-    { state }: { state?: string | null } = {}
-): T[] {
-    return state ? schemas.filter((schema) => !schema.state || schema.state === state) : schemas;
-}
-
-function filterEntrySchemas<T extends BaseEntrySchema>(
-    schemas: T[],
-    options: Exclude<SchemasEntriesFilterOptions, "data">
-): T[] {
-    return filterSchemasByState(schemas, options).filter((schema) => {
-        return (
-            !schema.hidden || options?.revealed === true || options?.revealed?.[schema.key] === true
-        );
-    });
-}
-
-// TODO this needs to also return custom outs
-function getOutsSchemas(
-    NodeCls: typeof TriggerNode,
-    options?: SchemasFilterOptions
-): BridgeSchema[] {
-    const rawOuts = NodeCls.defineOuts || (NodeCls.isEvent ? "out" : []);
-    return R.isString(rawOuts) ? [{ key: rawOuts }] : filterSchemasByState(rawOuts, options);
-}
-
-// TODO this needs to also return custom inputs
-function getInputsSchemas(
-    NodeCls: typeof TriggerNode,
-    options?: SchemasEntriesFilterOptions
-): InputEntrySchema[] {
-    return filterEntrySchemas(NodeCls.defineInputs ?? [], {
-        revealed: options?.revealed ?? options?.data?.revealed?.inputs,
-        state: options?.state,
-    });
-}
-
-// TODO this needs to also return custom inputs
-function getOutputsSchemas(
-    NodeCls: typeof TriggerNode,
-    options?: SchemasEntriesFilterOptions
-): OutputEntrySchema[] {
-    return filterEntrySchemas(NodeCls.defineOutputs ?? [], {
-        revealed: options?.revealed ?? options?.data?.revealed?.outputs,
-        state: options?.state,
-    });
-}
-
-function getNodeStates(NodeCls: typeof TriggerNode): string[] | null {
-    if (!R.isArray(NodeCls.states)) return null;
-
-    const rawStates = NodeCls.states.filter((state) => R.isString(state));
-    return rawStates.length >= 2 ? rawStates : null;
-}
-
 type NodeEntries = {
     in: NodeBridge | null;
     inputs: Collection<OpenNodeEntry>;
@@ -266,14 +213,5 @@ type NodeEntries = {
     outs: Collection<NodeBridge>;
 };
 
-type SchemasFilterOptions = {
-    state?: string | null;
-};
-
-type SchemasEntriesFilterOptions = SchemasFilterOptions & {
-    data?: NodeData;
-    revealed?: true | Record<string, boolean>;
-};
-
-export { getInputsSchemas, getNodeStates, getOutputsSchemas, getOutsSchemas, instantiateNode };
+export { instantiateNode };
 export type { OpenTriggerNode };

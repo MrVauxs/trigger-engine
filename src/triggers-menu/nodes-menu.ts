@@ -1,6 +1,6 @@
 import {
     BaseEntrySchema,
-    BridgeSchema,
+    BridgeSchemaInput,
     ConnectionId,
     getInputsSchemas,
     getNodeStates,
@@ -186,7 +186,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         const entry = this.#entry;
         const nodeStates = getNodeStates(OtherCls) ?? [null];
 
-        const getSchema = <T extends BaseEntrySchema | BridgeSchema>(
+        const getSchema = <T extends BaseEntrySchema | BridgeSchemaInput>(
             category: "outs" | "inputs" | "outputs",
             callback: (entries: T[]) => T | undefined
         ): T | undefined => {

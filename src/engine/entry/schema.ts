@@ -10,6 +10,12 @@ const zNodeEntrySchema = z.object({
     type: zString,
 });
 
+const zNodeOutputSchema = zNodeEntrySchema;
+
+const zNodeInputSchema = zNodeEntrySchema.extend({
+    field: z.record(zString, z.any()).optional().catch(undefined),
+});
+
 type BaseEntrySchema = z.input<typeof zNodeEntrySchema>;
 
 type OutputEntrySchema = BaseEntrySchema;
@@ -20,5 +26,5 @@ type InputEntrySchema<TField extends Record<string, any> | undefined = any> = Pr
     }
 >;
 
-export { zNodeEntrySchema };
+export { zNodeOutputSchema, zNodeInputSchema };
 export type { BaseEntrySchema, InputEntrySchema, OutputEntrySchema };
