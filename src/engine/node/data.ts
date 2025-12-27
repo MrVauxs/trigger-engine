@@ -1,4 +1,4 @@
-import { zEntryDataSchema } from "engine";
+import { zCustomInputData, zCustomOutData, zCustomOutputData, zEntryDataSchema } from "engine";
 import { z, zDocument, zID, zPosition, zString } from "module-helpers";
 
 class NodeData extends zDocument<NodeDataSchema> {
@@ -11,12 +11,20 @@ interface NodeData extends z.output<NodeDataSchema> {
     readonly _source: NodeDataInput;
 }
 
+const zRevealedRecord = z.record(zString, z.boolean()).default({});
 const zRevealed = z.object({
-    inputs: z.record(zString, z.boolean()).default({}),
-    outputs: z.record(zString, z.boolean()).default({}),
+    inputs: zRevealedRecord,
+    outputs: zRevealedRecord,
+});
+
+const zCustoms = z.object({
+    outs: z.array(zCustomOutData).default([]),
+    inputs: z.array(zCustomInputData).default([]),
+    outputs: z.array(zCustomOutputData).default([]),
 });
 
 const zNodeDataSchema = z.object({
+    custom: zCustoms.default({ outs: [], inputs: [], outputs: [] }),
     id: zID,
     inputs: zEntryDataSchema,
     ins: zEntryDataSchema,

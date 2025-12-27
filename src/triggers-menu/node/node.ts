@@ -1,12 +1,24 @@
 import { IconObject } from "_zod";
 import {
+    BaseCustomData,
+    BaseCustomEntryData,
+    BaseCustomEntrySchema,
+    BaseCustomSchema,
+    BaseEntrySchema,
     ConnectionId,
+    EntryCategory,
     isConnectionId,
     isOppositeConnection,
     NodeData,
     OpenTrigger,
     OpenTriggerNode,
     TriggerNode,
+    zCustomInputData,
+    zCustomInputSchema,
+    zCustomOutData,
+    zCustomOutputData,
+    zCustomOutputSchema,
+    zCustomOutSchema,
 } from "engine";
 import {
     confirmDialog,
@@ -19,6 +31,8 @@ import {
     MouseInteractionManager,
     R,
     subtractPoint,
+    waitDialog,
+    warning,
 } from "module-helpers";
 import {
     alignHorizontally,
@@ -319,6 +333,10 @@ class BlueprintNode extends PIXI.Container {
 
     localize(...args: LocalizeArgs): string | undefined {
         return this.#node.localize(...args);
+    }
+
+    rootLocalize(...args: LocalizeArgs): string | undefined {
+        return this.#node.rootLocalize(...args);
     }
 
     selectOnly() {
@@ -624,7 +642,7 @@ class BlueprintNode extends PIXI.Container {
         if (!R.isString(title)) return;
 
         const headerSource: NodeHeaderSource = {
-            background: this.#node.headerColor,
+            background: this.#node.headerColor ?? undefined,
             icon: this.#node.icon,
             subtitle: this.#node.subtitle,
             title,
@@ -700,32 +718,192 @@ class BlueprintNode extends PIXI.Container {
         });
     }
 
+    doubleLocalize(label: string | undefined, ...path: string[]): string | undefined {
+        return label ? game.i18n.localize(label) : this.localize(...path);
+    }
+
+    #refresh({
+        forceComputeConnections,
+        renderApplication,
+    }: {
+        forceComputeConnections?: boolean;
+        renderApplication?: boolean;
+    } = {}) {
+        this.trigger.refreshNode(this.id);
+        this.blueprint.draw({
+            forceComputeConnections,
+            renderApplication,
+            selectNodes: [this.id],
+        });
+    }
+
+    #switchState(state: string) {
+        this.data.update({ revealed: undefined, state });
+        // TODO we gonna want to delete variables
+        this.#refresh({
+            forceComputeConnections: true,
+            renderApplication: true,
+        });
+    }
+
+    #revealEntry(category: EntryCategory, schema: BaseEntrySchema) {
+        this.data.update({
+            revealed: {
+                [category]: { [schema.key]: true },
+            },
+        });
+        this.#refresh();
+    }
+
+    #customEntryLocalize(
+        label: string | undefined,
+        category: EntryCategory | "outs",
+        schema: BaseCustomSchema,
+        ...path: string[]
+    ): string | undefined {
+        return this.doubleLocalize(label, "custom", category, schema.slug, ...path);
+    }
+
+    #customEntryLabel(category: EntryCategory | "outs", schema: BaseCustomSchema): string {
+        return this.#customEntryLocalize(schema.label, category, schema, "label") ?? schema.slug;
+    }
+
+    async #addCustomEntry(category: EntryCategory | "outs", schema: BaseCustomSchema) {
+        const isEdit = false;
+
+        const title = this.#customEntryLabel(category, schema);
+
+        const label: CustomEntryDialogData["label"] = !schema.input?.replaceLabel && {
+            value: "",
+            placeholder:
+                this.#customEntryLocalize(schema.placeholder, category, schema, "placeholder") ??
+                schema.placeholder,
+        };
+
+        const input: CustomEntryDialogData["input"] = schema.input && {
+            label:
+                this.#customEntryLocalize(schema.input.label, category, schema, "input.label") ??
+                "input",
+            placeholder: this.#customEntryLocalize(
+                schema.input.placeholder,
+                category,
+                schema,
+                "input.placeholder"
+            ),
+            value: "",
+        };
+
+        const dialogData: CustomEntryDialogData = {
+            input,
+            label,
+            type: undefined,
+        };
+
+        if (category !== "outs") {
+            const availableTypes = this.trigger.application.entries.map((entry) => entry.type);
+
+            const selectedTypes = (schema as BaseCustomEntrySchema).types?.filter((type) =>
+                R.isIncludedIn(type, availableTypes)
+            );
+
+            dialogData.array = (schema as BaseCustomEntrySchema).array ? {} : undefined;
+
+            dialogData.types = R.map(
+                selectedTypes?.length ? selectedTypes : availableTypes,
+                (type) => {
+                    return {
+                        value: type,
+                        label: this.rootLocalize("entry", type, "title") ?? type,
+                    };
+                }
+            );
+        }
+
+        const result = await waitDialog<{
+            label?: string;
+            input?: string;
+            array?: boolean;
+            type?: string;
+        }>({
+            content: "edit-entry",
+            data: dialogData,
+            disabled: true,
+            i18n: "edit-entry",
+            title: localize("blueprint.entry", isEdit ? "edit" : "add", { label: title }),
+            yes: {
+                label: localize("edit-entry.yes", isEdit ? "edit" : "add"),
+            },
+        });
+
+        if (!result) return;
+
+        if (schema.input && !result.input) {
+            warning("edit-entry.required", { name: input?.label });
+            return;
+        }
+
+        if (!dialogData.types && !result.label) {
+            warning("edit-entry.required", { name: localize("edit-entry.label") });
+            return;
+        }
+
+        const entrySchema: BaseCustomData = {
+            input: result.input,
+            label:
+                (schema.input?.replaceLabel ? result.input : result.label) ||
+                dialogData.types?.find((type) => type.value === result.type)?.label ||
+                "",
+            slug: schema.slug,
+        };
+
+        if (result.type) {
+            foundry.utils.mergeObject(entrySchema, {
+                type: result.type,
+                isArray: result.array,
+            } satisfies Omit<BaseCustomEntryData, keyof BaseCustomData>);
+        }
+
+        const parser =
+            category === "inputs"
+                ? zCustomInputData
+                : category === "outputs"
+                ? zCustomOutputData
+                : zCustomOutData;
+
+        const entry = parser.safeParse(entrySchema)?.data;
+        if (!entry) return;
+
+        const entries = this.data.custom[category].slice();
+        entries.push(entry as any);
+
+        this.data.update({
+            custom: {
+                [category]: entries,
+            },
+        });
+
+        this.#refresh();
+    }
+
     async #onNodeContextMenu(event: PIXI.FederatedPointerEvent) {
         const locked = this.isLocked;
         const selected = this.parent.selected;
         const entries: Omit<ContextMenuEntry, "condition">[] = [];
 
+        // states
         if (!locked && this.#node.states && this.#node.state) {
             entries.push(
                 ...R.pipe(
                     this.#node.states,
                     R.filter((state) => state !== this.#node.state),
                     R.map((state) => {
+                        const label = this.#node.localize("states", state) ?? state;
+
                         return {
-                            name: this.#node.localize("states", state) ?? state,
+                            name: localize("blueprint.node.state", { label }),
                             icon: `<i class="fa-sharp fa-solid fa-arrows-repeat"></i>`,
                             callback: async () => {
-                                this.data.update({
-                                    revealed: undefined,
-                                    state,
-                                });
-                                this.trigger.refreshNode(this.id);
-                                // TODO we gonna want to delete variables
-                                this.blueprint.draw({
-                                    forceComputeConnections: true,
-                                    renderApplication: true,
-                                    selectNodes: [this.id],
-                                });
+                                this.#switchState(state);
                             },
                         };
                     })
@@ -733,6 +911,7 @@ class BlueprintNode extends PIXI.Container {
             );
         }
 
+        // hidden entries
         if (!locked) {
             const categories = [
                 ["inputs", "defineInputs"],
@@ -741,38 +920,62 @@ class BlueprintNode extends PIXI.Container {
 
             for (const [category, method] of categories) {
                 const allSchemas = (this.#node.constructor as typeof TriggerNode)[method] ?? [];
-                const schemas = allSchemas.filter((schema) => {
-                    return (
-                        !!schema.hidden &&
-                        (!schema.state || schema.state === this.#node.state) &&
-                        !this.data.revealed?.[category]?.[schema.key]
-                    );
-                });
+                const schemas = R.pipe(
+                    allSchemas,
+                    R.filter((schema) => {
+                        return (
+                            !!schema.hidden &&
+                            (!schema.state || schema.state === this.#node.state) &&
+                            !this.data.revealed?.[category]?.[schema.key]
+                        );
+                    })
+                );
 
                 for (const schema of schemas) {
-                    const label = schema.label
-                        ? game.i18n.localize(schema.label)
-                        : this.localize(category, schema.key) ?? schema.key;
+                    const label =
+                        this.doubleLocalize(schema.label, category, schema.key) ?? schema.key;
 
                     entries.push({
-                        name: localize("blueprint.node.add", { entry: label }),
+                        name: localize("blueprint.entry.add", { label }),
                         icon: `<i class="fa-solid fa-pen-line"></i>`,
                         callback: async () => {
-                            this.data.update({
-                                revealed: {
-                                    [category]: { [schema.key]: true },
-                                },
-                            });
-                            this.trigger.refreshNode(this.id);
-                            this.blueprint.draw({
-                                selectNodes: [this.id],
-                            });
+                            this.#revealEntry(category, schema);
                         },
                     });
                 }
             }
         }
 
+        // custom entries
+        if (!locked) {
+            const categories = [
+                ["outs", "defineCustomOuts", zCustomOutSchema],
+                ["inputs", "defineCustomInputs", zCustomInputSchema],
+                ["outputs", "defineCustomOutputs", zCustomOutputSchema],
+            ] as const;
+
+            for (const [category, method, parser] of categories) {
+                const schemas = R.pipe(
+                    (this.#node.constructor as typeof TriggerNode)[method] ?? [],
+                    R.map((schema) => parser.safeParse(schema)?.data),
+                    R.filter(R.isTruthy)
+                );
+
+                for (const schema of schemas) {
+                    const label = this.#customEntryLabel(category, schema);
+
+                    entries.push({
+                        name: localize("blueprint.entry.add", { label }),
+                        icon: `<i class="fa-solid fa-gear"></i>`,
+                        callback: async () => {
+                            this.#addCustomEntry(category, schema);
+                        },
+                    });
+                }
+            }
+        }
+
+        // duplicate & copy
         if (this.isDuplicable) {
             const filtered = selected.filter((node) => node.isDuplicable);
             const multiSelect = filtered.length > 1 ? "multi" : "single";
@@ -796,6 +999,7 @@ class BlueprintNode extends PIXI.Container {
             }
         }
 
+        // delete
         if (!locked) {
             const multiSelect = selected.length > 1 ? "multi" : "single";
 
@@ -831,6 +1035,14 @@ type InteractionData = {
 
 type PreciseTextOptions = Partial<PIXI.ITextStyle> & {
     fontMult?: number;
+};
+
+type CustomEntryDialogData = {
+    array?: {};
+    input?: { label: string; placeholder: string | undefined; value: string };
+    label: { placeholder: string | undefined; value: string } | false;
+    type: string | undefined;
+    types?: RequiredSelectOptions;
 };
 
 export { BlueprintNode };

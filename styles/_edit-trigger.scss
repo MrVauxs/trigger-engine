@@ -17,5 +17,11 @@
         &:has(.input-element-tags:not(:empty)) {
             margin-top: -0.4em;
         }
+
+        .input-element-tags {
+            &:empty {
+                display: none;
+            }
+        }
     }
 }

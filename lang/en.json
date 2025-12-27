@@ -2,10 +2,11 @@
     "trigger-engine": {
         "blueprint": {
             "entry": {
-                "disconnect": "Disconnect Entry"
+                "add": "Add: {label}",
+                "disconnect": "Disconnect Entry",
+                "edit": "Edit: {label}"
             },
             "node": {
-                "add": "Add: {entry}",
                 "copy": {
                     "copied": "The selection has been copied to the clipboard.",
                     "multi": "Copy Selected Nodes",
@@ -22,7 +23,8 @@
                 "duplicate": {
                     "multi": "Duplicate Selected Nodes",
                     "single": "Duplicate Node"
-                }
+                },
+                "state": "Switch: {label}"
             },
             "trigger": {
                 "back": "Back To Triggers",
@@ -60,6 +62,9 @@
             "entry": {
                 "number": {
                     "title": "Number"
+                },
+                "text": {
+                    "title": "Text"
                 }
             },
             "node": {
@@ -74,6 +79,16 @@
                 "debug": {
                     "title": "Debug"
                 }
+            }
+        },
+        "edit-entry": {
+            "array": "Is Array?",
+            "label": "Label",
+            "required": "The field <strong>{name}</strong> is required.",
+            "types": "Types",
+            "yes": {
+                "add": "Add",
+                "edit": "Edit"
             }
         },
         "edit-trigger": {

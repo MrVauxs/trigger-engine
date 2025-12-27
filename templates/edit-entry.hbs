@@ -1,0 +1,34 @@
+{{#if label}}
+<div class="form-group">
+    <label>{{@root.i18n 'label'}}</label>
+    <div class="form-fields">
+        <input type="text" name="label" value="{{label.value}}" placeholder="{{label.placeholder}}">
+    </div>
+</div>
+{{/if}}
+{{#if input}}
+<div class="form-group">
+    <label>{{input.label}}</label>
+    <div class="form-fields">
+        <input type="text" name="input" value="{{input.value}}" placeholder="{{input.placeholder}}">
+    </div>
+</div>
+{{/if}}
+{{#if array}}
+<div class="form-group">
+    <label>{{@root.i18n 'array'}}</label>
+    <div class="form-fields">
+        <input type="checkbox" name="array" {{checked array.value}}>
+    </div>
+</div>
+{{/if}}
+{{#if types}}
+<div class="form-group">
+    <label>{{@root.i18n 'types'}}</label>
+    <div class="form-fields">
+        <select name="type" {{disabled (lt types.length 2)}}>
+            {{selectOptions types selected=type sort=true}}
+        </select>
+    </div>
+</div>
+{{/if}}

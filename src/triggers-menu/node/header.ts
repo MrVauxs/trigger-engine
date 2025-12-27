@@ -14,9 +14,9 @@ const zNodeIconData = z.union([
 ]);
 
 const zNodeHeaderData = z.object({
-    background: zNodeHeaderBackground.nullish().catch("#000000"),
-    icon: zNodeIconData.nullish().catch(undefined),
-    subtitle: z.string().nullish().catch(undefined),
+    background: zNodeHeaderBackground.default("#000000"),
+    icon: zNodeIconData.nullish(),
+    subtitle: z.string().nullish(),
     title: zString,
 });
 

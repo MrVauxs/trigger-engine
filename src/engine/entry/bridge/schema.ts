@@ -2,8 +2,8 @@ import { z, zString } from "module-helpers";
 
 const zNodeBridgeSchema = z.object({
     key: zString,
-    label: zString.optional().catch(undefined),
-    state: zString.optional().catch(undefined),
+    label: zString.optional(),
+    state: zString.optional(),
 });
 
 type BridgeSchemaInput = z.infer<typeof zNodeBridgeSchema>;

@@ -1,19 +1,19 @@
 import { z, zString } from "module-helpers";
 
 const zNodeEntrySchema = z.object({
-    hidden: z.boolean().optional().catch(false),
-    isArray: z.boolean().optional().catch(false),
+    hidden: z.boolean().default(false),
+    isArray: z.boolean().default(false),
     key: zString,
-    label: zString.optional().catch(undefined),
-    group: zString.optional().catch(undefined),
-    state: zString.optional().catch(undefined),
+    label: zString.optional(),
+    group: zString.optional(),
+    state: zString.optional(),
     type: zString,
 });
 
 const zNodeOutputSchema = zNodeEntrySchema;
 
 const zNodeInputSchema = zNodeEntrySchema.extend({
-    field: z.record(zString, z.any()).optional().catch(undefined),
+    field: z.record(zString, z.any()).optional(),
 });
 
 type BaseEntrySchema = z.input<typeof zNodeEntrySchema>;
