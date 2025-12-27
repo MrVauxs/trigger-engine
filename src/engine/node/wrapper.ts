@@ -38,6 +38,9 @@ function instantiateNode(
         return rootLocalize("node", NodeCls.category, NodeCls.type, ...args);
     }
 
+    const isEvent = NodeCls.isEvent;
+
+    //states
     const nodeStates = getNodeStates(NodeCls);
     const nodeState = !nodeStates
         ? null
@@ -100,10 +103,7 @@ function instantiateNode(
                 })
             );
 
-            // entries
-
-            const isEvent = NodeCls.isEvent;
-
+            // bridges
             const [ins, outs] = R.map(
                 [
                     !isEvent && NodeCls.hasIn ? [{ key: "in", state: undefined }] : [],

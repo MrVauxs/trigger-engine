@@ -41,44 +41,43 @@ function instantiateEntry(
 
     const fieldData =
         "field" in entrySchema && R.isPlainObject(entrySchema.field) && entrySchema.field;
+    let entryField: Record<string, any> = {};
+
+    if (category === "inputs" && !entrySchema.isArray) {
+        try {
+            const FieldCls = EntryCls.FieldClass;
+
+            if (FieldCls && !(FieldCls.prototype instanceof NodeField)) {
+                throw new Error("invalid 'FieldCls' type.");
+            }
+
+            if (parent.isEvent && !FieldCls) {
+                throw new Error("event nodes can only have inputs with a field.");
+            }
+
+            const jsonSchema = EntryCls.FieldClass?.defineSchema;
+            if (jsonSchema) {
+                const fieldSchema = z.fromJSONSchema(jsonSchema);
+                const data = R.isObjectType(fieldData) ? fieldData : {};
+
+                entryField = zForceSafeParse(fieldSchema, data) as any;
+            }
+        } catch (error) {}
+    }
 
     class NodeEntryWrapper extends EntryCls {
         constructor() {
             super();
 
-            if (category === "inputs" && !entrySchema.isArray) {
-                let entryField: Record<string, any> = {};
+            // field
+            Object.defineProperty(this, "field", {
+                value: entryField,
+                configurable: false,
+                enumerable: false,
+                writable: false,
+            });
 
-                try {
-                    const FieldCls = EntryCls.FieldClass;
-
-                    if (FieldCls && !(FieldCls.prototype instanceof NodeField)) {
-                        throw new Error("invalid 'FieldCls' type.");
-                    }
-
-                    if (parent.isEvent && !FieldCls) {
-                        throw new Error("event nodes can only have inputs with a field.");
-                    }
-
-                    const jsonSchema = EntryCls.FieldClass?.defineSchema;
-                    if (jsonSchema) {
-                        const fieldSchema = z.fromJSONSchema(jsonSchema);
-                        const data = R.isObjectType(fieldData) ? fieldData : {};
-
-                        entryField = zForceSafeParse(fieldSchema, data) as any;
-                    }
-                } catch (error) {
-                } finally {
-                    Object.defineProperty(this, "field", {
-                        value: entryField,
-                        configurable: false,
-                        enumerable: false,
-                        writable: false,
-                    });
-
-                    foundry.utils.deepFreeze(this.field);
-                }
-            }
+            foundry.utils.deepFreeze(this.field);
 
             // from schema accessors
             Object.defineProperties(
