@@ -1,11 +1,19 @@
 import {
-    BaseEntrySchema,
+    BaseCustomData,
+    BaseCustomEntryData,
+    BaseCustomEntrySchema,
+    BaseEntrySchemaInput,
     BridgeSchemaInput,
     BridgeSchemaOutput,
-    InputEntrySchema,
+    CustomInputSchema,
+    InputEntrySchemaOutput,
     NodeData,
-    OutputEntrySchema,
+    OutputEntrySchemaOutput,
     TriggerNode,
+    zBaseEntrySchema,
+    zCustomInputSchema,
+    zCustomOutputSchema,
+    zCustomOutSchema,
     zNodeBridgeSchema,
     zNodeInputSchema,
     zNodeOutputSchema,
@@ -19,7 +27,7 @@ function filterSchemasByState<T extends { state?: string }>(
     return state ? schemas.filter((schema) => !schema.state || schema.state === state) : schemas;
 }
 
-function parseSchemas<T extends BaseEntrySchema | BridgeSchemaInput>(
+function parseSchemas<T extends BaseEntrySchemaInput | BridgeSchemaInput>(
     schemas: T[],
     parser: z.ZodObject
 ): T[] {
@@ -30,53 +38,145 @@ function parseSchemas<T extends BaseEntrySchema | BridgeSchemaInput>(
     ) as any;
 }
 
-// TODO this needs to also return custom outs
+function filterByCustomSchemas<
+    TParser extends z.ZodObject<{ slug: z.ZodString }>,
+    TEntry extends BaseCustomData,
+    TReturnSchema extends BaseEntrySchemaInput | BridgeSchemaInput,
+    TSchema extends z.output<TParser> = z.output<TParser>
+>(
+    rawSchemas: z.input<TParser>[] | null,
+    schemaParser: TParser,
+    entries: TEntry[],
+    callback: (schema: TSchema, entry: TEntry) => TReturnSchema
+): TReturnSchema[] {
+    if (!entries.length) {
+        return [];
+    }
+
+    const customSchemas = R.pipe(
+        rawSchemas ?? [],
+        R.map((schema): TSchema | undefined => {
+            return schemaParser.safeParse(schema)?.data as TSchema | undefined;
+        }),
+        R.filter(R.isTruthy),
+        R.indexBy(R.prop("slug"))
+    ) as Record<string, TSchema>;
+
+    return R.pipe(
+        entries,
+        R.map((entry) => {
+            const schema = customSchemas[entry.slug];
+            return schema && callback(schema, entry);
+        }),
+        R.filter(R.isTruthy)
+    );
+}
+
 function getOutsSchemas(
     NodeCls: typeof TriggerNode,
     options?: SchemasFilterOptions
 ): BridgeSchemaOutput[] {
-    const rawOuts = NodeCls.defineOuts || (NodeCls.isEvent ? "out" : []);
-    const filtered = R.isString(rawOuts)
-        ? [{ key: rawOuts }]
-        : filterSchemasByState(rawOuts, options);
+    const schemas = NodeCls.defineOuts || (NodeCls.isEvent ? "out" : []);
+    const filtered = R.isString(schemas)
+        ? [{ key: schemas }]
+        : filterSchemasByState(schemas, options);
+
+    if (options?.data) {
+        filtered.push(
+            ...filterByCustomSchemas(
+                NodeCls.defineCustomOuts,
+                zCustomOutSchema,
+                options.data.custom.outs,
+                (_, entry): BridgeSchemaOutput => {
+                    return {
+                        key: entry.id,
+                        label: entry.label,
+                        slug: entry.slug,
+                    };
+                }
+            )
+        );
+    }
 
     return parseSchemas(filtered, zNodeBridgeSchema);
 }
 
-function getEntrySchemas<T extends BaseEntrySchema>(
-    schemas: T[],
+function getEntrySchemas<T extends BaseEntrySchemaInput>(
+    schemas: T[] | null,
     parser: z.ZodObject,
-    options: Exclude<SchemasEntriesFilterOptions, "data">
+    options: SchemasFilterOptions,
+    custom: {
+        rawSchemas: BaseCustomEntrySchema[] | null;
+        schemaParser: typeof zBaseEntrySchema;
+        entries: BaseCustomEntryData[] | undefined;
+    }
 ): T[] {
-    const filtered = filterSchemasByState(schemas, options).filter((schema) => {
+    const filtered = filterSchemasByState(schemas ?? [], options).filter((schema) => {
         return (
             !schema.hidden || options?.revealed === true || options?.revealed?.[schema.key] === true
         );
     });
 
+    if (options?.data) {
+        filtered.push(
+            ...filterByCustomSchemas(
+                custom.rawSchemas,
+                custom.schemaParser,
+                custom.entries ?? [],
+                (schema, entry): T => {
+                    return {
+                        field: (schema as CustomInputSchema).field,
+                        group: schema.group,
+                        isArray: entry.isArray,
+                        key: entry.id,
+                        label: entry.label,
+                        slug: entry.slug,
+                        type: entry.type,
+                    } as any;
+                }
+            )
+        );
+    }
+
     return parseSchemas(filtered, parser);
 }
 
-// TODO this needs to also return custom inputs
 function getInputsSchemas(
     NodeCls: typeof TriggerNode,
-    options?: SchemasEntriesFilterOptions
-): InputEntrySchema[] {
-    return getEntrySchemas(NodeCls.defineInputs ?? [], zNodeInputSchema, {
-        revealed: options?.revealed ?? options?.data?.revealed?.inputs,
-        state: options?.state,
-    });
+    options?: SchemasFilterOptions
+): InputEntrySchemaOutput[] {
+    return getEntrySchemas(
+        NodeCls.defineInputs,
+        zNodeInputSchema,
+        {
+            ...options,
+            revealed: options?.revealed ?? options?.data?.revealed?.inputs,
+        },
+        {
+            entries: options?.data?.custom.inputs,
+            rawSchemas: NodeCls.defineCustomInputs,
+            schemaParser: zCustomInputSchema,
+        }
+    );
 }
 
-// TODO this needs to also return custom inputs
 function getOutputsSchemas(
     NodeCls: typeof TriggerNode,
-    options?: SchemasEntriesFilterOptions
-): OutputEntrySchema[] {
-    return getEntrySchemas(NodeCls.defineOutputs ?? [], zNodeOutputSchema, {
-        revealed: options?.revealed ?? options?.data?.revealed?.outputs,
-        state: options?.state,
-    });
+    options?: SchemasFilterOptions
+): OutputEntrySchemaOutput[] {
+    return getEntrySchemas(
+        NodeCls.defineOutputs,
+        zNodeOutputSchema,
+        {
+            ...options,
+            revealed: options?.revealed ?? options?.data?.revealed?.outputs,
+        },
+        {
+            entries: options?.data?.custom.outputs,
+            rawSchemas: NodeCls.defineCustomOutputs,
+            schemaParser: zCustomOutputSchema,
+        }
+    );
 }
 
 function getNodeStates(NodeCls: typeof TriggerNode): string[] | null {
@@ -88,11 +188,8 @@ function getNodeStates(NodeCls: typeof TriggerNode): string[] | null {
 
 type SchemasFilterOptions = {
     state?: string | null;
-};
-
-type SchemasEntriesFilterOptions = SchemasFilterOptions & {
     data?: NodeData;
     revealed?: true | Record<string, boolean>;
 };
 
-export { getInputsSchemas, getOutputsSchemas, getOutsSchemas, getNodeStates };
+export { getInputsSchemas, getNodeStates, getOutputsSchemas, getOutsSchemas };

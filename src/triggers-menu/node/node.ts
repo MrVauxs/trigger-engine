@@ -1,10 +1,10 @@
 import { IconObject } from "_zod";
 import {
     BaseCustomData,
-    BaseCustomEntryData,
+    BaseCustomEntryDataSource,
     BaseCustomEntrySchema,
     BaseCustomSchema,
-    BaseEntrySchema,
+    BaseEntrySchemaInput,
     ConnectionId,
     EntryCategory,
     isConnectionId,
@@ -746,7 +746,7 @@ class BlueprintNode extends PIXI.Container {
         });
     }
 
-    #revealEntry(category: EntryCategory, schema: BaseEntrySchema) {
+    #revealEntry(category: EntryCategory, schema: BaseEntrySchemaInput) {
         this.data.update({
             revealed: {
                 [category]: { [schema.key]: true },
@@ -860,7 +860,7 @@ class BlueprintNode extends PIXI.Container {
             foundry.utils.mergeObject(entrySchema, {
                 type: result.type,
                 isArray: result.array,
-            } satisfies Omit<BaseCustomEntryData, keyof BaseCustomData>);
+            } satisfies Omit<BaseCustomEntryDataSource, keyof BaseCustomData>);
         }
 
         const parser =

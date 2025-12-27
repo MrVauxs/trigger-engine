@@ -16,7 +16,8 @@ const zBaseEntryData = zBaseData.extend({
 
 type BaseCustomData = z.input<typeof zBaseData>;
 
-type BaseCustomEntryData = z.input<typeof zBaseEntryData>;
+type BaseCustomEntryDataSource = z.input<typeof zBaseEntryData>;
+type BaseCustomEntryData = z.output<typeof zBaseEntryData>;
 
 // schema
 
@@ -79,6 +80,7 @@ type CustomInputSchema<TFieldSchema extends Record<string, any> | undefined = an
 >;
 
 export {
+    zBaseEntrySchema,
     zCustomInputData,
     zCustomInputSchema,
     zCustomOutData,
@@ -89,6 +91,7 @@ export {
 export type {
     BaseCustomData,
     BaseCustomEntryData,
+    BaseCustomEntryDataSource,
     BaseCustomEntrySchema,
     BaseCustomSchema,
     CustomInputData,

@@ -1,4 +1,4 @@
-import { BaseEntrySchema, NodeField } from "engine";
+import { BaseEntrySchemaInput, NodeField } from "engine";
 import { MODULE } from "module-helpers";
 
 abstract class NodeEntry<
@@ -92,7 +92,7 @@ abstract class NodeEntry<
 }
 
 interface NodeEntry
-    extends Pick<BaseEntrySchema, "key" | "label" | "group">,
+    extends Pick<BaseEntrySchemaInput, "key" | "label" | "group">,
         Pick<typeof NodeEntry, "type" | "color"> {
     readonly isArray: boolean;
 }

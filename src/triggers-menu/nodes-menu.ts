@@ -1,5 +1,5 @@
 import {
-    BaseEntrySchema,
+    BaseEntrySchemaInput,
     BridgeSchemaInput,
     ConnectionId,
     getInputsSchemas,
@@ -186,7 +186,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         const entry = this.#entry;
         const nodeStates = getNodeStates(OtherCls) ?? [null];
 
-        const getSchema = <T extends BaseEntrySchema | BridgeSchemaInput>(
+        const getSchema = <T extends BaseEntrySchemaInput | BridgeSchemaInput>(
             category: "outs" | "inputs" | "outputs",
             callback: (entries: T[]) => T | undefined
         ): T | undefined => {
@@ -204,7 +204,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
                 const schema = callback(schemas);
 
                 if (schema) {
-                    if ((schema as BaseEntrySchema).hidden) {
+                    if ((schema as BaseEntrySchemaInput).hidden) {
                         hidden ??= { schema, state };
                         continue;
                     }
@@ -240,7 +240,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
             const isArray = !!(entry as BlueprintEntry).isArray;
             const entryType = (entry as BlueprintEntry).type;
 
-            return getSchema<BaseEntrySchema>(category, (schemas) => {
+            return getSchema<BaseEntrySchemaInput>(category, (schemas) => {
                 return schemas.find((schema) => {
                     return schema.type === entryType && isArray === !!schema.isArray;
                 });

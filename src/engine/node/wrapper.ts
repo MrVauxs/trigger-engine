@@ -107,7 +107,7 @@ function instantiateNode(
             const [ins, outs] = R.map(
                 [
                     !isEvent && NodeCls.hasIn ? [{ key: "in", state: undefined }] : [],
-                    getOutsSchemas(NodeCls, { state: nodeState }),
+                    getOutsSchemas(NodeCls, { data, state: nodeState }),
                 ] as const,
                 (schemas) => {
                     return R.pipe(

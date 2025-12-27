@@ -1,5 +1,5 @@
 import {
-    BaseEntrySchema,
+    BaseEntrySchemaInput,
     NodeData,
     NodeDataOutput,
     NodeEntry,
@@ -16,7 +16,7 @@ function instantiateEntry(
     trigger: OpenTrigger,
     parent: OpenTriggerNode,
     category: EntryCategory,
-    entrySchema: BaseEntrySchema,
+    entrySchema: BaseEntrySchemaInput,
     nodeData: NodeData,
     open: true
 ): OpenNodeEntry | undefined;
@@ -24,7 +24,7 @@ function instantiateEntry(
     trigger: Trigger,
     parent: TriggerNode,
     category: EntryCategory,
-    entrySchema: BaseEntrySchema,
+    entrySchema: BaseEntrySchemaInput,
     nodeData: NodeData,
     open: boolean
 ): NodeEntry | undefined;
@@ -32,7 +32,7 @@ function instantiateEntry(
     trigger: Trigger,
     parent: TriggerNode,
     category: EntryCategory,
-    entrySchema: BaseEntrySchema,
+    entrySchema: BaseEntrySchemaInput,
     nodeData: NodeData,
     open: boolean
 ): NodeEntry | OpenNodeEntry | undefined {

@@ -3,6 +3,7 @@ import { z, zString } from "module-helpers";
 const zNodeBridgeSchema = z.object({
     key: zString,
     label: zString.optional(),
+    slug: zString.optional(),
     state: zString.optional(),
 });
 
