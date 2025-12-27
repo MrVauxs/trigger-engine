@@ -12,7 +12,7 @@ import {
     TriggerHook,
     TriggerNode,
 } from "engine";
-import { MODULE, R } from "module-helpers";
+import { joinStr, LocalizeArgs, LocalizeData, MODULE, R } from "module-helpers";
 import { BlueprintApplication } from "triggers-menu";
 import utils = foundry.utils;
 
@@ -86,6 +86,16 @@ class TriggerApplication {
 
     get nodes(): Collection<typeof TriggerNode> {
         return this.#nodes;
+    }
+
+    localize(...args: LocalizeArgs): string | undefined {
+        const data = R.isObjectType(args.at(-1)) ? (args.pop() as LocalizeData) : undefined;
+
+        for (const applicationPath of [this.localizePath, BuiltInApplication.localizePath]) {
+            const path = joinStr(".", applicationPath, ...args);
+            if (!game.i18n.has(path, true)) continue;
+            return R.isObjectType(data) ? game.i18n.format(path, data) : game.i18n.localize(path);
+        }
     }
 
     async openMenu(arg?: TriggerDataInput): Promise<BlueprintApplication | undefined> {

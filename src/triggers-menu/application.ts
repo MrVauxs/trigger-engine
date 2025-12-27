@@ -378,18 +378,19 @@ class BlueprintApplication extends apps.ApplicationV2<
 
         const result = await waitDialog<UpdateTriggerData>({
             classes: ["trigger-engine-edit-trigger"],
-            content: await render("edit-trigger", {
+            content: "edit-trigger",
+            data: {
                 description: trigger?.description ?? "",
                 enrichedDescription: (await trigger?.enrichedDescription) ?? "",
                 folder: trigger?.folder ?? folder ?? "",
                 name: trigger?.name ?? "",
                 placeholder: trigger?.label ?? "",
                 tags: trigger?.tags,
-            }),
+            },
             i18n: "edit-trigger",
             skipAnimate: true,
             minWidth: "700px",
-            title: localize(isEdit ? "" : "blueprint.triggers.create"),
+            title: localize(isEdit ? "blueprint.trigger.edit" : "blueprint.triggers.create"),
             yes: {
                 label: localize("edit-trigger.yes", isEdit ? "edit" : "create"),
             },

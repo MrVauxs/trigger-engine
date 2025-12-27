@@ -12,7 +12,6 @@ import {
     OpenTrigger,
     TriggerApplication,
     TriggerNode,
-    triggerNodeLocalize,
 } from "engine";
 import {
     ApplicationClosingOptions,
@@ -116,7 +115,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
             R.flatMap((node): Required<SelectOption<string>>[] => {
                 return node.tags.map((tag): Required<SelectOption> => {
                     return {
-                        label: localizeNodeTag(this.application, node, tag),
+                        label: localizeNodeTag(this.application, tag),
                         value: tag,
                     };
                 });
@@ -459,7 +458,7 @@ function localizeNodeProperty(
     property: TriggerNodeStringProperty
 ): string {
     const path = getNodePropertyLocalizePath(node, property);
-    return triggerNodeLocalize(application, node, path) ?? node[property];
+    return application.localize(path) ?? node[property];
 }
 
 function getNodePropertyLocalizePath(
@@ -477,12 +476,8 @@ function getNodePropertyLocalizePath(
     }
 }
 
-function localizeNodeTag(
-    application: TriggerApplication,
-    node: typeof TriggerNode,
-    tag: string
-): string {
-    return triggerNodeLocalize(application, node, "tag", tag, "title") ?? tag;
+function localizeNodeTag(application: TriggerApplication, tag: string): string {
+    return application.localize("tag", tag, "title") ?? tag;
 }
 
 type TriggerNodeStringProperty = keyof {

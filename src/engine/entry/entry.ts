@@ -14,7 +14,7 @@ abstract class NodeEntry<
      * Must be an unique key among your registered module's entries (including the builtins)
      *
      * Localization path:
-     * `<module-id>.<application-id>.node.<category>.<node-type>.(inputs|outputs).<type>`
+     * `<module-id>.<application-id>.entry.<type>.title`
      */
     static get type(): string {
         throw MODULE.Error("the 'type' static getter must be implemented.");

@@ -120,6 +120,13 @@ abstract class TriggerNode {
     }
 
     // TODO
+    /**
+     * Localization path:
+     * `<module-id>.<application-id>.node.<category>.<type>.custom.outs.<slug>.label`
+     * `<module-id>.<application-id>.node.<category>.<type>.custom.outs.<slug>.placeholder`
+     * `<module-id>.<application-id>.node.<category>.<type>.custom.outs.<slug>.input.label`
+     * `<module-id>.<application-id>.node.<category>.<type>.custom.outs.<slug>.input.placeholder`
+     */
     static get defineCustomOuts(): CustomOutSchema[] | null {
         return null;
     }

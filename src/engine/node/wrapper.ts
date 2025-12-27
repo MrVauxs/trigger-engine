@@ -1,19 +1,16 @@
 import {
     BaseEntrySchema,
     BridgeSchema,
-    BuiltInApplication,
     InputEntrySchema,
     instantiateEntry,
-    isBuiltInNode,
     NodeBridge,
     NodeEntry,
     OpenNodeEntry,
     OpenTrigger,
     OutputEntrySchema,
     Trigger,
-    TriggerApplication,
 } from "engine";
-import { joinStr, LocalizeArgs, LocalizeData, MODULE, R } from "module-helpers";
+import { LocalizeArgs, MODULE, R } from "module-helpers";
 import { NodeData, TriggerNode } from ".";
 
 function instantiateNode(
@@ -31,7 +28,7 @@ function instantiateNode(
     if (!NodeCls) return;
 
     function rootLocalize(...args: LocalizeArgs): string | undefined {
-        return triggerNodeLocalize(parent.application, NodeCls, ...args);
+        return parent.application.localize(...args);
     }
 
     function localize(...args: LocalizeArgs): string | undefined {
@@ -142,7 +139,7 @@ function instantiateNode(
             const [ins, outs] = R.map(
                 [
                     !isEvent && NodeCls.hasIn ? [{ key: "in", state: undefined }] : [],
-                    getOutsSchemas(NodeCls, { data, state: nodeState }),
+                    getOutsSchemas(NodeCls, { state: nodeState }),
                 ] as const,
                 (schemas) => {
                     return R.pipe(
@@ -215,10 +212,7 @@ function filterSchemasByState<T extends { state?: string }>(
 
 function filterEntrySchemas<T extends BaseEntrySchema>(
     schemas: T[],
-    options: {
-        revealed: Record<string, boolean> | true | undefined;
-        state: string | null | undefined;
-    }
+    options: Exclude<SchemasEntriesFilterOptions, "data">
 ): T[] {
     return filterSchemasByState(schemas, options).filter((schema) => {
         return (
@@ -239,7 +233,7 @@ function getOutsSchemas(
 // TODO this needs to also return custom inputs
 function getInputsSchemas(
     NodeCls: typeof TriggerNode,
-    options?: SchemasFilterOptions
+    options?: SchemasEntriesFilterOptions
 ): InputEntrySchema[] {
     return filterEntrySchemas(NodeCls.defineInputs ?? [], {
         revealed: options?.revealed ?? options?.data?.revealed?.inputs,
@@ -250,7 +244,7 @@ function getInputsSchemas(
 // TODO this needs to also return custom inputs
 function getOutputsSchemas(
     NodeCls: typeof TriggerNode,
-    options?: SchemasFilterOptions
+    options?: SchemasEntriesFilterOptions
 ): OutputEntrySchema[] {
     return filterEntrySchemas(NodeCls.defineOutputs ?? [], {
         revealed: options?.revealed ?? options?.data?.revealed?.outputs,
@@ -265,19 +259,6 @@ function getNodeStates(NodeCls: typeof TriggerNode): string[] | null {
     return rawStates.length >= 2 ? rawStates : null;
 }
 
-function triggerNodeLocalize(
-    application: TriggerApplication,
-    node: typeof TriggerNode,
-    ...args: LocalizeArgs
-): string | undefined {
-    const AppCls = isBuiltInNode(node) ? BuiltInApplication : application;
-    const data = R.isObjectType(args.at(-1)) ? (args.pop() as LocalizeData) : undefined;
-    const path = joinStr(".", AppCls.localizePath, ...args);
-
-    if (!game.i18n.has(path, true)) return;
-    return R.isObjectType(data) ? game.i18n.format(path, data) : game.i18n.localize(path);
-}
-
 type NodeEntries = {
     in: NodeBridge | null;
     inputs: Collection<OpenNodeEntry>;
@@ -286,17 +267,13 @@ type NodeEntries = {
 };
 
 type SchemasFilterOptions = {
-    data?: NodeData;
-    revealed?: true;
     state?: string | null;
 };
 
-export {
-    getInputsSchemas,
-    getNodeStates,
-    getOutputsSchemas,
-    getOutsSchemas,
-    instantiateNode,
-    triggerNodeLocalize,
+type SchemasEntriesFilterOptions = SchemasFilterOptions & {
+    data?: NodeData;
+    revealed?: true | Record<string, boolean>;
 };
-export type { OpenTriggerNode, SchemasFilterOptions };
+
+export { getInputsSchemas, getNodeStates, getOutputsSchemas, getOutsSchemas, instantiateNode };
+export type { OpenTriggerNode };
