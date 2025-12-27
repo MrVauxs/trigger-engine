@@ -149,8 +149,9 @@ function getInputsSchemas(
         NodeCls.defineInputs,
         zNodeInputSchema,
         {
-            ...options,
+            data: options?.data,
             revealed: options?.revealed ?? options?.data?.revealed?.inputs,
+            state: options?.state,
         },
         {
             entries: options?.data?.custom.inputs,
@@ -168,8 +169,9 @@ function getOutputsSchemas(
         NodeCls.defineOutputs,
         zNodeOutputSchema,
         {
-            ...options,
+            data: options?.data,
             revealed: options?.revealed ?? options?.data?.revealed?.outputs,
+            state: options?.state,
         },
         {
             entries: options?.data?.custom.outputs,
