@@ -104,6 +104,7 @@ abstract class TriggerNode {
      *
      * Localization path:
      * `<module-id>.<application-id>.node.<category>.<type>.inputs.<key>`
+     * `<module-id>.<application-id>.node.<category>.<type>.group.<group>`
      */
     static get defineInputs(): InputEntrySchemaInput[] | null {
         return null;

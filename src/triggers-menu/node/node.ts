@@ -9,6 +9,7 @@ import {
     isConnectionId,
     isOppositeConnection,
     NodeData,
+    OpenNodeEntry,
     OpenTrigger,
     OpenTriggerNode,
     TriggerNode,
@@ -303,7 +304,7 @@ class BlueprintNode extends PIXI.Container {
 
         const targetWidth = width - this.outerPadding.x * 2;
         for (const row of body.children as NodePart[]) {
-            const output = row.children.at(-1) as NodePart;
+            const output = R.last(row.children) as NodePart;
 
             // x is not 0 so it is indeed an output
             if (output.x !== 0) {
@@ -540,29 +541,58 @@ class BlueprintNode extends PIXI.Container {
     }
 
     #drawBody(): NodePart {
-        const body = new PIXI.Container() as NodePart;
-        const entries = this.#node.entries;
-        const outs = entries.outs.contents;
-        const inputs = entries.inputs.contents;
-        const outputs = entries.outputs.contents;
-        const minEntryIndex = entries.in || outs.length ? 1 : 0;
-        const nbRows = Math.max(inputs.length + minEntryIndex, outs.length + outputs.length);
         const spacing = 20;
         const padding = this.outerPadding;
+        const body = new PIXI.Container() as NodePart;
+        const entries = this.#node.entries;
+
+        const outs = entries.outs.contents;
+        const minIndex = entries.in || outs.length ? 1 : 0;
+        const [inputs, outputs] = R.pipe(
+            ["inputs", "outputs"] as const,
+            R.map((category) => {
+                return R.pipe(
+                    entries[category].contents,
+                    R.groupBy((entry) => entry.group ?? ""),
+                    R.entries(),
+                    R.sortBy(([group]) => group)
+                );
+            })
+        );
+
+        const nbEntries = (section: [key: string, value: OpenNodeEntry[]][]): number => {
+            return R.sum(
+                section.map(([group, entries]) => entries.length + (group === "" ? 0 : 1))
+            );
+        };
+
+        const nbRows = Math.max(nbEntries(inputs) + minIndex, nbEntries(outputs) + outs.length);
         const rows: NodePart[] = R.times(nbRows, () => new PIXI.Container() as NodePart);
 
-        const addToRow = (index: number, el: BaseBlueprintEntry) => {
-            const row = rows[index];
+        const addToRow = (
+            rowIndex: number,
+            column: 0 | 1,
+            el: BaseBlueprintEntry | PreciseText
+        ) => {
+            const row = rows[rowIndex];
 
-            el.draw();
+            if ("draw" in el) {
+                el.draw();
+            }
+
             row.addChild(el);
 
-            if (el.isInput) {
+            if (column === 0) {
                 row.calculatedWith = getRight(el) + spacing;
             } else {
                 el.x = row.calculatedWith || spacing;
                 row.calculatedWith = getRight(el);
             }
+        };
+
+        const createGroup = (group: string): PreciseText => {
+            const label = this.localize("group", group) ?? group;
+            return this.preciseText(label);
         };
 
         // we process all inputs first to make layout computation easier
@@ -571,18 +601,24 @@ class BlueprintNode extends PIXI.Container {
             this.#in = new BlueprintBridgeEntry(this, "inputs", entries.in);
             this.#entries.push(this.#in);
 
-            addToRow(0, this.#in);
+            addToRow(0, 0, this.#in);
         }
 
-        const firstInputIndex = minEntryIndex;
-        for (let i = 0; i < inputs.length; i++) {
-            const input = inputs[i];
-            const entry = new BlueprintEntry(this, input);
+        let inputIndex = minIndex;
+        for (const [group, entries] of inputs) {
+            if (group) {
+                const label = createGroup(group);
+                addToRow(inputIndex++, 0, label);
+            }
 
-            this.#inputs.set(entry.key, entry);
-            this.#entries.push(entry);
+            for (const input of entries) {
+                const entry = new BlueprintEntry(this, input);
 
-            addToRow(i + firstInputIndex, entry);
+                this.#inputs.set(entry.key, entry);
+                this.#entries.push(entry);
+
+                addToRow(inputIndex++, 0, entry);
+            }
         }
 
         // we process all outputs after that
@@ -594,18 +630,24 @@ class BlueprintNode extends PIXI.Container {
             this.#outs.set(entry.key, entry);
             this.#entries.push(entry);
 
-            addToRow(i, entry);
+            addToRow(i, 1, entry);
         }
 
-        const firstoutputIndex = Math.max(outs.length, minEntryIndex);
-        for (let i = 0; i < outputs.length; i++) {
-            const output = outputs[i];
-            const entry = new BlueprintEntry(this, output);
+        let outputIndex = Math.max(outs.length, minIndex);
+        for (const [group, entries] of outputs) {
+            if (group) {
+                const label = createGroup(group);
+                addToRow(outputIndex++, 0, label);
+            }
 
-            this.#outputs.set(entry.key, entry);
-            this.#entries.push(entry);
+            for (const output of entries) {
+                const entry = new BlueprintEntry(this, output);
 
-            addToRow(i + firstoutputIndex, entry);
+                this.#outputs.set(entry.key, entry);
+                this.#entries.push(entry);
+
+                addToRow(outputIndex++, 1, entry);
+            }
         }
 
         // return
