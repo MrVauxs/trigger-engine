@@ -42,8 +42,8 @@ class BlueprintEntry extends BaseBlueprintEntry {
         return !!this.#entry.schema.hidden;
     }
 
-    get isCustom(): boolean {
-        return this.isRevealed || !!this.#entry.schema.slug;
+    get customSlug(): string | undefined {
+        return this.#entry.schema.slug;
     }
 
     get color(): ColorSource {

@@ -4,7 +4,8 @@
             "entry": {
                 "add": "Add: {label}",
                 "disconnect": "Disconnect Entry",
-                "edit": "Edit: {label}"
+                "edit": "Edit: {label}",
+                "remove": "Remove Entry"
             },
             "node": {
                 "copy": {

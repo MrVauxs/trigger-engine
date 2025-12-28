@@ -24,8 +24,12 @@ class BlueprintBridgeEntry extends BaseBlueprintEntry {
         return this.#data.key;
     }
 
-    get isCustom(): boolean {
-        return !!this.#data.schema.slug;
+    get customSlug(): string | undefined {
+        return this.#data.schema.slug;
+    }
+
+    get isRevealed(): boolean {
+        return false;
     }
 
     get label(): string {

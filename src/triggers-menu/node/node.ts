@@ -722,7 +722,7 @@ class BlueprintNode extends PIXI.Container {
         return label ? game.i18n.localize(label) : this.localize(...path);
     }
 
-    #refresh({
+    refresh({
         forceComputeConnections,
         renderApplication,
     }: {
@@ -740,7 +740,7 @@ class BlueprintNode extends PIXI.Container {
     #switchState(state: string) {
         this.data.update({ revealed: undefined, state });
         // TODO we gonna want to delete variables
-        this.#refresh({
+        this.refresh({
             forceComputeConnections: true,
             renderApplication: true,
         });
@@ -752,7 +752,7 @@ class BlueprintNode extends PIXI.Container {
                 [category]: { [schema.key]: true },
             },
         });
-        this.#refresh();
+        this.refresh();
     }
 
     #customEntryLocalize(
@@ -882,7 +882,7 @@ class BlueprintNode extends PIXI.Container {
             },
         });
 
-        this.#refresh();
+        this.refresh();
     }
 
     async #onNodeContextMenu(event: PIXI.FederatedPointerEvent) {

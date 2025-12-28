@@ -22,7 +22,8 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
     abstract get color(): ColorSource;
     abstract get canConnect(): boolean;
     abstract get hasConnector(): boolean;
-    abstract get isCustom(): boolean;
+    abstract get isRevealed(): boolean;
+    abstract get customSlug(): string | undefined;
 
     get id(): EntryId {
         return `${this.node.id}:${this.preciseCategory}:${this.key}`;
@@ -54,6 +55,10 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
 
     get stage(): PIXI.Container {
         return this.blueprint.stage;
+    }
+
+    get isCustom(): boolean {
+        return this.isRevealed || !!this.customSlug;
     }
 
     get isConnected(): boolean {
@@ -175,6 +180,35 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
         this.blueprint.draw({ forceComputeConnections: true });
     }
 
+    remove() {
+        const category = this.preciseCategory;
+        if (!this.isCustom || category === "ins") return;
+
+        // TODO also remove variables
+
+        if (this.isRevealed) {
+            this.node.data.update({
+                revealed: {
+                    [category]: {
+                        [this.key]: undefined,
+                    },
+                },
+            });
+        } else {
+            const customs = this.node.data.custom[category]?.slice() ?? [];
+            const removed = customs.findSplice((custom) => custom.slug === this.customSlug);
+            if (!removed) return;
+
+            this.node.data.update({
+                custom: {
+                    [category]: customs,
+                },
+            });
+        }
+
+        this.node.refresh({ forceComputeConnections: true });
+    }
+
     #clear() {
         this.removeChildren();
 
@@ -236,6 +270,16 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
                 icon: `<i class="fa-solid fa-link-horizontal-slash"></i>`,
                 callback: async () => {
                     this.disconnect();
+                },
+            });
+        }
+
+        if (this.isCustom || this.isRevealed) {
+            entries.push({
+                name: localizePath("blueprint.entry.remove"),
+                icon: `<i class="fa-solid fa-trash fa-fw"></i>`,
+                callback: async () => {
+                    this.remove();
                 },
             });
         }
