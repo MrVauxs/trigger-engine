@@ -24,6 +24,7 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
     abstract get hasConnector(): boolean;
     abstract get isRevealed(): boolean;
     abstract get customSlug(): string | undefined;
+    abstract get isConnectionInitiator(): boolean;
 
     get id(): EntryId {
         return `${this.node.id}:${this.preciseCategory}:${this.key}`;

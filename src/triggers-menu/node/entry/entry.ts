@@ -38,6 +38,10 @@ class BlueprintEntry extends BaseBlueprintEntry {
         return this.#entry.isArray;
     }
 
+    get isConnectionInitiator(): boolean {
+        return this.isInput;
+    }
+
     get isRevealed(): boolean {
         return !!this.#entry.schema.hidden;
     }

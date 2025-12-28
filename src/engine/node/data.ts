@@ -27,7 +27,7 @@ const zNodeDataSchema = z.object({
     custom: zCustoms.default({ outs: {}, inputs: {}, outputs: {} }),
     id: zID,
     inputs: zEntryDataSchema,
-    ins: zEntryDataSchema,
+    outs: zEntryDataSchema,
     position: zPosition,
     revealed: zRevealed.default({ inputs: {}, outputs: {} }),
     state: z.string().trim().optional(),

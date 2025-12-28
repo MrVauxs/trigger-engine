@@ -136,80 +136,73 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
         this.#computedConnections = {};
         this.#linkedConnections.clear();
 
-        for (const inputNode of this.nodes) {
-            const InputNodeCls = inputNode.constructor as typeof TriggerNode;
-            const nodeInputs = getInputsSchemas(InputNodeCls, inputNode);
+        for (const originNode of this.nodes) {
+            const OriginNodeCls = originNode.constructor as typeof TriggerNode;
 
-            const ins = R.pipe(
-                R.values(inputNode.data.ins),
-                R.map(({ connections }) => ["ins", "bridge", "in", connections] as const)
-            );
+            const originConnections = R.pipe(
+                [
+                    ["outs", originNode.data.outs, getOutsSchemas(OriginNodeCls, originNode)],
+                    ["inputs", originNode.data.inputs, getInputsSchemas(OriginNodeCls, originNode)],
+                ] as const,
+                R.flatMap(([category, entries, schemas]) => {
+                    return R.pipe(
+                        R.entries(entries),
+                        R.flatMap(([key, { connections }]) => {
+                            const entry = schemas.find(({ key }) => key === key);
+                            if (!entry) return;
 
-            const inputs = R.pipe(
-                R.entries(inputNode.data.inputs),
-                R.map(([inputKey, { connections }]) => {
-                    const input = nodeInputs.find(({ key }) => key === inputKey);
-                    if (!R.isObjectType(input) || !R.isString(input.type)) return;
+                            const connectionIds = R.keys(connections);
+                            if (!connectionIds.length) return;
 
-                    return ["inputs", input.type, inputKey, connections] as const;
-                }),
-                R.filter(R.isTruthy)
-            );
-
-            const inputConnections = R.pipe(
-                [...ins, ...inputs],
-                R.flatMap(([category, type, key, connections]) => {
-                    const connectionIds = R.keys(connections);
-                    if (!connectionIds.length) return;
-
-                    return connectionIds.map(
-                        (connection) => [category, type, key, connection] as const
+                            const type = ("type" in entry ? entry.type : "bridge") as string;
+                            return connectionIds.map(
+                                (connectionId) => [category, type, key, connectionId] as const
+                            );
+                        }),
+                        R.filter(R.isTruthy)
                     );
-                }),
-                R.filter(R.isTruthy)
+                })
             );
 
-            for (const [category, inputType, inputKey, outputId] of inputConnections) {
-                const [outputNodeId, outputCategory, outputEntryKey] = R.split(outputId, ":");
-                const outputNode = this.getNode(outputNodeId);
+            for (const [category, originType, originKey, otherId] of originConnections) {
+                const [otherNodeId, otherCategory, otherEntryKey] = R.split(otherId, ":");
+                const otherNode = this.getNode(otherNodeId);
 
                 /**
-                 * we delete stale connections for next save this way we don't have to manually
+                 * we delete stale connections for next save, this way we don't have to manually
                  * update every node when connections are removed
                  */
                 const deleteData = () => {
-                    for (const data of [inputNode.data, inputNode.data._source] as const) {
+                    for (const data of [originNode.data, originNode.data._source] as const) {
                         if (!data[category]) continue;
 
-                        delete data[category][inputKey].connections?.[outputId];
+                        delete data[category][originKey].connections?.[otherId];
 
-                        if (foundry.utils.isEmpty(data[category][inputKey].connections)) {
-                            delete data[category][inputKey];
+                        if (foundry.utils.isEmpty(data[category][originKey].connections)) {
+                            delete data[category][originKey];
                         }
                     }
                 };
 
-                if (!outputNode) {
+                if (!otherNode) {
                     deleteData();
                     continue;
                 }
 
-                const OutputNodeCls = outputNode.constructor as typeof TriggerNode;
+                const OutputNodeCls = otherNode.constructor as typeof TriggerNode;
 
-                if (outputCategory === "outs") {
-                    const outs = getOutsSchemas(OutputNodeCls, outputNode);
-                    const out = outs.find(({ key }) => key === outputEntryKey);
-
-                    if (!out) {
+                if (otherCategory === "ins") {
+                    if (!OutputNodeCls.hasIn) {
                         deleteData();
                         continue;
                     }
                 } else {
-                    const outputs = getOutputsSchemas(OutputNodeCls, outputNode);
+                    const outputs = getOutputsSchemas(OutputNodeCls, otherNode);
                     const output = outputs.find(({ key, type }) => {
+                        if (key !== otherEntryKey) return false;
+
                         return (
-                            key === outputEntryKey &&
-                            (type === inputType || !!this.application.getConvertor(type, inputType))
+                            type === originType || !!this.application.getConvertor(type, originType)
                         );
                     });
 
@@ -219,10 +212,10 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
                     }
                 }
 
-                const inputCategory = outputCategory === "outs" ? "ins" : "inputs";
-                const inputId: EntryId = `${inputNode.id}:${inputCategory}:${inputKey}`;
+                const inputCategory = otherCategory === "ins" ? "outs" : "inputs";
+                const inputId: EntryId = `${originNode.id}:${inputCategory}:${originKey}`;
 
-                this.addComputedConnections(inputId, outputId);
+                this.addComputedConnections(inputId, otherId);
             }
         }
     }

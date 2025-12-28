@@ -1,7 +1,7 @@
 import { R, z } from "module-helpers";
 
-const CONNECTION_CATEGORIES = ["outputs", "outs"] as const;
-const OPPOSITE_CONNECTION_CATEGORY = ["inputs", "ins"] as const;
+const CONNECTION_CATEGORIES = ["outputs", "ins"] as const;
+const OPPOSITE_CONNECTION_CATEGORY = ["inputs", "outs"] as const;
 
 const zConnectionId = z.string().trim().refine(isConnectionId) as zTypedString<ConnectionId>;
 
@@ -38,13 +38,7 @@ type PreciseEntryCategory = "inputs" | "outputs" | "ins" | "outs";
 
 type EntryId = `${string}:${PreciseEntryCategory}:${string}`;
 
-export {
-    CONNECTION_CATEGORIES,
-    isConnectionId,
-    isOppositeConnection,
-    OPPOSITE_CONNECTION_CATEGORY,
-    zEntryDataSchema,
-};
+export { isConnectionId, isOppositeConnection, OPPOSITE_CONNECTION_CATEGORY, zEntryDataSchema };
 export type {
     ConnectionCategory,
     ConnectionId,

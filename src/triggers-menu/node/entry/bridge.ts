@@ -12,6 +12,10 @@ class BlueprintBridgeEntry extends BaseBlueprintEntry {
         this.#data = data;
     }
 
+    get isConnectionInitiator(): boolean {
+        return this.isOutput;
+    }
+
     get preciseCategory(): PreciseEntryCategory {
         return this.isInput ? "ins" : "outs";
     }

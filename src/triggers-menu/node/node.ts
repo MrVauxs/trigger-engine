@@ -7,6 +7,7 @@ import {
     BaseEntrySchemaInput,
     EntryCategory,
     isConnectionId,
+    isOppositeConnection,
     NodeData,
     OpenTrigger,
     OpenTriggerNode,
@@ -357,7 +358,7 @@ class BlueprintNode extends PIXI.Container {
     }
 
     addConnection(category: PreciseEntryCategory, key: string, targetId: EntryId) {
-        if (!isConnectionId(targetId)) return;
+        if (!isOppositeConnection(category) || !isConnectionId(targetId)) return;
 
         this.data.update({
             [category]: {
@@ -372,20 +373,28 @@ class BlueprintNode extends PIXI.Container {
     }
 
     removeConnection(category: PreciseEntryCategory, key: string, targetId: EntryId) {
-        if (!isConnectionId(targetId)) return;
+        if (!isOppositeConnection(category) || !isConnectionId(targetId)) return;
 
-        const connections = this.data[category as "ins"];
+        const connections = R.omit(this.data[category][key].connections, [targetId]);
 
-        this.data.update({
-            [category]: {
-                [key]: {
-                    connections: {
-                        [targetId]: undefined,
-                    },
-                    value: undefined,
+        if (foundry.utils.isEmpty(connections)) {
+            this.data.update({
+                [category]: {
+                    [key]: undefined,
                 },
-            },
-        });
+            });
+        } else {
+            this.data.update({
+                [category]: {
+                    [key]: {
+                        connections: {
+                            [targetId]: undefined,
+                        },
+                        value: undefined,
+                    },
+                },
+            });
+        }
     }
 
     _onClickLeft(event: FederatedEvent) {

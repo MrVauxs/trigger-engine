@@ -122,17 +122,17 @@ class BlueprintConnectionsLayer extends PIXI.Container {
         if (targetEntry?.canConnectTo(originEntry)) {
             connector.origin.entry = undefined;
 
-            const [inputNode, inputEntry, outputNode, outputEntry] = originEntry.isInput
+            const [initNode, initEntry, otherNode, otherEntry] = originEntry.isConnectionInitiator
                 ? [originNode, originEntry, targetNode, targetEntry]
                 : [targetNode, targetEntry, originNode, originEntry];
 
-            inputNode.addConnection(inputEntry.preciseCategory, inputEntry.key, outputEntry.id);
+            initNode.addConnection(initEntry.preciseCategory, initEntry.key, otherEntry.id);
 
-            this.blueprint.trigger?.addComputedConnections(inputEntry.id, outputEntry.id);
-            this.add(inputEntry.id, outputEntry.id);
+            this.blueprint.trigger?.addComputedConnections(initEntry.id, otherEntry.id);
+            this.add(initEntry.id, otherEntry.id);
 
-            inputNode.draw();
-            outputNode.draw();
+            initNode.draw();
+            otherNode.draw();
         }
 
         this.#terminateConnection();

@@ -171,21 +171,21 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         }
     }
 
-    #selectNode(source: NodeDataInput) {
+    #selectNode(otherSource: NodeDataInput) {
         const trigger = this.trigger;
         if (!trigger) return;
 
-        const OtherCls = this.application.nodes.get(source.type) as typeof TriggerNode;
+        const OtherCls = this.application.nodes.get(otherSource.type) as typeof TriggerNode;
         if (!OtherCls) return;
 
-        source.position = this.#position;
+        otherSource.position = this.#position;
 
         let otherIdSuffix: `${PreciseEntryCategory}:${string}` | undefined;
 
         const entry = this.#entry;
         const nodeStates = getNodeStates(OtherCls) ?? [null];
 
-        const getSchema = <T extends BaseEntrySchemaInput | BridgeSchemaInput>(
+        const getOtherSchema = <T extends BaseEntrySchemaInput | BridgeSchemaInput>(
             category: "outs" | "inputs" | "outputs",
             callback: (entries: T[]) => T | undefined
         ): T | undefined => {
@@ -209,9 +209,9 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
                     }
 
                     if (state) {
-                        source.state = state;
+                        otherSource.state = state;
                     } else {
-                        delete source.state;
+                        delete otherSource.state;
                     }
 
                     return schema;
@@ -220,12 +220,12 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
 
             if (hidden) {
                 if (hidden.state) {
-                    source.state = hidden.state;
+                    otherSource.state = hidden.state;
                 } else {
-                    delete source.state;
+                    delete otherSource.state;
                 }
 
-                source.revealed = {
+                otherSource.revealed = {
                     [category]: {
                         [hidden.schema.key]: true,
                     },
@@ -235,11 +235,11 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
             }
         };
 
-        const getEntrySchema = (category: "inputs" | "outputs") => {
+        const getOtherEntrySchema = (category: "inputs" | "outputs") => {
             const isArray = !!(entry as BlueprintEntry).isArray;
             const entryType = (entry as BlueprintEntry).type;
 
-            return getSchema<BaseEntrySchemaInput>(category, (schemas) => {
+            return getOtherSchema<BaseEntrySchemaInput>(category, (schemas) => {
                 return schemas.find((schema) => {
                     return schema.type === entryType && isArray === !!schema.isArray;
                 });
@@ -248,19 +248,29 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
 
         if (entry?.isInput) {
             if (isBlueprintEntry(entry)) {
-                const otherEntry = getEntrySchema("outputs");
+                const otherEntry = getOtherEntrySchema("outputs");
                 otherIdSuffix = otherEntry ? `outputs:${otherEntry.key}` : undefined;
             } else {
-                const out = getSchema("outs", (schemas) => schemas.at(0))?.key;
-                otherIdSuffix = out ? `outs:${out}` : undefined;
+                const otherOut = getOtherSchema("outs", (schemas) => schemas.at(0))?.key;
+
+                if (otherOut) {
+                    otherIdSuffix = otherOut ? `outs:${otherOut}` : undefined;
+                    otherSource.outs = {
+                        [otherOut]: {
+                            connections: {
+                                [entry.id]: true,
+                            },
+                        },
+                    };
+                }
             }
         } else if (entry?.isOutput) {
             if (isBlueprintEntry(entry)) {
-                const otherEntry = getEntrySchema("inputs");
+                const otherEntry = getOtherEntrySchema("inputs");
 
                 if (otherEntry) {
                     otherIdSuffix = `inputs:${otherEntry.key}`;
-                    source.inputs = {
+                    otherSource.inputs = {
                         [otherEntry.key]: {
                             connections: {
                                 [entry.id]: true,
@@ -270,17 +280,10 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
                 }
             } else {
                 otherIdSuffix = "ins:in";
-                source.ins = {
-                    in: {
-                        connections: {
-                            [entry.id]: true,
-                        },
-                    },
-                };
             }
         }
 
-        const newNode = trigger.addNode(source);
+        const newNode = trigger.addNode(otherSource);
         if (!newNode) return;
 
         const otherId: EntryId | undefined = otherIdSuffix
@@ -297,7 +300,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         if (entry && otherId) {
             this.blueprint.connections.add(entry.id, otherId);
 
-            if (entry.isInput) {
+            if (entry.isConnectionInitiator) {
                 entry.node.addConnection(entry.preciseCategory, entry.key, otherId);
                 entry.node.draw();
             }
