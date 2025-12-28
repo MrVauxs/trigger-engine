@@ -5,10 +5,8 @@ import {
     BaseCustomEntrySchema,
     BaseCustomSchema,
     BaseEntrySchemaInput,
-    ConnectionId,
     EntryCategory,
     isConnectionId,
-    isOppositeConnection,
     NodeData,
     OpenTrigger,
     OpenTriggerNode,
@@ -358,24 +356,15 @@ class BlueprintNode extends PIXI.Container {
         }
     }
 
-    getEntryConnections(category: PreciseEntryCategory, key: string): ConnectionId[] {
-        return (
-            (isOppositeConnection(category) && this.data[category][key]?.connections?.slice()) || []
-        );
-    }
-
     addConnection(category: PreciseEntryCategory, key: string, targetId: EntryId) {
         if (!isConnectionId(targetId)) return;
-
-        const connections = this.getEntryConnections(category, key);
-        if (connections.includes(targetId)) return;
-
-        connections.push(targetId);
 
         this.data.update({
             [category]: {
                 [key]: {
-                    connections,
+                    connections: {
+                        [targetId]: true,
+                    },
                     value: undefined,
                 },
             },
@@ -385,26 +374,18 @@ class BlueprintNode extends PIXI.Container {
     removeConnection(category: PreciseEntryCategory, key: string, targetId: EntryId) {
         if (!isConnectionId(targetId)) return;
 
-        const connections = this.getEntryConnections(category, key);
-        const exist = connections.findSplice((id) => id === targetId);
-        if (!exist) return;
+        const connections = this.data[category as "ins"];
 
-        if (connections.length) {
-            this.data.update({
-                [category]: {
-                    [key]: {
-                        connections,
-                        value: undefined,
+        this.data.update({
+            [category]: {
+                [key]: {
+                    connections: {
+                        [targetId]: undefined,
                     },
+                    value: undefined,
                 },
-            });
-        } else {
-            this.data.update({
-                [category]: {
-                    [key]: undefined,
-                },
-            });
-        }
+            },
+        });
     }
 
     _onClickLeft(event: FederatedEvent) {

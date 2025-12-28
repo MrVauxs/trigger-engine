@@ -176,7 +176,7 @@ class BlueprintEntry extends BaseBlueprintEntry {
                 this.node.data.update({
                     inputs: {
                         [this.key]: {
-                            connections: [],
+                            connections: undefined,
                             value: newValue,
                         },
                     },

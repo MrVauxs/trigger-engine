@@ -3,14 +3,14 @@ import { R, z } from "module-helpers";
 const CONNECTION_CATEGORIES = ["outputs", "outs"] as const;
 const OPPOSITE_CONNECTION_CATEGORY = ["inputs", "ins"] as const;
 
+const zConnectionId = z.string().trim().refine(isConnectionId) as zTypedString<ConnectionId>;
+
 const zEntryDataSchema = z
     .record(
         z.string(),
         z.object({
             value: z.unknown().optional(),
-            connections: z.array(
-                z.string().trim().refine(isConnectionId) as zTypedString<ConnectionId>
-            ),
+            connections: z.record(zConnectionId, z.boolean()).default({}),
         })
     )
     .default({});
@@ -26,6 +26,8 @@ function isConnectionId(id: string): id is ConnectionId {
     return args.length === 3 && R.isIncludedIn(args.at(1), CONNECTION_CATEGORIES);
 }
 
+type EntryConnections = Record<ConnectionId, boolean>;
+
 type ConnectionId = `${string}:${ConnectionCategory}:${string}`;
 
 type ConnectionCategory = (typeof CONNECTION_CATEGORIES)[number];
@@ -36,11 +38,18 @@ type PreciseEntryCategory = "inputs" | "outputs" | "ins" | "outs";
 
 type EntryId = `${string}:${PreciseEntryCategory}:${string}`;
 
-export { isConnectionId, isOppositeConnection, zEntryDataSchema };
+export {
+    CONNECTION_CATEGORIES,
+    isConnectionId,
+    isOppositeConnection,
+    OPPOSITE_CONNECTION_CATEGORY,
+    zEntryDataSchema,
+};
 export type {
     ConnectionCategory,
     ConnectionId,
     EntryCategory,
+    EntryConnections,
     EntryId,
     OppositeConnectionCategory,
     PreciseEntryCategory,

@@ -1,4 +1,4 @@
-import { ConnectionId, NodeDataOutput, OpenTriggerNode } from "engine";
+import { NodeDataOutput, OpenTriggerNode, OPPOSITE_CONNECTION_CATEGORY } from "engine";
 import { info, R } from "module-helpers";
 import { BaseBlueprintEntry, BlueprintNode, EntryId } from ".";
 import { Blueprint, BlueprintLayers } from "..";
@@ -131,15 +131,15 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
         for (const source of sources) {
             source.id = replacementIds[source.id];
 
-            for (const category of ["ins", "inputs"] as const) {
+            for (const category of OPPOSITE_CONNECTION_CATEGORY) {
                 for (const entry of R.values(source[category])) {
-                    if (entry?.connections?.length) {
-                        entry.connections = entry.connections.map((connection): ConnectionId => {
-                            const [nodeId, category, key] = R.split(connection, ":");
-                            const newId = replacementIds[nodeId];
-                            return `${newId}:${category}:${key}`;
-                        });
-                    }
+                    if (!entry.connections) continue;
+
+                    entry.connections = R.mapKeys(entry.connections, (connectionId) => {
+                        const [nodeId, category, key] = R.split(connectionId, ":");
+                        const newId = replacementIds[nodeId];
+                        return `${newId}:${category}:${key}`;
+                    });
                 }
             }
 
@@ -184,20 +184,17 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
             source.position.x += 200;
             source.position.y += 100;
 
-            for (const category of ["ins", "inputs"] as const) {
+            for (const category of OPPOSITE_CONNECTION_CATEGORY) {
                 for (const [key, entry] of R.entries(source[category])) {
-                    if (entry?.connections?.length) {
-                        entry.connections = R.pipe(
-                            entry.connections,
-                            R.filter((connection) => {
-                                const nodeId = R.split(connection, ":")[0];
-                                return R.isIncludedIn(nodeId, nodeIds);
-                            })
-                        );
+                    if (!entry?.connections) continue;
 
-                        if (!entry.connections) {
-                            delete source[category][key];
-                        }
+                    entry.connections = R.pickBy(entry.connections, (value, connectionId) => {
+                        const nodeId = R.split(connectionId, ":")[0];
+                        return R.isIncludedIn(nodeId, nodeIds);
+                    });
+
+                    if (foundry.utils.isEmpty(entry.connections)) {
+                        delete source[category][key];
                     }
                 }
             }

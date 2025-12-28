@@ -159,8 +159,10 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
             const inputConnections = R.pipe(
                 [...ins, ...inputs],
                 R.flatMap(([category, type, key, connections]) => {
-                    if (!connections?.length) return;
-                    return connections.map(
+                    const connectionIds = R.keys(connections);
+                    if (!connectionIds.length) return;
+
+                    return connectionIds.map(
                         (connection) => [category, type, key, connection] as const
                     );
                 }),
@@ -172,17 +174,17 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
                 const outputNode = this.getNode(outputNodeId);
 
                 /**
-                 * we delete stale connections for next save this way we don't have to maunally
-                 * update every node when connections are removed (from deleting nodes or disconnecting)
+                 * we delete stale connections for next save this way we don't have to manually
+                 * update every node when connections are removed
                  */
                 const deleteData = () => {
                     for (const data of [inputNode.data, inputNode.data._source] as const) {
-                        const connections = data[category]?.[inputKey]?.connections;
+                        if (!data[category]) continue;
 
-                        connections?.findSplice((connection) => connection === outputId);
+                        delete data[category][inputKey].connections?.[outputId];
 
-                        if (!connections?.length) {
-                            delete data[category]?.[inputKey];
+                        if (foundry.utils.isEmpty(data[category][inputKey].connections)) {
+                            delete data[category][inputKey];
                         }
                     }
                 };

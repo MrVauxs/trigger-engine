@@ -1,7 +1,6 @@
 import {
     BaseEntrySchemaInput,
     BridgeSchemaInput,
-    ConnectionId,
     getInputsSchemas,
     getNodeStates,
     getOutputsSchemas,
@@ -263,7 +262,9 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
                     otherIdSuffix = `inputs:${otherEntry.key}`;
                     source.inputs = {
                         [otherEntry.key]: {
-                            connections: [entry.id as ConnectionId],
+                            connections: {
+                                [entry.id]: true,
+                            },
                         },
                     };
                 }
@@ -271,7 +272,9 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
                 otherIdSuffix = "ins:in";
                 source.ins = {
                     in: {
-                        connections: [entry.id as ConnectionId],
+                        connections: {
+                            [entry.id]: true,
+                        },
                     },
                 };
             }
