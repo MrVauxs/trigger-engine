@@ -18,13 +18,13 @@ const zRevealed = z.object({
 });
 
 const zCustoms = z.object({
-    outs: z.array(zCustomOutData).default([]),
-    inputs: z.array(zCustomInputData).default([]),
-    outputs: z.array(zCustomOutputData).default([]),
+    outs: z.record(zString, zCustomOutData).default({}),
+    inputs: z.record(zString, zCustomInputData).default({}),
+    outputs: z.record(zString, zCustomOutputData).default({}),
 });
 
 const zNodeDataSchema = z.object({
-    custom: zCustoms.default({ outs: [], inputs: [], outputs: [] }),
+    custom: zCustoms.default({ outs: {}, inputs: {}, outputs: {} }),
     id: zID,
     inputs: zEntryDataSchema,
     ins: zEntryDataSchema,

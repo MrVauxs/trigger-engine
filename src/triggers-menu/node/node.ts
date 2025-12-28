@@ -873,12 +873,11 @@ class BlueprintNode extends PIXI.Container {
         const entry = parser.safeParse(entrySchema)?.data;
         if (!entry) return;
 
-        const entries = this.data.custom[category].slice();
-        entries.push(entry as any);
-
         this.data.update({
             custom: {
-                [category]: entries,
+                [category]: {
+                    [entry.slug]: entry,
+                },
             },
         });
 

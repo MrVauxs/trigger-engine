@@ -46,9 +46,11 @@ function filterByCustomSchemas<
 >(
     rawSchemas: z.input<TParser>[] | null,
     schemaParser: TParser,
-    entries: TEntry[],
+    customEntries: Record<string, TEntry> | undefined = {},
     callback: (schema: TSchema, entry: TEntry) => TReturnSchema
 ): TReturnSchema[] {
+    const entries = R.values(customEntries);
+
     if (!entries.length) {
         return [];
     }
@@ -108,7 +110,7 @@ function getEntrySchemas<T extends BaseEntrySchemaInput>(
     custom: {
         rawSchemas: BaseCustomEntrySchema[] | null;
         schemaParser: typeof zBaseEntrySchema;
-        entries: BaseCustomEntryData[] | undefined;
+        entries: Record<string, BaseCustomEntryData> | undefined;
     }
 ): T[] {
     const filtered = filterSchemasByState(schemas ?? [], options).filter((schema) => {
@@ -122,7 +124,7 @@ function getEntrySchemas<T extends BaseEntrySchemaInput>(
             ...filterByCustomSchemas(
                 custom.rawSchemas,
                 custom.schemaParser,
-                custom.entries ?? [],
+                custom.entries,
                 (schema, entry): T => {
                     return {
                         field: (schema as CustomInputSchema).field,

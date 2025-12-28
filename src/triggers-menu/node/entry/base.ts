@@ -195,13 +195,14 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
                 },
             });
         } else {
-            const customs = this.node.data.custom[category]?.slice() ?? [];
-            const removed = customs.findSplice((custom) => custom.slug === this.customSlug);
-            if (!removed) return;
+            const slug = this.customSlug;
+            if (!slug) return;
 
             this.node.data.update({
                 custom: {
-                    [category]: customs,
+                    [category]: {
+                        [slug]: undefined,
+                    },
                 },
             });
         }
