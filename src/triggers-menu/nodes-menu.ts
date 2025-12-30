@@ -27,12 +27,12 @@ import {
     localize,
     R,
     render,
-    waitDialog,
 } from "module-helpers";
 import {
     BaseBlueprintEntry,
     Blueprint,
     BlueprintEntry,
+    editNodeDialog,
     EntryId,
     filterElements,
     isBlueprintEntry,
@@ -188,32 +188,23 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
     }
 
     async #createGate() {
-        const group = foundry.applications.fields.createFormGroup({
-            label: localize("edit-gate.label"),
-            input: foundry.applications.fields.createTextInput({
-                name: "label",
-                autofocus: true,
-                required: true,
-                value: "",
-            }),
-        });
+        this.#abortController.abort();
 
-        const result = await waitDialog<{ label: string }>({
-            content: group.outerHTML,
-            i18n: "edit-gate",
-            title: localize("edit-gate.title.create"),
-        });
+        const label = await editNodeDialog();
 
-        if (!result || !result.label) return;
+        if (!label) {
+            return this.close();
+        }
 
         const source: NodeDataInput = {
             custom: {
-                title: result.label,
+                title: label,
             },
             type: EXIT_GATE_TYPE,
         };
 
         this.#selectNode(source);
+        this.close();
     }
 
     #selectGate(exitId: string) {
@@ -231,7 +222,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         const newSource: NodeDataInput = {
             custom: {
                 inputs: foundry.utils.deepClone(exitNode.data.custom.outputs),
-                title: exitNode.data.custom.title,
+                // title: exitNode.data.custom.title,
             },
             position: this.#position,
             outs: {
@@ -582,9 +573,9 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
             window.addEventListener(
                 "click",
                 (event) => {
-                    if (!(event.target instanceof HTMLElement) || html.contains(event.target))
-                        return;
-                    this.close();
+                    if (event.target instanceof HTMLElement && html.contains(event.target)) {
+                        this.close();
+                    }
                 },
                 { signal: this.#abortController.signal }
             );

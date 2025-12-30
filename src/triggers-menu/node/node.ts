@@ -44,6 +44,7 @@ import {
     BlueprintBridgeEntry,
     BlueprintEntry,
     BlueprintNodesLayer,
+    editNode,
     EntryId,
     getBottom,
     getRight,
@@ -140,8 +141,16 @@ class BlueprintNode extends PIXI.Container {
         return !this.isEvent && !this.isGate;
     }
 
+    get title(): string | null {
+        return (
+            this.#node.exitGate?.data.custom.title ??
+            this.#node.data.custom.title ??
+            this.#node.title
+        );
+    }
+
     get label(): string {
-        return this.#node.data.custom.title ?? this.#node.title ?? this.#node.id;
+        return this.title ?? this.#node.id;
     }
 
     get inputsHaveConnector(): boolean {
@@ -693,7 +702,7 @@ class BlueprintNode extends PIXI.Container {
     }
 
     #createHeader(): NodeheaderPart | undefined {
-        const title = this.#node.data.custom.title || this.#node.title;
+        const title = this.title;
         if (!R.isString(title)) return;
 
         const headerSource: NodeHeaderSource = {
@@ -1069,6 +1078,17 @@ class BlueprintNode extends PIXI.Container {
                     },
                 });
             }
+        }
+
+        // edit
+        if (!locked && isExitGate(this)) {
+            entries.push({
+                name: localizePath(`blueprint.node.edit`),
+                icon: `<i class="fa-solid fa-pen-to-square"></i>`,
+                callback: () => {
+                    editNode(this);
+                },
+            });
         }
 
         // delete

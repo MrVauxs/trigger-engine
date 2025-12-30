@@ -29,7 +29,7 @@ import {
     render,
     waitDialog,
 } from "module-helpers";
-import { Blueprint, BlueprintNode } from ".";
+import { Blueprint, BlueprintNode, editNode } from ".";
 import apps = foundry.applications.api;
 
 class BlueprintApplication extends apps.ApplicationV2<
@@ -266,6 +266,16 @@ class BlueprintApplication extends apps.ApplicationV2<
 
     #getTriggerNodeContextOptions(): ContextMenuEntry[] {
         return [
+            {
+                icon: `<i class="fa-solid fa-pen-to-square"></i>`,
+                name: localizePath(`blueprint.node.edit`),
+                condition: (el) => el.hasAttribute("data-editable"),
+                callback: (el) => {
+                    const nodeId = el.dataset.id ?? "";
+                    const node = this.blueprint.nodes.get(nodeId);
+                    return node && editNode(node);
+                },
+            },
             {
                 icon: `<i class="fa-solid fa-trash"></i>`,
                 name: localizePath("blueprint.node.delete.single"),

@@ -25,6 +25,7 @@
                     "multi": "Duplicate Selected Nodes",
                     "single": "Duplicate Node"
                 },
+                "edit": "Edit Node",
                 "state": "Switch: {label}"
             },
             "trigger": {
@@ -103,9 +104,13 @@
         "edit-gate": {
             "label": "Label",
             "title": {
-                "create": "Create Gate"
+                "create": "Create Gate",
+                "edit": "Edit Gate"
             },
-            "yes": "Create"
+            "yes": {
+                "create": "Create",
+                "edit": "Edit"
+            }
         },
         "edit-entry": {
             "array": "Is Array?",

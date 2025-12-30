@@ -44,7 +44,7 @@
     <div class="scroll">
         <div class="list">
             {{#each gates as |gate|}}
-            <div class="node" data-id="{{gate.node.id}}" data-action="select-node">
+            <div class="node" data-id="{{gate.node.id}}" data-action="select-node" data-editable>
                 <span>{{gate.node.label}}</span>
                 {{#if gate.hasEntries}}
                 <div class="controls">

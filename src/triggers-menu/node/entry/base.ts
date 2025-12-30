@@ -295,6 +295,15 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
             });
         }
 
+        if (this.preciseCategory === "outputs") {
+            // TODO we need check if the variable doesn't already exist and if it is, we add an edit instead
+            entries.push({
+                name: localizePath("blueprint.entry.variable"),
+                icon: `<i class="fa-solid fa-square-root-variable"></i>`,
+                callback: async () => {},
+            });
+        }
+
         if ((this.isCustom || this.isRevealed) && !isEntryGate(this.node)) {
             entries.push({
                 name: localizePath("blueprint.entry.remove"),

@@ -1,4 +1,5 @@
-import { R } from "module-helpers";
+import { localize, R, waitDialog } from "module-helpers";
+import { BlueprintNode } from ".";
 
 function alignHorizontally(
     parent: PIXI.Container,
@@ -43,10 +44,48 @@ function maxBottom(a?: PIXI.Container | NodePart, b?: PIXI.Container | NodePart)
     return Math.max(getBottom(a), getBottom(b));
 }
 
+async function editNodeDialog(node?: BlueprintNode): Promise<string | undefined> {
+    const label = node?.data.custom.title || "";
+
+    const group = foundry.applications.fields.createFormGroup({
+        label: localize("edit-gate.label"),
+        input: foundry.applications.fields.createTextInput({
+            name: "label",
+            autofocus: true,
+            placeholder: label,
+            value: label,
+        }),
+    });
+
+    const result = await waitDialog<{ label: string }>({
+        content: group.outerHTML,
+        i18n: "edit-gate",
+        title: localize("edit-gate.title", node ? "edit" : "create"),
+        yes: {
+            label: localize("edit-gate.yes", node ? "edit" : "create"),
+        },
+    });
+
+    return result && result.label && (!node || label !== result.label) ? result.label : undefined;
+}
+
+async function editNode(node: BlueprintNode) {
+    const label = await editNodeDialog(node);
+    if (!label) return;
+
+    node.data.update({
+        custom: {
+            title: label,
+        },
+    });
+
+    node.refresh({ renderApplication: true });
+}
+
 type NodePart<T extends PIXI.DisplayObject = PIXI.DisplayObject> = PIXI.Container<T> & {
     calculatedHeight: number;
     calculatedWith: number;
 };
 
-export { alignHorizontally, getBottom, getRight, maxBottom, maxRight };
+export { alignHorizontally, editNode, editNodeDialog, getBottom, getRight, maxBottom, maxRight };
 export type { NodePart };
