@@ -126,7 +126,7 @@ class TriggerApplication {
         }
     }
 
-    createTrigger(source: DeepPartial<TriggerDataInput>, open: boolean): OpenTrigger | null {
+    createTrigger(source: TriggerDataInput, open: boolean): OpenTrigger | null {
         try {
             const data = new TriggerData(source);
             return new OpenTrigger(this, data);

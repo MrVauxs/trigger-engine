@@ -222,7 +222,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         }
     }
 
-    addTrigger(source: DeepPartial<TriggerDataInput>) {
+    addTrigger(source: TriggerDataInput) {
         if (source.id && this.triggers.has(source.id)) return;
 
         const trigger = this.application.createTrigger(source, true);

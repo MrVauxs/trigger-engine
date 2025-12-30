@@ -18,16 +18,10 @@ interface TriggerData extends Omit<z.output<TriggerDataSchema>, "nodes"> {
     readonly nodes: zCollection<TriggerData, NodeDataSchema, NodeData>;
 }
 
-// const zTriggerGates = z.object({
-//     entries: z.array(zTriggerGateEntry).default([]),
-//     exits: z.array(zTriggerGateExit).default([]),
-// });
-
 const zTriggerDataSchema = z.object({
     id: zID,
     description: z.string().trim().default(""),
     folder: z.string().trim().default(""),
-    // gates: zTriggerGates.default({ entries: [], exits: [] }),
     name: z.string().trim().default(""),
     nodes: z.array(zNodeDataSchema).default([]),
     tags: z.array(z.string().trim()).default([]),

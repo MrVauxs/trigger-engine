@@ -25,10 +25,10 @@ function instantiateNode(
 function instantiateNode(parent: Trigger, data: NodeData, open: boolean): TriggerNode | undefined;
 function instantiateNode(
     parent: Trigger,
-    data: NodeData,
+    nodeData: NodeData,
     open: boolean
 ): TriggerNode | OpenTriggerNode | undefined {
-    const NodeCls = parent.application.nodes.get(data.type) as typeof TriggerNode;
+    const NodeCls = parent.application.nodes.get(nodeData.type) as typeof TriggerNode;
     if (!NodeCls) return;
 
     function rootLocalize(...args: LocalizeArgs): string | undefined {
@@ -45,14 +45,14 @@ function instantiateNode(
     const nodeStates = getNodeStates(NodeCls);
     const nodeState = !nodeStates
         ? null
-        : R.isString(data.state) && R.isIncludedIn(data.state, nodeStates)
-        ? data.state
+        : R.isString(nodeData.state) && R.isIncludedIn(nodeData.state, nodeStates)
+        ? nodeData.state
         : nodeStates[0];
 
     const exitGate: ExitGate | undefined = (() => {
-        if (!isEntryGate(data)) return;
+        if (!isEntryGate(nodeData)) return;
 
-        const exitConnection = R.keys(data.outs.out?.connections ?? {}).at(0);
+        const exitConnection = R.keys(nodeData.outs.out?.connections ?? {}).at(0);
         const exitId = exitConnection?.split(":").at(0) ?? "";
         const exitNode = parent.nodes.get(exitId);
         const ExitCls = exitNode?.constructor as typeof TriggerNode | undefined;
@@ -77,7 +77,7 @@ function instantiateNode(
                 this,
                 R.fromKeys(["id", "invalid"] as const, (property) => {
                     return {
-                        value: data[property],
+                        value: nodeData[property],
                         configurable: false,
                         enumerable: true,
                         writable: false,
@@ -122,7 +122,7 @@ function instantiateNode(
             const [ins, outs] = R.map(
                 [
                     !isEvent && NodeCls.hasIn ? [{ key: "in", state: undefined }] : [],
-                    getOutsSchemas(NodeCls, { data, state: nodeState }),
+                    getOutsSchemas(NodeCls, { data: nodeData, state: nodeState }),
                 ] as const,
                 (schemas) => {
                     return R.pipe(
@@ -145,9 +145,9 @@ function instantiateNode(
                         "inputs",
                         exitGate // we use the exit output schemas
                             ? getOutputsSchemas(exitGate.NodeCls, { data: exitGate.data })
-                            : getInputsSchemas(NodeCls, { data, state: nodeState }),
+                            : getInputsSchemas(NodeCls, { data: nodeData, state: nodeState }),
                     ],
-                    ["outputs", getOutputsSchemas(NodeCls, { data, state: nodeState })],
+                    ["outputs", getOutputsSchemas(NodeCls, { data: nodeData, state: nodeState })],
                 ] as const,
                 ([category, schemas]) => {
                     const entries = R.pipe(
@@ -159,7 +159,7 @@ function instantiateNode(
                                     this,
                                     category,
                                     schema,
-                                    data,
+                                    nodeData,
                                     open
                                 );
 
@@ -186,7 +186,7 @@ function instantiateNode(
             if (open) {
                 Object.defineProperties(this, {
                     data: {
-                        value: data,
+                        value: nodeData,
                     },
                     entries: {
                         value: {
