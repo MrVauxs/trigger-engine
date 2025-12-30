@@ -726,10 +726,7 @@ class BlueprintNode extends PIXI.Container {
         return headerEl;
     }
 
-    async createContextMenu(
-        event: PIXI.FederatedPointerEvent,
-        entries: Omit<ContextMenuEntry, "condition">[]
-    ) {
+    async createContextMenu(event: PIXI.FederatedPointerEvent, entries: ContextMenuEntry[]) {
         if (!entries.length) return;
 
         const anchor = createHTMLElement("div", {
@@ -952,7 +949,7 @@ class BlueprintNode extends PIXI.Container {
     async #onNodeContextMenu(event: PIXI.FederatedPointerEvent) {
         const locked = this.isLocked;
         const selected = this.parent.selected;
-        const entries: Omit<ContextMenuEntry, "condition">[] = [];
+        const entries: ContextMenuEntry[] = [];
 
         // states
         if (!locked && this.#node.states && this.#node.state) {
@@ -1039,55 +1036,47 @@ class BlueprintNode extends PIXI.Container {
             }
         }
 
-        // duplicate & copy
-        if (this.isDuplicable) {
-            const filtered = selected.filter((node) => node.isDuplicable);
-            const multiSelect = filtered.length > 1 ? "multi" : "single";
+        const duplicable = this.isDuplicable;
+        const filtered = selected.filter((node) => node.isDuplicable);
+        const multiFiltered = filtered.length > 1 ? "multi" : "single";
+        const multiSelected = selected.length > 1 ? "multi" : "single";
 
-            entries.push({
-                name: localizePath(`blueprint.node.copy.${multiSelect}`),
+        entries.push(
+            {
+                name: localizePath(`blueprint.node.copy.${multiFiltered}`),
                 icon: `<i class="fa-solid fa-clipboard"></i>`,
+                condition: duplicable,
                 callback: async () => {
                     this.parent.copySelected(selected);
                 },
-            });
-
-            if (!locked) {
-                entries.push({
-                    name: localizePath(`blueprint.node.duplicate.${multiSelect}`),
-                    icon: `<i class="fa-solid fa-copy"></i>`,
-                    callback: async () => {
-                        this.parent.duplicateSelected(selected);
-                    },
-                });
-            }
-        }
-
-        // edit
-        if (!locked && isExitGate(this)) {
-            entries.push({
+            },
+            {
+                name: localizePath(`blueprint.node.duplicate.${multiFiltered}`),
+                icon: `<i class="fa-solid fa-copy"></i>`,
+                condition: duplicable && !locked,
+                callback: async () => {
+                    this.parent.duplicateSelected(selected);
+                },
+            },
+            {
                 name: localizePath(`blueprint.node.edit`),
                 icon: `<i class="fa-solid fa-pen-to-square"></i>`,
+                condition: !locked && isExitGate(this),
                 callback: () => {
                     editNode(this);
                 },
-            });
-        }
-
-        // delete
-        if (!locked) {
-            const multiSelect = selected.length > 1 ? "multi" : "single";
-
-            entries.push({
-                name: localizePath(`blueprint.node.delete.${multiSelect}`),
+            },
+            {
+                name: localizePath(`blueprint.node.delete.${multiSelected}`),
                 icon: `<i class="fa-solid fa-trash fa-fw"></i>`,
+                condition: !locked,
                 callback: async () => {
                     // TODO we gonna want to delete variables
                     const confirm = await confirmDialog("blueprint.node.delete.confirm");
                     return confirm && this.parent.delete(selected);
                 },
-            });
-        }
+            }
+        );
 
         this.createContextMenu(event, entries);
     }

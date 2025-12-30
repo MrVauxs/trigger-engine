@@ -287,38 +287,31 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
         if (event.button !== 2) return;
         if (this.node.isLocked) return;
 
-        const entries: Omit<ContextMenuEntry, "condition">[] = [];
-
-        if (this.isConnected) {
-            entries.push({
+        this.node.createContextMenu(event, [
+            {
                 name: localizePath("blueprint.entry.disconnect"),
                 icon: `<i class="fa-solid fa-link-horizontal-slash"></i>`,
+                condition: this.isConnected,
                 callback: async () => {
                     this.disconnect();
                 },
-            });
-        }
-
-        if (this.preciseCategory === "outputs") {
+            },
             // TODO we need check if the variable doesn't already exist and if it is, we add an edit instead
-            entries.push({
+            {
                 name: localizePath("blueprint.entry.variable"),
                 icon: `<i class="fa-solid fa-square-root-variable"></i>`,
+                condition: this.preciseCategory === "outputs",
                 callback: async () => {},
-            });
-        }
-
-        if ((this.isCustom || this.isRevealed) && !isEntryGate(this.node)) {
-            entries.push({
+            },
+            {
                 name: localizePath("blueprint.entry.remove"),
                 icon: `<i class="fa-solid fa-trash fa-fw"></i>`,
+                condition: (this.isCustom || this.isRevealed) && !isEntryGate(this.node),
                 callback: async () => {
                     this.remove();
                 },
-            });
-        }
-
-        this.node.createContextMenu(event, entries);
+            },
+        ]);
     }
 }
 
