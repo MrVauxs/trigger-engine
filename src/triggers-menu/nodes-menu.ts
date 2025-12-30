@@ -323,11 +323,14 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
             const isArray = !!(entry as BlueprintEntry).isArray;
             const entryType = (entry as BlueprintEntry).type;
 
-            // TODO sort by group
             return getOtherSchema<BaseEntrySchemaInput>(category, (schemas) => {
-                return schemas.find((schema) => {
-                    return schema.type === entryType && isArray === !!schema.isArray;
-                });
+                return R.pipe(
+                    schemas,
+                    R.sortBy((schema) => schema.group ?? ""),
+                    R.find((schema) => {
+                        return schema.type === entryType && isArray === !!schema.isArray;
+                    })
+                );
             });
         };
 
