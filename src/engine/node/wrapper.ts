@@ -1,10 +1,12 @@
 import {
     instantiateEntry,
-    isEntryGate,
+    isGateEntryNode,
+    isVariableGetterNode,
     NodeBridge,
     NodeEntry,
     OpenNodeEntry,
     OpenTrigger,
+    OutputEntrySchema,
     Trigger,
 } from "engine";
 import { LocalizeArgs, MODULE, R } from "module-helpers";
@@ -31,6 +33,44 @@ function instantiateNode(
     const NodeCls = parent.application.nodes.get(nodeData.type) as typeof TriggerNode;
     if (!NodeCls) return;
 
+    // we retrieve the exit-gate if we are an entry-gate
+    const isGateEntry = isGateEntryNode(nodeData);
+    const exitGate: { node: TriggerNode; schemas: OutputEntrySchema[] } | undefined = (() => {
+        if (!isGateEntry) return;
+
+        const connection = nodeData.outs.out.connection;
+        const nodeId = connection?.split(":").at(0) ?? "";
+        const node = parent.nodes.get(nodeId);
+        const data = foundry.utils.deepClone(parent.data.nodes.get(nodeId));
+        if (!node || !data) return;
+
+        const ExitCls = node.constructor as typeof TriggerNode;
+        const schemas = getOutputsSchemas(ExitCls, { data });
+
+        return { node, schemas };
+    })();
+    if (isGateEntry && !exitGate) return;
+
+    // we construct the variable schema
+    const isVariableGetter = isVariableGetterNode(nodeData);
+    const variableSchemas = ((): OutputEntrySchema[] | undefined => {
+        if (!isVariableGetter) return;
+
+        const connection = nodeData.inputs.in.connection;
+        const data = connection && parent.data.variables[connection];
+        if (!data) return;
+
+        return [
+            {
+                isArray: data.isArray,
+                key: "entry",
+                label: data.label,
+                type: data.type,
+            },
+        ];
+    })();
+    if (isVariableGetter && !variableSchemas) return;
+
     function rootLocalize(...args: LocalizeArgs): string | undefined {
         return parent.application.localize(...args);
     }
@@ -48,20 +88,6 @@ function instantiateNode(
         : R.isString(nodeData.state) && R.isIncludedIn(nodeData.state, nodeStates)
         ? nodeData.state
         : nodeStates[0];
-
-    const exitGate: ExitGate | undefined = (() => {
-        if (!isEntryGate(nodeData)) return;
-
-        const exitConnection = nodeData.outs.out.connection;
-        const exitId = exitConnection?.split(":").at(0) ?? "";
-        const exitNode = parent.nodes.get(exitId);
-        const ExitCls = exitNode?.constructor as typeof TriggerNode | undefined;
-        const exitData = foundry.utils.deepClone(parent.data.nodes.get(exitId));
-
-        return exitData
-            ? ({ node: exitNode, NodeCls: ExitCls, data: exitData } as ExitGate)
-            : undefined;
-    })();
 
     class TriggerNodeWrapper extends NodeCls {
         #in: NodeBridge | null;
@@ -143,11 +169,15 @@ function instantiateNode(
                 [
                     [
                         "inputs",
-                        exitGate // we use the exit output schemas
-                            ? getOutputsSchemas(exitGate.NodeCls, { data: exitGate.data })
-                            : getInputsSchemas(NodeCls, { data: nodeData, state: nodeState }),
+                        variableSchemas ?? // unique schema for variables
+                            exitGate?.schemas ?? // we use the exit output schemas
+                            getInputsSchemas(NodeCls, { data: nodeData, state: nodeState }),
                     ],
-                    ["outputs", getOutputsSchemas(NodeCls, { data: nodeData, state: nodeState })],
+                    [
+                        "outputs",
+                        variableSchemas ?? // unique schema for variables
+                            getOutputsSchemas(NodeCls, { data: nodeData, state: nodeState }),
+                    ],
                 ] as const,
                 ([category, schemas]) => {
                     const entries = R.pipe(
@@ -217,8 +247,8 @@ function instantiateNode(
     }
 
     interface TriggerNodeWrapper {
-        execute(options?: Record<string, any>): Promise<boolean>;
-        query(key: string): Promise<any>;
+        _execute(options?: Record<string, any>): Promise<boolean>;
+        _query(key: string): Promise<any>;
     }
 
     return new TriggerNodeWrapper();
@@ -233,12 +263,6 @@ interface OpenTriggerNode extends TriggerNode {
     states: string[] | null;
     tags: string[];
 }
-
-type ExitGate = {
-    node: TriggerNode;
-    NodeCls: typeof TriggerNode;
-    data: NodeData;
-};
 
 type NodeEntries = {
     in: NodeBridge | null;

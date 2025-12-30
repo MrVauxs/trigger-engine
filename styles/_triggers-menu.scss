@@ -152,6 +152,15 @@
                 padding-inline: 0.3em;
             }
         }
+
+        .variable {
+            .name {
+                i {
+                    color: var(--variable-color);
+                    margin-right: 0.1em;
+                }
+            }
+        }
     }
 
     .sidebar.triggers {

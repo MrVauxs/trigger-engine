@@ -10,10 +10,6 @@ class TriggerGateExit extends TriggerNode {
         return EXIT_GATE_TYPE;
     }
 
-    static get tags(): string[] {
-        return ["gate", "exit"];
-    }
-
     static get defineCustomOutputs(): CustomOutputSchema[] {
         return [
             {
@@ -34,17 +30,17 @@ class TriggerGateExit extends TriggerNode {
         };
     }
 
-    execute(options?: Record<string, any>): Promise<boolean> {
+    _execute(options?: Record<string, any>): Promise<boolean> {
         throw new Error("Method not implemented.");
     }
 
-    query(key: string): Promise<any> {
+    _query(key: string): Promise<any> {
         throw new Error("Method not implemented.");
     }
 }
 
-function isExitGate(node: { type: string }): boolean {
+function isGateExitNode(node: { type: string }): boolean {
     return node.type === EXIT_GATE_TYPE;
 }
 
-export { isExitGate, TriggerGateExit };
+export { isGateExitNode, TriggerGateExit };

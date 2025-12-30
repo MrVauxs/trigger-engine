@@ -1,4 +1,4 @@
-import { ConnectionId, isEntryGate, isExitGate, isOppositeConnection } from "engine";
+import { ConnectionId, isGateEntryNode, isGateExitNode, isOppositeConnection } from "engine";
 import { localizePath, R } from "module-helpers";
 import { Blueprint } from "triggers-menu";
 import { alignHorizontally, BlueprintNode } from "..";
@@ -157,7 +157,7 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
             this.canConnect &&
             this.preciseCategory === other.oppositePreciseCategory &&
             // we don't want gates looping over each other, this is an easy exception to make
-            (this.node.isGate || !other.node.isGate || this.node.gateId !== other.node.gateId)
+            (!this.node.isGate || !other.node.isGate || this.node.gateId !== other.node.gateId)
         );
     }
 
@@ -201,7 +201,7 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
         ];
 
         // we want to disconnect all the entry-gates too
-        if (isExitGate(this.node)) {
+        if (isGateExitNode(this.node)) {
             const oppositeCategory = this.oppositePreciseCategory;
 
             nodes.push(
@@ -231,7 +231,31 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
             }
         }
 
-        this.node.refresh({ forceComputeConnections: true });
+        this.node.refresh({
+            forceComputeConnections: true,
+            renderApplication: true,
+        });
+    }
+
+    _contextMenuOptions(): ContextMenuEntry[] {
+        return [
+            {
+                name: localizePath("blueprint.entry.disconnect"),
+                icon: `<i class="fa-solid fa-link-horizontal-slash"></i>`,
+                condition: this.isConnected,
+                callback: async () => {
+                    this.disconnect();
+                },
+            },
+            {
+                name: localizePath("blueprint.entry.remove"),
+                icon: `<i class="fa-solid fa-trash fa-fw"></i>`,
+                condition: (this.isCustom || this.isRevealed) && !isGateEntryNode(this.node),
+                callback: async () => {
+                    this.remove();
+                },
+            },
+        ];
     }
 
     #clear() {
@@ -287,31 +311,8 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
         if (event.button !== 2) return;
         if (this.node.isLocked) return;
 
-        this.node.createContextMenu(event, [
-            {
-                name: localizePath("blueprint.entry.disconnect"),
-                icon: `<i class="fa-solid fa-link-horizontal-slash"></i>`,
-                condition: this.isConnected,
-                callback: async () => {
-                    this.disconnect();
-                },
-            },
-            // TODO we need check if the variable doesn't already exist and if it is, we add an edit instead
-            {
-                name: localizePath("blueprint.entry.variable"),
-                icon: `<i class="fa-solid fa-square-root-variable"></i>`,
-                condition: this.preciseCategory === "outputs",
-                callback: async () => {},
-            },
-            {
-                name: localizePath("blueprint.entry.remove"),
-                icon: `<i class="fa-solid fa-trash fa-fw"></i>`,
-                condition: (this.isCustom || this.isRevealed) && !isEntryGate(this.node),
-                callback: async () => {
-                    this.remove();
-                },
-            },
-        ]);
+        const entries: ContextMenuEntry[] = this._contextMenuOptions();
+        this.node.createContextMenu(event, entries);
     }
 }
 

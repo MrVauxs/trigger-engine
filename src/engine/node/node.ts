@@ -216,7 +216,7 @@ abstract class TriggerNode {
      * @example
      * return this.executeNext("true")
      *
-     * @see {@link TriggerNode#execute}
+     * @see {@link TriggerNode#_execute}
      */
     declare readonly executeNext: (out: string) => Promise<boolean>;
 
@@ -231,7 +231,7 @@ abstract class TriggerNode {
      * @example
      * const number = await this.get("number");
      *
-     * @see {@link TriggerNode#execute}
+     * @see {@link TriggerNode#_execute}
      */
     declare readonly getInputValue: (input: string) => Promise<any>;
 
@@ -260,7 +260,7 @@ abstract class TriggerNode {
      *
      * @param output key of the `output` to set
      *
-     * @see {@link TriggerNode#execute}
+     * @see {@link TriggerNode#_execute}
      */
     declare readonly setOutputValue: (output: string) => void;
 
@@ -283,7 +283,7 @@ abstract class TriggerNode {
      * @see {@link TriggerNode#getInputValue}
      * @see {@link TriggerNode#setOutputValue}
      */
-    abstract execute(options?: Record<string, any>): Promise<boolean>;
+    abstract _execute(options?: Record<string, any>): Promise<boolean>;
 
     /**
      * @abstract
@@ -294,7 +294,7 @@ abstract class TriggerNode {
      * @returns the computed value of the output type requested by the other node.
      * If the returned value isn't compatible with the connection type, the default value will be instead be returned.
      */
-    abstract query(key: string): Promise<any>;
+    abstract _query(key: string): Promise<any>;
 }
 
 interface TriggerNode

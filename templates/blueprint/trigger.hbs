@@ -45,7 +45,7 @@
         <div class="list">
             {{#each gates as |gate|}}
             <div class="node" data-id="{{gate.node.id}}" data-action="select-node" data-editable>
-                <span>{{gate.node.label}}</span>
+                <div>{{gate.node.label}}</div>
                 {{#if gate.hasEntries}}
                 <div class="controls">
                     <a data-action="tab-gate" {{{@root.i18n.tooltip 'gates.tab' }}}>
@@ -58,10 +58,27 @@
         </div>
     </div>
     <div class="header sub">
-        {{@root.i18n 'variables'}}
+        {{@root.i18n 'variables.title'}}
     </div>
     <div class="scroll variables">
-        <div class="list"></div>
+        <div class="list">
+            {{#each variables as |variable|}}
+            <div class="variable" data-id="{{variable.id}}" data-action="select-variable"
+                data-editable>
+                <div class="name" style="--variable-color: {{variable.color}};">
+                    <i class="fa-regular fa-circle"></i>
+                    {{variable.label}}
+                </div>
+                {{#if variable.hasNodes}}
+                <div class="controls">
+                    <a data-action="tab-variable" {{{@root.i18n.tooltip 'variables.tab' }}}>
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    </a>
+                </div>
+                {{/if}}
+            </div>
+            {{/each}}
+        </div>
     </div>
 </div>
 {{#unless (and isFree (not trigger.name includeZero=true))}}

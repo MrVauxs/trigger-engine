@@ -8,8 +8,8 @@ import {
     EntryCategory,
     GATE_CATEGORY,
     isConnectionId,
-    isEntryGate,
-    isExitGate,
+    isGateEntryNode,
+    isGateExitNode,
     isOppositeConnection,
     NodeData,
     OpenNodeEntry,
@@ -125,7 +125,7 @@ class BlueprintNode extends PIXI.Container {
     }
 
     get gateId(): string | undefined {
-        return isExitGate(this) ? this.#node.id : this.#node.exitGate?.id;
+        return isGateExitNode(this) ? this.#node.id : this.#node.exitGate?.id;
     }
 
     get data(): NodeData {
@@ -554,14 +554,14 @@ class BlueprintNode extends PIXI.Container {
         const body = new PIXI.Container() as NodePart;
         const entries = this.#node.entries;
 
-        const outs = isEntryGate(this.#node) ? [] : entries.outs.contents;
+        const outs = isGateEntryNode(this.#node) ? [] : entries.outs.contents;
         const minIndex = entries.in || outs.length ? 1 : 0;
         const [inputs, outputs] = R.pipe(
             ["inputs", "outputs"] as const,
             R.map((category) => {
                 if (
-                    (category === "inputs" && isExitGate(this.#node)) ||
-                    (category === "outputs" && isEntryGate(this.#node))
+                    (category === "inputs" && isGateExitNode(this.#node)) ||
+                    (category === "outputs" && isGateEntryNode(this.#node))
                 ) {
                     return [];
                 }
@@ -612,7 +612,7 @@ class BlueprintNode extends PIXI.Container {
 
         // we process all inputs first to make layout computation easier
 
-        if (entries.in && !isExitGate(this.#node)) {
+        if (entries.in && !isGateExitNode(this.#node)) {
             this.#in = new BlueprintBridgeEntry(this, "inputs", entries.in);
             this.#entries.push(this.#in);
 
@@ -782,7 +782,7 @@ class BlueprintNode extends PIXI.Container {
         this.trigger.refreshNode(this.id);
 
         // wer need to refresh all the entry-gates as well
-        if (isExitGate(this)) {
+        if (isGateExitNode(this)) {
             for (const node of this.parent.getGateEntries(this.id)) {
                 this.trigger.refreshNode(node.id);
             }
@@ -1008,7 +1008,7 @@ class BlueprintNode extends PIXI.Container {
         }
 
         // custom entries
-        if (!locked && !isEntryGate(this)) {
+        if (!locked && !isGateEntryNode(this)) {
             const categories = [
                 ["outs", "defineCustomOuts", zCustomOutSchema],
                 ["inputs", "defineCustomInputs", zCustomInputSchema],
@@ -1061,7 +1061,7 @@ class BlueprintNode extends PIXI.Container {
             {
                 name: localizePath(`blueprint.node.edit`),
                 icon: `<i class="fa-solid fa-pen-to-square"></i>`,
-                condition: !locked && isExitGate(this),
+                condition: !locked && isGateExitNode(this),
                 callback: () => {
                     editNode(this);
                 },

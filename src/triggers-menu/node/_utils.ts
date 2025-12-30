@@ -44,33 +44,34 @@ function maxBottom(a?: PIXI.Container | NodePart, b?: PIXI.Container | NodePart)
     return Math.max(getBottom(a), getBottom(b));
 }
 
-async function editNodeDialog(node?: BlueprintNode): Promise<string | undefined> {
-    const label = node?.data.custom.title || "";
-
+async function editLabelDialog(
+    type: "gate" | "variable",
+    { placeholder, value }: { placeholder?: string; value?: string } = {}
+): Promise<string | undefined> {
     const group = foundry.applications.fields.createFormGroup({
-        label: localize("edit-gate.label"),
+        label: localize("edit-label.label"),
         input: foundry.applications.fields.createTextInput({
             name: "label",
             autofocus: true,
-            placeholder: label,
-            value: label,
+            placeholder: placeholder || value,
+            value: value,
         }),
     });
 
     const result = await waitDialog<{ label: string }>({
         content: group.outerHTML,
-        i18n: "edit-gate",
-        title: localize("edit-gate.title", node ? "edit" : "create"),
+        i18n: "edit-label",
+        title: localize("edit-label.title", type, value ? "edit" : "create"),
         yes: {
-            label: localize("edit-gate.yes", node ? "edit" : "create"),
+            label: localize("edit-label.yes", value ? "edit" : "create"),
         },
     });
 
-    return result && result.label && (!node || label !== result.label) ? result.label : undefined;
+    return result && result.label && (!value || value !== result.label) ? result.label : undefined;
 }
 
 async function editNode(node: BlueprintNode) {
-    const label = await editNodeDialog(node);
+    const label = await editLabelDialog("gate", { value: node?.data.custom.title });
     if (!label) return;
 
     node.data.update({
@@ -87,5 +88,5 @@ type NodePart<T extends PIXI.DisplayObject = PIXI.DisplayObject> = PIXI.Containe
     calculatedWith: number;
 };
 
-export { alignHorizontally, editNode, editNodeDialog, getBottom, getRight, maxBottom, maxRight };
+export { alignHorizontally, editNode, editLabelDialog, getBottom, getRight, maxBottom, maxRight };
 export type { NodePart };

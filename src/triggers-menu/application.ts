@@ -1,9 +1,11 @@
 import {
-    isEntryGate,
-    isExitGate,
+    ConnectionId,
+    isGateEntryNode,
+    isGateExitNode,
     OpenTrigger,
     TriggerApplication,
     TriggerDataInput,
+    TriggerVariable,
     UpdateTriggerData,
 } from "engine";
 import {
@@ -260,11 +262,11 @@ class BlueprintApplication extends apps.ApplicationV2<
     }
 
     #createContextMenus() {
-        this._createContextMenu(this.#getTriggerContextOptions, ".sidebar.triggers .trigger");
-        this._createContextMenu(this.#getTriggerNodeContextOptions, ".sidebar.trigger .node");
+        this._createContextMenu(this.#triggerContextMenuOptions, ".sidebar.triggers .trigger");
+        this._createContextMenu(this.#triggerNodeContextMenuOptions, ".sidebar.trigger .node");
     }
 
-    #getTriggerNodeContextOptions(): ContextMenuEntry[] {
+    #triggerNodeContextMenuOptions(): ContextMenuEntry[] {
         return [
             {
                 icon: `<i class="fa-solid fa-pen-to-square"></i>`,
@@ -288,7 +290,7 @@ class BlueprintApplication extends apps.ApplicationV2<
         ];
     }
 
-    #getTriggerContextOptions(): ContextMenuEntry[] {
+    #triggerContextMenuOptions(): ContextMenuEntry[] {
         const getTriggerFromElement = (el: HTMLElement): OpenTrigger | null => {
             const triggerId = el.dataset.id;
             return triggerId ? this.blueprint.getTrigger(triggerId) : null;
@@ -365,13 +367,28 @@ class BlueprintApplication extends apps.ApplicationV2<
         this.#search = "";
 
         const gates = R.map(
-            this.blueprint.nodes.filter((node) => isExitGate(node)),
-            (node): TriggerGate => {
+            this.blueprint.nodes.filter((node) => isGateExitNode(node)),
+            (node): PreparedGate => {
                 const hasEntries = this.blueprint.nodes.some(
-                    (other) => isEntryGate(other) && other.gateId === node.id
+                    (other) => isGateEntryNode(other) && other.gateId === node.id
                 );
                 return { hasEntries, node };
             }
+        );
+
+        const variables: PreparedVariable[] = R.pipe(
+            this.blueprint.trigger?.data.variables ?? {},
+            R.entries(),
+            R.map(([id, variable]): PreparedVariable => {
+                const color = this.application.entries.get(variable.type)?.color;
+
+                return {
+                    ...variable,
+                    color: new PIXI.Color(color).toHex(),
+                    hasNodes: false, // TODO
+                    id,
+                };
+            })
         );
 
         return {
@@ -379,6 +396,7 @@ class BlueprintApplication extends apps.ApplicationV2<
             gates,
             isFree: this.application.isFreeApplication,
             trigger,
+            variables,
         };
     }
 
@@ -527,14 +545,21 @@ type BlueprintContext = TriggersContext | TriggerContext;
 
 type TriggerContext = {
     events: BlueprintNode[];
-    gates: TriggerGate[];
+    gates: PreparedGate[];
     isFree: boolean;
     trigger: OpenTrigger;
+    variables: PreparedVariable[];
 };
 
-type TriggerGate = {
+type PreparedGate = {
     hasEntries: boolean;
     node: BlueprintNode;
+};
+
+type PreparedVariable = TriggerVariable & {
+    color: string;
+    hasNodes: boolean;
+    id: ConnectionId;
 };
 
 type TriggersContext = {

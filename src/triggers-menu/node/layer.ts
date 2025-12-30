@@ -1,6 +1,6 @@
 import {
-    isEntryGate,
-    isExitGate,
+    isGateEntryNode,
+    isGateExitNode,
     NodeDataOutput,
     OpenTriggerNode,
     OPPOSITE_CONNECTION_CATEGORY,
@@ -25,7 +25,7 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
     }
 
     getGateEntries(exitId: string): BlueprintNode[] {
-        return this.filter((node) => isEntryGate(node) && node.gateId === exitId);
+        return this.filter((node) => isGateEntryNode(node) && node.gateId === exitId);
     }
 
     filter(fn: (node: BlueprintNode) => boolean) {
@@ -107,7 +107,7 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
         for (const node of nodes) {
             const groupedNodes = [node];
 
-            if (isExitGate(node)) {
+            if (isGateExitNode(node)) {
                 groupedNodes.push(...this.getGateEntries(node.id));
             }
 

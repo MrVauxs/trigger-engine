@@ -1,6 +1,7 @@
-import { instantiateField, NodeEntry, NodeField, OpenNodeEntry } from "engine";
+import { instantiateField, NodeEntry, NodeField, OpenNodeEntry, TriggerVariable } from "engine";
 import { BaseBlueprintEntry } from ".";
-import { BlueprintNode } from "..";
+import { BlueprintNode, editLabelDialog } from "..";
+import { localizePath } from "module-helpers";
 
 class BlueprintEntry extends BaseBlueprintEntry {
     #entry: OpenNodeEntry;
@@ -191,6 +192,40 @@ class BlueprintEntry extends BaseBlueprintEntry {
         });
 
         return fieldElement;
+    }
+
+    _contextMenuOptions(): ContextMenuEntry[] {
+        const options = super._contextMenuOptions();
+
+        options.unshift(
+            // TODO we need check if the variable doesn't already exist and if it is, we add an edit instead
+            {
+                name: localizePath("blueprint.entry.variable.create"),
+                icon: `<i class="fa-solid fa-square-root-variable"></i>`,
+                condition: this.preciseCategory === "outputs",
+                callback: async () => {
+                    const placeholder = this.label;
+                    const label = await editLabelDialog("variable", { placeholder });
+
+                    this.node.trigger.update({
+                        variables: {
+                            [this.id]: {
+                                isArray: this.isArray,
+                                label: label || placeholder,
+                                type: this.type,
+                            } satisfies TriggerVariable,
+                        },
+                    });
+
+                    this.node.refresh({
+                        forceComputeConnections: true,
+                        renderApplication: true,
+                    });
+                },
+            }
+        );
+
+        return options;
     }
 }
 

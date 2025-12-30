@@ -17,11 +17,11 @@ class TestTriggerNode extends BuiltInTriggerNode {
         return "\ue4f3";
     }
 
-    execute(options?: Record<string, any>): Promise<boolean> {
+    _execute(options?: Record<string, any>): Promise<boolean> {
         throw new Error("Method not implemented.");
     }
 
-    query(key: string): Promise<any> {
+    _query(key: string): Promise<any> {
         throw new Error("Method not implemented.");
     }
 }

@@ -6,6 +6,7 @@ import {
     EntryConvertor,
     EXIT_GATE_TYPE,
     GATE_CATEGORY,
+    GETTER_VARIABLE_TYPE,
     NodeEntry,
     OpenTrigger,
     TriggerApplicationCollection,
@@ -16,14 +17,16 @@ import {
     TriggerGateExit,
     TriggerHook,
     TriggerNode,
+    TriggerVariableGetter,
+    VARIABLE_CATEGORY,
 } from "engine";
 import { joinStr, LocalizeArgs, LocalizeData, MODULE, R } from "module-helpers";
 import { BlueprintApplication } from "triggers-menu";
 import utils = foundry.utils;
 
 const APPLICATION_MODES = ["setting", "free"] as const;
-const FORBIDDEN_NODE_CATEGORIES = [GATE_CATEGORY];
-const FORBIDDEN_NODE_TYPE = [EXIT_GATE_TYPE, ENTRY_GATE_TYPE];
+const FORBIDDEN_NODE_CATEGORIES = [GATE_CATEGORY, VARIABLE_CATEGORY];
+const FORBIDDEN_NODE_TYPE = [EXIT_GATE_TYPE, ENTRY_GATE_TYPE, GETTER_VARIABLE_TYPE];
 
 class TriggerApplication {
     #applicationId: string;
@@ -58,6 +61,7 @@ class TriggerApplication {
         // add mandatory stuff
         this.#nodes.set(ENTRY_GATE_TYPE, TriggerGateEntry);
         this.#nodes.set(EXIT_GATE_TYPE, TriggerGateExit);
+        this.#nodes.set(GETTER_VARIABLE_TYPE, TriggerVariableGetter);
 
         // setup settings
         if (this.isSettingApplication) {

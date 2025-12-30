@@ -1,5 +1,5 @@
 import { IconObject } from "_zod";
-import { CustomInputSchema, ENTRY_GATE_TYPE, GATE_CATEGORY, TriggerNode } from "engine";
+import { ENTRY_GATE_TYPE, GATE_CATEGORY, TriggerNode } from "engine";
 
 class TriggerGateEntry extends TriggerNode {
     static get category(): string {
@@ -8,19 +8,6 @@ class TriggerGateEntry extends TriggerNode {
 
     static get type(): string {
         return ENTRY_GATE_TYPE;
-    }
-
-    static get tags(): string[] {
-        return ["gate", "entry"];
-    }
-
-    static get defineCustomInputs(): CustomInputSchema[] {
-        return [
-            {
-                array: true,
-                slug: "entry",
-            },
-        ];
     }
 
     get headerColor(): `#${string}` {
@@ -34,17 +21,17 @@ class TriggerGateEntry extends TriggerNode {
         };
     }
 
-    execute(options?: Record<string, any>): Promise<boolean> {
+    _execute(options?: Record<string, any>): Promise<boolean> {
         throw new Error("Method not implemented.");
     }
 
-    query(key: string): Promise<any> {
+    _query(key: string): Promise<any> {
         throw new Error("Method not implemented.");
     }
 }
 
-function isEntryGate(node: { type: string }): boolean {
+function isGateEntryNode(node: { type: string }): boolean {
     return node.type === ENTRY_GATE_TYPE;
 }
 
-export { isEntryGate, TriggerGateEntry };
+export { isGateEntryNode, TriggerGateEntry };

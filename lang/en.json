@@ -5,7 +5,11 @@
                 "add": "Add: {label}",
                 "disconnect": "Disconnect Entry",
                 "edit": "Edit: {label}",
-                "remove": "Remove Entry"
+                "remove": "Remove Entry",
+                "variable": {
+                    "create": "Create Variable",
+                    "edit": "Edit Variable"
+                }
             },
             "node": {
                 "copy": {
@@ -50,7 +54,10 @@
                 },
                 "reset": "Reset Trigger",
                 "save": "Save Triggers",
-                "variables": "Variables"
+                "variables": {
+                    "tab": "Move to nex Variable Getter",
+                    "title": "Variables"
+                }
             },
             "triggers": {
                 "close": "Close Window",
@@ -67,7 +74,6 @@
             }
         },
         "builtins": {
-            "category": {},
             "entry": {
                 "boolean": {
                     "title": "Boolean"
@@ -101,17 +107,6 @@
                 }
             }
         },
-        "edit-gate": {
-            "label": "Label",
-            "title": {
-                "create": "Create Gate",
-                "edit": "Edit Gate"
-            },
-            "yes": {
-                "create": "Create",
-                "edit": "Edit"
-            }
-        },
         "edit-entry": {
             "array": "Is Array?",
             "label": "Label",
@@ -131,6 +126,23 @@
                 "edit": "Edit"
             }
         },
+        "edit-label": {
+            "label": "Label",
+            "title": {
+                "gate": {
+                    "create": "Create Gate",
+                    "edit": "Edit Gate"
+                },
+                "variable": {
+                    "create": "Create Variable",
+                    "edit": "Edit Variable"
+                }
+            },
+            "yes": {
+                "create": "Create",
+                "edit": "Edit"
+            }
+        },
         "node": {
             "entry": "Entry",
             "in": "In",
@@ -145,7 +157,8 @@
             "category": {
                 "event": "Events",
                 "gate": "Gates",
-                "node": "Nodes"
+                "node": "Nodes",
+                "variable": "Variables"
             },
             "clipboard": {
                 "paste": "Paste Node(s) from Clipboard",

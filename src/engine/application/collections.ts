@@ -17,7 +17,7 @@ function getLocal(options: TriggerApplicationOptions, collection: TriggerApplica
         return mapConvertors(options.convertors ?? []);
     }
 
-    return R.map(options[collection] ?? [], (node) => [node.type, node as any] as const);
+    return R.map(options[collection] ?? [], (entry) => [entry.type, entry as any] as const);
 }
 
 function getBuiltins(options: TriggerApplicationOptions, collection: TriggerApplicationCollection) {

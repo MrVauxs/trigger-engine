@@ -4,12 +4,12 @@ import {
     ConnectionId,
     ENTRY_GATE_TYPE,
     EXIT_GATE_TYPE,
+    GATE_CATEGORY,
     getInputsSchemas,
     getNodeStates,
     getOutputsSchemas,
     getOutsSchemas,
-    isEntryGate,
-    isExitGate,
+    isGateExitNode,
     NodeData,
     NodeDataInput,
     NodeDataOutput,
@@ -17,6 +17,7 @@ import {
     OpenTriggerNode,
     TriggerApplication,
     TriggerNode,
+    VARIABLE_CATEGORY,
 } from "engine";
 import {
     ApplicationClosingOptions,
@@ -33,7 +34,7 @@ import {
     BaseBlueprintEntry,
     Blueprint,
     BlueprintEntry,
-    editNodeDialog,
+    editLabelDialog,
     EntryId,
     filterElements,
     isBlueprintEntry,
@@ -114,7 +115,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         const allNodes = this.#getNodes();
         const gateNodes = this.#getGateNodes();
         const [allEvents, nodes] = R.partition(allNodes, (node) => node.isEvent);
-        // TODO variables
+        const variables = this.#prepareVariablesGroup();
 
         const tags: RequiredSelectOptions = R.pipe(
             [...allNodes, ...gateNodes],
@@ -146,6 +147,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
             groups: this.#prepareNodesGroups(nodes, "node"),
             inClipboard: this.#inClipboard.length > 0,
             tags,
+            variables: [variables],
         };
     }
 
@@ -191,7 +193,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
     async #createGate() {
         this.#abortController.abort();
 
-        const label = await editNodeDialog();
+        const label = await editLabelDialog("gate");
 
         if (!label) {
             return this.close();
@@ -450,16 +452,42 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         }
     }
 
+    #prepareVariablesGroup(): NodesGroup {
+        const entry = this.#entry;
+        const group: NodesGroup = {
+            action: "select-variable",
+            label: this.localize("category.variable"),
+            nodes: [],
+        };
+
+        if (entry && (!isBlueprintEntry(entry) || entry.isOutput)) {
+            return group;
+        }
+
+        for (const [id, variable] of R.entries(this.trigger?.data.variables ?? {})) {
+            if (entry && entry.type !== variable.type) continue;
+
+            group.nodes.push({
+                id,
+                tags: [],
+                title: variable.label,
+                type: variable.type,
+            });
+        }
+
+        return group;
+    }
+
     #getGateNodes(): OpenTriggerNode[] {
         const entry = this.#entry;
 
         // entry-gates don't have outputs and we never create another instance of exit-gate
-        if (entry && (entry.isInput || isExitGate(entry.node))) {
+        if (entry && (entry.isInput || isGateExitNode(entry.node))) {
             return [];
         }
 
         // to create an entry-gate, we need to look at the existing exit-gate schemas
-        const nodes = this.trigger?.nodes.filter(isExitGate) ?? [];
+        const nodes = this.trigger?.nodes.filter(isGateExitNode) ?? [];
 
         // all gates have an 'in' so we don't even need to check further
         if (!entry || !isBlueprintEntry(entry)) {
@@ -480,7 +508,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         const entry = this.#entry;
 
         let nodes = this.application.nodes.filter(
-            (node) => !isExitGate(node) && !isEntryGate(node)
+            (node) => !R.isIncludedIn(node.category, [GATE_CATEGORY, VARIABLE_CATEGORY])
         );
 
         if (!entry) {
@@ -510,8 +538,8 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         });
     }
 
-    #prepareGatesGroup(nodes: OpenTriggerNode[]): GateGroup {
-        const group: GateGroup = {
+    #prepareGatesGroup(nodes: OpenTriggerNode[]): GatesGroup {
+        const group: GatesGroup = {
             action: "select-gate",
             add: { action: "create-gate", tooltip: this.localize("add.gate") },
             label: this.localize("category.gate"),
@@ -569,7 +597,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
             window.addEventListener(
                 "click",
                 (event) => {
-                    if (event.target instanceof HTMLElement && html.contains(event.target)) {
+                    if (event.target instanceof HTMLElement && !html.contains(event.target)) {
                         this.close();
                     }
                 },
@@ -633,10 +661,11 @@ type EventAction = "create-gate" | "paste-nodes" | "select-gate" | "select-node"
 
 type NodesMenuContext = {
     events: NodesGroup[];
-    gates: [GateGroup];
+    gates: [GatesGroup];
     groups: NodesGroup[];
     inClipboard: boolean;
     tags: RequiredSelectOptions;
+    variables: NodesGroup[];
 };
 
 type NodesGroup = {
@@ -645,12 +674,13 @@ type NodesGroup = {
     nodes: PreparedNode[];
 };
 
-type GateGroup = Exclude<NodesGroup, "nodes"> & {
-    add: { action: string; tooltip: string };
+type GatesGroup = NodesGroup & {
     nodes: (PreparedNode & { id: string })[];
+    add: { action: string; tooltip: string };
 };
 
 type PreparedNode = {
+    id?: string;
     tags: string[];
     title: string;
     type: string;
