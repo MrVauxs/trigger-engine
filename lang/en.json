@@ -35,7 +35,10 @@
                     "notify": "The Trigger path has been copied to the clipboard."
                 },
                 "data": "Export Data",
-                "delete": "Delete Trigger",
+                "delete": {
+                    "content": "Are you sure you want to delete the selected trigger?",
+                    "title": "Delete Trigger"
+                },
                 "duplicate": "Duplicate Trigger",
                 "edit": "Edit Trigger",
                 "events": "Events",

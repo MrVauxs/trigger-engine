@@ -12,6 +12,7 @@ import {
     ApplicationClosingOptions,
     ApplicationConfiguration,
     ApplicationRenderOptions,
+    confirmDialog,
     createHTMLElement,
     ExtendedMultiSelectElement,
     ExtendedTextInputElement,
@@ -268,9 +269,10 @@ class BlueprintApplication extends apps.ApplicationV2<
             {
                 icon: `<i class="fa-solid fa-trash"></i>`,
                 name: localizePath("blueprint.node.delete.single"),
-                callback: (el) => {
+                callback: async (el) => {
                     const nodeId = el.dataset.id ?? "";
-                    return this.blueprint.nodes.deleteById([nodeId]);
+                    const confirm = await confirmDialog("blueprint.node.delete.confirm");
+                    return confirm && this.blueprint.nodes.deleteById([nodeId]);
                 },
             },
         ];
@@ -311,10 +313,11 @@ class BlueprintApplication extends apps.ApplicationV2<
             },
             {
                 icon: `<i class="fa-solid fa-trash"></i>`,
-                name: localizePath("blueprint.trigger.delete"),
-                callback: (el) => {
-                    const triggerId = el.dataset.id;
-                    return triggerId && this.blueprint.deleteTrigger(triggerId);
+                name: localizePath("blueprint.trigger.delete.title"),
+                callback: async (el) => {
+                    const triggerId = el.dataset.id ?? "";
+                    const confirm = await confirmDialog("blueprint.trigger.delete");
+                    return confirm && this.blueprint.deleteTrigger(triggerId);
                 },
             },
         ];
