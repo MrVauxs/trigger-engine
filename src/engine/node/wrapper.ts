@@ -1,5 +1,6 @@
 import {
     instantiateEntry,
+    isEntryGate,
     NodeBridge,
     NodeEntry,
     OpenNodeEntry,
@@ -47,6 +48,17 @@ function instantiateNode(
         : R.isString(data.state) && R.isIncludedIn(data.state, nodeStates)
         ? data.state
         : nodeStates[0];
+
+    const exitGate: OpenTriggerNode["exitGate"] = (() => {
+        if (!isEntryGate(data)) return;
+
+        const exitConnection = R.keys(data.outs.out?.connections ?? {}).at(0);
+        const exitId = exitConnection?.split(":").at(0) ?? "";
+        const ExitCls = parent.nodes.get(exitId)?.constructor as typeof TriggerNode | undefined;
+        const exitData = foundry.utils.deepClone(parent.data.nodes.get(exitId));
+
+        return ExitCls && exitData ? { NodeCls: ExitCls, data: exitData } : undefined;
+    })();
 
     class TriggerNodeWrapper extends NodeCls {
         #in: NodeBridge | null;
@@ -123,10 +135,15 @@ function instantiateNode(
                 }
             );
 
-            // TODO also add customs
+            // entries
             const [inputs, outputs] = R.map(
                 [
-                    ["inputs", getInputsSchemas(NodeCls, { data, state: nodeState })],
+                    [
+                        "inputs",
+                        exitGate // we use the exit output schemas
+                            ? getOutputsSchemas(exitGate.NodeCls, { data: exitGate.data })
+                            : getInputsSchemas(NodeCls, { data, state: nodeState }),
+                    ],
                     ["outputs", getOutputsSchemas(NodeCls, { data, state: nodeState })],
                 ] as const,
                 ([category, schemas]) => {
@@ -176,6 +193,9 @@ function instantiateNode(
                             outputs: outputs as Collection<OpenNodeEntry>,
                         } satisfies NodeEntries,
                     },
+                    exitGate: {
+                        value: exitGate,
+                    },
                     parent: {
                         value: parent,
                     },
@@ -201,6 +221,7 @@ function instantiateNode(
 interface OpenTriggerNode extends TriggerNode {
     data: NodeData;
     entries: NodeEntries;
+    exitGate: { NodeCls: typeof TriggerNode; data: NodeData } | undefined;
     parent: OpenTrigger;
     state: string | null;
     states: string[] | null;

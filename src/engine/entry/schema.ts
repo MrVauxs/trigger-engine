@@ -20,15 +20,15 @@ const zNodeInputSchema = zNodeEntrySchema.extend({
 type BaseEntrySchemaInput = z.input<typeof zNodeEntrySchema>;
 type BaseEntrySchemaOutput = z.input<typeof zNodeEntrySchema>;
 
-type OutputEntrySchemaInput = BaseEntrySchemaInput;
-type OutputEntrySchemaOutput = BaseEntrySchemaOutput;
+type OutputEntrySchemaSource = BaseEntrySchemaInput;
+type OutputEntrySchema = BaseEntrySchemaOutput;
 
-type InputEntrySchemaInput<TField extends Record<string, any> | undefined = any> = Prettify<
+type InputEntrySchemaSource<TField extends Record<string, any> | undefined = any> = Prettify<
     BaseEntrySchemaInput & {
         field?: TField;
     }
 >;
-type InputEntrySchemaOutput<TField extends Record<string, any> | undefined = any> = Prettify<
+type InputEntrySchema<TField extends Record<string, any> | undefined = any> = Prettify<
     BaseEntrySchemaOutput & {
         field?: TField;
     }
@@ -38,8 +38,8 @@ export { zNodeInputSchema, zNodeOutputSchema };
 export type {
     BaseEntrySchemaInput,
     BaseEntrySchemaOutput,
-    InputEntrySchemaInput,
-    InputEntrySchemaOutput,
-    OutputEntrySchemaInput,
-    OutputEntrySchemaOutput,
+    InputEntrySchemaSource,
+    InputEntrySchema,
+    OutputEntrySchemaSource,
+    OutputEntrySchema,
 };

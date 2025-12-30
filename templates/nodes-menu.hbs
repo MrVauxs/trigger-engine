@@ -1,4 +1,4 @@
-<div class="content">
+<div class="content" data-tooltip-class="pf2e" data-tooltip-direction="UP">
     <div class="left">
         {{!-- search --}}
         <fieldset>
@@ -25,24 +25,30 @@
             </div>
         </fieldset>
         {{/if}}
-        <div class="scroll">
-            {{> 'section' events}}
-        </div>
+        {{> 'section' gates}}
+        {{> 'section' events}}
     </div>
     <div class="right">
-        <div class="scroll">
-            {{> 'section' groups}}
-        </div>
+        {{> 'section' groups}}
     </div>
 </div>
 
 {{#*inline 'section'}}
 {{#each this as |group|}}
 <fieldset>
-    <legend>{{group.label}}</legend>
+    <legend>
+        {{#if group.add}}
+        <a data-action="{{group.add.action}}" data-tooltip="{{group.add.tooltip}}">
+            <i class="fa-solid fa-plus"></i>
+            {{group.label}}
+        </a>
+        {{else}}
+        {{group.label}}
+        {{/if}}
+    </legend>
     <div class="nodes" data-empty="{{@root.i18n 'empty'}}">{{#each group.nodes as |node|}}<div
-            class="selectable node" data-action="select-node" data-tags="{{node.tags}}"
-            data-name="{{node.title}}" data-type="{{node.type}}">
+            class="selectable node" data-action="{{group.action}}" data-tags="{{node.tags}}"
+            data-name="{{node.title}}" data-type="{{node.type}}" data-id="{{node.id}}">
             <div class="name">{{node.title}}</div>
         </div>{{/each}}</div>
 </fieldset>

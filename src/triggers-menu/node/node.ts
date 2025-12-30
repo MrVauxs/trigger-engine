@@ -7,11 +7,14 @@ import {
     BaseEntrySchemaInput,
     EntryCategory,
     isConnectionId,
+    isEntryGate,
+    isExitGate,
     isOppositeConnection,
     NodeData,
     OpenNodeEntry,
     OpenTrigger,
     OpenTriggerNode,
+    TriggerGateExit,
     TriggerNode,
     zCustomInputData,
     zCustomInputSchema,
@@ -26,6 +29,7 @@ import {
     drawRectangleMask,
     localize,
     LocalizeArgs,
+    localizeIfExist,
     localizePath,
     mapToObjByKey,
     MouseInteractionManager,
@@ -75,6 +79,10 @@ class BlueprintNode extends PIXI.Container {
         this.#node = node;
     }
 
+    get category(): string {
+        return this.#node.category;
+    }
+
     get type(): string {
         return this.#node.type;
     }
@@ -111,6 +119,14 @@ class BlueprintNode extends PIXI.Container {
         return this.#node.id;
     }
 
+    get isGate() {
+        return this.category === TriggerGateExit.category;
+    }
+
+    get gateId(): string | undefined {
+        return isExitGate(this) ? this.#node.id : this.#node.exitGate?.data.id;
+    }
+
     get data(): NodeData {
         return this.#node.data;
     }
@@ -120,12 +136,12 @@ class BlueprintNode extends PIXI.Container {
     }
 
     get isDuplicable(): boolean {
-        // TODO also exclude variables & gate exist
-        return !this.isEvent;
+        // TODO also exclude variables
+        return !this.isEvent && !this.isGate;
     }
 
     get label(): string {
-        return this.#node.title ?? this.#node.id;
+        return this.#node.data.custom.title ?? this.#node.title ?? this.#node.id;
     }
 
     get inputsHaveConnector(): boolean {
@@ -546,11 +562,18 @@ class BlueprintNode extends PIXI.Container {
         const body = new PIXI.Container() as NodePart;
         const entries = this.#node.entries;
 
-        const outs = entries.outs.contents;
+        const outs = isEntryGate(this.#node) ? [] : entries.outs.contents;
         const minIndex = entries.in || outs.length ? 1 : 0;
         const [inputs, outputs] = R.pipe(
             ["inputs", "outputs"] as const,
             R.map((category) => {
+                if (
+                    (category === "inputs" && isExitGate(this.#node)) ||
+                    (category === "outputs" && isEntryGate(this.#node))
+                ) {
+                    return [];
+                }
+
                 return R.pipe(
                     entries[category].contents,
                     R.groupBy((entry) => entry.group ?? ""),
@@ -597,7 +620,7 @@ class BlueprintNode extends PIXI.Container {
 
         // we process all inputs first to make layout computation easier
 
-        if (entries.in) {
+        if (entries.in && !isExitGate(this.#node)) {
             this.#in = new BlueprintBridgeEntry(this, "inputs", entries.in);
             this.#entries.push(this.#in);
 
@@ -670,7 +693,7 @@ class BlueprintNode extends PIXI.Container {
     }
 
     #createHeader(): NodeheaderPart | undefined {
-        const title = this.#node.title;
+        const title = this.#node.data.custom.title || this.#node.title;
         if (!R.isString(title)) return;
 
         const headerSource: NodeHeaderSource = {
@@ -744,10 +767,16 @@ class BlueprintNode extends PIXI.Container {
             }),
         });
 
-        menu.element.addEventListener("pointerleave", () => {
+        const close = () => {
             anchor.remove();
             menu.close();
-        });
+        };
+
+        if (menu.element.matches(":hover")) {
+            menu.element.addEventListener("pointerleave", close);
+        } else {
+            close();
+        }
     }
 
     doubleLocalize(label: string | undefined, ...path: string[]): string | undefined {
@@ -762,6 +791,14 @@ class BlueprintNode extends PIXI.Container {
         renderApplication?: boolean;
     } = {}) {
         this.trigger.refreshNode(this.id);
+
+        // wer need to refresh all the entry-gates as well
+        if (isExitGate(this)) {
+            for (const node of this.parent.getGateEntries(this.id)) {
+                this.trigger.refreshNode(node.id);
+            }
+        }
+
         this.blueprint.draw({
             forceComputeConnections,
             renderApplication,
@@ -797,7 +834,11 @@ class BlueprintNode extends PIXI.Container {
     }
 
     #customEntryLabel(category: EntryCategory | "outs", schema: BaseCustomSchema): string {
-        return this.#customEntryLocalize(schema.label, category, schema, "label") ?? schema.slug;
+        return (
+            this.#customEntryLocalize(schema.label, category, schema, "label") ??
+            localizeIfExist("node", schema.slug) ??
+            schema.slug
+        );
     }
 
     async #addCustomEntry(category: EntryCategory | "outs", schema: BaseCustomSchema) {
@@ -908,7 +949,7 @@ class BlueprintNode extends PIXI.Container {
         this.data.update({
             custom: {
                 [category]: {
-                    [entry.slug]: entry,
+                    [entry.id]: entry,
                 },
             },
         });
@@ -978,7 +1019,7 @@ class BlueprintNode extends PIXI.Container {
         }
 
         // custom entries
-        if (!locked) {
+        if (!locked && !isEntryGate(this)) {
             const categories = [
                 ["outs", "defineCustomOuts", zCustomOutSchema],
                 ["inputs", "defineCustomInputs", zCustomInputSchema],

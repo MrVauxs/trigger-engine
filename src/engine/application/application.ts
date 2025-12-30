@@ -9,6 +9,8 @@ import {
     TriggerApplicationCollections,
     TriggerData,
     TriggerDataInput,
+    TriggerGateEntry,
+    TriggerGateExit,
     TriggerHook,
     TriggerNode,
 } from "engine";
@@ -39,6 +41,11 @@ class TriggerApplication {
         this.#hooks = new Collection();
         this.#nodes = createCollection(options, "nodes");
 
+        // add mandatory stuff
+        this.#nodes.set(TriggerGateEntry.type, TriggerGateEntry);
+        this.#nodes.set(TriggerGateExit.type, TriggerGateExit);
+
+        // setup settings
         if (this.isSettingApplication) {
             this.#setupSetting(options.setting);
         }

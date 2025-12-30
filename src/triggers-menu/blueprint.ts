@@ -182,7 +182,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
 
         const nodePosition = node.position;
         const layerPosition = this.#layers.position;
-        const targetPosition = subtractPoint({ x: 400, y: 180 }, nodePosition);
+        const targetPosition = subtractPoint({ x: 600, y: 350 }, nodePosition);
         const distance = distanceToPoint(layerPosition, targetPosition);
         const tilePosition = this.#gridLayer.tilePosition;
 

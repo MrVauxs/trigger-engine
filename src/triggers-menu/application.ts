@@ -1,4 +1,11 @@
-import { OpenTrigger, TriggerApplication, TriggerDataInput, UpdateTriggerData } from "engine";
+import {
+    isEntryGate,
+    isExitGate,
+    OpenTrigger,
+    TriggerApplication,
+    TriggerDataInput,
+    UpdateTriggerData,
+} from "engine";
 import {
     addEnterKeyListeners,
     addListener,
@@ -8,6 +15,7 @@ import {
     createHTMLElement,
     ExtendedMultiSelectElement,
     ExtendedTextInputElement,
+    htmlClosest,
     htmlQuery,
     includesAll,
     includesAny,
@@ -164,7 +172,12 @@ class BlueprintApplication extends apps.ApplicationV2<
         if (ui) {
             ui.innerHTML = result;
         } else {
-            const wrapper = createHTMLElement("div", { classes: ["ui"], content: result });
+            const wrapper = createHTMLElement("div", {
+                classes: ["ui"],
+                content: result,
+                dataset: { tooltipClass: "pf2e" },
+            });
+
             content.appendChild(wrapper);
         }
 
@@ -228,7 +241,7 @@ class BlueprintApplication extends apps.ApplicationV2<
                 return;
             }
 
-            case "select-event": {
+            case "select-node": {
                 const nodeId = target.dataset.id ?? "";
                 return this.blueprint.moveToNode(nodeId, true);
             }
@@ -236,6 +249,11 @@ class BlueprintApplication extends apps.ApplicationV2<
             case "select-trigger": {
                 const triggerId = target.dataset.id ?? null;
                 return (this.blueprint.trigger = triggerId);
+            }
+
+            case "tab-gate": {
+                const nodeId = htmlClosest(target, "[data-id]")?.dataset.id ?? "";
+                return this.#tabGate(nodeId);
             }
         }
     }
@@ -288,6 +306,25 @@ class BlueprintApplication extends apps.ApplicationV2<
         ];
     }
 
+    #tabGate(exitId: string) {
+        const nodes = this.blueprint.nodes.getGateEntries(exitId);
+        const nbNodes = nodes.length;
+        if (!nbNodes) return;
+
+        if (this.blueprint.nodes.selected.length !== 1 || nbNodes === 1) {
+            return this.blueprint.moveToNode(nodes[0].id, true);
+        }
+
+        const currentIndex = nodes.findIndex((node) => node.selected);
+
+        if (currentIndex >= 0) {
+            const node = nodes[(currentIndex + 1) % nbNodes];
+            this.blueprint.moveToNode(node.id, true);
+        } else {
+            this.blueprint.moveToNode(nodes[0].id, true);
+        }
+    }
+
     #filterTriggers() {
         filterElements(
             this.element.querySelectorAll<HTMLElement>(".sidebar.triggers .trigger"),
@@ -300,12 +337,37 @@ class BlueprintApplication extends apps.ApplicationV2<
     #prepareTriggerContext(trigger: OpenTrigger): TriggerContext {
         this.#search = "";
 
-        const events = this.blueprint.nodes.filter((node) => node.isEvent);
+        const events = R.map(
+            this.blueprint.nodes.filter((node) => node.isEvent),
+            (node): TriggerEntry => {
+                return { actions: [], buttons: [], node };
+            }
+        );
+
+        const gates = R.map(
+            this.blueprint.nodes.filter((node) => isExitGate(node)),
+            (node): TriggerEntry => {
+                const buttons: TriggerEntry["buttons"] = [];
+                const hasEntries = this.blueprint.nodes.some(
+                    (other) => isEntryGate(other) && other.gateId === node.id
+                );
+
+                if (hasEntries) {
+                    buttons.push({
+                        action: "tab-gate",
+                        icon: "fa-solid fa-plug",
+                    });
+                }
+
+                return { actions: [], buttons, node };
+            }
+        );
 
         return {
             events,
+            gates,
             isFree: this.application.isFreeApplication,
-            trigger: trigger,
+            trigger,
         };
     }
 
@@ -446,15 +508,23 @@ type EventAction =
     | "import-triggers"
     | "reset-trigger"
     | "save-triggers"
-    | "select-event"
-    | "select-trigger";
+    | "select-node"
+    | "select-trigger"
+    | "tab-gate";
 
 type BlueprintContext = TriggersContext | TriggerContext;
 
 type TriggerContext = {
-    events: BlueprintNode[];
+    events: TriggerEntry[];
+    gates: TriggerEntry[];
     isFree: boolean;
     trigger: OpenTrigger;
+};
+
+type TriggerEntry = {
+    actions: { icon: string; action: string }[];
+    buttons: { icon: string; action: string }[];
+    node: BlueprintNode;
 };
 
 type TriggersContext = {

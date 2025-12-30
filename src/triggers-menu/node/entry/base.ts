@@ -1,4 +1,4 @@
-import { EntryConnections, isOppositeConnection } from "engine";
+import { EntryConnections, isEntryGate, isExitGate, isOppositeConnection } from "engine";
 import { localizePath, R } from "module-helpers";
 import { Blueprint } from "triggers-menu";
 import { alignHorizontally, BlueprintNode } from "..";
@@ -152,14 +152,16 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
         return (
             this.hasConnector &&
             this.canConnect &&
-            this.preciseCategory === other.oppositePreciseCategory
+            this.preciseCategory === other.oppositePreciseCategory &&
+            // we don't want gates looping over each other, this is an easy exception to make
+            (this.node.isGate || !other.node.isGate || this.node.gateId !== other.node.gateId)
         );
     }
 
     disconnect() {
         const category = this.preciseCategory;
 
-        if (this.isInput) {
+        if (this.isConnectionInitiator) {
             for (const otherId of R.keys(this.connections)) {
                 this.node.removeConnection(category, this.key, otherId);
             }
@@ -185,30 +187,44 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
     }
 
     remove() {
-        const category = this.preciseCategory;
-        if (!this.isCustom || category === "ins") return;
+        const preciseCategory = this.preciseCategory;
+        if (!this.isCustom || preciseCategory === "ins") return;
 
         // TODO also remove variables
 
-        if (this.isRevealed) {
-            this.node.data.update({
-                revealed: {
-                    [category]: {
-                        [this.key]: undefined,
-                    },
-                },
-            });
-        } else {
-            const slug = this.customSlug;
-            if (!slug) return;
+        const nodes: (readonly [PreciseEntryCategory, BlueprintNode])[] = [
+            [preciseCategory, this.node],
+        ];
 
-            this.node.data.update({
-                custom: {
-                    [category]: {
-                        [slug]: undefined,
+        // we want to disconnect all the entry-gates too
+        if (isExitGate(this.node)) {
+            const oppositeCategory = this.oppositePreciseCategory;
+
+            nodes.push(
+                ...this.node.parent
+                    .getGateEntries(this.node.id)
+                    .map((node) => [oppositeCategory, node] as const)
+            );
+        }
+
+        for (const [category, node] of nodes) {
+            if (this.isRevealed) {
+                node.data.update({
+                    revealed: {
+                        [category]: {
+                            [this.key]: undefined,
+                        },
                     },
-                },
-            });
+                });
+            } else {
+                node.data.update({
+                    custom: {
+                        [category]: {
+                            [this.key]: undefined,
+                        },
+                    },
+                });
+            }
         }
 
         this.node.refresh({ forceComputeConnections: true });
@@ -279,7 +295,7 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
             });
         }
 
-        if (this.isCustom || this.isRevealed) {
+        if ((this.isCustom || this.isRevealed) && !isEntryGate(this.node)) {
             entries.push({
                 name: localizePath("blueprint.entry.remove"),
                 icon: `<i class="fa-solid fa-trash fa-fw"></i>`,

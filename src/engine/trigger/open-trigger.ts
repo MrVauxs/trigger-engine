@@ -9,6 +9,7 @@ import {
     TriggerApplication,
     TriggerData,
     TriggerDataOutput,
+    TriggerGateExit,
     TriggerNode,
     UpdateTriggerData,
 } from "engine";
@@ -24,6 +25,19 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
         super(parent, data);
 
         for (const nodeData of data.nodes) {
+            if (nodeData.type !== TriggerGateExit.type) continue;
+
+            try {
+                const node = instantiateNode(this, nodeData, true);
+                if (!node) continue;
+
+                this.nodes.set(node.id, node);
+            } catch (error) {}
+        }
+
+        for (const nodeData of data.nodes) {
+            if (nodeData.type === TriggerGateExit.type) continue;
+
             try {
                 const node = instantiateNode(this, nodeData, true);
                 if (!node) continue;
@@ -138,11 +152,16 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
 
         for (const originNode of this.nodes) {
             const OriginNodeCls = originNode.constructor as typeof TriggerNode;
-
             const originConnections = R.pipe(
                 [
                     ["outs", originNode.data.outs, getOutsSchemas(OriginNodeCls, originNode)],
-                    ["inputs", originNode.data.inputs, getInputsSchemas(OriginNodeCls, originNode)],
+                    [
+                        "inputs",
+                        originNode.data.inputs,
+                        originNode.exitGate
+                            ? getOutputsSchemas(originNode.exitGate.NodeCls, originNode.exitGate)
+                            : getInputsSchemas(OriginNodeCls, originNode),
+                    ],
                 ] as const,
                 R.flatMap(([category, entries, schemas]) => {
                     return R.pipe(

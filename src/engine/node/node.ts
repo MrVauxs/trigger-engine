@@ -4,9 +4,9 @@ import {
     CustomInputSchema,
     CustomOutputSchema,
     CustomOutSchema,
-    InputEntrySchemaInput,
+    InputEntrySchemaSource,
     NodeField,
-    OutputEntrySchemaInput,
+    OutputEntrySchemaSource,
 } from "engine";
 import { LocalizeArgs, MODULE } from "module-helpers";
 import { NodeData } from ".";
@@ -106,7 +106,7 @@ abstract class TriggerNode {
      * `<module-id>.<application-id>.node.<category>.<type>.inputs.<key>`
      * `<module-id>.<application-id>.node.<category>.<type>.group.<group>`
      */
-    static get defineInputs(): InputEntrySchemaInput[] | null {
+    static get defineInputs(): InputEntrySchemaSource[] | null {
         return null;
     }
 
@@ -116,7 +116,7 @@ abstract class TriggerNode {
      * Localization path:
      * `<module-id>.<application-id>.node.<category>.<type>.outputs.<key>`
      */
-    static get defineOutputs(): OutputEntrySchemaInput[] | null {
+    static get defineOutputs(): OutputEntrySchemaSource[] | null {
         return null;
     }
 

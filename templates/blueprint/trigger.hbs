@@ -26,24 +26,8 @@
             </a>
         </div>
     </div>
-    <div class="header sub">
-        {{@root.i18n 'events'}}
-    </div>
-    <div class="scroll">
-        <div class="list">
-            {{#each events as |event|}}
-            <div class="event" data-id="{{event.id}}" data-action="select-event">
-                {{event.label}}
-            </div>
-            {{/each}}
-        </div>
-    </div>
-    <div class="header sub">
-        {{@root.i18n 'gates'}}
-    </div>
-    <div class="scroll">
-
-    </div>
+    {{> 'entries' type='events' entries=events}}
+    {{> 'entries' type='gates' entries=gates}}
     <div class="header sub">
         {{@root.i18n 'variables'}}
     </div>
@@ -65,3 +49,28 @@
     <i class="fa-solid fa-expand"></i>
     {{@root.i18n 'expand'}}
 </a>
+
+{{#*inline 'entries'}}
+<div class="header sub">
+    {{@root.i18n type 'title'}}
+</div>
+<div class="scroll">
+    <div class="list">
+        {{#each entries as |entry|}}
+        <div data-id="{{entry.node.id}}" data-action="select-node" data-tooltip-direction="UP">
+            <span>{{entry.node.label}}</span>
+            {{#if entry.buttons.length}}
+            {{#each entry.buttons as |button|}}
+            <div class="controls">
+                <a data-action="{{button.action}}" {{{@root.i18n.tooltip ../../type 'buttons'
+                    button.action}}}>
+                    <i class="{{button.icon}}"></i>
+                </a>
+            </div>
+            {{/each}}
+            {{/if}}
+        </div>
+        {{/each}}
+    </div>
+</div>
+{{/inline}}

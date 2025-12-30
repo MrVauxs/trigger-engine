@@ -3,7 +3,7 @@ import { z } from "module-helpers";
 const zIconObj = z.object({
     fontWeight: z.optional(z.string<TextStyleFontWeight>()),
     fontMult: z.number().min(0).default(1),
-    unicode: z.string().trim().min(5),
+    unicode: z.string().trim().min(1),
 });
 
 type IconObject = z.input<typeof zIconObj>;

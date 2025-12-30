@@ -6,9 +6,9 @@ import {
     BridgeSchemaInput,
     BridgeSchemaOutput,
     CustomInputSchema,
-    InputEntrySchemaOutput,
+    InputEntrySchema,
     NodeData,
-    OutputEntrySchemaOutput,
+    OutputEntrySchema,
     TriggerNode,
     zBaseEntrySchema,
     zCustomInputSchema,
@@ -146,7 +146,7 @@ function getEntrySchemas<T extends BaseEntrySchemaInput>(
 function getInputsSchemas(
     NodeCls: typeof TriggerNode,
     options?: SchemasFilterOptions
-): InputEntrySchemaOutput[] {
+): InputEntrySchema[] {
     return getEntrySchemas(
         NodeCls.defineInputs,
         zNodeInputSchema,
@@ -166,7 +166,7 @@ function getInputsSchemas(
 function getOutputsSchemas(
     NodeCls: typeof TriggerNode,
     options?: SchemasFilterOptions
-): OutputEntrySchemaOutput[] {
+): OutputEntrySchema[] {
     return getEntrySchemas(
         NodeCls.defineOutputs,
         zNodeOutputSchema,

@@ -90,7 +90,7 @@ class BlueprintEntry extends BaseBlueprintEntry {
         if (isArray) {
             connector.lineStyle({ color, width: 1 });
             if (isCustom) {
-                connector.drawRoundedRect(0, 0, 13, 14.5, 2.5);
+                connector.drawRoundedRect(0, 0, 12.5, 14.5, 2.5);
             } else {
                 connector.drawCircle(7, 7, 7.5);
             }
@@ -104,7 +104,7 @@ class BlueprintEntry extends BaseBlueprintEntry {
 
         if (isCustom) {
             if (isArray) {
-                connector.drawRoundedRect(2, 2, 9, 10.5, 2.5);
+                connector.drawRoundedRect(2, 2, 8.5, 10, 2);
             } else {
                 connector.drawRoundedRect(0, 0, 12.5, 14, 2.5);
             }

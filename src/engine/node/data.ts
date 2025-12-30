@@ -17,14 +17,17 @@ const zRevealed = z.object({
     outputs: zRevealedRecord,
 });
 
-const zCustoms = z.object({
-    outs: z.record(zString, zCustomOutData).default({}),
-    inputs: z.record(zString, zCustomInputData).default({}),
-    outputs: z.record(zString, zCustomOutputData).default({}),
-});
+const zNodeCustoms = z
+    .object({
+        title: z.string().optional(),
+        inputs: z.record(zString, zCustomInputData).default({}),
+        outputs: z.record(zString, zCustomOutputData).default({}),
+        outs: z.record(zString, zCustomOutData).default({}),
+    })
+    .default({ outs: {}, inputs: {}, outputs: {} });
 
 const zNodeDataSchema = z.object({
-    custom: zCustoms.default({ outs: {}, inputs: {}, outputs: {} }),
+    custom: zNodeCustoms,
     id: zID,
     inputs: zEntryDataSchema,
     outs: zEntryDataSchema,
@@ -41,5 +44,5 @@ type NodeDataSchema = typeof zNodeDataSchema;
 
 type CreateNodeData = z.input<NodeDataSchema>;
 
-export { NodeData, zNodeDataSchema };
+export { NodeData, zNodeDataSchema, zNodeCustoms };
 export type { CreateNodeData, NodeDataInput, NodeDataOutput, NodeDataSchema };

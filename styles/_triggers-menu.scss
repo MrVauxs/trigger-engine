@@ -141,6 +141,17 @@
             &.variables {
                 flex: 2;
             }
+
+            [data-id] {
+                justify-content: space-between;
+            }
+        }
+
+        .controls {
+            a {
+                padding-inline: 0.3em;
+                font-size: 1.1em;
+            }
         }
     }
 

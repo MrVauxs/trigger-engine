@@ -23,6 +23,7 @@
         .right {
             display: flex;
             flex-direction: column;
+            overflow: hidden;
 
             .scroll {
                 flex: 1;
@@ -32,6 +33,9 @@
             }
 
             fieldset {
+                position: relative;
+                overflow-y: auto;
+
                 .legend {
                     font-size: 1.2em;
                 }

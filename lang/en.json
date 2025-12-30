@@ -38,9 +38,16 @@
                 "delete": "Delete Trigger",
                 "duplicate": "Duplicate Trigger",
                 "edit": "Edit Trigger",
-                "events": "Events",
+                "events": {
+                    "title": "Events"
+                },
                 "expand": "Restore Triggers Window",
-                "gates": "Gates",
+                "gates": {
+                    "buttons": {
+                        "tab-gate": "Move to next Entry Gate"
+                    },
+                    "title": "Gates"
+                },
                 "reset": "Reset Trigger",
                 "save": "Save Triggers",
                 "variables": "Variables"
@@ -60,7 +67,11 @@
             }
         },
         "builtins": {
+            "category": {},
             "entry": {
+                "boolean": {
+                    "title": "Boolean"
+                },
                 "number": {
                     "title": "Number"
                 },
@@ -69,6 +80,14 @@
                 }
             },
             "node": {
+                "__gate__": {
+                    "__gate_entry__": {
+                        "subtitle": "Entry Gate"
+                    },
+                    "__gate_exit__": {
+                        "subtitle": "Exit Gate"
+                    }
+                },
                 "event": {
                     "test-event": {
                         "title": "Test Event",
@@ -81,6 +100,13 @@
                     "title": "Debug"
                 }
             }
+        },
+        "edit-gate": {
+            "label": "Label",
+            "title": {
+                "create": "Create Gate"
+            },
+            "yes": "Create"
         },
         "edit-entry": {
             "array": "Is Array?",
@@ -102,12 +128,19 @@
             }
         },
         "node": {
+            "entry": "Entry",
             "in": "In",
-            "out": "Out"
+            "input": "Input",
+            "out": "Out",
+            "output": "Output"
         },
         "nodes-menu": {
+            "add": {
+                "gate": "Create new gate"
+            },
             "category": {
                 "event": "Events",
+                "gate": "Gates",
                 "node": "Nodes"
             },
             "clipboard": {

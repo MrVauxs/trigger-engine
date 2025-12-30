@@ -1,4 +1,10 @@
-import { NodeDataOutput, OpenTriggerNode, OPPOSITE_CONNECTION_CATEGORY } from "engine";
+import {
+    isEntryGate,
+    isExitGate,
+    NodeDataOutput,
+    OpenTriggerNode,
+    OPPOSITE_CONNECTION_CATEGORY,
+} from "engine";
 import { info, R } from "module-helpers";
 import { BaseBlueprintEntry, BlueprintNode, EntryId } from ".";
 import { Blueprint, BlueprintLayers } from "..";
@@ -18,8 +24,16 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
         return this.#nodes.filter((node) => node.selected);
     }
 
+    getGateEntries(exitId: string): BlueprintNode[] {
+        return this.filter((node) => isEntryGate(node) && node.gateId === exitId);
+    }
+
     filter(fn: (node: BlueprintNode) => boolean) {
         return this.#nodes.filter(fn);
+    }
+
+    some(fn: (node: BlueprintNode) => boolean) {
+        return this.#nodes.some(fn);
     }
 
     clearSelected() {
@@ -91,10 +105,16 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
         if (!trigger) return;
 
         for (const node of nodes) {
-            if (!node.selected) continue;
+            const groupedNodes = [node];
 
-            node.eventMode = "none";
-            trigger.deleteNode(node.id);
+            if (isExitGate(node)) {
+                groupedNodes.push(...this.getGateEntries(node.id));
+            }
+
+            for (const groupedNode of groupedNodes) {
+                groupedNode.eventMode = "none";
+                trigger.deleteNode(groupedNode.id);
+            }
         }
 
         this.blueprint.draw({ forceComputeConnections: true, renderApplication: true });

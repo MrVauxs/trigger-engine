@@ -38,7 +38,7 @@ const zBaseSchema = z.object({
 const zBaseEntrySchema = zBaseSchema.extend({
     array: z.boolean().default(false),
     group: zString.optional(),
-    types: z.array(zString),
+    types: z.array(zString).default([]),
 });
 
 type BaseCustomSchema = z.input<typeof zBaseSchema>;

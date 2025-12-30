@@ -5,24 +5,29 @@ import {
     getNodeStates,
     getOutputsSchemas,
     getOutsSchemas,
+    isEntryGate,
+    isExitGate,
     NodeData,
     NodeDataInput,
     NodeDataOutput,
     OpenTrigger,
+    OpenTriggerNode,
     TriggerApplication,
+    TriggerGateEntry,
+    TriggerGateExit,
     TriggerNode,
 } from "engine";
 import {
     ApplicationClosingOptions,
     ApplicationConfiguration,
     ApplicationRenderOptions,
-    datasetToData,
     ExtendedMultiSelectElement,
     ExtendedTextInputElement,
     htmlQuery,
     localize,
     R,
     render,
+    waitDialog,
 } from "module-helpers";
 import {
     BaseBlueprintEntry,
@@ -106,11 +111,12 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
 
     async _prepareContext(options: ApplicationRenderOptions): Promise<NodesMenuContext> {
         const allNodes = this.#getNodes();
+        const gateNodes = this.#getGateNodes();
         const [allEvents, nodes] = R.partition(allNodes, (node) => node.isEvent);
-        // TODO variables & gates
+        // TODO variables
 
         const tags: RequiredSelectOptions = R.pipe(
-            allNodes,
+            [...allNodes, ...gateNodes.map((node) => node.constructor as typeof TriggerNode)],
             R.flatMap((node): Required<SelectOption<string>>[] => {
                 return node.tags.map((tag): Required<SelectOption> => {
                     return {
@@ -135,6 +141,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
 
         return {
             events: this.#prepareNodesGroups(events, "event"),
+            gates: [this.#prepareGatesGroup(gateNodes)],
             groups: this.#prepareNodesGroups(nodes, "node"),
             inClipboard: this.#inClipboard.length > 0,
             tags,
@@ -160,27 +167,119 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         const action = target.dataset.action as EventAction;
 
         switch (action) {
+            case "create-gate": {
+                return this.#createGate();
+            }
+
             case "paste-nodes": {
                 return this.#pasteFromClipboard();
             }
 
+            case "select-gate": {
+                const id = target.dataset.id as string;
+                return this.#selectGate(id);
+            }
+
             case "select-node": {
-                const source = R.pick(datasetToData(target), ["type", "builtin"]);
-                return this.#selectNode(source);
+                const type = target.dataset.type as string;
+                return this.#selectNode({ type });
             }
         }
     }
 
-    #selectNode(otherSource: NodeDataInput) {
+    async #createGate() {
+        const group = foundry.applications.fields.createFormGroup({
+            label: localize("edit-gate.label"),
+            input: foundry.applications.fields.createTextInput({
+                name: "label",
+                autofocus: true,
+                required: true,
+                value: "",
+            }),
+        });
+
+        const result = await waitDialog<{ label: string }>({
+            content: group.outerHTML,
+            i18n: "edit-gate",
+            title: localize("edit-gate.title.create"),
+        });
+
+        if (!result || !result.label) return;
+
+        const source: NodeDataInput = {
+            custom: {
+                title: result.label,
+            },
+            type: TriggerGateExit.type,
+        };
+
+        this.#selectNode(source);
+    }
+
+    #selectGate(exitId: string) {
         const trigger = this.trigger;
         if (!trigger) return;
 
-        const OtherCls = this.application.nodes.get(otherSource.type) as typeof TriggerNode;
+        const entry = this.#entry;
+        if (entry && entry.isInput) return;
+
+        const exitNode = trigger.nodes.get(exitId);
+        if (!exitNode) return;
+
+        let otherIdSuffix: EntryIdSuffix | undefined;
+
+        const newSource: NodeDataInput = {
+            custom: {
+                inputs: foundry.utils.deepClone(exitNode.data.custom.outputs),
+                title: exitNode.data.custom.title,
+            },
+            position: this.#position,
+            outs: {
+                out: {
+                    connections: {
+                        [`${exitNode.id}:ins:in`]: true,
+                    },
+                },
+            },
+            type: TriggerGateEntry.type,
+        };
+
+        if (entry && isBlueprintEntry(entry)) {
+            const isArray = !!entry.isArray;
+            const entries = getOutputsSchemas(exitNode.constructor as typeof TriggerNode, {
+                data: exitNode.data,
+            });
+            const exitEntry = entries.find((other) => {
+                return other.type === entry.type && isArray === !!other.isArray;
+            });
+
+            if (exitEntry) {
+                otherIdSuffix = `inputs:${exitEntry.key}`;
+                newSource.inputs = {
+                    [exitEntry.key]: {
+                        connections: {
+                            [entry.id]: true,
+                        },
+                    },
+                };
+            }
+        } else if (entry) {
+            otherIdSuffix = "ins:in";
+        }
+
+        this.#createNode(newSource, otherIdSuffix);
+    }
+
+    #selectNode(newSource: NodeDataInput) {
+        const trigger = this.trigger;
+        if (!trigger) return;
+
+        const OtherCls = this.application.nodes.get(newSource.type) as typeof TriggerNode;
         if (!OtherCls) return;
 
-        otherSource.position = this.#position;
+        newSource.position = this.#position;
 
-        let otherIdSuffix: `${PreciseEntryCategory}:${string}` | undefined;
+        let otherIdSuffix: EntryIdSuffix | undefined;
 
         const entry = this.#entry;
         const nodeStates = getNodeStates(OtherCls) ?? [null];
@@ -209,9 +308,9 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
                     }
 
                     if (state) {
-                        otherSource.state = state;
+                        newSource.state = state;
                     } else {
-                        delete otherSource.state;
+                        delete newSource.state;
                     }
 
                     return schema;
@@ -220,12 +319,12 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
 
             if (hidden) {
                 if (hidden.state) {
-                    otherSource.state = hidden.state;
+                    newSource.state = hidden.state;
                 } else {
-                    delete otherSource.state;
+                    delete newSource.state;
                 }
 
-                otherSource.revealed = {
+                newSource.revealed = {
                     [category]: {
                         [hidden.schema.key]: true,
                     },
@@ -255,7 +354,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
 
                 if (otherOut) {
                     otherIdSuffix = otherOut ? `outs:${otherOut}` : undefined;
-                    otherSource.outs = {
+                    newSource.outs = {
                         [otherOut]: {
                             connections: {
                                 [entry.id]: true,
@@ -270,7 +369,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
 
                 if (otherEntry) {
                     otherIdSuffix = `inputs:${otherEntry.key}`;
-                    otherSource.inputs = {
+                    newSource.inputs = {
                         [otherEntry.key]: {
                             connections: {
                                 [entry.id]: true,
@@ -283,16 +382,21 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
             }
         }
 
-        const newNode = trigger.addNode(otherSource);
+        this.#createNode(newSource, otherIdSuffix);
+    }
+
+    #createNode(newSource: NodeDataInput, otherIdSuffix: EntryIdSuffix | undefined) {
+        const newNode = this.trigger?.addNode(newSource);
         if (!newNode) return;
 
+        const entry = this.#entry;
         const otherId: EntryId | undefined = otherIdSuffix
             ? `${newNode.id}:${otherIdSuffix}`
             : undefined;
 
         if (entry && otherId) {
             // we do it before creating the node so we don't have to update it
-            trigger.addComputedConnections(entry.id, otherId);
+            this.trigger?.addComputedConnections(entry.id, otherId);
         }
 
         const blueprintNode = this.blueprint.nodes.add(newNode, true);
@@ -361,17 +465,49 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         }
     }
 
+    #getGateNodes(): OpenTriggerNode[] {
+        const entry = this.#entry;
+
+        // entry-gates don't have outputs and we never create another instance of exit-gate
+        if (entry && (entry.isInput || isExitGate(entry.node))) {
+            return [];
+        }
+
+        // to create an entry-gate, we need to look at the existing exit-gate schemas
+        const nodes = this.trigger?.nodes.filter(isExitGate) ?? [];
+
+        // all gates have an 'in' so we don't even need to check further
+        if (!entry || !isBlueprintEntry(entry)) {
+            return nodes;
+        }
+
+        const isArray = !!entry.isArray;
+
+        return nodes.filter((node) => {
+            // entry-gates input schemas is a mirror of exit-gates output schemas
+            const entries = getOutputsSchemas(node.constructor as typeof TriggerNode, {
+                data: node.data,
+            });
+
+            return entries.some((other) => {
+                return other.type === entry.type && isArray === !!other.isArray;
+            });
+        });
+    }
+
     #getNodes(): (typeof TriggerNode)[] {
         const entry = this.#entry;
 
-        let nodes = this.application.nodes.contents;
+        let nodes = this.application.nodes.filter(
+            (node) => !isExitGate(node) && !isEntryGate(node)
+        );
 
         if (!entry) {
             return nodes;
         }
 
+        // events never have inputs so we get rid of them all
         if (entry.isOutput) {
-            // events never have inputs so we get rid of them all
             nodes = nodes.filter((node) => !node.isEvent);
         }
 
@@ -393,9 +529,29 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         });
     }
 
+    #prepareGatesGroup(nodes: OpenTriggerNode[]): GateGroup {
+        const group: GateGroup = {
+            action: "select-gate",
+            add: { action: "create-gate", tooltip: this.localize("add.gate") },
+            label: this.localize("category.gate"),
+            nodes: [],
+        };
+
+        for (const node of nodes) {
+            group.nodes.push({
+                id: node.id,
+                tags: (node.constructor as typeof TriggerNode).tags,
+                title: node.data.custom.title ?? node.id,
+                type: node.type,
+            });
+        }
+
+        return group;
+    }
+
     #prepareNodesGroups(nodes: (typeof TriggerNode)[], empty: string): NodesGroup[] {
         if (!nodes.length) {
-            return [{ label: this.localize("category", empty), nodes: [], value: "" }];
+            return [{ action: "select-node", label: this.localize("category", empty), nodes: [] }];
         }
 
         return R.pipe(
@@ -418,9 +574,9 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
                 });
 
                 return {
+                    action: "select-node",
                     label,
                     nodes,
-                    value,
                 };
             }),
             R.sortBy(R.prop("label"))
@@ -492,19 +648,25 @@ type TriggerNodeStringProperty = keyof {
         : never]: (typeof TriggerNode)[P];
 };
 
-type EventAction = "paste-nodes" | "select-node";
+type EventAction = "create-gate" | "paste-nodes" | "select-gate" | "select-node";
 
 type NodesMenuContext = {
     events: NodesGroup[];
+    gates: [GateGroup];
     groups: NodesGroup[];
     inClipboard: boolean;
     tags: RequiredSelectOptions;
 };
 
 type NodesGroup = {
+    action: string;
     label: string;
     nodes: PreparedNode[];
-    value: string;
+};
+
+type GateGroup = Exclude<NodesGroup, "nodes"> & {
+    add: { action: string; tooltip: string };
+    nodes: (PreparedNode & { id: string })[];
 };
 
 type PreparedNode = {
@@ -514,5 +676,7 @@ type PreparedNode = {
 };
 
 type BlueprintNodesMenuResolve = (result: boolean | null) => void;
+
+type EntryIdSuffix = `${PreciseEntryCategory}:${string}`;
 
 export { BlueprintNodesMenu };
