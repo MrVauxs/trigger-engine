@@ -1,12 +1,12 @@
 import {
     CreateNodeData,
+    EXIT_GATE_TYPE,
     instantiateNode,
     OpenTriggerNode,
     Trigger,
     TriggerApplication,
     TriggerData,
     TriggerDataOutput,
-    TriggerGateExit,
     UpdateTriggerData,
 } from "engine";
 import { enrichHTML, MODULE, R } from "module-helpers";
@@ -21,7 +21,7 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
         super(parent, data);
 
         for (const nodeData of data.nodes) {
-            if (nodeData.type !== TriggerGateExit.type) continue;
+            if (nodeData.type !== EXIT_GATE_TYPE) continue;
 
             try {
                 const node = instantiateNode(this, nodeData, true);
@@ -32,7 +32,7 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
         }
 
         for (const nodeData of data.nodes) {
-            if (nodeData.type === TriggerGateExit.type) continue;
+            if (nodeData.type === EXIT_GATE_TYPE) continue;
 
             try {
                 const node = instantiateNode(this, nodeData, true);

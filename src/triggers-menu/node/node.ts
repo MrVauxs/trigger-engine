@@ -6,6 +6,7 @@ import {
     BaseCustomSchema,
     BaseEntrySchemaInput,
     EntryCategory,
+    GATE_CATEGORY,
     isConnectionId,
     isEntryGate,
     isExitGate,
@@ -14,7 +15,6 @@ import {
     OpenNodeEntry,
     OpenTrigger,
     OpenTriggerNode,
-    TriggerGateExit,
     TriggerNode,
     zCustomInputData,
     zCustomInputSchema,
@@ -120,7 +120,7 @@ class BlueprintNode extends PIXI.Container {
     }
 
     get isGate() {
-        return this.category === TriggerGateExit.category;
+        return this.category === GATE_CATEGORY;
     }
 
     get gateId(): string | undefined {

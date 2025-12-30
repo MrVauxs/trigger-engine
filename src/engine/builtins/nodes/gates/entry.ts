@@ -1,13 +1,13 @@
 import { IconObject } from "_zod";
-import { CustomInputSchema, TriggerNode } from "engine";
+import { CustomInputSchema, ENTRY_GATE_TYPE, GATE_CATEGORY, TriggerNode } from "engine";
 
 class TriggerGateEntry extends TriggerNode {
     static get category(): string {
-        return "__gate__";
+        return GATE_CATEGORY;
     }
 
     static get type(): string {
-        return "__gate_entry__";
+        return ENTRY_GATE_TYPE;
     }
 
     static get tags(): string[] {
@@ -44,7 +44,7 @@ class TriggerGateEntry extends TriggerNode {
 }
 
 function isEntryGate(node: { type: string }): boolean {
-    return node.type === TriggerGateEntry.type;
+    return node.type === ENTRY_GATE_TYPE;
 }
 
 export { isEntryGate, TriggerGateEntry };

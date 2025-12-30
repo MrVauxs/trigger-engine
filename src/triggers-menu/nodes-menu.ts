@@ -1,6 +1,8 @@
 import {
     BaseEntrySchemaInput,
     BridgeSchemaInput,
+    ENTRY_GATE_TYPE,
+    EXIT_GATE_TYPE,
     getInputsSchemas,
     getNodeStates,
     getOutputsSchemas,
@@ -13,8 +15,6 @@ import {
     OpenTrigger,
     OpenTriggerNode,
     TriggerApplication,
-    TriggerGateEntry,
-    TriggerGateExit,
     TriggerNode,
 } from "engine";
 import {
@@ -210,7 +210,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
             custom: {
                 title: result.label,
             },
-            type: TriggerGateExit.type,
+            type: EXIT_GATE_TYPE,
         };
 
         this.#selectNode(source);
@@ -241,7 +241,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
                     },
                 },
             },
-            type: TriggerGateEntry.type,
+            type: ENTRY_GATE_TYPE,
         };
 
         if (entry && isBlueprintEntry(entry)) {

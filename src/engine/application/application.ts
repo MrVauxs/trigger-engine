@@ -2,7 +2,10 @@ import {
     BuiltInApplication,
     createCollection,
     createConvertorKey,
+    ENTRY_GATE_TYPE,
     EntryConvertor,
+    EXIT_GATE_TYPE,
+    GATE_CATEGORY,
     NodeEntry,
     OpenTrigger,
     TriggerApplicationCollection,
@@ -19,8 +22,8 @@ import { BlueprintApplication } from "triggers-menu";
 import utils = foundry.utils;
 
 const APPLICATION_MODES = ["setting", "free"] as const;
-const FORBIDDEN_NODE_CATEGORIES = [TriggerGateExit.category];
-const FORBIDDEN_NODE_TYPE = [TriggerGateExit.type, TriggerGateEntry.type];
+const FORBIDDEN_NODE_CATEGORIES = [GATE_CATEGORY];
+const FORBIDDEN_NODE_TYPE = [EXIT_GATE_TYPE, ENTRY_GATE_TYPE];
 
 class TriggerApplication {
     #applicationId: string;
@@ -53,8 +56,8 @@ class TriggerApplication {
         this.#nodes = createCollection(options, "nodes");
 
         // add mandatory stuff
-        this.#nodes.set(TriggerGateEntry.type, TriggerGateEntry);
-        this.#nodes.set(TriggerGateExit.type, TriggerGateExit);
+        this.#nodes.set(ENTRY_GATE_TYPE, TriggerGateEntry);
+        this.#nodes.set(EXIT_GATE_TYPE, TriggerGateExit);
 
         // setup settings
         if (this.isSettingApplication) {
