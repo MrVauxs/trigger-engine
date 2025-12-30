@@ -38,14 +38,10 @@
                 "delete": "Delete Trigger",
                 "duplicate": "Duplicate Trigger",
                 "edit": "Edit Trigger",
-                "events": {
-                    "title": "Events"
-                },
+                "events": "Events",
                 "expand": "Restore Triggers Window",
                 "gates": {
-                    "buttons": {
-                        "tab-gate": "Move to next Entry Gate"
-                    },
+                    "tab": "Move to next Entry Gate",
                     "title": "Gates"
                 },
                 "reset": "Reset Trigger",

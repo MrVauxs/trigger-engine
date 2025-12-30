@@ -175,7 +175,7 @@ class BlueprintApplication extends apps.ApplicationV2<
             const wrapper = createHTMLElement("div", {
                 classes: ["ui"],
                 content: result,
-                dataset: { tooltipClass: "pf2e" },
+                dataset: { tooltipClass: "pf2e", tooltipDirection: "UP" },
             });
 
             content.appendChild(wrapper);
@@ -337,34 +337,18 @@ class BlueprintApplication extends apps.ApplicationV2<
     #prepareTriggerContext(trigger: OpenTrigger): TriggerContext {
         this.#search = "";
 
-        const events = R.map(
-            this.blueprint.nodes.filter((node) => node.isEvent),
-            (node): TriggerEntry => {
-                return { actions: [], buttons: [], node };
-            }
-        );
-
         const gates = R.map(
             this.blueprint.nodes.filter((node) => isExitGate(node)),
-            (node): TriggerEntry => {
-                const buttons: TriggerEntry["buttons"] = [];
+            (node): TriggerGate => {
                 const hasEntries = this.blueprint.nodes.some(
                     (other) => isEntryGate(other) && other.gateId === node.id
                 );
-
-                if (hasEntries) {
-                    buttons.push({
-                        action: "tab-gate",
-                        icon: "fa-solid fa-plug",
-                    });
-                }
-
-                return { actions: [], buttons, node };
+                return { hasEntries, node };
             }
         );
 
         return {
-            events,
+            events: this.blueprint.nodes.filter((node) => node.isEvent),
             gates,
             isFree: this.application.isFreeApplication,
             trigger,
@@ -515,15 +499,14 @@ type EventAction =
 type BlueprintContext = TriggersContext | TriggerContext;
 
 type TriggerContext = {
-    events: TriggerEntry[];
-    gates: TriggerEntry[];
+    events: BlueprintNode[];
+    gates: TriggerGate[];
     isFree: boolean;
     trigger: OpenTrigger;
 };
 
-type TriggerEntry = {
-    actions: { icon: string; action: string }[];
-    buttons: { icon: string; action: string }[];
+type TriggerGate = {
+    hasEntries: boolean;
     node: BlueprintNode;
 };
 
