@@ -19,6 +19,8 @@ import { BlueprintApplication } from "triggers-menu";
 import utils = foundry.utils;
 
 const APPLICATION_MODES = ["setting", "free"] as const;
+const FORBIDDEN_NODE_CATEGORIES = [TriggerGateExit.category];
+const FORBIDDEN_NODE_TYPE = [TriggerGateExit.type, TriggerGateEntry.type];
 
 class TriggerApplication {
     #applicationId: string;
@@ -35,6 +37,15 @@ class TriggerApplication {
         this.#moduleId = moduleId;
         this.#applicationId = applicationId;
         this.#applicationKey = `${moduleId}:${applicationId}`;
+
+        if (R.isArray(options.nodes)) {
+            options.nodes = options.nodes.filter((node) => {
+                return (
+                    !R.isIncludedIn(node.category, FORBIDDEN_NODE_CATEGORIES) &&
+                    !R.isIncludedIn(node.type, FORBIDDEN_NODE_TYPE)
+                );
+            });
+        }
 
         this.#convertors = createCollection(options, "convertors");
         this.#entries = createCollection(options, "entries");
