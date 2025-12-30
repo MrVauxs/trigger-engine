@@ -389,9 +389,7 @@ class BlueprintNode extends PIXI.Container {
         this.data.update({
             [category]: {
                 [key]: {
-                    connections: {
-                        [targetId]: true,
-                    },
+                    connection: targetId,
                     value: undefined,
                 },
             },
@@ -401,26 +399,11 @@ class BlueprintNode extends PIXI.Container {
     removeConnection(category: PreciseEntryCategory, key: string, targetId: EntryId) {
         if (!isOppositeConnection(category) || !isConnectionId(targetId)) return;
 
-        const connections = R.omit(this.data[category][key].connections, [targetId]);
-
-        if (foundry.utils.isEmpty(connections)) {
-            this.data.update({
-                [category]: {
-                    [key]: undefined,
-                },
-            });
-        } else {
-            this.data.update({
-                [category]: {
-                    [key]: {
-                        connections: {
-                            [targetId]: undefined,
-                        },
-                        value: undefined,
-                    },
-                },
-            });
-        }
+        this.data.update({
+            [category]: {
+                [key]: undefined,
+            },
+        });
     }
 
     _onClickLeft(event: FederatedEvent) {

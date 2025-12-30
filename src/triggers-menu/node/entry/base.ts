@@ -1,4 +1,4 @@
-import { EntryConnections, isEntryGate, isExitGate, isOppositeConnection } from "engine";
+import { ConnectionId, isEntryGate, isExitGate, isOppositeConnection } from "engine";
 import { localizePath, R } from "module-helpers";
 import { Blueprint } from "triggers-menu";
 import { alignHorizontally, BlueprintNode } from "..";
@@ -109,11 +109,14 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
         };
     }
 
-    get connections(): EntryConnections {
+    get connection(): ConnectionId | undefined {
         const key = this.key;
         const category = this.preciseCategory;
 
-        return (isOppositeConnection(category) && this.node.data[category][key]?.connections) || {};
+        return (
+            (isOppositeConnection(category) && this.node.data[category][key]?.connection) ||
+            undefined
+        );
     }
 
     abstract _drawConnector(connector: PIXI.Graphics, isConnected: boolean): void;
@@ -162,9 +165,10 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
         const category = this.preciseCategory;
 
         if (this.isConnectionInitiator) {
-            for (const otherId of R.keys(this.connections)) {
-                this.node.removeConnection(category, this.key, otherId);
-            }
+            const connection = this.connection;
+            if (!connection) return;
+
+            this.node.removeConnection(category, this.key, connection);
         } else {
             const entryId = this.id;
 

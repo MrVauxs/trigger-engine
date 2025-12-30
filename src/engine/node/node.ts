@@ -80,7 +80,7 @@ abstract class TriggerNode {
     }
 
     /**
-     * Does this node have an `in` bridge connection.
+     * Does this node have an `in` bridge entry.
      *
      * Localization path:
      * `<module-id>.<application-id>.node.<category>.<type>.in`
@@ -90,7 +90,7 @@ abstract class TriggerNode {
     }
 
     /**
-     * List of `out` bridge connections.
+     * List of `out` bridge entries.
      *
      * Localization path:
      * `<module-id>.<application-id>.node.<category>.<type>.outs.<key>`

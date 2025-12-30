@@ -1,6 +1,7 @@
 import {
     BaseEntrySchemaInput,
     BridgeSchemaInput,
+    ConnectionId,
     ENTRY_GATE_TYPE,
     EXIT_GATE_TYPE,
     getInputsSchemas,
@@ -227,9 +228,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
             position: this.#position,
             outs: {
                 out: {
-                    connections: {
-                        [`${exitNode.id}:ins:in`]: true,
-                    },
+                    connection: `${exitNode.id}:ins:in`,
                 },
             },
             type: ENTRY_GATE_TYPE,
@@ -245,9 +244,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
                 otherIdSuffix = `inputs:${exitEntry.key}`;
                 newSource.inputs = {
                     [exitEntry.key]: {
-                        connections: {
-                            [entry.id]: true,
-                        },
+                        connection: entry.id as ConnectionId,
                     },
                 };
             }
@@ -345,9 +342,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
                     otherIdSuffix = otherOut ? `outs:${otherOut}` : undefined;
                     newSource.outs = {
                         [otherOut]: {
-                            connections: {
-                                [entry.id]: true,
-                            },
+                            connection: entry.id as ConnectionId,
                         },
                     };
                 }
@@ -360,9 +355,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
                     otherIdSuffix = `inputs:${otherEntry.key}`;
                     newSource.inputs = {
                         [otherEntry.key]: {
-                            connections: {
-                                [entry.id]: true,
-                            },
+                            connection: entry.id as ConnectionId,
                         },
                     };
                 }

@@ -158,13 +158,12 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
 
             for (const category of OPPOSITE_CONNECTION_CATEGORY) {
                 for (const entry of R.values(source[category])) {
-                    if (!entry.connections) continue;
+                    if (!entry.connection) continue;
 
-                    entry.connections = R.mapKeys(entry.connections, (connectionId) => {
-                        const [nodeId, category, key] = R.split(connectionId, ":");
-                        const newId = replacementIds[nodeId];
-                        return `${newId}:${category}:${key}`;
-                    });
+                    const [nodeId, category, key] = R.split(entry.connection, ":");
+                    const newId = replacementIds[nodeId];
+
+                    entry.connection = `${newId}:${category}:${key}`;
                 }
             }
 
@@ -211,14 +210,11 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
 
             for (const category of OPPOSITE_CONNECTION_CATEGORY) {
                 for (const [key, entry] of R.entries(source[category])) {
-                    if (!entry?.connections) continue;
+                    if (!entry?.connection) continue;
 
-                    entry.connections = R.pickBy(entry.connections, (value, connectionId) => {
-                        const nodeId = R.split(connectionId, ":")[0];
-                        return R.isIncludedIn(nodeId, nodeIds);
-                    });
+                    const nodeId = R.split(entry.connection, ":")[0];
 
-                    if (foundry.utils.isEmpty(entry.connections)) {
+                    if (!R.isIncludedIn(nodeId, nodeIds)) {
                         delete source[category][key];
                     }
                 }

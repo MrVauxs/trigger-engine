@@ -161,17 +161,14 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
 
                     return R.pipe(
                         R.entries(records),
-                        R.flatMap(([key, { connections }]) => {
+                        R.map(([key, { connection }]) => {
+                            if (!connection) return;
+
                             const entry = schemas.find(({ key }) => key === key);
                             if (!entry) return;
 
-                            const connectionIds = R.keys(connections);
-                            if (!connectionIds.length) return;
-
                             const type = ("type" in entry ? entry.type : "bridge") as string;
-                            return connectionIds.map(
-                                (connectionId) => [category, type, key, connectionId] as const
-                            );
+                            return [category, type, key, connection] as const;
                         }),
                         R.filter(R.isTruthy)
                     );
@@ -188,13 +185,7 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
                  */
                 const deleteData = () => {
                     for (const data of [originNode.data, originNode.data._source] as const) {
-                        if (!data[category]) continue;
-
-                        delete data[category][originKey].connections?.[otherId];
-
-                        if (foundry.utils.isEmpty(data[category][originKey].connections)) {
-                            delete data[category][originKey];
-                        }
+                        delete data[category]?.[originKey];
                     }
                 };
 

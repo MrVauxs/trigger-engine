@@ -52,7 +52,7 @@ function instantiateNode(
     const exitGate: ExitGate | undefined = (() => {
         if (!isEntryGate(nodeData)) return;
 
-        const exitConnection = R.keys(nodeData.outs.out?.connections ?? {}).at(0);
+        const exitConnection = nodeData.outs.out.connection;
         const exitId = exitConnection?.split(":").at(0) ?? "";
         const exitNode = parent.nodes.get(exitId);
         const ExitCls = exitNode?.constructor as typeof TriggerNode | undefined;
