@@ -32,7 +32,7 @@
     <div class="scroll">
         <div class="list">
             {{#each events as |event|}}
-            <div data-id="{{event.id}}" data-action="select-node">
+            <div class="node" data-id="{{event.id}}" data-action="select-node">
                 {{event.label}}
             </div>
             {{/each}}
@@ -44,7 +44,7 @@
     <div class="scroll">
         <div class="list">
             {{#each gates as |gate|}}
-            <div data-id="{{gate.node.id}}" data-action="select-node">
+            <div class="node" data-id="{{gate.node.id}}" data-action="select-node">
                 <span>{{gate.node.label}}</span>
                 {{#if gate.hasEntries}}
                 <div class="controls">

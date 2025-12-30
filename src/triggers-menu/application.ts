@@ -127,7 +127,7 @@ class BlueprintApplication extends apps.ApplicationV2<
             element.prepend(this.blueprint.view);
         });
 
-        this._createContextMenus();
+        this.#createContextMenus();
         this.#resizeObserver.observe(this.element);
     }
 
@@ -258,11 +258,25 @@ class BlueprintApplication extends apps.ApplicationV2<
         }
     }
 
-    _createContextMenus() {
-        this._createContextMenu(this._getTriggerContextOptions, ".sidebar.triggers .trigger");
+    #createContextMenus() {
+        this._createContextMenu(this.#getTriggerContextOptions, ".sidebar.triggers .trigger");
+        this._createContextMenu(this.#getTriggerNodeContextOptions, ".sidebar.trigger .node");
     }
 
-    _getTriggerContextOptions(): ContextMenuEntry[] {
+    #getTriggerNodeContextOptions(): ContextMenuEntry[] {
+        return [
+            {
+                icon: `<i class="fa-solid fa-trash"></i>`,
+                name: localizePath("blueprint.node.delete.single"),
+                callback: (el) => {
+                    const nodeId = el.dataset.id ?? "";
+                    return this.blueprint.nodes.deleteById([nodeId]);
+                },
+            },
+        ];
+    }
+
+    #getTriggerContextOptions(): ContextMenuEntry[] {
         const getTriggerFromElement = (el: HTMLElement): OpenTrigger | null => {
             const triggerId = el.dataset.id;
             return triggerId ? this.blueprint.getTrigger(triggerId) : null;

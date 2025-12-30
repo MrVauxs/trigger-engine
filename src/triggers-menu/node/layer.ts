@@ -102,7 +102,7 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
 
     delete(nodes: BlueprintNode[]) {
         const trigger = this.blueprint.trigger;
-        if (!trigger) return;
+        if (!trigger || !nodes.length) return;
 
         for (const node of nodes) {
             const groupedNodes = [node];
@@ -118,6 +118,11 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
         }
 
         this.blueprint.draw({ forceComputeConnections: true, renderApplication: true });
+    }
+
+    deleteById(ids: string[]) {
+        const nodes = ids.map((id) => this.get(id)).filter(R.isTruthy);
+        this.delete(nodes);
     }
 
     copySelected(nodes: BlueprintNode[]) {
