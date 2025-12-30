@@ -49,15 +49,18 @@ function instantiateNode(
         ? data.state
         : nodeStates[0];
 
-    const exitGate: OpenTriggerNode["exitGate"] = (() => {
+    const exitGate: ExitGate | undefined = (() => {
         if (!isEntryGate(data)) return;
 
         const exitConnection = R.keys(data.outs.out?.connections ?? {}).at(0);
         const exitId = exitConnection?.split(":").at(0) ?? "";
-        const ExitCls = parent.nodes.get(exitId)?.constructor as typeof TriggerNode | undefined;
+        const exitNode = parent.nodes.get(exitId);
+        const ExitCls = exitNode?.constructor as typeof TriggerNode | undefined;
         const exitData = foundry.utils.deepClone(parent.data.nodes.get(exitId));
 
-        return ExitCls && exitData ? { NodeCls: ExitCls, data: exitData } : undefined;
+        return exitData
+            ? ({ node: exitNode, NodeCls: ExitCls, data: exitData } as ExitGate)
+            : undefined;
     })();
 
     class TriggerNodeWrapper extends NodeCls {
@@ -194,7 +197,7 @@ function instantiateNode(
                         } satisfies NodeEntries,
                     },
                     exitGate: {
-                        value: exitGate,
+                        value: exitGate?.node,
                     },
                     parent: {
                         value: parent,
@@ -204,6 +207,9 @@ function instantiateNode(
                     },
                     states: {
                         value: nodeStates,
+                    },
+                    tags: {
+                        value: NodeCls.tags,
                     },
                 });
             }
@@ -221,11 +227,18 @@ function instantiateNode(
 interface OpenTriggerNode extends TriggerNode {
     data: NodeData;
     entries: NodeEntries;
-    exitGate: { NodeCls: typeof TriggerNode; data: NodeData } | undefined;
+    exitGate: OpenTriggerNode | undefined;
     parent: OpenTrigger;
     state: string | null;
     states: string[] | null;
+    tags: string[];
 }
+
+type ExitGate = {
+    node: TriggerNode;
+    NodeCls: typeof TriggerNode;
+    data: NodeData;
+};
 
 type NodeEntries = {
     in: NodeBridge | null;

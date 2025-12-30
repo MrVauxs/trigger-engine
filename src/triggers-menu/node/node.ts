@@ -124,7 +124,7 @@ class BlueprintNode extends PIXI.Container {
     }
 
     get gateId(): string | undefined {
-        return isExitGate(this) ? this.#node.id : this.#node.exitGate?.data.id;
+        return isExitGate(this) ? this.#node.id : this.#node.exitGate?.id;
     }
 
     get data(): NodeData {

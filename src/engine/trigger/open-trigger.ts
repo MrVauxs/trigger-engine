@@ -1,8 +1,5 @@
 import {
     CreateNodeData,
-    getInputsSchemas,
-    getOutputsSchemas,
-    getOutsSchemas,
     instantiateNode,
     OpenTriggerNode,
     Trigger,
@@ -10,7 +7,6 @@ import {
     TriggerData,
     TriggerDataOutput,
     TriggerGateExit,
-    TriggerNode,
     UpdateTriggerData,
 } from "engine";
 import { enrichHTML, MODULE, R } from "module-helpers";
@@ -151,21 +147,20 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
         this.#linkedConnections.clear();
 
         for (const originNode of this.nodes) {
-            const OriginNodeCls = originNode.constructor as typeof TriggerNode;
             const originConnections = R.pipe(
                 [
-                    ["outs", originNode.data.outs, getOutsSchemas(OriginNodeCls, originNode)],
+                    ["outs", originNode.data.outs, originNode.entries.outs],
                     [
                         "inputs",
                         originNode.data.inputs,
-                        originNode.exitGate
-                            ? getOutputsSchemas(originNode.exitGate.NodeCls, originNode.exitGate)
-                            : getInputsSchemas(OriginNodeCls, originNode),
+                        originNode.exitGate?.entries.outputs ?? originNode.entries.inputs,
                     ],
                 ] as const,
-                R.flatMap(([category, entries, schemas]) => {
+                R.flatMap(([category, records, entries]) => {
+                    const schemas = entries.map((entry) => entry.schema);
+
                     return R.pipe(
-                        R.entries(entries),
+                        R.entries(records),
                         R.flatMap(([key, { connections }]) => {
                             const entry = schemas.find(({ key }) => key === key);
                             if (!entry) return;
@@ -208,18 +203,14 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
                     continue;
                 }
 
-                const OutputNodeCls = otherNode.constructor as typeof TriggerNode;
-
                 if (otherCategory === "ins") {
-                    if (!OutputNodeCls.hasIn) {
+                    if (!otherNode.entries.in) {
                         deleteData();
                         continue;
                     }
                 } else {
-                    const outputs = getOutputsSchemas(OutputNodeCls, otherNode);
-                    const output = outputs.find(({ key, type }) => {
+                    const output = otherNode.entries.outputs.find(({ schema: { key, type } }) => {
                         if (key !== otherEntryKey) return false;
-
                         return (
                             type === originType || !!this.application.getConvertor(type, originType)
                         );

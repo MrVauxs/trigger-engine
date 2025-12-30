@@ -116,7 +116,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         // TODO variables
 
         const tags: RequiredSelectOptions = R.pipe(
-            [...allNodes, ...gateNodes.map((node) => node.constructor as typeof TriggerNode)],
+            [...allNodes, ...gateNodes],
             R.flatMap((node): Required<SelectOption<string>>[] => {
                 return node.tags.map((tag): Required<SelectOption> => {
                     return {
@@ -246,10 +246,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
 
         if (entry && isBlueprintEntry(entry)) {
             const isArray = !!entry.isArray;
-            const entries = getOutputsSchemas(exitNode.constructor as typeof TriggerNode, {
-                data: exitNode.data,
-            });
-            const exitEntry = entries.find((other) => {
+            const exitEntry = exitNode.entries.outputs.find(({ schema: other }) => {
                 return other.type === entry.type && isArray === !!other.isArray;
             });
 
@@ -338,6 +335,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
             const isArray = !!(entry as BlueprintEntry).isArray;
             const entryType = (entry as BlueprintEntry).type;
 
+            // TODO sort by group
             return getOtherSchema<BaseEntrySchemaInput>(category, (schemas) => {
                 return schemas.find((schema) => {
                     return schema.type === entryType && isArray === !!schema.isArray;
@@ -485,11 +483,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
 
         return nodes.filter((node) => {
             // entry-gates input schemas is a mirror of exit-gates output schemas
-            const entries = getOutputsSchemas(node.constructor as typeof TriggerNode, {
-                data: node.data,
-            });
-
-            return entries.some((other) => {
+            return node.entries.outputs.some((other) => {
                 return other.type === entry.type && isArray === !!other.isArray;
             });
         });
@@ -540,7 +534,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         for (const node of nodes) {
             group.nodes.push({
                 id: node.id,
-                tags: (node.constructor as typeof TriggerNode).tags,
+                tags: node.tags,
                 title: node.data.custom.title ?? node.id,
                 type: node.type,
             });
