@@ -283,18 +283,18 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         this.draw({ renderApplication: true });
     }
 
-    async deleteVariable(id: ConnectionId) {
-        const confirm = await confirmDialog("blueprint.variable.delete");
-        if (!confirm) return;
+    deleteVariable(id: ConnectionId, redraw: boolean = true) {
+        const trigger = this.trigger;
+        if (!trigger?.data.variables[id]) return;
 
-        this.trigger?.update({
+        trigger?.update({
             variables: {
                 [id]: undefined,
             },
         });
 
         const nodes = this.nodes.getVariables(id);
-        this.nodes.delete(nodes);
+        this.nodes.delete(nodes, redraw);
     }
 
     getTrigger(triggerId: string): OpenTrigger | null {

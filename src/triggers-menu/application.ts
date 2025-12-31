@@ -294,9 +294,10 @@ class BlueprintApplication extends apps.ApplicationV2<
             {
                 icon: `<i class="fa-solid fa-trash"></i>`,
                 name: localizePath("blueprint.variable.delete.title"),
-                callback: (el) => {
+                callback: async (el) => {
                     const id = el.dataset.id as ConnectionId;
-                    return this.blueprint.deleteVariable(id);
+                    const confirm = await confirmDialog("blueprint.variable.delete");
+                    return confirm && this.blueprint.deleteVariable(id);
                 },
             },
         ];

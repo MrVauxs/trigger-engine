@@ -5,34 +5,18 @@ import {
     NodeEntry,
     NodeField,
     OpenNodeEntry,
-    OpenTrigger,
     TriggerVariable,
 } from "engine";
+import { confirmDialog, localizePath } from "module-helpers";
 import { BaseBlueprintEntry } from ".";
 import { BlueprintNode, editLabelDialog } from "..";
-import { localizePath } from "module-helpers";
 
 class BlueprintEntry extends BaseBlueprintEntry {
     #entry: OpenNodeEntry;
-    #parent: BlueprintNode;
 
     constructor(parent: BlueprintNode, entry: OpenNodeEntry) {
         super(parent, entry.category);
-
         this.#entry = entry;
-        this.#parent = parent;
-    }
-
-    get node(): BlueprintNode {
-        return this.#parent;
-    }
-
-    get trigger(): OpenTrigger {
-        return this.node.trigger;
-    }
-
-    get blueprint() {
-        return this.node.blueprint;
     }
 
     get type(): string {
@@ -257,7 +241,8 @@ class BlueprintEntry extends BaseBlueprintEntry {
                 icon: `<i class="fa-solid fa-trash fa-fw"></i>`,
                 condition: hasVariable,
                 callback: async () => {
-                    return this.blueprint.deleteVariable(this.id as ConnectionId);
+                    const confirm = await confirmDialog("blueprint.variable.delete");
+                    return confirm && this.blueprint.deleteVariable(this.id as ConnectionId);
                 },
             }
         );

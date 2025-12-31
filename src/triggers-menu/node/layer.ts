@@ -105,9 +105,9 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
         return _node;
     }
 
-    delete(nodes: BlueprintNode[]) {
+    delete(nodes: BlueprintNode[], redraw: boolean = true) {
         const trigger = this.blueprint.trigger;
-        if (!trigger || !nodes.length) return;
+        if (!trigger) return;
 
         const variablesKeys = R.keys(trigger.data.variables);
 
@@ -135,7 +135,9 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
             trigger.deleteNode(node.id);
         }
 
-        this.blueprint.draw({ forceComputeConnections: true, renderApplication: true });
+        if (redraw) {
+            this.blueprint.draw({ forceComputeConnections: true, renderApplication: true });
+        }
     }
 
     deleteById(ids: string[]) {

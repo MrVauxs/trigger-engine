@@ -5,7 +5,10 @@
                 "add": "Add: {label}",
                 "disconnect": "Disconnect Entry",
                 "edit": "Edit: {label}",
-                "remove": "Remove Entry",
+                "remove": {
+                    "content": "Are you sure you want to remove this custom entry?",
+                    "title": "Remove Entry"
+                },
                 "variable": "Create Variable"
             },
             "node": {

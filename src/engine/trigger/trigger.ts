@@ -1,5 +1,4 @@
-import { EntryId, TriggerApplication, TriggerData, TriggerNode } from "engine";
-import { R } from "module-helpers";
+import { TriggerApplication, TriggerData, TriggerNode } from "engine";
 
 class Trigger<TNode extends TriggerNode = TriggerNode> {
     #data: TriggerData;

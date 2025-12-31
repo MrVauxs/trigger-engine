@@ -1,5 +1,11 @@
-import { ConnectionId, isGateEntryNode, isGateExitNode, isOppositeConnection } from "engine";
-import { localizePath, R } from "module-helpers";
+import {
+    ConnectionId,
+    isGateEntryNode,
+    isGateExitNode,
+    isOppositeConnection,
+    OpenTrigger,
+} from "engine";
+import { confirmDialog, localizePath, R } from "module-helpers";
 import { Blueprint } from "triggers-menu";
 import { alignHorizontally, BlueprintNode } from "..";
 
@@ -48,6 +54,10 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
 
     get node(): BlueprintNode {
         return this.#parent;
+    }
+
+    get trigger(): OpenTrigger {
+        return this.node.trigger;
     }
 
     get blueprint(): Blueprint {
@@ -190,11 +200,9 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
         this.blueprint.draw({ forceComputeConnections: true });
     }
 
-    remove() {
+    async remove() {
         const preciseCategory = this.preciseCategory;
         if (!this.isCustom || preciseCategory === "ins") return;
-
-        // TODO also remove variables
 
         const nodes: (readonly [PreciseEntryCategory, BlueprintNode])[] = [
             [preciseCategory, this.node],
@@ -231,6 +239,9 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
             }
         }
 
+        // we remove the variable if any (and all the getters)
+        this.blueprint.deleteVariable(this.id as ConnectionId, false);
+
         this.node.refresh({
             forceComputeConnections: true,
             renderApplication: true,
@@ -248,11 +259,12 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
                 },
             },
             {
-                name: localizePath("blueprint.entry.remove"),
+                name: localizePath("blueprint.entry.remove.title"),
                 icon: `<i class="fa-solid fa-trash fa-fw"></i>`,
                 condition: (this.isCustom || this.isRevealed) && !isGateEntryNode(this.node),
                 callback: async () => {
-                    this.remove();
+                    const confirm = await confirmDialog("blueprint.entry.remove");
+                    return confirm && this.remove();
                 },
             },
         ];
