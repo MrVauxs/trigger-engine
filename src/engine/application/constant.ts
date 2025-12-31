@@ -4,3 +4,5 @@ export const EXIT_GATE_TYPE = "__gate_exit__";
 
 export const VARIABLE_CATEGORY = "__variable__";
 export const GETTER_VARIABLE_TYPE = "__variable_getter__";
+
+export const START_EVENT_TYPE = "__start_event__";

@@ -17,7 +17,7 @@ class TriggerGateEntry extends TriggerNode {
     get icon(): IconObject {
         return {
             unicode: "\uf1e6",
-            fontWeight: "400",
+            fontWeight: "800",
         };
     }
 

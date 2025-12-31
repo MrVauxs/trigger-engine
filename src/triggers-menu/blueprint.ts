@@ -225,6 +225,18 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
     addTrigger(source: TriggerDataInput) {
         if (source.id && this.triggers.has(source.id)) return;
 
+        if (this.application.events.size === 1 && !source.nodes?.length) {
+            const event = this.application.events.contents[0];
+
+            source.nodes = [
+                {
+                    id: foundry.utils.randomID(),
+                    position: { x: 400, y: 200 },
+                    type: event.type,
+                },
+            ];
+        }
+
         const trigger = this.application.createTrigger(source, true);
         if (!trigger) return;
 

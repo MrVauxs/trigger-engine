@@ -1,4 +1,5 @@
 import {
+    _StartTriggerNode,
     BuiltInApplication,
     createCollection,
     createConvertorKey,
@@ -33,6 +34,7 @@ class TriggerApplication {
     #applicationKey: string;
     #convertors: Collection<EntryConvertor>;
     #entries: Collection<typeof NodeEntry>;
+    #events: Collection<typeof TriggerNode>;
     #hooks: Collection<typeof TriggerHook>;
     #mode: TriggerApplicationMode;
     #moduleId: string;
@@ -62,6 +64,20 @@ class TriggerApplication {
         this.#nodes.set(ENTRY_GATE_TYPE, TriggerGateEntry);
         this.#nodes.set(EXIT_GATE_TYPE, TriggerGateExit);
         this.#nodes.set(GETTER_VARIABLE_TYPE, TriggerVariableGetter);
+
+        // events
+        this.#events = new Collection(
+            R.map(
+                this.#nodes.filter((node) => node.isEvent),
+                (node) => [node.type, node] as const
+            )
+        );
+
+        // if no event in the application, we had a default one
+        if (!this.#events.size) {
+            this.#events.set(_StartTriggerNode.type, _StartTriggerNode);
+            this.#nodes.set(_StartTriggerNode.type, _StartTriggerNode);
+        }
 
         // setup settings
         if (this.isSettingApplication) {
@@ -111,6 +127,10 @@ class TriggerApplication {
 
     get nodes(): Collection<typeof TriggerNode> {
         return this.#nodes;
+    }
+
+    get events(): Collection<typeof TriggerNode> {
+        return this.#events;
     }
 
     localize(...args: LocalizeArgs): string | undefined {
