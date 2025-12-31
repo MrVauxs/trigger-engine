@@ -1,4 +1,13 @@
-import { instantiateField, NodeEntry, NodeField, OpenNodeEntry, TriggerVariable } from "engine";
+import {
+    ConnectionId,
+    instantiateField,
+    isVariableGetterNode,
+    NodeEntry,
+    NodeField,
+    OpenNodeEntry,
+    OpenTrigger,
+    TriggerVariable,
+} from "engine";
 import { BaseBlueprintEntry } from ".";
 import { BlueprintNode, editLabelDialog } from "..";
 import { localizePath } from "module-helpers";
@@ -18,6 +27,10 @@ class BlueprintEntry extends BaseBlueprintEntry {
         return this.#parent;
     }
 
+    get trigger(): OpenTrigger {
+        return this.node.trigger;
+    }
+
     get blueprint() {
         return this.node.blueprint;
     }
@@ -31,6 +44,9 @@ class BlueprintEntry extends BaseBlueprintEntry {
     }
 
     get label(): string {
+        const variable = this.trigger.data.variables[this.id as ConnectionId]?.label;
+        if (variable) return variable;
+
         const { key, label } = this.#entry;
         return label ? game.i18n.localize(label) : this.node.localize(this.category, key) ?? key;
     }
@@ -197,17 +213,22 @@ class BlueprintEntry extends BaseBlueprintEntry {
     _contextMenuOptions(): ContextMenuEntry[] {
         const options = super._contextMenuOptions();
 
+        if (this.preciseCategory !== "outputs" || isVariableGetterNode(this.node)) {
+            return options;
+        }
+
+        const hasVariable = !!this.trigger.data.variables[this.id as ConnectionId];
+
         options.unshift(
-            // TODO we need check if the variable doesn't already exist and if it is, we add an edit instead
             {
-                name: localizePath("blueprint.entry.variable.create"),
+                name: localizePath("blueprint.entry.variable"),
                 icon: `<i class="fa-solid fa-square-root-variable"></i>`,
-                condition: this.preciseCategory === "outputs",
+                condition: !hasVariable,
                 callback: async () => {
                     const placeholder = this.label;
                     const label = await editLabelDialog("variable", { placeholder });
 
-                    this.node.trigger.update({
+                    this.trigger.update({
                         variables: {
                             [this.id]: {
                                 isArray: this.isArray,
@@ -221,6 +242,22 @@ class BlueprintEntry extends BaseBlueprintEntry {
                         forceComputeConnections: true,
                         renderApplication: true,
                     });
+                },
+            },
+            {
+                name: localizePath("blueprint.variable.edit"),
+                icon: `<i class="fa-solid fa-pen-to-square"></i>`,
+                condition: hasVariable,
+                callback: async () => {
+                    return this.blueprint.editVariable(this.id as ConnectionId);
+                },
+            },
+            {
+                name: localizePath("blueprint.variable.delete.title"),
+                icon: `<i class="fa-solid fa-trash fa-fw"></i>`,
+                condition: hasVariable,
+                callback: async () => {
+                    return this.blueprint.deleteVariable(this.id as ConnectionId);
                 },
             }
         );

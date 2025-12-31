@@ -9,6 +9,14 @@ class TriggerVariableGetter extends TriggerNode {
         return GETTER_VARIABLE_TYPE;
     }
 
+    static get hasIn(): boolean {
+        return false;
+    }
+
+    static get defineOuts(): null {
+        return null;
+    }
+
     get icon(): string {
         return "\uf044";
     }

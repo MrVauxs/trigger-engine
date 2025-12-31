@@ -22,5 +22,5 @@ const zNodeHeaderData = z.object({
 
 type NodeHeaderSource = z.input<typeof zNodeHeaderData>;
 
-export { zNodeHeaderData };
+export { zNodeIconData, zNodeHeaderData };
 export type { NodeHeaderSource };

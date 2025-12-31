@@ -1,7 +1,9 @@
 import {
     CreateNodeData,
-    EXIT_GATE_TYPE,
     instantiateNode,
+    isGateExitNode,
+    isVariableGetterNode,
+    NodeData,
     OpenTriggerNode,
     Trigger,
     TriggerApplication,
@@ -20,26 +22,23 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
     constructor(parent: TriggerApplication, data: TriggerData) {
         super(parent, data);
 
-        for (const nodeData of data.nodes) {
-            if (nodeData.type !== EXIT_GATE_TYPE) continue;
+        const sequences: ((nodeData: NodeData) => boolean)[] = [
+            (nodeData) => isGateExitNode(nodeData),
+            (nodeData) => !isGateExitNode(nodeData) && !isVariableGetterNode(nodeData),
+            (nodeData) => isVariableGetterNode(nodeData),
+        ];
 
-            try {
-                const node = instantiateNode(this, nodeData, true);
-                if (!node) continue;
+        for (const fn of sequences) {
+            for (const nodeData of data.nodes) {
+                if (!fn(nodeData)) continue;
 
-                this.nodes.set(node.id, node);
-            } catch (error) {}
-        }
+                try {
+                    const node = instantiateNode(this, nodeData, true);
+                    if (!node || node.invalid) continue;
 
-        for (const nodeData of data.nodes) {
-            if (nodeData.type === EXIT_GATE_TYPE) continue;
-
-            try {
-                const node = instantiateNode(this, nodeData, true);
-                if (!node) continue;
-
-                this.nodes.set(node.id, node);
-            } catch (error) {}
+                    this.nodes.set(node.id, node);
+                } catch (error) {}
+            }
         }
     }
 
@@ -79,7 +78,7 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
         return this.nodes.get(id);
     }
 
-    update(data: UpdateTriggerData): TriggerData {
+    update(data: DeepPartial<UpdateTriggerData> & { [k: string]: any }): TriggerData {
         return this.data.update(data);
     }
 
@@ -153,7 +152,9 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
                     [
                         "inputs",
                         originNode.data.inputs,
-                        originNode.exitGate?.entries.outputs ?? originNode.entries.inputs,
+                        isVariableGetterNode(originNode)
+                            ? [] // we don't want to process variables getter input
+                            : originNode.exitGate?.entries.outputs ?? originNode.entries.inputs,
                     ],
                 ] as const,
                 R.flatMap(([category, records, entries]) => {

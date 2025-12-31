@@ -1,5 +1,6 @@
-import { OpenTrigger, TriggerApplication, TriggerDataInput, UpdateTriggerData } from "engine";
+import { ConnectionId, OpenTrigger, TriggerApplication, TriggerDataInput } from "engine";
 import {
+    confirmDialog,
     distanceToPoint,
     dividePointBy,
     MouseInteractionManager,
@@ -15,6 +16,7 @@ import {
     BlueprintNode,
     BlueprintNodesLayer,
     BlueprintNodesMenu,
+    editLabelDialog,
 } from ".";
 
 class Blueprint extends PIXI.Application<HTMLCanvasElement> {
@@ -244,17 +246,55 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         this.trigger = trigger;
     }
 
-    updateTrigger(id: string, updates: UpdateTriggerData) {
-        const trigger = this.triggers.get(id);
-        if (!trigger) return;
+    async deleteTrigger(id: string) {
+        const confirm = await confirmDialog("blueprint.trigger.delete");
+        if (!confirm) return;
 
-        trigger.update(updates);
+        this.triggers.delete(id);
         this.parent.render();
     }
 
-    deleteTrigger(id: string) {
-        this.triggers.delete(id);
-        this.parent.render();
+    async editVariable(id: ConnectionId) {
+        const trigger = this.trigger;
+        if (!trigger) return;
+
+        const current = trigger.data.variables[id]?.label;
+        if (current === undefined) return;
+
+        const label = await editLabelDialog("variable", { placeholder: current, value: current });
+        if (!label) return;
+
+        trigger.update({
+            variables: {
+                [id]: { label },
+            },
+        });
+
+        const nodeId = R.split(id, ":")[0];
+        if (nodeId) {
+            trigger.refreshNode(nodeId);
+        }
+
+        const variables = this.nodes.getVariables(id);
+        for (const node of variables) {
+            trigger.refreshNode(node.id);
+        }
+
+        this.draw({ renderApplication: true });
+    }
+
+    async deleteVariable(id: ConnectionId) {
+        const confirm = await confirmDialog("blueprint.variable.delete");
+        if (!confirm) return;
+
+        this.trigger?.update({
+            variables: {
+                [id]: undefined,
+            },
+        });
+
+        const nodes = this.nodes.getVariables(id);
+        this.nodes.delete(nodes);
     }
 
     getTrigger(triggerId: string): OpenTrigger | null {
@@ -315,6 +355,8 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         renderApplication?: boolean;
         selectNodes?: string[];
     } = {}) {
+        selectNodes ??= this.nodes.selected.map((node) => node.id);
+
         this.#clear();
 
         const trigger = this.trigger;
@@ -338,7 +380,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
 
         this.stage.on("wheel", this.#onWheel, this);
 
-        if (selectNodes) {
+        if (selectNodes.length) {
             this.nodes.selectNodes(selectNodes);
         }
 

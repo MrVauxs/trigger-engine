@@ -5,17 +5,20 @@ import {
     BaseCustomEntrySchema,
     BaseCustomSchema,
     BaseEntrySchemaInput,
+    ConnectionId,
     EntryCategory,
     GATE_CATEGORY,
     isConnectionId,
     isGateEntryNode,
     isGateExitNode,
     isOppositeConnection,
+    isVariableGetterNode,
     NodeData,
     OpenNodeEntry,
     OpenTrigger,
     OpenTriggerNode,
     TriggerNode,
+    VARIABLE_CATEGORY,
     zCustomInputData,
     zCustomInputSchema,
     zCustomOutData,
@@ -44,7 +47,7 @@ import {
     BlueprintBridgeEntry,
     BlueprintEntry,
     BlueprintNodesLayer,
-    editNode,
+    editLabelDialog,
     EntryId,
     getBottom,
     getRight,
@@ -54,6 +57,7 @@ import {
     NodePart,
     PreciseEntryCategory,
     zNodeHeaderData,
+    zNodeIconData,
 } from ".";
 import { Blueprint } from "..";
 
@@ -120,25 +124,36 @@ class BlueprintNode extends PIXI.Container {
         return this.#node.id;
     }
 
-    get isGate() {
-        return this.category === GATE_CATEGORY;
-    }
-
     get gateId(): string | undefined {
         return isGateExitNode(this) ? this.#node.id : this.#node.exitGate?.id;
+    }
+
+    get variableId(): ConnectionId | undefined {
+        return isVariableGetterNode(this) ? this.#node.data.inputs.entry?.connection : undefined;
     }
 
     get data(): NodeData {
         return this.#node.data;
     }
 
+    get icon(): string | undefined {
+        return zNodeIconData.safeParse(this.#node.icon)?.data?.unicode;
+    }
+
     get isEvent(): boolean {
         return this.#node.isEvent;
     }
 
+    get isGate(): boolean {
+        return this.category === GATE_CATEGORY;
+    }
+
+    get isVariable(): boolean {
+        return this.category === VARIABLE_CATEGORY;
+    }
+
     get isDuplicable(): boolean {
-        // TODO also exclude variables
-        return !this.isEvent && !this.isGate;
+        return !this.isEvent && !this.isGate && !this.isVariable;
     }
 
     get title(): string | null {
@@ -406,6 +421,19 @@ class BlueprintNode extends PIXI.Container {
         });
     }
 
+    async edit() {
+        const label = await editLabelDialog("gate", { value: this.data.custom.title });
+        if (!label) return;
+
+        this.data.update({
+            custom: {
+                title: label,
+            },
+        });
+
+        this.refresh({ renderApplication: true });
+    }
+
     _onClickLeft(event: FederatedEvent) {
         this.blueprint.cancelMouse();
 
@@ -560,7 +588,8 @@ class BlueprintNode extends PIXI.Container {
             ["inputs", "outputs"] as const,
             R.map((category) => {
                 if (
-                    (category === "inputs" && isGateExitNode(this.#node)) ||
+                    (category === "inputs" && // both getters & exit gates don't have inputs
+                        (isGateExitNode(this.#node) || isVariableGetterNode(this.#node))) ||
                     (category === "outputs" && isGateEntryNode(this.#node))
                 ) {
                     return [];
@@ -781,7 +810,7 @@ class BlueprintNode extends PIXI.Container {
     } = {}) {
         this.trigger.refreshNode(this.id);
 
-        // wer need to refresh all the entry-gates as well
+        // we need to refresh all the entry-gates as well
         if (isGateExitNode(this)) {
             for (const node of this.parent.getGateEntries(this.id)) {
                 this.trigger.refreshNode(node.id);
@@ -1063,7 +1092,7 @@ class BlueprintNode extends PIXI.Container {
                 icon: `<i class="fa-solid fa-pen-to-square"></i>`,
                 condition: !locked && isGateExitNode(this),
                 callback: () => {
-                    editNode(this);
+                    this.edit();
                 },
             },
             {

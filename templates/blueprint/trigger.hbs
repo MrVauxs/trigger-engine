@@ -9,15 +9,19 @@
             <a data-action="back-menu" {{{@root.i18n.tooltip 'back' }}}>
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
+            {{#unless isLocked}}
             <a data-action="edit-trigger" {{{@root.i18n.tooltip 'edit' }}}>
                 <i class="fa-solid fa-pen-to-square"></i>
             </a>
+            {{/unless}}
             {{/if}}
         </div>
         <div class="controls">
+            {{#unless isLocked}}
             <a data-action="reset-trigger" {{{@root.i18n.tooltip 'reset' }}}>
                 <i class="fa-solid fa-rotate-left"></i>
             </a>
+            {{/unless}}
             <a data-action="save-triggers" {{{@root.i18n.tooltip 'save' }}}>
                 <i class="fa-solid fa-floppy-disk"></i>
             </a>
@@ -32,8 +36,15 @@
     <div class="scroll">
         <div class="list">
             {{#each events as |event|}}
-            <div class="node" data-id="{{event.id}}" data-action="select-node">
-                {{event.label}}
+            <div class="node event" data-node-id="{{event.id}}" data-action="select-node">
+                <div class="name">
+                    {{#with event.icon as |icon|}}
+                    <i class="fa">{{icon}}</i>
+                    {{else}}
+                    <i class="fa-solid fa-calendar"></i>
+                    {{/with}}
+                    {{event.label}}
+                </div>
             </div>
             {{/each}}
         </div>
@@ -44,8 +55,12 @@
     <div class="scroll">
         <div class="list">
             {{#each gates as |gate|}}
-            <div class="node" data-id="{{gate.node.id}}" data-action="select-node" data-editable>
-                <div>{{gate.node.label}}</div>
+            <div class="node gate" data-node-id="{{gate.node.id}}" data-action="select-node"
+                data-editable>
+                <div class="name">
+                    <i class="fa-regular fa-outlet"></i>
+                    {{gate.node.label}}
+                </div>
                 {{#if gate.hasEntries}}
                 <div class="controls">
                     <a data-action="tab-gate" {{{@root.i18n.tooltip 'gates.tab' }}}>
@@ -63,8 +78,8 @@
     <div class="scroll variables">
         <div class="list">
             {{#each variables as |variable|}}
-            <div class="variable" data-id="{{variable.id}}" data-action="select-variable"
-                data-editable>
+            <div class="variable" data-node-id="{{variable.nodeId}}" data-id="{{variable.id}}"
+                data-action="select-node">
                 <div class="name" style="--variable-color: {{variable.color}};">
                     <i class="fa-regular fa-circle"></i>
                     {{variable.label}}

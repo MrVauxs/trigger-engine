@@ -6,10 +6,7 @@
                 "disconnect": "Disconnect Entry",
                 "edit": "Edit: {label}",
                 "remove": "Remove Entry",
-                "variable": {
-                    "create": "Create Variable",
-                    "edit": "Edit Variable"
-                }
+                "variable": "Create Variable"
             },
             "node": {
                 "copy": {
@@ -55,7 +52,7 @@
                 "reset": "Reset Trigger",
                 "save": "Save Triggers",
                 "variables": {
-                    "tab": "Move to nex Variable Getter",
+                    "tab": "Move to next Variable Getter",
                     "title": "Variables"
                 }
             },
@@ -71,6 +68,13 @@
                 "tags": {
                     "placeholder": "Trigger Tags"
                 }
+            },
+            "variable": {
+                "delete": {
+                    "content": "Are you sure you want to delete the selected variable?",
+                    "title": "Delete Variable"
+                },
+                "edit": "Edit Variable"
             }
         },
         "builtins": {

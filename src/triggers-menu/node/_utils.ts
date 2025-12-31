@@ -1,5 +1,4 @@
 import { localize, R, waitDialog } from "module-helpers";
-import { BlueprintNode } from ".";
 
 function alignHorizontally(
     parent: PIXI.Container,
@@ -70,23 +69,10 @@ async function editLabelDialog(
     return result && result.label && (!value || value !== result.label) ? result.label : undefined;
 }
 
-async function editNode(node: BlueprintNode) {
-    const label = await editLabelDialog("gate", { value: node?.data.custom.title });
-    if (!label) return;
-
-    node.data.update({
-        custom: {
-            title: label,
-        },
-    });
-
-    node.refresh({ renderApplication: true });
-}
-
 type NodePart<T extends PIXI.DisplayObject = PIXI.DisplayObject> = PIXI.Container<T> & {
     calculatedHeight: number;
     calculatedWith: number;
 };
 
-export { alignHorizontally, editNode, editLabelDialog, getBottom, getRight, maxBottom, maxRight };
+export { alignHorizontally, editLabelDialog, getBottom, getRight, maxBottom, maxRight };
 export type { NodePart };

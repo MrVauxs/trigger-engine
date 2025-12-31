@@ -9,6 +9,7 @@ import {
     getNodeStates,
     getOutputsSchemas,
     getOutsSchemas,
+    GETTER_VARIABLE_TYPE,
     isGateExitNode,
     NodeData,
     NodeDataInput,
@@ -187,6 +188,11 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
                 const type = target.dataset.type as string;
                 return this.#selectNode({ type });
             }
+
+            case "select-variable": {
+                const id = target.dataset.id as ConnectionId;
+                return this.#selectVariable(id);
+            }
         }
     }
 
@@ -210,6 +216,24 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         this.close();
     }
 
+    #selectVariable(id: ConnectionId) {
+        if (!this.trigger?.data.variables[id]) return;
+
+        const entry = this.#entry;
+        if (entry && (entry.isOutput || !isBlueprintEntry(entry))) return;
+
+        const source: NodeDataInput = {
+            inputs: {
+                entry: {
+                    connection: id,
+                },
+            },
+            type: GETTER_VARIABLE_TYPE,
+        };
+
+        this.#createNode(source, entry ? "outputs:entry" : undefined);
+    }
+
     #selectGate(exitId: string) {
         const trigger = this.trigger;
         if (!trigger) return;
@@ -225,9 +249,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         const newSource: NodeDataInput = {
             custom: {
                 inputs: foundry.utils.deepClone(exitNode.data.custom.outputs),
-                // title: exitNode.data.custom.title,
             },
-            position: this.#position,
             outs: {
                 out: {
                     connection: `${exitNode.id}:ins:in`,
@@ -263,8 +285,6 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
 
         const OtherCls = this.application.nodes.get(newSource.type) as typeof TriggerNode;
         if (!OtherCls) return;
-
-        newSource.position = this.#position;
 
         let otherIdSuffix: EntryIdSuffix | undefined;
 
@@ -373,8 +393,13 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
     }
 
     #createNode(newSource: NodeDataInput, otherIdSuffix: EntryIdSuffix | undefined) {
+        newSource.position = this.#position;
+
         const newNode = this.trigger?.addNode(newSource);
-        if (!newNode) return;
+
+        if (!newNode) {
+            return this.close();
+        }
 
         const entry = this.#entry;
         const otherId: EntryId | undefined = otherIdSuffix
@@ -657,7 +682,12 @@ type TriggerNodeStringProperty = keyof {
         : never]: (typeof TriggerNode)[P];
 };
 
-type EventAction = "create-gate" | "paste-nodes" | "select-gate" | "select-node";
+type EventAction =
+    | "create-gate"
+    | "paste-nodes"
+    | "select-gate"
+    | "select-node"
+    | "select-variable";
 
 type NodesMenuContext = {
     events: NodesGroup[];

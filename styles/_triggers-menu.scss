@@ -112,8 +112,9 @@
                     display: flex;
                     align-items: center;
                     gap: 0.3em;
-                    padding: 0.3rem;
+                    padding-inline: 0.3rem;
                     cursor: pointer;
+                    height: 2em;
 
                     .controls {
                         display: flex;
@@ -142,7 +143,7 @@
                 flex: 2;
             }
 
-            [data-id] {
+            [data-node-id] {
                 justify-content: space-between;
             }
         }
@@ -153,11 +154,36 @@
             }
         }
 
+        .name {
+            i {
+                text-align: center;
+            }
+        }
+
+        .event {
+            .name {
+                i {
+                    width: 1.5em;
+                }
+            }
+        }
+
+        .gate {
+            .name {
+                display: flex;
+                gap: 0.5em;
+
+                i {
+                    font-size: 1.2em;
+                }
+            }
+        }
+
         .variable {
             .name {
                 i {
                     color: var(--variable-color);
-                    margin-right: 0.1em;
+                    margin-right: 0.2em;
                 }
             }
         }

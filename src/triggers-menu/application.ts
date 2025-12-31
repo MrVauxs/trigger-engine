@@ -31,7 +31,7 @@ import {
     render,
     waitDialog,
 } from "module-helpers";
-import { Blueprint, BlueprintNode, editNode } from ".";
+import { Blueprint, BlueprintNode } from ".";
 import apps = foundry.applications.api;
 
 class BlueprintApplication extends apps.ApplicationV2<
@@ -65,6 +65,10 @@ class BlueprintApplication extends apps.ApplicationV2<
 
     get blueprint(): Blueprint {
         return this.#blueprint;
+    }
+
+    get trigger(): OpenTrigger | undefined {
+        return this.blueprint.trigger;
     }
 
     get search(): string {
@@ -245,7 +249,7 @@ class BlueprintApplication extends apps.ApplicationV2<
             }
 
             case "select-node": {
-                const nodeId = target.dataset.id ?? "";
+                const nodeId = target.dataset.nodeId ?? "";
                 return this.blueprint.moveToNode(nodeId, true);
             }
 
@@ -255,34 +259,66 @@ class BlueprintApplication extends apps.ApplicationV2<
             }
 
             case "tab-gate": {
-                const nodeId = htmlClosest(target, "[data-id]")?.dataset.id ?? "";
-                return this.#tabGate(nodeId);
+                const nodeId = htmlClosest(target, "[data-node-id]")?.dataset.nodeId ?? "";
+                const nodes = this.blueprint.nodes.getGateEntries(nodeId);
+                return this.#tabNode(nodes);
+            }
+
+            case "tab-variable": {
+                const id = htmlClosest(target, "[data-id]")?.dataset.id as ConnectionId;
+                const nodes = this.blueprint.nodes.getVariables(id);
+                return this.#tabNode(nodes);
             }
         }
     }
 
     #createContextMenus() {
-        this._createContextMenu(this.#triggerContextMenuOptions, ".sidebar.triggers .trigger");
-        this._createContextMenu(this.#triggerNodeContextMenuOptions, ".sidebar.trigger .node");
+        this._createContextMenu(this.#triggerContextMenu, ".sidebar.triggers .trigger");
+
+        if (this.blueprint.locked) return;
+
+        this._createContextMenu(this.#triggerNodeContextMenu, ".sidebar.trigger .node");
+        this._createContextMenu(this.#triggerVariableContextMenu, ".sidebar.trigger .variable");
     }
 
-    #triggerNodeContextMenuOptions(): ContextMenuEntry[] {
+    #triggerVariableContextMenu(): ContextMenuEntry[] {
+        return [
+            {
+                icon: `<i class="fa-solid fa-pen-to-square"></i>`,
+                name: localizePath(`blueprint.variable.edit`),
+                callback: (el) => {
+                    const id = el.dataset.id as ConnectionId;
+                    return this.blueprint.editVariable(id);
+                },
+            },
+            {
+                icon: `<i class="fa-solid fa-trash"></i>`,
+                name: localizePath("blueprint.variable.delete.title"),
+                callback: (el) => {
+                    const id = el.dataset.id as ConnectionId;
+                    return this.blueprint.deleteVariable(id);
+                },
+            },
+        ];
+    }
+
+    #triggerNodeContextMenu(): ContextMenuEntry[] {
         return [
             {
                 icon: `<i class="fa-solid fa-pen-to-square"></i>`,
                 name: localizePath(`blueprint.node.edit`),
                 condition: (el) => el.hasAttribute("data-editable"),
                 callback: (el) => {
-                    const nodeId = el.dataset.id ?? "";
+                    const nodeId = el.dataset.nodeId ?? "";
                     const node = this.blueprint.nodes.get(nodeId);
-                    return node && editNode(node);
+                    return node?.edit();
                 },
             },
             {
                 icon: `<i class="fa-solid fa-trash"></i>`,
                 name: localizePath("blueprint.node.delete.single"),
                 callback: async (el) => {
-                    const nodeId = el.dataset.id ?? "";
+                    const nodeId = el.dataset.nodeId ?? "";
                     const confirm = await confirmDialog("blueprint.node.delete.confirm");
                     return confirm && this.blueprint.nodes.deleteById([nodeId]);
                 },
@@ -290,7 +326,8 @@ class BlueprintApplication extends apps.ApplicationV2<
         ];
     }
 
-    #triggerContextMenuOptions(): ContextMenuEntry[] {
+    #triggerContextMenu(): ContextMenuEntry[] {
+        const isLocked = this.blueprint.locked;
         const getTriggerFromElement = (el: HTMLElement): OpenTrigger | null => {
             const triggerId = el.dataset.id;
             return triggerId ? this.blueprint.getTrigger(triggerId) : null;
@@ -309,6 +346,7 @@ class BlueprintApplication extends apps.ApplicationV2<
             {
                 icon: `<i class="fa-solid fa-pen-to-square"></i>`,
                 name: localizePath("blueprint.trigger.edit"),
+                condition: !isLocked,
                 callback: (el) => {
                     const trigger = getTriggerFromElement(el);
                     return trigger && this.#editTrigger(trigger.folder, trigger);
@@ -326,17 +364,16 @@ class BlueprintApplication extends apps.ApplicationV2<
             {
                 icon: `<i class="fa-solid fa-trash"></i>`,
                 name: localizePath("blueprint.trigger.delete.title"),
-                callback: async (el) => {
+                condition: !isLocked,
+                callback: (el) => {
                     const triggerId = el.dataset.id ?? "";
-                    const confirm = await confirmDialog("blueprint.trigger.delete");
-                    return confirm && this.blueprint.deleteTrigger(triggerId);
+                    return this.blueprint.deleteTrigger(triggerId);
                 },
             },
         ];
     }
 
-    #tabGate(exitId: string) {
-        const nodes = this.blueprint.nodes.getGateEntries(exitId);
+    #tabNode(nodes: BlueprintNode[]) {
         const nbNodes = nodes.length;
         if (!nbNodes) return;
 
@@ -377,7 +414,7 @@ class BlueprintApplication extends apps.ApplicationV2<
         );
 
         const variables: PreparedVariable[] = R.pipe(
-            this.blueprint.trigger?.data.variables ?? {},
+            this.trigger?.data.variables ?? {},
             R.entries(),
             R.map(([id, variable]): PreparedVariable => {
                 const color = this.application.entries.get(variable.type)?.color;
@@ -385,8 +422,9 @@ class BlueprintApplication extends apps.ApplicationV2<
                 return {
                     ...variable,
                     color: new PIXI.Color(color).toHex(),
-                    hasNodes: false, // TODO
+                    hasNodes: this.blueprint.nodes.some((node) => node.variableId === id),
                     id,
+                    nodeId: id.split(":")[0],
                 };
             })
         );
@@ -395,6 +433,7 @@ class BlueprintApplication extends apps.ApplicationV2<
             events: this.blueprint.nodes.filter((node) => node.isEvent),
             gates,
             isFree: this.application.isFreeApplication,
+            isLocked: this.blueprint.locked,
             trigger,
             variables,
         };
@@ -490,7 +529,8 @@ class BlueprintApplication extends apps.ApplicationV2<
         if (!result) return;
 
         if (isEdit) {
-            this.blueprint.updateTrigger(trigger.id, result);
+            trigger.update(result);
+            this.render();
         } else {
             this.blueprint.addTrigger(result);
         }
@@ -539,7 +579,8 @@ type EventAction =
     | "save-triggers"
     | "select-node"
     | "select-trigger"
-    | "tab-gate";
+    | "tab-gate"
+    | "tab-variable";
 
 type BlueprintContext = TriggersContext | TriggerContext;
 
@@ -547,6 +588,7 @@ type TriggerContext = {
     events: BlueprintNode[];
     gates: PreparedGate[];
     isFree: boolean;
+    isLocked: boolean;
     trigger: OpenTrigger;
     variables: PreparedVariable[];
 };
@@ -560,6 +602,7 @@ type PreparedVariable = TriggerVariable & {
     color: string;
     hasNodes: boolean;
     id: ConnectionId;
+    nodeId: string;
 };
 
 type TriggersContext = {

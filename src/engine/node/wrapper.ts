@@ -40,7 +40,7 @@ function instantiateNode(
 
         const connection = nodeData.outs.out.connection;
         const nodeId = connection?.split(":").at(0) ?? "";
-        const node = parent.nodes.get(nodeId);
+        const node = parent.getNode(nodeId);
         const data = foundry.utils.deepClone(parent.data.nodes.get(nodeId));
         if (!node || !data) return;
 
@@ -56,9 +56,13 @@ function instantiateNode(
     const variableSchemas = ((): OutputEntrySchema[] | undefined => {
         if (!isVariableGetter) return;
 
-        const connection = nodeData.inputs.in.connection;
+        const connection = nodeData.inputs.entry?.connection;
         const data = connection && parent.data.variables[connection];
         if (!data) return;
+
+        const [nodeId, _, key] = connection.split(":");
+        const node = parent.getNode(nodeId) as OpenTriggerNode | TriggerNode | undefined;
+        if (!node || ("entries" in node && !node.entries.outputs.get(key))) return;
 
         return [
             {

@@ -1,4 +1,5 @@
 import {
+    ConnectionId,
     isGateEntryNode,
     isGateExitNode,
     NodeDataOutput,
@@ -26,6 +27,10 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
 
     getGateEntries(exitId: string): BlueprintNode[] {
         return this.filter((node) => isGateEntryNode(node) && node.gateId === exitId);
+    }
+
+    getVariables(id: ConnectionId): BlueprintNode[] {
+        return this.filter((node) => node.variableId === id);
     }
 
     filter(fn: (node: BlueprintNode) => boolean) {
@@ -104,17 +109,30 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
         const trigger = this.blueprint.trigger;
         if (!trigger || !nodes.length) return;
 
-        for (const node of nodes) {
-            const groupedNodes = [node];
+        const variablesKeys = R.keys(trigger.data.variables);
 
+        // first pass to add extra nodes to delete
+        for (const node of nodes.slice()) {
+            // we add the gate entries
             if (isGateExitNode(node)) {
-                groupedNodes.push(...this.getGateEntries(node.id));
+                nodes.push(...this.getGateEntries(node.id));
             }
 
-            for (const groupedNode of groupedNodes) {
-                groupedNode.eventMode = "none";
-                trigger.deleteNode(groupedNode.id);
+            // we add variable getters
+            const variables = variablesKeys.filter((id) => R.split(id, ":")[0] === node.id);
+            for (const id of variables) {
+                nodes.push(...this.getVariables(id));
             }
+
+            // we update the variables data in bundle
+            trigger.update({
+                variables: R.fromKeys(variables, (id) => undefined),
+            });
+        }
+
+        for (const node of R.unique(nodes)) {
+            node.eventMode = "none";
+            trigger.deleteNode(node.id);
         }
 
         this.blueprint.draw({ forceComputeConnections: true, renderApplication: true });
