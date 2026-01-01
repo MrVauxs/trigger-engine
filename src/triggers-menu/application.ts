@@ -342,6 +342,13 @@ class BlueprintApplication extends apps.ApplicationV2<
             {
                 icon: `<i class="fa-solid fa-trash"></i>`,
                 name: localizePath("blueprint.node.delete.single"),
+                condition: (el) => {
+                    const nodeId = el.dataset.nodeId ?? "";
+                    const node = this.blueprint.nodes.get(nodeId);
+                    return (
+                        !!node && (!node.isEvent || !!this.trigger?.application.hasMultipleEvents)
+                    );
+                },
                 callback: async (el) => {
                     const nodeId = el.dataset.nodeId ?? "";
                     const confirm = await confirmDialog("blueprint.node.delete.confirm");

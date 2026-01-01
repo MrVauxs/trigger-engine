@@ -133,6 +133,10 @@ class TriggerApplication {
         return this.#events;
     }
 
+    get hasMultipleEvents(): boolean {
+        return this.events.size > 1;
+    }
+
     localize(...args: LocalizeArgs): string | undefined {
         const data = R.isObjectType(args.at(-1)) ? (args.pop() as LocalizeData) : undefined;
 

@@ -1117,7 +1117,7 @@ class BlueprintNode extends PIXI.Container {
             {
                 name: localizePath(`blueprint.node.delete.${multiSelected}`),
                 icon: `<i class="fa-solid fa-trash fa-fw"></i>`,
-                condition: !locked,
+                condition: !locked && (!this.isEvent || this.trigger.application.hasMultipleEvents),
                 callback: async () => {
                     const confirm = await confirmDialog("blueprint.node.delete.confirm");
                     return confirm && this.parent.delete(selected);
