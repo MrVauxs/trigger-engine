@@ -72,7 +72,7 @@ abstract class TriggerNode {
     }
 
     /**
-     * Some nodes may not want to only have value inputs.
+     * Some nodes may want to only have value inputs.
      * This can only be used in conjunction with entries with a field.
      */
     static get inputsHaveConnector(): boolean {

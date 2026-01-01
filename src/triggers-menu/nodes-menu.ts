@@ -540,13 +540,15 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
             return nodes;
         }
 
-        // events never have inputs so we get rid of them all
-        if (entry.isOutput) {
+        const entryIsInput = entry.isInput;
+
+        // events never have input connectors, so we get rid of them all
+        if (!entryIsInput) {
             nodes = nodes.filter((node) => !node.isEvent);
         }
 
         if (!isBlueprintEntry(entry)) {
-            return entry.isInput
+            return entryIsInput
                 ? nodes.filter((node) => getOutsSchemas(node).length)
                 : nodes.filter((node) => node.hasIn);
         }
@@ -554,10 +556,15 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         const isArray = !!entry.isArray;
 
         return nodes.filter((node) => {
-            const schemasFn = entry.isInput ? getOutputsSchemas : getInputsSchemas;
+            const schemasFn = entryIsInput ? getOutputsSchemas : getInputsSchemas;
             const entries = schemasFn(node, { revealed: true });
 
             return entries.some((other) => {
+                if (!entryIsInput) {
+                    const OtherCls = this.application.entries.get(other.type);
+                    if (OtherCls?.FieldClass && !node.inputsHaveConnector) return false;
+                }
+
                 return other.type === entry.type && isArray === !!other.isArray;
             });
         });
