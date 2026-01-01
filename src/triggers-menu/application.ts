@@ -31,7 +31,7 @@ import {
     render,
     waitDialog,
 } from "module-helpers";
-import { Blueprint, BlueprintNode } from ".";
+import { Blueprint, BlueprintEntry, BlueprintNode } from ".";
 import apps = foundry.applications.api;
 
 class BlueprintApplication extends apps.ApplicationV2<
@@ -417,7 +417,10 @@ class BlueprintApplication extends apps.ApplicationV2<
         const variables: PreparedVariable[] = R.pipe(
             this.trigger?.data.variables ?? {},
             R.entries(),
-            R.map(([id, variable]): PreparedVariable => {
+            R.map(([id, variable]): PreparedVariable | undefined => {
+                const entry = this.blueprint.nodes.getEntryFromId(id) as BlueprintEntry | undefined;
+                if (!entry) return;
+
                 const color = this.application.entries.get(variable.type)?.color;
 
                 return {
@@ -425,9 +428,12 @@ class BlueprintApplication extends apps.ApplicationV2<
                     color: new PIXI.Color(color).toHex(),
                     hasNodes: this.blueprint.nodes.some((node) => node.variableId === id),
                     id,
+                    isArray: variable.isArray,
+                    isCustom: !!entry.schema.hidden || foundry.data.validators.isValidId(entry.key),
                     nodeId: id.split(":")[0],
                 };
-            })
+            }),
+            R.filter(R.isTruthy)
         );
 
         return {
@@ -603,6 +609,8 @@ type PreparedVariable = TriggerVariable & {
     color: string;
     hasNodes: boolean;
     id: ConnectionId;
+    isArray: boolean;
+    isCustom: boolean;
     nodeId: string;
 };
 

@@ -62,6 +62,11 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
         }
     }
 
+    getNodeFromEntryId(id: EntryId): BlueprintNode | undefined {
+        const [nodeId] = R.split(id, ":");
+        return this.get(nodeId);
+    }
+
     getEntryFromId(id: EntryId): BaseBlueprintEntry | undefined {
         const [nodeId, category, key] = R.split(id, ":");
         return (this.get(nodeId)?.[category] as Collection<BaseBlueprintEntry>).get(key);

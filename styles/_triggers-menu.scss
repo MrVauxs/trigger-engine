@@ -115,6 +115,7 @@
                     padding-inline: 0.3rem;
                     cursor: pointer;
                     height: 2em;
+                    border-bottom: 1px solid #ffffff14;
 
                     .controls {
                         display: flex;
@@ -180,10 +181,15 @@
         }
 
         .variable {
+            padding-left: 0;
+
             .name {
-                i {
-                    color: var(--variable-color);
-                    margin-right: 0.2em;
+                height: 100%;
+                display: flex;
+                align-items: center;
+
+                svg {
+                    height: 100%;
                 }
             }
         }
