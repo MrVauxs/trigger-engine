@@ -11,6 +11,7 @@ import {
 import {
     addEnterKeyListeners,
     addListener,
+    addListenerAll,
     ApplicationClosingOptions,
     ApplicationConfiguration,
     ApplicationRenderOptions,
@@ -176,26 +177,30 @@ class BlueprintApplication extends apps.ApplicationV2<
     ): void {
         const ui = htmlQuery(content, ":scope > .ui");
 
+        const description = `<div class="description actor sheet">
+            <section class="window-content">
+                <div class="item-summary"></div>
+            </section>
+        </div>`;
+
         if (ui) {
-            ui.innerHTML = result;
+            ui.innerHTML = result + description;
         } else {
             const wrapper = createHTMLElement("div", {
                 classes: ["ui"],
-                content: result,
+                content: result + description,
                 dataset: { tooltipClass: "pf2e", tooltipDirection: "UP" },
             });
 
             content.appendChild(wrapper);
         }
 
-        if (!options.trigger && this.search !== "") {
-            this.#filterTriggers();
+        if (!options.trigger) {
+            this.#activateTriggersListeners(content);
         }
-
-        this.#activateListeners(content);
     }
 
-    protected _onClickAction(event: PointerEvent, target: HTMLElement) {
+    async _onClickAction(event: PointerEvent, target: HTMLElement) {
         if (event.button !== 0) return;
 
         const action = target.dataset.action as EventAction;
@@ -269,7 +274,26 @@ class BlueprintApplication extends apps.ApplicationV2<
                 const nodes = this.blueprint.nodes.getVariables(id);
                 return this.#tabNode(nodes);
             }
+
+            case "toggle-description": {
+                const description = htmlQuery(this.element, ".ui > .description");
+                if (!description) return;
+
+                description.classList.toggle("show");
+
+                const container = htmlQuery(description, ".item-summary");
+                this.#addTriggerDescription(container);
+
+                return;
+            }
         }
+    }
+
+    async #addTriggerDescription(el: HTMLElement | null, triggerId?: string) {
+        if (!el || el.hasChildNodes()) return;
+
+        const trigger = triggerId ? this.blueprint.getTrigger(triggerId) : this.trigger;
+        el.innerHTML = (await trigger?.enrichedDescription) || "<div></div>";
     }
 
     #createContextMenus() {
@@ -439,6 +463,7 @@ class BlueprintApplication extends apps.ApplicationV2<
         return {
             events: this.blueprint.nodes.filter((node) => node.isEvent),
             gates,
+            hasDescription: !!trigger.description,
             isFree: this.application.isFreeApplication,
             isLocked: this.blueprint.locked,
             trigger,
@@ -490,8 +515,18 @@ class BlueprintApplication extends apps.ApplicationV2<
         };
     }
 
-    #activateListeners(html: HTMLElement) {
+    #activateTriggersListeners(html: HTMLElement) {
         addEnterKeyListeners(html, "text");
+
+        addListenerAll(html, ".trigger", "pointerenter", async (el) => {
+            const container = htmlQuery(html, ".ui > .description .item-summary");
+            if (!container) return;
+
+            const cached = htmlQuery(el, ".trigger-description");
+
+            await this.#addTriggerDescription(cached, el.dataset.id);
+            container.innerHTML = cached?.innerHTML ?? "";
+        });
 
         addListener(html, `[name="search"]`, "input", (el: ExtendedTextInputElement) => {
             this.search = el.value;
@@ -507,6 +542,10 @@ class BlueprintApplication extends apps.ApplicationV2<
             multiSelect.addEventListener("mode", () => {
                 this.tagsMode = multiSelect.mode;
             });
+        }
+
+        if (this.search !== "") {
+            this.#filterTriggers();
         }
     }
 
@@ -587,13 +626,15 @@ type EventAction =
     | "select-node"
     | "select-trigger"
     | "tab-gate"
-    | "tab-variable";
+    | "tab-variable"
+    | "toggle-description";
 
 type BlueprintContext = TriggersContext | TriggerContext;
 
 type TriggerContext = {
     events: BlueprintNode[];
     gates: PreparedGate[];
+    hasDescription: boolean;
     isFree: boolean;
     isLocked: boolean;
     trigger: OpenTrigger;

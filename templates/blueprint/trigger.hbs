@@ -17,11 +17,11 @@
             {{/if}}
         </div>
         <div class="controls">
-            {{#unless isLocked}}
-            <a data-action="reset-trigger" {{{@root.i18n.tooltip 'reset' }}}>
-                <i class="fa-solid fa-rotate-left"></i>
+            {{#if hasDescription}}
+            <a data-action="toggle-description" {{{@root.i18n.tooltip 'description' }}}>
+                <i class="fa-solid fa-square-info"></i>
             </a>
-            {{/unless}}
+            {{/if}}
             <a data-action="save-triggers" {{{@root.i18n.tooltip 'save' }}}>
                 <i class="fa-solid fa-floppy-disk"></i>
             </a>
@@ -83,6 +83,7 @@
                 <div class="name" style="--variable-color: {{variable.color}};">
                     <svg viewBox="0 0 95 100" xmlns="http://www.w3.org/2000/svg">
                         <g color="var(--variable-color)">
+                            {{!-- custom --}}
                             {{#if variable.isCustom}}
                             {{#if variable.isArray}}
                             <rect x="18" width="56" height="56" rx="10" fill="none"
@@ -93,6 +94,7 @@
                             <rect x="20" width="52" height="52" rx="10" fill="none"
                                 stroke="currentColor" y="20" stroke-width="8"></rect>
                             {{/if}}
+                            {{!-- regular --}}
                             {{else}}
                             {{#if variable.isArray}}
                             <circle cx="45" cy="50" r="28" stroke-width="4" fill="none"

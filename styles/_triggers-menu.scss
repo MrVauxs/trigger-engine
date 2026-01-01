@@ -29,6 +29,7 @@
     pointer-events: none;
     top: 5px;
     border-radius: 0 5px 5px 0;
+    color: var(--color-text-light-highlight);
 
     .ui {
         height: 100%;
@@ -130,6 +131,10 @@
                 }
             }
         }
+
+        .trigger-description {
+            display: none;
+        }
     }
 
     .sidebar.trigger {
@@ -193,6 +198,10 @@
                 }
             }
         }
+
+        ~ .description:not(.show) {
+            display: none;
+        }
     }
 
     .sidebar.triggers {
@@ -254,22 +263,32 @@
                 display: none;
             }
         }
-
-        .trigger {
-            .trigger-description {
-                display: none;
-            }
-        }
     }
 
     .description {
+        --font-primary: var(--body-serif);
+
+        z-index: 1;
         height: 100%;
         flex: 1;
-        background-color: var(--background-color);
+        background: #1a1a1a;
         pointer-events: all;
+        font-family: var(--body-serif);
 
-        &:empty {
-            display: none;
+        .window-content {
+            height: 100%;
+            background: none;
+        }
+
+        .item-summary {
+            overflow-y: auto;
+            color: var(--color-text-light-highlight);
+            padding: 0.5em 1em;
+            user-select: text;
+        }
+
+        .content-link {
+            color: var(--color-text-dark-1);
         }
     }
 

@@ -47,6 +47,7 @@
                     "content": "Are you sure you want to delete the selected trigger?",
                     "title": "Delete Trigger"
                 },
+                "description": "Toggle description",
                 "duplicate": "Duplicate Trigger",
                 "edit": "Edit Trigger",
                 "events": "Events",
