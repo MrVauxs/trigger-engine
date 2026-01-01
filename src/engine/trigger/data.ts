@@ -29,9 +29,9 @@ const zTriggerDataSchema = z.object({
     description: z.string().trim().default(""),
     folder: z.string().trim().default(""),
     name: z.string().trim().default(""),
-    nodes: z.array(zNodeDataSchema).default([]),
-    tags: z.array(z.string().trim()).default([]),
-    variables: z.record(zConnectionId, zTriggerVariable).default({}),
+    nodes: z.array(zNodeDataSchema).default(() => []),
+    tags: z.array(z.string().trim()).default(() => []),
+    variables: z.record(zConnectionId, zTriggerVariable).default(() => ({})),
 });
 
 type TriggerDataInput = z.input<TriggerDataSchema>;

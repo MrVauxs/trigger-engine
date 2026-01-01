@@ -13,7 +13,7 @@ const zEntryDataSchema = z
             connection: z.optional(zConnectionId),
         })
     )
-    .default({});
+    .default(() => ({}));
 
 function isOppositeConnection(
     category: PreciseEntryCategory
