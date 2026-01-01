@@ -100,11 +100,11 @@ class BlueprintNode extends PIXI.Container {
         return this.#outs;
     }
 
-    get inputs(): Collection<BaseBlueprintEntry> {
+    get inputs(): Collection<BlueprintEntry> {
         return this.#inputs;
     }
 
-    get outputs(): Collection<BaseBlueprintEntry> {
+    get outputs(): Collection<BlueprintEntry> {
         return this.#outputs;
     }
 
@@ -825,8 +825,24 @@ class BlueprintNode extends PIXI.Container {
     }
 
     #switchState(state: string) {
-        this.data.update({ revealed: undefined, state });
-        // TODO we gonna want to delete variables
+        // those are the entry that will be removed during switch
+        const toBeRemoved = this.outputs.filter((entry) => entry.schema.state === this.#node.state);
+
+        for (const entry of toBeRemoved) {
+            // we delete the variable
+            this.blueprint.deleteVariable(entry.id as ConnectionId, false);
+        }
+
+        // those revealed entries could only exist in the current state
+        const revealed = R.pipe(
+            toBeRemoved,
+            R.filter((entry) => !!entry.schema.hidden),
+            R.map((entry) => entry.id as ConnectionId),
+            R.fromKeys(() => undefined)
+        );
+
+        this.data.update({ revealed, state });
+
         this.refresh({
             forceComputeConnections: true,
             renderApplication: true,
@@ -990,10 +1006,13 @@ class BlueprintNode extends PIXI.Container {
                         const label = this.#node.localize("states", state) ?? state;
 
                         return {
-                            name: localize("blueprint.node.state", { label }),
+                            name: localize("blueprint.node.state.title", { label }),
                             icon: `<i class="fa-sharp fa-solid fa-arrows-repeat"></i>`,
                             callback: async () => {
-                                this.#switchState(state);
+                                const confirm = await confirmDialog("blueprint.node.state", {
+                                    data: { label },
+                                });
+                                return confirm && this.#switchState(state);
                             },
                         };
                     })
@@ -1100,7 +1119,6 @@ class BlueprintNode extends PIXI.Container {
                 icon: `<i class="fa-solid fa-trash fa-fw"></i>`,
                 condition: !locked,
                 callback: async () => {
-                    // TODO we gonna want to delete variables
                     const confirm = await confirmDialog("blueprint.node.delete.confirm");
                     return confirm && this.parent.delete(selected);
                 },

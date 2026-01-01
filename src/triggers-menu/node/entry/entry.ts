@@ -1,4 +1,5 @@
 import {
+    BaseEntrySchemaInput,
     ConnectionId,
     instantiateField,
     isVariableGetterNode,
@@ -25,6 +26,10 @@ class BlueprintEntry extends BaseBlueprintEntry {
 
     get key(): string {
         return this.#entry.key;
+    }
+
+    get schema(): BaseEntrySchemaInput {
+        return this.#entry.schema;
     }
 
     get label(): string {

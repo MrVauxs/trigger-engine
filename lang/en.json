@@ -6,7 +6,7 @@
                 "disconnect": "Disconnect Entry",
                 "edit": "Edit: {label}",
                 "remove": {
-                    "content": "Are you sure you want to remove this custom entry?",
+                    "content": "Are you sure you want to remove this entry?",
                     "title": "Remove Entry"
                 },
                 "variable": "Create Variable"
@@ -30,7 +30,10 @@
                     "single": "Duplicate Node"
                 },
                 "edit": "Edit Node",
-                "state": "Switch: {label}"
+                "state": {
+                    "content": "Are you sure you want to switch state?",
+                    "title": "Switch: {label}"
+                }
             },
             "trigger": {
                 "back": "Back To Triggers",
