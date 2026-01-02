@@ -37,7 +37,7 @@ class BlueprintEntry extends BaseBlueprintEntry {
         if (variable) return variable;
 
         const { key, label } = this.#entry;
-        return label ? game.i18n.localize(label) : this.node.localize(this.category, key) ?? key;
+        return label ? game.i18n.localize(label) : (this.node.localize(this.category, key) ?? key);
     }
 
     get isArray() {
@@ -149,7 +149,7 @@ class BlueprintEntry extends BaseBlueprintEntry {
             value: processValue(rawValue),
         };
 
-        const fieldElement = instantiateField(FieldCls, node, options);
+        const fieldElement = instantiateField(FieldCls, this.#entry, node, options);
         fieldElement.draw();
 
         if (isConnected || !this.canConnect) {
@@ -249,7 +249,7 @@ class BlueprintEntry extends BaseBlueprintEntry {
                     const confirm = await confirmDialog("blueprint.variable.delete");
                     return confirm && this.blueprint.deleteVariable(this.id as ConnectionId);
                 },
-            }
+            },
         );
 
         return options;

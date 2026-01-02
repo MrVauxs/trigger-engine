@@ -3,6 +3,7 @@ import {
     isGateEntryNode,
     isGateExitNode,
     OpenTrigger,
+    SearchSelectInputElement,
     TriggerApplication,
     TriggerDataInput,
     TriggerVariable,
@@ -28,6 +29,7 @@ import {
     localizePath,
     MultiSelectTagsMode,
     R,
+    registerCustomElement,
     registerCustomElements,
     render,
     waitDialog,
@@ -157,14 +159,15 @@ class BlueprintApplication extends apps.ApplicationV2<
 
     async _preFirstRender(
         context: Record<string, unknown>,
-        options: BlueprintRenderOptions
+        options: BlueprintRenderOptions,
     ): Promise<void> {
         registerCustomElements("extended-multi-select", "extended-text-input");
+        registerCustomElement("search-select-input", SearchSelectInputElement);
     }
 
     protected _renderHTML(
         context: BlueprintContext,
-        options: BlueprintRenderOptions
+        options: BlueprintRenderOptions,
     ): Promise<string> {
         const key = options.trigger ? "trigger" : "triggers";
         return render(`blueprint.${key}`, context);
@@ -173,7 +176,7 @@ class BlueprintApplication extends apps.ApplicationV2<
     protected _replaceHTML(
         result: string,
         content: HTMLElement,
-        options: BlueprintRenderOptions
+        options: BlueprintRenderOptions,
     ): void {
         const ui = htmlQuery(content, ":scope > .ui");
 
@@ -428,7 +431,7 @@ class BlueprintApplication extends apps.ApplicationV2<
             this.element.querySelectorAll<HTMLElement>(".sidebar.triggers .trigger"),
             this.search,
             this.tags,
-            this.tagsMode
+            this.tagsMode,
         );
     }
 
@@ -439,10 +442,10 @@ class BlueprintApplication extends apps.ApplicationV2<
             this.blueprint.nodes.filter((node) => isGateExitNode(node)),
             (node): PreparedGate => {
                 const hasEntries = this.blueprint.nodes.some(
-                    (other) => isGateEntryNode(other) && other.gateId === node.id
+                    (other) => isGateEntryNode(other) && other.gateId === node.id,
                 );
                 return { hasEntries, node };
-            }
+            },
         );
 
         const variables: PreparedVariable[] = R.pipe(
@@ -464,7 +467,7 @@ class BlueprintApplication extends apps.ApplicationV2<
                     nodeId: id.split(":")[0],
                 };
             }),
-            R.filter(R.isTruthy)
+            R.filter(R.isTruthy),
         );
 
         return {
@@ -487,10 +490,10 @@ class BlueprintApplication extends apps.ApplicationV2<
             R.sortBy(([folder]) => folder),
             R.map(([folder, triggers]): TriggersGroup => {
                 return { folder, triggers };
-            })
+            }),
         );
 
-        // we move the folderless group at the end
+        // we move the folder-less group at the end
         if (groups.length > 1 && groups[0].folder === "") {
             groups.push(groups.shift()!);
         }
@@ -508,7 +511,7 @@ class BlueprintApplication extends apps.ApplicationV2<
                 };
             }),
             R.unique(),
-            R.sortBy(R.identity())
+            R.sortBy(R.identity()),
         );
 
         return {
@@ -599,7 +602,7 @@ function filterElements(
     elements: NodeListOf<HTMLElement>,
     search: string | undefined,
     tags: string[] | undefined = [],
-    tagsMode: MultiSelectTagsMode = "and"
+    tagsMode: MultiSelectTagsMode = "and",
 ) {
     const searchTerm = search?.toLocaleLowerCase();
     const tagsFn = tagsMode === "and" ? includesAll : includesAny;

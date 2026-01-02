@@ -66,7 +66,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         position: Point,
         resolve: BlueprintNodesMenuResolve,
         entry: BaseBlueprintEntry | undefined,
-        options?: DeepPartial<ApplicationConfiguration>
+        options?: DeepPartial<ApplicationConfiguration>,
     ) {
         super(options);
 
@@ -95,7 +95,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
     static async wait(
         blueprint: Blueprint,
         position: Point,
-        entry?: BaseBlueprintEntry
+        entry?: BaseBlueprintEntry,
     ): Promise<boolean | null> {
         return new Promise((resolve: BlueprintNodesMenuResolve) => {
             new BlueprintNodesMenu(blueprint, position, resolve, entry).render(true);
@@ -129,13 +129,13 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
                 });
             }),
             R.uniqueBy(R.prop("label")),
-            R.sortBy(R.prop("label"))
+            R.sortBy(R.prop("label")),
         );
 
         const existingEvents = R.pipe(
             this.trigger?.nodes.contents ?? [],
             R.filter((node) => node.isEvent),
-            R.map((node) => node.type)
+            R.map((node) => node.type),
         );
 
         const events = allEvents.filter((event) => !R.isIncludedIn(event.type, existingEvents));
@@ -293,7 +293,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
 
         const getOtherSchema = <T extends BaseEntrySchemaInput | BridgeSchemaInput>(
             category: "outs" | "inputs" | "outputs",
-            callback: (entries: T[]) => T | undefined
+            callback: (entries: T[]) => T | undefined,
         ): T | undefined => {
             let hidden: { state: string | null; schema: T } | undefined;
 
@@ -301,8 +301,8 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
                 category === "outs"
                     ? getOutsSchemas
                     : category === "inputs"
-                    ? getInputsSchemas
-                    : getOutputsSchemas;
+                      ? getInputsSchemas
+                      : getOutputsSchemas;
 
             for (const state of nodeStates) {
                 const schemas = schemaFn(OtherCls, { revealed: true, state }) as T[];
@@ -351,7 +351,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
                     R.sortBy((schema) => schema.group ?? ""),
                     R.find((schema) => {
                         return schema.type === entryType && isArray === !!schema.isArray;
-                    })
+                    }),
                 );
             });
         };
@@ -533,7 +533,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         const entry = this.#entry;
 
         let nodes = this.application.nodes.filter(
-            (node) => !R.isIncludedIn(node.category, [GATE_CATEGORY, VARIABLE_CATEGORY])
+            (node) => !R.isIncludedIn(node.category, [GATE_CATEGORY, VARIABLE_CATEGORY]),
         );
 
         if (!entry) {
@@ -620,20 +620,20 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
                     nodes,
                 };
             }),
-            R.sortBy(R.prop("label"))
+            R.sortBy(R.prop("label")),
         );
     }
 
     #addEventListeners(html: HTMLElement) {
         requestAnimationFrame(() => {
             window.addEventListener(
-                "click",
+                "pointerdown",
                 (event) => {
                     if (event.target instanceof HTMLElement && !html.contains(event.target)) {
                         this.close();
                     }
                 },
-                { signal: this.#abortController.signal }
+                { signal: this.#abortController.signal },
             );
         });
 
@@ -650,7 +650,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
             this.element.querySelectorAll<HTMLElement>(`.nodes .node`),
             this.#searchInput?.value,
             this.#tagsInput?.value,
-            this.#tagsInput?.mode
+            this.#tagsInput?.mode,
         );
     }
 }
@@ -658,7 +658,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
 function localizeNodeProperty(
     application: TriggerApplication,
     node: typeof TriggerNode,
-    property: TriggerNodeStringProperty
+    property: TriggerNodeStringProperty,
 ): string {
     const path = getNodePropertyLocalizePath(node, property);
     return application.localize(path) ?? node[property];
@@ -666,7 +666,7 @@ function localizeNodeProperty(
 
 function getNodePropertyLocalizePath(
     node: typeof TriggerNode,
-    property: TriggerNodeStringProperty
+    property: TriggerNodeStringProperty,
 ): string {
     switch (property) {
         case "category": {

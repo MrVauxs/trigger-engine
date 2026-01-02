@@ -18,7 +18,7 @@ function instantiateEntry(
     category: EntryCategory,
     entrySchema: BaseEntrySchemaInput,
     nodeData: NodeData,
-    open: true
+    open: true,
 ): OpenNodeEntry | undefined;
 function instantiateEntry(
     trigger: Trigger,
@@ -26,7 +26,7 @@ function instantiateEntry(
     category: EntryCategory,
     entrySchema: BaseEntrySchemaInput,
     nodeData: NodeData,
-    open: boolean
+    open: boolean,
 ): NodeEntry | undefined;
 function instantiateEntry(
     trigger: Trigger,
@@ -34,7 +34,7 @@ function instantiateEntry(
     category: EntryCategory,
     entrySchema: BaseEntrySchemaInput,
     nodeData: NodeData,
-    open: boolean
+    open: boolean,
 ): NodeEntry | OpenNodeEntry | undefined {
     const EntryCls = trigger.application.entries.get(entrySchema.type) as typeof NodeEntry;
     if (!EntryCls) return;
@@ -89,7 +89,7 @@ function instantiateEntry(
                         enumerable: true,
                         writable: false,
                     };
-                })
+                }),
             );
 
             // from static accessors
@@ -102,7 +102,7 @@ function instantiateEntry(
                         enumerable: true,
                         writable: false,
                     };
-                })
+                }),
             );
 
             if (open) {

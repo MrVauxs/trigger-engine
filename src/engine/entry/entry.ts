@@ -3,7 +3,7 @@ import { MODULE } from "module-helpers";
 
 abstract class NodeEntry<
     TValue extends unknown = unknown,
-    TFieldSchema extends Record<string, any> | undefined = undefined
+    TFieldSchema extends Record<string, any> | undefined = undefined,
 > {
     //////////////////////////////
     // ABSTRACT STATIC ACCESSORS
@@ -92,7 +92,8 @@ abstract class NodeEntry<
 }
 
 interface NodeEntry
-    extends Pick<BaseEntrySchemaInput, "key" | "label" | "group">,
+    extends
+        Pick<BaseEntrySchemaInput, "key" | "label" | "group">,
         Pick<typeof NodeEntry, "type" | "color"> {
     readonly isArray: boolean;
 }

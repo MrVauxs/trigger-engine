@@ -1,15 +1,29 @@
 import { drawRectangleMask, R } from "module-helpers";
 import { BlueprintNode, NodeFieldOptions } from "triggers-menu";
 import { NodeField } from ".";
+import { LocalizeArgs } from "module-helpers/src";
+import { NodeEntry } from "..";
 
 function instantiateField(
     FieldCls: typeof NodeField,
+    parent: NodeEntry,
     node: BlueprintNode,
-    options: NodeFieldOptions
+    options: NodeFieldOptions,
 ) {
+    function localize(...args: LocalizeArgs): string | undefined {
+        return node.localize(...args);
+    }
+
     class EntryFieldWrapper extends FieldCls {
         constructor() {
             super();
+
+            Object.defineProperty(this, "entry", {
+                value: parent,
+                configurable: false,
+                enumerable: false,
+                writable: false,
+            });
 
             // from options
             Object.defineProperties(
@@ -21,7 +35,7 @@ function instantiateField(
                         enumerable: true,
                         writable: false,
                     };
-                })
+                }),
             );
 
             // from BlueprintNode methods
@@ -40,8 +54,8 @@ function instantiateField(
                             enumerable: false,
                             writable: false,
                         };
-                    })
-                )
+                    }),
+                ),
             );
 
             // from private methods
@@ -51,6 +65,7 @@ function instantiateField(
                     [
                         ["addRectangleMask", this.#addRectangleMask],
                         ["getGlobalBounds", this.#getGlobalBounds],
+                        ["localize", localize],
                     ] as const,
                     R.fromEntries(),
                     R.mapValues((method) => {
@@ -60,8 +75,8 @@ function instantiateField(
                             enumerable: false,
                             writable: false,
                         };
-                    })
-                )
+                    }),
+                ),
             );
         }
 
@@ -71,7 +86,7 @@ function instantiateField(
             y: number,
             width: number,
             height: number,
-            radius?: number | undefined
+            radius?: number | undefined,
         ) {
             const mask = drawRectangleMask(x, y, width, height, radius);
 

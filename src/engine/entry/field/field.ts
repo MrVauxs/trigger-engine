@@ -1,12 +1,14 @@
 import { IconObject } from "_zod";
 import { NodeEntry } from "engine";
-import { MODULE, z } from "module-helpers";
+import { LocalizeArgs, MODULE, z } from "module-helpers";
 import { PreciseTextOptions } from "triggers-menu";
 
 abstract class NodeField<
     TValue extends unknown = unknown,
-    TFieldSchema extends Record<string, any> = Record<string, any>
-> extends PIXI.Graphics {
+    TFieldSchema extends Record<string, any> = Record<string, any>,
+>
+    extends PIXI.Graphics
+{
     //////////////////////////////
     // STATIC ACCESSORS
     //////////////////////////////
@@ -23,6 +25,8 @@ abstract class NodeField<
     //////////////////////////////
     // IMMUTABLE ACCESSORS
     //////////////////////////////
+
+    declare readonly entry: NodeEntry<TValue, TFieldSchema>;
 
     /**
      * @see {@link NodeField.defineSchema}
@@ -84,7 +88,7 @@ abstract class NodeField<
     abstract draw(): void;
 
     /**
-     * Event listener called when the field is clicked on. It is only registerred if the entry isn't connected.
+     * Event listener called when the field is clicked on. It is only registered if the entry isn't connected.
      */
     abstract onClick(): Promise<TValue>;
 
@@ -111,13 +115,18 @@ abstract class NodeField<
         y: number,
         width: number,
         height: number,
-        radius?: number | undefined
+        radius?: number | undefined,
     ) => void;
 
     /**
      * The bounds of the field in the viewport.
      */
     declare readonly getGlobalBounds: () => PIXI.Rectangle;
+
+    /**
+     * @see {@link TriggerNode#localize}
+     */
+    declare readonly localize: (...args: LocalizeArgs) => string | undefined;
 }
 
 export { NodeField };

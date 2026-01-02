@@ -1,3 +1,4 @@
+export * from "./custom-elements";
 export * from "./base";
 export * from "./boolean";
 export * from "./input";

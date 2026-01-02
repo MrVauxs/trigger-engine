@@ -20,6 +20,50 @@ input#trigger-engine-field {
     line-height: 0;
 }
 
+search-select-input#trigger-engine-field {
+    input {
+        height: 100%;
+        background-image: url(../images/magnifier.svg);
+        background-repeat: no-repeat;
+        background-size: auto 80%;
+        background-position: 0.3rem;
+        padding-left: var(--target-height);
+    }
+
+    .popup {
+        position: absolute;
+        width: 100%;
+        background: var(--color-cool-4);
+        height: 0;
+        max-height: 40vh;
+        overflow-x: hidden;
+        overflow-y: auto;
+
+        &.expand {
+            height: auto;
+        }
+
+        .option {
+            cursor: pointer;
+            padding: 0.1rem 0.5rem;
+
+            &:hover {
+                background: #366c7d4f;
+            }
+
+            &.selected {
+                background: #366c7d2e;
+            }
+        }
+    }
+
+    &.bottom-half {
+        .popup {
+            bottom: 100%;
+        }
+    }
+}
+
 prose-mirror#trigger-engine-field {
     gap: 0;
     outline: 2px solid var(--color-cool-3);

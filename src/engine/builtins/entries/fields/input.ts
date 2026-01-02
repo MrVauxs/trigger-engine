@@ -3,7 +3,7 @@ import { BuiltInEntryField } from ".";
 
 abstract class InputField<
     TValue extends unknown,
-    TSchema extends Record<string, any>
+    TSchema extends Record<string, any>,
 > extends BuiltInEntryField<TValue, TSchema> {
     abstract get fontSize(): number;
     abstract get targetWidth(): number;
@@ -41,6 +41,10 @@ abstract class InputField<
         return 150;
     }
 
+    get valueAlpha(): number {
+        return this.value === this.default ? 0.5 : 1;
+    }
+
     draw(): void {
         if (this.isConnected) {
             this.beginFill(this.backgroundColor);
@@ -51,7 +55,7 @@ abstract class InputField<
             });
 
             valueElement.x = this.innerPadding;
-            valueElement.alpha = this.value === this.default ? 0.5 : 1;
+            valueElement.alpha = this.valueAlpha;
 
             this.addRectangleMask(valueElement, 0, 0, this.innerWidth, this.height);
             this.addChild(valueElement);
@@ -116,7 +120,7 @@ abstract class InputField<
 
     activateEventListeners(
         input: HTMLInputElement,
-        returnValue: (value: TValue) => Promise<void>
+        returnValue: (value: TValue) => Promise<void>,
     ): void {
         const onBlur = () => {
             returnValue(getInputValue(input) as TValue);
