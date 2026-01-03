@@ -74,6 +74,11 @@ class SearchSelectInputElement extends foundry.applications.elements.AbstractFor
             this.value = el.dataset.value as string;
         });
 
+        this.#input.addEventListener("change", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+        });
+
         this.#input.addEventListener("input", () => {
             const search = this.#input.value.trim().toLowerCase();
 
