@@ -271,7 +271,7 @@ class BlueprintNode extends PIXI.Container {
 
         const permissions: ConstructorParameters<typeof MouseInteractionManager>[2] = R.fromKeys(
             ["dragLeftStart", "dragLeftMove", "dragLeftDrop"] as const,
-            () => !this.isLocked
+            () => !this.isLocked,
         );
 
         this.#mouseManager = new foundry.canvas.interaction.MouseInteractionManager(
@@ -279,7 +279,7 @@ class BlueprintNode extends PIXI.Container {
             this.stage,
             permissions,
             handlers,
-            { application: this.blueprint }
+            { application: this.blueprint },
         );
 
         this.#mouseManager.activate();
@@ -313,7 +313,7 @@ class BlueprintNode extends PIXI.Container {
 
         const width = Math.min(
             Math.max(header?.calculatedWith ?? 0, body.calculatedWith, this.minWidth),
-            this.maxWidth
+            this.maxWidth,
         );
         const height = body.calculatedHeight + (header?.calculatedHeight ?? 0);
 
@@ -341,7 +341,6 @@ class BlueprintNode extends PIXI.Container {
         }
 
         // body
-
         const targetWidth = width - this.outerPadding.x * 2;
         for (const row of body.children as NodePart[]) {
             const output = R.last(row.children) as NodePart;
@@ -560,8 +559,8 @@ class BlueprintNode extends PIXI.Container {
                     wordWrapWidth: 100,
                     lineJoin: "miter",
                 },
-                options
-            )
+                options,
+            ),
         );
 
         return new foundry.canvas.containers.PreciseText(text, style);
@@ -599,14 +598,14 @@ class BlueprintNode extends PIXI.Container {
                     entries[category].contents,
                     R.groupBy((entry) => entry.group ?? ""),
                     R.entries(),
-                    R.sortBy(([group]) => group)
+                    R.sortBy(([group]) => group),
                 );
-            })
+            }),
         );
 
         const nbEntries = (section: [key: string, value: OpenNodeEntry[]][]): number => {
             return R.sum(
-                section.map(([group, entries]) => entries.length + (group === "" ? 0 : 1))
+                section.map(([group, entries]) => entries.length + (group === "" ? 0 : 1)),
             );
         };
 
@@ -616,7 +615,7 @@ class BlueprintNode extends PIXI.Container {
         const addToRow = (
             rowIndex: number,
             column: 0 | 1,
-            el: BaseBlueprintEntry | PreciseText
+            el: BaseBlueprintEntry | PreciseText,
         ) => {
             const row = rows[rowIndex];
 
@@ -838,7 +837,7 @@ class BlueprintNode extends PIXI.Container {
             toBeRemoved,
             R.filter((entry) => !!entry.schema.hidden),
             R.map((entry) => entry.id as ConnectionId),
-            R.fromKeys(() => undefined)
+            R.fromKeys(() => undefined),
         );
 
         this.data.update({ revealed, state });
@@ -895,7 +894,7 @@ class BlueprintNode extends PIXI.Container {
                 schema.input.placeholder,
                 category,
                 schema,
-                "input.placeholder"
+                "input.placeholder",
             ),
             value: "",
         };
@@ -910,7 +909,7 @@ class BlueprintNode extends PIXI.Container {
             const availableTypes = this.trigger.application.entries.map((entry) => entry.type);
 
             const selectedTypes = (schema as BaseCustomEntrySchema).types?.filter((type) =>
-                R.isIncludedIn(type, availableTypes)
+                R.isIncludedIn(type, availableTypes),
             );
 
             dialogData.array = (schema as BaseCustomEntrySchema).array ? {} : undefined;
@@ -922,7 +921,7 @@ class BlueprintNode extends PIXI.Container {
                         value: type,
                         label: this.rootLocalize("entry", type, "title") ?? type,
                     };
-                }
+                },
             );
         }
 
@@ -974,8 +973,8 @@ class BlueprintNode extends PIXI.Container {
             category === "inputs"
                 ? zCustomInputData
                 : category === "outputs"
-                ? zCustomOutputData
-                : zCustomOutData;
+                  ? zCustomOutputData
+                  : zCustomOutData;
 
         const entry = parser.safeParse(entrySchema)?.data;
         if (!entry) return;
@@ -1015,8 +1014,8 @@ class BlueprintNode extends PIXI.Container {
                                 return confirm && this.#switchState(state);
                             },
                         };
-                    })
-                )
+                    }),
+                ),
             );
         }
 
@@ -1037,7 +1036,7 @@ class BlueprintNode extends PIXI.Container {
                             (!schema.state || schema.state === this.#node.state) &&
                             !this.data.revealed?.[category]?.[schema.key]
                         );
-                    })
+                    }),
                 );
 
                 for (const schema of schemas) {
@@ -1067,7 +1066,7 @@ class BlueprintNode extends PIXI.Container {
                 const schemas = R.pipe(
                     (this.#node.constructor as typeof TriggerNode)[method] ?? [],
                     R.map((schema) => parser.safeParse(schema)?.data),
-                    R.filter(R.isTruthy)
+                    R.filter(R.isTruthy),
                 );
 
                 for (const schema of schemas) {
@@ -1122,7 +1121,7 @@ class BlueprintNode extends PIXI.Container {
                     const confirm = await confirmDialog("blueprint.node.delete.confirm");
                     return confirm && this.parent.delete(selected);
                 },
-            }
+            },
         );
 
         this.createContextMenu(event, entries);

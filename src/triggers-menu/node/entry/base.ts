@@ -151,6 +151,9 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
             reverse: this.isOutput,
             spacing: 5,
         });
+
+        this.eventMode = "static";
+        this.hitArea = new PIXI.Rectangle(0, 0, this.width, this.height);
     }
 
     redrawConnector(isConnected: boolean) {
@@ -192,7 +195,7 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
                 otherEntry.node.removeConnection(
                     otherEntry.preciseCategory,
                     otherEntry.key,
-                    entryId
+                    entryId,
                 );
             }
         }
@@ -215,7 +218,7 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
             nodes.push(
                 ...this.node.parent
                     .getGateEntries(this.node.id)
-                    .map((node) => [oppositeCategory, node] as const)
+                    .map((node) => [oppositeCategory, node] as const),
             );
         }
 

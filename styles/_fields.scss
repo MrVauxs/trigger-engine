@@ -20,6 +20,14 @@
     }
 }
 
+#trigger-engine-field-tooltip {
+    position: absolute;
+}
+
+#tooltip.trigger-engine-field-tooltip {
+    border: 1px solid #6d5c00;
+}
+
 input#trigger-engine-field {
     line-height: 0;
 }

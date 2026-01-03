@@ -11,6 +11,7 @@ import {
 import { confirmDialog, localizePath } from "module-helpers";
 import { BaseBlueprintEntry } from ".";
 import { BlueprintNode, editLabelDialog } from "..";
+import { createHTMLElement, R } from "module-helpers/src";
 
 class BlueprintEntry extends BaseBlueprintEntry {
     #entry: OpenNodeEntry;
@@ -86,6 +87,47 @@ class BlueprintEntry extends BaseBlueprintEntry {
 
     canConnectTo(other: BlueprintEntry): boolean {
         return super.canConnectTo(other) && this.canConvertWith(other);
+    }
+
+    draw(): void {
+        super.draw();
+
+        this.eventMode = "static";
+        this.hitArea = new PIXI.Rectangle(0, 0, this.width, this.height);
+
+        this.on("pointerenter", (event) => {
+            event.stopPropagation();
+
+            const tooltip = this.#entry.generatedTooltip;
+            if (!tooltip) return;
+
+            const offset = 5 * this.blueprint.scale;
+            const { left, top, width, height } = this.blueprint.getGlobalBounds(this);
+            const anchor = createHTMLElement("div", {
+                id: "trigger-engine-field-tooltip",
+                style: {
+                    left: `${left - offset}px`,
+                    top: `${top}px`,
+                    width: `${width + offset * 2}px`,
+                    height: `${height}px`,
+                },
+            });
+
+            document.body.appendChild(anchor);
+
+            game.tooltip.activate(anchor, {
+                cssClass: "trigger-engine-field-tooltip",
+                direction: this.isInput ? "LEFT" : "RIGHT",
+                html: tooltip instanceof HTMLElement ? tooltip : undefined,
+                text: R.isString(tooltip) ? tooltip : undefined,
+            });
+        });
+
+        this.on("pointerleave", (event) => {
+            event.stopPropagation();
+            game.tooltip.deactivate();
+            document.getElementById("trigger-engine-field-tooltip")?.remove();
+        });
     }
 
     _drawConnector(connector: PIXI.Graphics, isConnected: boolean) {

@@ -70,6 +70,13 @@ abstract class NodeEntry<
         return (this.constructor as typeof NodeEntry).default as TValue;
     }
 
+    /**
+     * Tooltip to display when the entry is hovered over.
+     */
+    get generatedTooltip(): string | HTMLElement | undefined {
+        return this.tooltip;
+    }
+
     //////////////////////////////
     // ABSTRACT METHODS
     //////////////////////////////
@@ -93,7 +100,7 @@ abstract class NodeEntry<
 
 interface NodeEntry
     extends
-        Pick<BaseEntrySchemaInput, "key" | "label" | "group">,
+        Pick<BaseEntrySchemaInput, "isArray" | "key" | "label" | "group" | "tooltip">,
         Pick<typeof NodeEntry, "type" | "color"> {
     readonly isArray: boolean;
 }
