@@ -158,6 +158,18 @@
                 "edit": "Edit"
             }
         },
+        "import-export-triggers": {
+            "keep": "Keep Triggers IDs",
+            "title": {
+                "export": "Export Triggers",
+                "import": "Import Triggers"
+            },
+            "toggle": "Toggle All",
+            "yes": {
+                "export": "Export",
+                "import": "Import"
+            }
+        },
         "node": {
             "entry": "Entry",
             "in": "In",

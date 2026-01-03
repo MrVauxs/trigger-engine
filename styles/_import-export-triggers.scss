@@ -1,0 +1,38 @@
+.dialog.trigger-engine-import-export {
+    .window-content {
+        padding-inline: 0;
+    }
+
+    .dialog-form,
+    .dialog-content {
+        overflow: hidden;
+    }
+
+    .triggers {
+        overflow-y: auto;
+    }
+
+    .toggle,
+    .trigger {
+        display: flex;
+        align-items: center;
+        gap: 0.3em;
+    }
+
+    .group.main {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3em;
+        overflow: hidden;
+    }
+
+    .header:not(.main) {
+        margin-block: 0.3em;
+    }
+
+    .header.main,
+    .triggers,
+    footer {
+        padding-inline: 1rem;
+    }
+}

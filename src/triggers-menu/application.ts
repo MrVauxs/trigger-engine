@@ -22,6 +22,7 @@ import {
     ExtendedTextInputElement,
     htmlClosest,
     htmlQuery,
+    htmlQueryAll,
     includesAll,
     includesAny,
     info,
@@ -126,7 +127,7 @@ class BlueprintApplication extends apps.ApplicationV2<
         return this;
     }
 
-    _onFirstRender(context: object, options: BlueprintRenderOptions) {
+    _onFirstRender(_context: object, _options: BlueprintRenderOptions) {
         this.bringToFront();
 
         // we wait one frame before initializing the canvas
@@ -158,8 +159,8 @@ class BlueprintApplication extends apps.ApplicationV2<
     }
 
     async _preFirstRender(
-        context: Record<string, unknown>,
-        options: BlueprintRenderOptions,
+        _context: Record<string, unknown>,
+        _options: BlueprintRenderOptions,
     ): Promise<void> {
         registerCustomElements("extended-multi-select", "extended-text-input");
         registerCustomElement("search-select-input", SearchSelectInputElement);
@@ -241,7 +242,7 @@ class BlueprintApplication extends apps.ApplicationV2<
             }
 
             case "export-triggers": {
-                return;
+                return this.#exportTriggers();
             }
 
             case "import-triggers": {
@@ -290,6 +291,53 @@ class BlueprintApplication extends apps.ApplicationV2<
                 return;
             }
         }
+    }
+
+    async #exportTriggers() {
+        const result = await this.#importExportTriggers("export", this.blueprint.triggers.contents);
+        if (!result) return;
+
+        console.log(result);
+    }
+
+    async #importExportTriggers(
+        category: "import" | "export",
+        triggers: PreparableTrigger[],
+    ): Promise<{ keepIds: boolean | undefined; selected: string[] } | undefined> {
+        const result = await waitDialog<{ keepids?: boolean; selected: Record<string, boolean> }>({
+            classes: ["trigger-engine-import-export"],
+            content: "import-export-menu",
+            data: {
+                category,
+                groups: this.#prepareTriggersGroups(triggers),
+            },
+            expand: true,
+            i18n: "import-export-triggers",
+            onRender: (_event, dialog) => {
+                const html = dialog.element;
+
+                addListenerAll(html, `[data-action="toggle-all"]`, (el) => {
+                    const parent = htmlClosest(el, ".group");
+                    const inputs = htmlQueryAll<HTMLInputElement>(parent, ".trigger input");
+                    const checked = inputs.some((input) => !input.checked);
+
+                    for (const input of inputs) {
+                        input.checked = checked;
+                    }
+                });
+            },
+            title: localize("import-export-triggers.title", category),
+            yes: {
+                label: localize("import-export-triggers.yes", category),
+            },
+        });
+
+        if (!result) return;
+
+        return {
+            keepIds: result.keepids,
+            selected: R.keys(R.pickBy(result.selected, (selected) => selected)),
+        };
     }
 
     async #addTriggerDescription(el: HTMLElement | null, triggerId?: string) {
@@ -481,17 +529,23 @@ class BlueprintApplication extends apps.ApplicationV2<
         };
     }
 
-    #prepareTriggersContext(options: BlueprintRenderOptions): TriggersContext {
-        const triggers = this.blueprint.triggers.contents;
-        const groups: TriggersGroup[] = R.pipe(
-            triggers,
-            R.groupBy(R.prop("folder")),
+    #prepareTriggersGroups<T extends PreparableTrigger>(
+        triggersData: T[],
+    ): { folder: string; triggers: T[] }[] {
+        return R.pipe(
+            triggersData,
+            R.groupBy((trigger) => trigger.folder ?? ""),
             R.entries(),
             R.sortBy(([folder]) => folder),
-            R.map(([folder, triggers]): TriggersGroup => {
+            R.map(([folder, triggers]) => {
                 return { folder, triggers };
             }),
         );
+    }
+
+    #prepareTriggersContext(_options: BlueprintRenderOptions): TriggersContext {
+        const triggers = this.blueprint.triggers.contents;
+        const groups = this.#prepareTriggersGroups(triggers);
 
         // we move the folder-less group at the end
         if (groups.length > 1 && groups[0].folder === "") {
@@ -683,6 +737,12 @@ type TriggersGroup = {
 
 type BlueprintRenderOptions = ApplicationRenderOptions & {
     trigger: OpenTrigger | undefined;
+};
+
+type PreparableTrigger = {
+    folder: string | undefined;
+    id: string;
+    name: string | undefined;
 };
 
 export { BlueprintApplication, filterElements };

@@ -6,9 +6,11 @@
             </a>
         </div>
         <div class="controls">
+            {{#if groups.length}}
             <a data-action="export-triggers" {{{@root.i18n.tooltip 'export' }}}>
                 <i class="fa-solid fa-file-export"></i>
             </a>
+            {{/if}}
             <a data-action="import-triggers" {{{@root.i18n.tooltip 'import' }}}>
                 <i class="fa-solid fa-file-import"></i>
             </a>

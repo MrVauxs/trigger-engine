@@ -1,0 +1,36 @@
+<div class="group main">
+    {{#unless (and (eq groups.length 1) groups.0.folder)}}
+    <div class="header main">
+        <a class="toggle" data-action="toggle-all">
+            <i class="fa-solid fa-sliders-simple"></i>
+            {{@root.i18n 'toggle'}}
+        </a>
+    </div>
+    {{/unless}}
+    <div class="triggers">
+        {{#each groups as |group|}}
+        <div class="group">
+            {{#if group.folder}}
+            <div class="header">
+                <a class="toggle" data-action="toggle-all">
+                    <i class="fa-solid fa-sliders-simple"></i>
+                    {{group.folder}}
+                </a>
+            </div>
+            {{/if}}
+            {{#each group.triggers as |trigger|}}
+            <label class="trigger">
+                <input type="checkbox" name="selected.{{trigger.id}}">
+                <span>{{trigger.label}}</span>
+            </label>
+            {{/each}}
+        </div>
+        {{/each}}
+    </div>
+    {{#if (eq category 'import')}}
+    <label class="keep-ids">
+        <input type="checkbox" name="keepids">
+        {{@root.i18n 'keep'}}:
+    </label>
+    {{/if}}
+</div>
