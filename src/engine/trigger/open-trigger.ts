@@ -75,7 +75,7 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
     }
 
     get tags(): string[] {
-        return this.data.tags;
+        return R.filter([...this.data.tags, this.folder], R.isTruthy);
     }
 
     getNode(id: string): OpenTriggerNode | undefined {
