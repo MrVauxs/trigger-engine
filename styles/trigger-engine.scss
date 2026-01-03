@@ -8,13 +8,13 @@
         .form-group {
             white-space: nowrap;
 
-            .form-fields:has(input[type="number"]) {
+            .form-fields:has(> input[type="number"]) {
                 flex: 0;
+            }
 
-                input {
-                    width: 10ch;
-                    text-align: end;
-                }
+            input[type="number"] {
+                width: 10ch;
+                text-align: end;
             }
         }
     }

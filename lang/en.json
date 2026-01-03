@@ -131,6 +131,10 @@
         "edit-trigger": {
             "folder": "Folder",
             "name": "Trigger Name",
+            "priority": {
+                "label": "Priority",
+                "tooltip": "Tooltips with higher priority will be executed first."
+            },
             "tags": "Trigger Tags",
             "yes": {
                 "create": "Create",

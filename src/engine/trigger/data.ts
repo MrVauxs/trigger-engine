@@ -30,6 +30,7 @@ const zTriggerDataSchema = z.object({
     folder: z.string().trim().default(""),
     name: z.string().trim().default(""),
     nodes: z.array(zNodeDataSchema).default(() => []),
+    priority: z.number().default(0),
     tags: z.array(z.string().trim()).default(() => []),
     variables: z.record(zConnectionId, zTriggerVariable).default(() => ({})),
 });

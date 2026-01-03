@@ -571,6 +571,7 @@ class BlueprintApplication extends apps.ApplicationV2<
                 folder: trigger?.folder ?? folder ?? "",
                 name: trigger?.name ?? "",
                 placeholder: trigger?.label ?? "",
+                priority: trigger?.priority ?? 0,
                 tags: trigger?.tags,
             },
             i18n: "edit-trigger",

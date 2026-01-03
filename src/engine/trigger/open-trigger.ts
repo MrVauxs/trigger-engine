@@ -70,6 +70,10 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
         return this.name || this.id;
     }
 
+    get priority(): number {
+        return this.data.priority;
+    }
+
     get tags(): string[] {
         return this.data.tags;
     }
@@ -154,7 +158,7 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
                         originNode.data.inputs,
                         isVariableGetterNode(originNode)
                             ? [] // we don't want to process variables getter input
-                            : originNode.exitGate?.entries.outputs ?? originNode.entries.inputs,
+                            : (originNode.exitGate?.entries.outputs ?? originNode.entries.inputs),
                     ],
                 ] as const,
                 R.flatMap(([category, records, entries]) => {
@@ -171,9 +175,9 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
                             const type = ("type" in entry ? entry.type : "bridge") as string;
                             return [category, type, key, connection] as const;
                         }),
-                        R.filter(R.isTruthy)
+                        R.filter(R.isTruthy),
                     );
-                })
+                }),
             );
 
             for (const [category, originType, originKey, otherId] of originConnections) {

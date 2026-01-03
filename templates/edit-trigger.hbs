@@ -8,6 +8,10 @@
     <label>{{@root.i18n 'folder'}}</label>
     <div class="form-fields">
         <input type="text" name="folder" value="{{folder}}" placeholder="{{folder}}">
+        <div class="priority">
+            <label>{{@root.i18n 'priority.label'}}</label>
+            <input type="number" name="priority" value="{{priority}}" placeholder="0" step="1" {{{@root.i18n.tooltip 'priority.tooltip'}}} />
+        </div>
     </div>
 </div>
 <div class="form-group">
