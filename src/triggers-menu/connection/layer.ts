@@ -9,6 +9,7 @@ import {
 } from "triggers-menu";
 
 class BlueprintConnectionsLayer extends PIXI.Container {
+    #abortController?: AbortController;
     #blueprint: Blueprint;
     #connections = new Collection<BlueprintConnection, TwoWaysEntryId>();
     #connector?: FreeConnector;
@@ -58,6 +59,10 @@ class BlueprintConnectionsLayer extends PIXI.Container {
             position: this.fromPoint(entry.connectorCenter),
             wasConnected: alreadyConnected,
         };
+
+        window.addEventListener("contextmenu", () => this.#terminateConnection(), {
+            signal: (this.#abortController = new AbortController()).signal,
+        });
 
         this.stage.on("pointermove", this.#onPointerMove, this);
         this.stage.on("pointerup", this.#onPointerUp, this);
@@ -139,6 +144,9 @@ class BlueprintConnectionsLayer extends PIXI.Container {
     }
 
     #terminateConnection() {
+        this.#abortController?.abort();
+        this.#abortController = undefined;
+
         if (!this.#connector) return;
 
         this.stage.off("pointermove", this.#onPointerMove, this);

@@ -630,6 +630,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
                 "pointerdown",
                 (event) => {
                     if (event.target instanceof HTMLElement && !html.contains(event.target)) {
+                        this.#abortController.abort();
                         this.close();
                     }
                 },
