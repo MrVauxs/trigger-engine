@@ -3,7 +3,7 @@ import { BuiltInNodeEntry, TextField, TextFieldSchema } from ".";
 import validators = foundry.data.validators;
 
 class TextEntry extends BuiltInNodeEntry<string, TextFieldSchema> {
-    #options?: SelectOptions;
+    #options?: EntrySelectOption[];
 
     static get type(): "text" {
         return "text";
@@ -44,7 +44,7 @@ class TextEntry extends BuiltInNodeEntry<string, TextFieldSchema> {
         );
     }
 
-    get options(): SelectOptions {
+    get options(): EntrySelectOption[] {
         return (this.#options ??= this.#prepareOptions());
     }
 
@@ -71,23 +71,11 @@ class TextEntry extends BuiltInNodeEntry<string, TextFieldSchema> {
         return this.field.trim !== false ? value.trim() : value;
     }
 
-    #prepareOptions(): SelectOptions {
+    #prepareOptions(): EntrySelectOption[] {
         const options = this.field?.options;
 
         if (R.isString(options)) {
-            const cursor = foundry.utils.getProperty(window, options);
-
-            if (!R.isObjectType<Record<string, string>>(cursor)) {
-                return [];
-            }
-
-            return R.pipe(
-                cursor,
-                R.entries(),
-                R.map(([value, label]) => {
-                    return { value, label };
-                }),
-            );
+            return this.#getOptionsFromPath(options);
         } else if (R.isArray(options)) {
             return R.pipe(
                 options,
@@ -95,10 +83,39 @@ class TextEntry extends BuiltInNodeEntry<string, TextFieldSchema> {
                     return R.isString(option) ? { value: option } : option;
                 }),
             );
+        } else if (R.isPlainObject(options)) {
+            const { path, exclude } = options;
+            const prepared = this.#getOptionsFromPath(path);
+
+            return exclude?.length
+                ? prepared.filter(({ value }) => !R.isIncludedIn(value, exclude))
+                : prepared;
         }
 
         return [];
     }
+
+    #getOptionsFromPath(path: string): EntrySelectOption[] {
+        const cursor = foundry.utils.getProperty(window, path);
+
+        if (!R.isObjectType<Record<string, string | { label: string }>>(cursor)) {
+            return [];
+        }
+
+        return R.pipe(
+            cursor,
+            R.entries(),
+            R.map(([value, label]) => {
+                return { value, label };
+            }),
+        );
+    }
 }
 
+type EntrySelectOption = {
+    value: string;
+    label?: string | { label: string };
+};
+
 export { TextEntry };
+export type { EntrySelectOption };

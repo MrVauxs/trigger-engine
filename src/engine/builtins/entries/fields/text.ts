@@ -1,6 +1,6 @@
-import { htmlQuery, z } from "module-helpers";
+import { R, htmlQuery, z } from "module-helpers";
 import { InputField, SearchSelectInputElement } from ".";
-import { TextEntry } from "..";
+import { EntrySelectOption, TextEntry } from "..";
 import elements = foundry.applications.elements;
 
 const NODE_INPUT_CODE_TYPES = ["javascript", "json"] as const;
@@ -15,6 +15,17 @@ class TextField extends InputField<string, TextFieldSchema> {
                 options: {
                     anyOf: [
                         { type: "string" },
+                        {
+                            type: "object",
+                            properties: {
+                                path: { type: "string" },
+                                exclude: {
+                                    type: "array",
+                                    items: { type: "string" },
+                                },
+                            },
+                            required: ["path"],
+                        },
                         {
                             type: "array",
                             items: {
@@ -33,7 +44,10 @@ class TextField extends InputField<string, TextFieldSchema> {
                         },
                     ],
                 },
-                trim: { type: "boolean", default: true },
+                trim: {
+                    default: true,
+                    type: "boolean",
+                },
                 type: {
                     type: "string",
                     enum: NODE_INPUT_TEXT_TYPES as any,
@@ -66,7 +80,7 @@ class TextField extends InputField<string, TextFieldSchema> {
         return this.entry.isSelect;
     }
 
-    get options(): SelectOptions {
+    get options(): EntrySelectOption[] {
         return this.entry.options;
     }
 
@@ -115,8 +129,16 @@ class TextField extends InputField<string, TextFieldSchema> {
         return this.isSelect ? 1 : super.valueAlpha;
     }
 
-    localizeOption({ value, label }: SelectOption) {
-        return label ? game.i18n.localize(label) : (this.localize("options", value) ?? value);
+    localizeOption({ value, label }: EntrySelectOption) {
+        const parsedLabel = R.isString(label)
+            ? label
+            : R.isPlainObject(label) && "label" in label
+              ? label.label
+              : value;
+
+        return parsedLabel
+            ? game.i18n.localize(parsedLabel)
+            : (this.localize("options", value) ?? value);
     }
 
     draw(): void {
@@ -294,7 +316,7 @@ type TextEntryType = (typeof NODE_INPUT_TEXT_TYPES)[number];
 
 type TextFieldSchema = {
     default?: string;
-    options?: string | string[] | SelectOptions;
+    options?: string | string[] | { path: string; exclude?: string[] } | SelectOptions;
     trim: boolean;
     type?: TextEntryType;
 };

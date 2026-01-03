@@ -9,6 +9,10 @@
     transform: translate(-50%, -50%);
     transition: all var(--transition-time) ease-in;
 
+    input {
+        border-radius: 0;
+    }
+
     &.scale-to {
         width: var(--target-width);
         height: var(--target-height);
@@ -46,6 +50,9 @@ search-select-input#trigger-engine-field {
         .option {
             cursor: pointer;
             padding: 0.1rem 0.5rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
 
             &:hover {
                 background: #366c7d4f;
@@ -67,7 +74,6 @@ search-select-input#trigger-engine-field {
 prose-mirror#trigger-engine-field {
     gap: 0;
     outline: 2px solid var(--color-cool-3);
-    border-radius: 4px;
     min-height: 0;
 
     .editor-menu {
