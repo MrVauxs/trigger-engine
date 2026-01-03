@@ -1,4 +1,10 @@
-import { R, addListenerAll, createHTMLElement, createInputElement } from "module-helpers";
+import {
+    R,
+    addListenerAll,
+    createHTMLElement,
+    createInputElement,
+    htmlQuery,
+} from "module-helpers";
 
 class SearchSelectInputElement extends foundry.applications.elements.AbstractFormInputElement<
     string,
@@ -23,6 +29,9 @@ class SearchSelectInputElement extends foundry.applications.elements.AbstractFor
 
     expand() {
         this.#popup.classList.add("expand");
+
+        const selected = htmlQuery(this.#popup, ".selected");
+        selected?.scrollIntoView({ behavior: "smooth", block: "center" });
     }
 
     collapse() {
