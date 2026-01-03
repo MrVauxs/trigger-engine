@@ -1,16 +1,13 @@
-import { z } from "module-helpers";
+import { NodeFieldSchema } from "engine";
 import { InputField } from ".";
 
 class NumberField extends InputField<number, NumberFieldSchema> {
-    static get defineSchema(): z.core.JSONSchema.ObjectSchema {
+    static get defineSchema(): NodeFieldSchema {
         return {
-            type: "object",
-            properties: {
-                default: { type: "number" },
-                min: { type: "number" },
-                max: { type: "number" },
-                step: { default: 1, type: "number" },
-            },
+            default: { type: "number" },
+            min: { type: "number" },
+            max: { type: "number" },
+            step: { default: 1, type: "number" },
         };
     }
 

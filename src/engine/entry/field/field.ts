@@ -18,7 +18,7 @@ abstract class NodeField<
      *
      * Defines the DataSchema for the input field that will be used in the triggers menu.
      */
-    static get defineSchema(): z.core.JSONSchema.ObjectSchema {
+    static get defineSchema(): NodeFieldSchema {
         throw MODULE.Error("the 'defineSchema' static getter must be implemented.");
     }
 
@@ -129,4 +129,7 @@ abstract class NodeField<
     declare readonly localize: (...args: LocalizeArgs) => string | undefined;
 }
 
+type NodeFieldSchema = Record<string, z.core.JSONSchema.JSONSchema>;
+
 export { NodeField };
+export type { NodeFieldSchema };

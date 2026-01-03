@@ -1,4 +1,5 @@
-import { R, htmlQuery, z } from "module-helpers";
+import { NodeFieldSchema } from "engine";
+import { R, htmlQuery } from "module-helpers";
 import { InputField, SearchSelectInputElement } from ".";
 import { EntrySelectOption, TextEntry } from "..";
 import elements = foundry.applications.elements;
@@ -7,51 +8,48 @@ const NODE_INPUT_CODE_TYPES = ["javascript", "json"] as const;
 const NODE_INPUT_TEXT_TYPES = ["enriched", ...NODE_INPUT_CODE_TYPES] as const;
 
 class TextField extends InputField<string, TextFieldSchema> {
-    static get defineSchema(): z.core.JSONSchema.ObjectSchema {
+    static get defineSchema(): NodeFieldSchema {
         return {
-            type: "object",
-            properties: {
-                default: { type: "string" },
-                options: {
-                    anyOf: [
-                        { type: "string" },
-                        {
-                            type: "object",
-                            properties: {
-                                path: { type: "string" },
-                                exclude: {
-                                    type: "array",
-                                    items: { type: "string" },
-                                },
+            default: { type: "string" },
+            options: {
+                anyOf: [
+                    { type: "string" },
+                    {
+                        type: "object",
+                        properties: {
+                            path: { type: "string" },
+                            exclude: {
+                                type: "array",
+                                items: { type: "string" },
                             },
-                            required: ["path"],
                         },
-                        {
-                            type: "array",
-                            items: {
-                                anyOf: [
-                                    { type: "string" },
-                                    {
-                                        type: "object",
-                                        properties: {
-                                            value: { type: "string" },
-                                            label: { type: "string" },
-                                        },
-                                        required: ["value"],
+                        required: ["path"],
+                    },
+                    {
+                        type: "array",
+                        items: {
+                            anyOf: [
+                                { type: "string" },
+                                {
+                                    type: "object",
+                                    properties: {
+                                        value: { type: "string" },
+                                        label: { type: "string" },
                                     },
-                                ],
-                            },
+                                    required: ["value"],
+                                },
+                            ],
                         },
-                    ],
-                },
-                trim: {
-                    default: true,
-                    type: "boolean",
-                },
-                type: {
-                    type: "string",
-                    enum: NODE_INPUT_TEXT_TYPES as any,
-                },
+                    },
+                ],
+            },
+            trim: {
+                default: true,
+                type: "boolean",
+            },
+            type: {
+                type: "string",
+                enum: NODE_INPUT_TEXT_TYPES as any,
             },
         };
     }

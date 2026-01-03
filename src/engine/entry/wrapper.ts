@@ -57,7 +57,10 @@ function instantiateEntry(
 
             const jsonSchema = EntryCls.FieldClass?.defineSchema;
             if (jsonSchema) {
-                const fieldSchema = z.fromJSONSchema(jsonSchema);
+                const fieldSchema = z.fromJSONSchema({
+                    type: "object",
+                    properties: jsonSchema,
+                });
                 const data = R.isObjectType(fieldData) ? fieldData : {};
 
                 entryField = zForceSafeParse(fieldSchema, data) as any;

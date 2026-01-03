@@ -1,13 +1,10 @@
-import { z } from "module-helpers";
+import { NodeFieldSchema } from "engine";
 import { BuiltInEntryField } from ".";
 
 class BooleanField extends BuiltInEntryField<boolean, BooleanFieldSchema> {
-    static get defineSchema(): z.core.JSONSchema.ObjectSchema {
+    static get defineSchema(): NodeFieldSchema {
         return {
-            type: "object",
-            properties: {
-                default: { type: "boolean" },
-            },
+            default: { type: "boolean" },
         };
     }
 
