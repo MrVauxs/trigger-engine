@@ -33,6 +33,7 @@ class TriggerApplication {
     #applicationId: string;
     #applicationKey: string;
     #convertors: Collection<EntryConvertor>;
+    #enabledIds: Set<string> = new Set();
     #entries: Collection<typeof NodeEntry>;
     #events: Collection<typeof TriggerNode>;
     #hooks: Collection<typeof TriggerHook>;
@@ -81,7 +82,12 @@ class TriggerApplication {
 
         // setup settings
         if (this.isSettingApplication) {
-            this.#setupSetting(options.setting);
+            this.#setupSettings(options.setting);
+
+            const ids = game.settings.get<string[]>(moduleId, this.settingEnabledKey);
+            for (const id of ids) {
+                this.#enabledIds.add(id);
+            }
         }
     }
 
@@ -117,6 +123,10 @@ class TriggerApplication {
         return `${this.applicationId}-triggers`;
     }
 
+    get settingEnabledKey(): string {
+        return `${this.applicationId}-enabled`;
+    }
+
     get localizePath(): string {
         return `${this.moduleId}.${this.applicationId}`;
     }
@@ -135,6 +145,18 @@ class TriggerApplication {
 
     get hasMultipleEvents(): boolean {
         return this.events.size > 1;
+    }
+
+    isEnabled({ id }: { id: string }): boolean {
+        return this.#enabledIds.has(id);
+    }
+
+    enableTrigger({ id }: { id: string }, enabled: boolean) {
+        if (enabled) {
+            this.#enabledIds.add(id);
+        } else {
+            this.#enabledIds.delete(id);
+        }
     }
 
     localize(...args: LocalizeArgs): string | undefined {
@@ -159,16 +181,14 @@ class TriggerApplication {
             await exist?.close();
         }
 
-        const MenuCls = this.isFreeApplication
-            ? this.#getFreeApplication(arg)
-            : this.#getSettingApplication();
+        const MenuCls = this.isFreeApplication ? this.#getFreeApplication(arg) : this.#getSettingApplication();
 
         if (MenuCls) {
             return new MenuCls().render(true);
         }
     }
 
-    createTrigger(source: TriggerDataInput, open: boolean): OpenTrigger | null {
+    createTrigger(source: TriggerDataInput): OpenTrigger | null {
         try {
             const data = new TriggerData(source);
             return new OpenTrigger(this, data);
@@ -190,7 +210,7 @@ class TriggerApplication {
 
     #getFreeApplication(source: unknown): typeof BlueprintApplication | null {
         const self = this;
-        const test = this.createTrigger(R.isPlainObject(source) ? source : {}, true);
+        const test = this.createTrigger(R.isPlainObject(source) ? source : {});
         if (!test || test.invalid) return null;
 
         return class FreeBlueprintApplication extends BlueprintApplication {
@@ -204,11 +224,12 @@ class TriggerApplication {
         };
     }
 
-    #setupSetting({ hint, icon, label, name }: ApplicationMenuOptions = {}) {
+    #setupSettings({ hint, icon, label, name }: ApplicationMenuOptions = {}) {
         const self = this;
         const moduleId = this.moduleId;
         const applicationId = this.applicationId;
         const settingKey = this.settingKey;
+        const enabledKey = this.settingEnabledKey;
 
         game.settings.register(moduleId, settingKey, {
             type: Array,
@@ -221,14 +242,24 @@ class TriggerApplication {
             },
         });
 
+        game.settings.register(moduleId, enabledKey, {
+            type: Array,
+            default: [],
+            scope: "world",
+            name: enabledKey,
+            onChange: () => {
+                // TODO re-prepare hooks
+            },
+        });
+
         class SettingBlueprintApplication extends BlueprintApplication {
             get application(): TriggerApplication {
                 return self;
             }
 
             getTriggersSources(): TriggerDataInput[] {
-                const settings = game.settings.get<TriggerDataInput[]>(moduleId, settingKey);
-                return utils.deepClone(settings) ?? [];
+                const setting = game.settings.get<TriggerDataInput[]>(moduleId, settingKey);
+                return utils.deepClone(setting);
             }
         }
 

@@ -36,15 +36,15 @@
     <div class="scroll">
         <div class="list">
             {{#each events as |event|}}
-            <div class="node event" data-node-id="{{event.id}}" data-action="select-node">
-                <div class="name">
+            <div class="node event" data-node-id="{{event.id}}">
+                <a class="name" data-action="select-node">
                     {{#with event.icon as |icon|}}
                     <i class="fa">{{icon}}</i>
                     {{else}}
                     <i class="fa-solid fa-calendar"></i>
                     {{/with}}
                     {{event.label}}
-                </div>
+                </a>
             </div>
             {{/each}}
         </div>
@@ -55,12 +55,12 @@
     <div class="scroll">
         <div class="list">
             {{#each gates as |gate|}}
-            <div class="node gate" data-node-id="{{gate.node.id}}" data-action="select-node"
+            <div class="node gate" data-node-id="{{gate.node.id}}"
                 data-editable>
-                <div class="name">
+                <a class="name" data-action="select-node">
                     <i class="fa-regular fa-outlet"></i>
                     {{gate.node.label}}
-                </div>
+                </a>
                 {{#if gate.hasEntries}}
                 <div class="controls">
                     <a data-action="tab-gate" {{{@root.i18n.tooltip 'gates.tab' }}}>
@@ -78,9 +78,8 @@
     <div class="scroll variables">
         <div class="list">
             {{#each variables as |variable|}}
-            <div class="variable" data-node-id="{{variable.nodeId}}" data-id="{{variable.id}}"
-                data-action="select-node">
-                <div class="name" style="--variable-color: {{variable.color}};">
+            <div class="variable" data-node-id="{{variable.nodeId}}" data-id="{{variable.id}}">
+                <a class="name" data-action="select-node" style="--variable-color: {{variable.color}};">
                     <svg viewBox="0 0 95 100" xmlns="http://www.w3.org/2000/svg">
                         <g color="var(--variable-color)">
                             {{!-- custom --}}
@@ -109,7 +108,7 @@
                         </g>
                     </svg>
                     {{variable.label}}
-                </div>
+                </a>
                 {{#if variable.hasNodes}}
                 <div class="controls">
                     <a data-action="tab-variable" {{{@root.i18n.tooltip 'variables.tab' }}}>

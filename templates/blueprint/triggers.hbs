@@ -44,15 +44,11 @@
         {{!-- triggers --}}
         <div class="list">
             {{#each group.triggers as |trigger|}}
-            <div class="trigger" data-action="select-trigger" {{#if trigger.name}}
+            <div class="trigger" {{#if trigger.name}}
                 data-name="{{trigger.name}}" {{/if}} data-id={{trigger.id}}
                 data-path="{{trigger.path}}" data-tags="{{trigger.tags}}">
-                <div class="label">
-                    {{trigger.label}}
-                </div>
-                <div class="controls">
-
-                </div>
+                <input type="checkbox" data-action="toggle-enabled" name="enabled" {{checked (@root.isEnabled trigger)}}>
+                <a class="name" data-action="select-trigger">{{trigger.label}}</a>
                 <div class="trigger-description"></div>
             </div>
             {{/each}}

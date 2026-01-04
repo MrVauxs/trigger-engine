@@ -43,10 +43,7 @@ import {
 import { Blueprint, BlueprintEntry, BlueprintNode } from ".";
 import apps = foundry.applications.api;
 
-class BlueprintApplication extends apps.ApplicationV2<
-    ApplicationConfiguration,
-    BlueprintRenderOptions
-> {
+class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, BlueprintRenderOptions> {
     #blueprint: Blueprint = new Blueprint(this);
     #search: string = "";
     #tags: string[] = [];
@@ -158,32 +155,20 @@ class BlueprintApplication extends apps.ApplicationV2<
     }
 
     async _prepareContext(options: BlueprintRenderOptions): Promise<BlueprintContext> {
-        return options.trigger
-            ? this.#prepareTriggerContext(options.trigger)
-            : this.#prepareTriggersContext(options);
+        return options.trigger ? this.#prepareTriggerContext(options.trigger) : this.#prepareTriggersContext(options);
     }
 
-    async _preFirstRender(
-        _context: Record<string, unknown>,
-        _options: BlueprintRenderOptions,
-    ): Promise<void> {
+    async _preFirstRender(_context: Record<string, unknown>, _options: BlueprintRenderOptions): Promise<void> {
         registerCustomElements("extended-multi-select", "extended-text-input");
         registerCustomElement("search-select-input", SearchSelectInputElement);
     }
 
-    protected _renderHTML(
-        context: BlueprintContext,
-        options: BlueprintRenderOptions,
-    ): Promise<string> {
+    protected _renderHTML(context: BlueprintContext, options: BlueprintRenderOptions): Promise<string> {
         const key = options.trigger ? "trigger" : "triggers";
         return render(`blueprint.${key}`, context);
     }
 
-    protected _replaceHTML(
-        result: string,
-        content: HTMLElement,
-        options: BlueprintRenderOptions,
-    ): void {
+    protected _replaceHTML(result: string, content: HTMLElement, options: BlueprintRenderOptions): void {
         const ui = htmlQuery(content, ":scope > .ui");
 
         const description = `<div class="description actor sheet">
@@ -263,12 +248,12 @@ class BlueprintApplication extends apps.ApplicationV2<
             }
 
             case "select-node": {
-                const nodeId = target.dataset.nodeId ?? "";
+                const nodeId = htmlClosest(target, "[data-node-id]")?.dataset.nodeId ?? "";
                 return this.blueprint.moveToNode(nodeId, true);
             }
 
             case "select-trigger": {
-                const triggerId = target.dataset.id ?? null;
+                const triggerId = htmlClosest(target, "[data-id]")?.dataset.id ?? null;
                 return (this.blueprint.trigger = triggerId);
             }
 
@@ -294,6 +279,10 @@ class BlueprintApplication extends apps.ApplicationV2<
                 this.#addTriggerDescription(container);
 
                 return;
+            }
+
+            case "toggle-enabled": {
+                return event.stopPropagation();
             }
         }
     }
@@ -331,7 +320,7 @@ class BlueprintApplication extends apps.ApplicationV2<
         if (!result) return;
 
         for (const source of result) {
-            this.blueprint.addTrigger(source, false);
+            this.blueprint.addTrigger(source, false, false);
         }
 
         info("import-export-triggers.imported");
@@ -358,10 +347,7 @@ class BlueprintApplication extends apps.ApplicationV2<
                         const trigger = new TriggerData(data);
                         return trigger;
                     } catch (error: any) {
-                        MODULE.error(
-                            "an error occurred while trying to parse trigger data from file.",
-                            error,
-                        );
+                        MODULE.error("an error occurred while trying to parse trigger data from file.", error);
                     }
                 }),
                 R.filter(R.isTruthy),
@@ -490,9 +476,7 @@ class BlueprintApplication extends apps.ApplicationV2<
                 condition: (el) => {
                     const nodeId = el.dataset.nodeId ?? "";
                     const node = this.blueprint.nodes.get(nodeId);
-                    return (
-                        !!node && (!node.isEvent || !!this.trigger?.application.hasMultipleEvents)
-                    );
+                    return !!node && (!node.isEvent || !!this.trigger?.application.hasMultipleEvents);
                 },
                 callback: async (el) => {
                     const nodeId = el.dataset.nodeId ?? "";
@@ -535,7 +519,7 @@ class BlueprintApplication extends apps.ApplicationV2<
                 callback: (el) => {
                     const trigger = getTriggerFromElement(el);
                     const source = trigger?.duplicate();
-                    return source && this.blueprint.addTrigger(source);
+                    return source && this.blueprint.addTrigger(source, true, true);
                 },
             },
             {
@@ -664,6 +648,7 @@ class BlueprintApplication extends apps.ApplicationV2<
 
         return {
             groups,
+            isEnabled: this.application.isEnabled.bind(this.application),
             search: this.#search,
             tags: {
                 list: tags,
@@ -684,6 +669,17 @@ class BlueprintApplication extends apps.ApplicationV2<
 
             await this.#addTriggerDescription(cached, el.dataset.id);
             container.innerHTML = cached?.innerHTML ?? "";
+        });
+
+        addListenerAll(html, ".trigger input", "change", (el: HTMLInputElement, event) => {
+            event.stopPropagation();
+
+            const id = htmlClosest(el, "[data-id]")?.dataset.id as string;
+            const trigger = this.blueprint.getTrigger(id);
+
+            if (trigger) {
+                this.application.enableTrigger(trigger, el.checked);
+            }
         });
 
         addListener(html, `[name="search"]`, "input", (el: ExtendedTextInputElement) => {
@@ -737,7 +733,7 @@ class BlueprintApplication extends apps.ApplicationV2<
             trigger.update(result);
             this.render();
         } else {
-            this.blueprint.addTrigger(result);
+            this.blueprint.addTrigger(result, true, true);
         }
     }
 }
@@ -786,7 +782,8 @@ type EventAction =
     | "select-trigger"
     | "tab-gate"
     | "tab-variable"
-    | "toggle-description";
+    | "toggle-description"
+    | "toggle-enabled";
 
 type BlueprintContext = TriggersContext | TriggerContext;
 
@@ -816,6 +813,7 @@ type PreparedVariable = TriggerVariable & {
 
 type TriggersContext = {
     groups: TriggersGroup[];
+    isEnabled: (trigger: OpenTrigger) => boolean;
     search: string;
     tags: {
         list: RequiredSelectOptions;

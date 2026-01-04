@@ -160,7 +160,7 @@
         },
         "import-export-triggers": {
             "error": "An error occurred while trying to parse triggers data.",
-            "imported": "Your triggers have been imported but not saved nor enabled.",
+            "imported": "Your triggers have been imported but nothing has been saved.",
             "keep": "Keep IDs",
             "title": {
                 "export": "Export Triggers",

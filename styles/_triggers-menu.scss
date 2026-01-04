@@ -99,12 +99,6 @@
             }
         }
 
-        .label {
-            flex: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
         .scroll {
             flex: 1;
             overflow: auto;
@@ -114,9 +108,8 @@
                     position: relative;
                     display: flex;
                     align-items: center;
-                    gap: 0.3em;
+                    gap: 0.5em;
                     padding-inline: 0.3rem;
-                    cursor: pointer;
                     height: 2em;
                     border-bottom: 1px solid #ffffff14;
 
@@ -126,10 +119,11 @@
                         justify-content: center;
                         gap: 0.3em;
                     }
+                }
 
-                    &:hover {
-                        background: var(--background-color-highlight);
-                    }
+                .name {
+                    overflow: hidden;
+                    text-overflow: ellipsis;
                 }
             }
         }
@@ -263,6 +257,13 @@
 
             &:not(:has(+ .list .trigger:not(.hidden))) {
                 display: none;
+            }
+        }
+
+        .trigger {
+            input {
+                margin: 0;
+                height: 1.2em;
             }
         }
     }

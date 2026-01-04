@@ -49,7 +49,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
             R.pipe(
                 this.parent.getTriggersSources(),
                 R.map((source) => {
-                    const trigger = this.application.createTrigger(source, true);
+                    const trigger = this.application.createTrigger(source);
                     return trigger && ([trigger.id, trigger] as const);
                 }),
                 R.filter(R.isTruthy),
@@ -224,7 +224,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         }
     }
 
-    addTrigger(source: TriggerDataInput, setTrigger: boolean = true) {
+    addTrigger(source: TriggerDataInput, setEnabled: boolean, setTrigger: boolean) {
         if (this.application.events.size === 1 && !source.nodes?.length) {
             const event = this.application.events.contents[0];
 
@@ -237,13 +237,17 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
             ];
         }
 
-        const trigger = this.application.createTrigger(source, true);
+        const trigger = this.application.createTrigger(source);
         if (!trigger) return;
 
         this.triggers.set(trigger.id, trigger);
 
         if (setTrigger) {
             this.trigger = trigger;
+        }
+
+        if (setEnabled) {
+            this.application.enableTrigger(trigger, true);
         }
     }
 
@@ -327,10 +331,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         return new PIXI.Rectangle(x, y, width, height);
     }
 
-    async openNodesMenu(
-        event: PIXI.FederatedPointerEvent,
-        entry?: BaseBlueprintEntry,
-    ): Promise<boolean | undefined> {
+    async openNodesMenu(event: PIXI.FederatedPointerEvent, entry?: BaseBlueprintEntry): Promise<boolean | undefined> {
         if (this.locked) return;
 
         // we need to calculate it now as FederatedEvent will be reused
