@@ -1,10 +1,11 @@
-import { ConnectionId, OpenTrigger, TriggerApplication, TriggerDataInput } from "engine";
+import { ConnectionId, OpenTrigger, TriggerApplication, TriggerDataInput, TriggersSetting } from "engine";
 import {
+    MODULE,
+    MouseInteractionManager,
+    R,
     confirmDialog,
     distanceToPoint,
     dividePointBy,
-    MouseInteractionManager,
-    R,
     subtractPoint,
 } from "module-helpers";
 import {
@@ -20,6 +21,7 @@ import {
 } from ".";
 
 class Blueprint extends PIXI.Application<HTMLCanvasElement> {
+    #enabledIds: Set<string> = new Set();
     #gridLayer: BlueprintGridLayer;
     #hitArea: PIXI.Rectangle;
     #layers: BlueprintLayers;
@@ -45,9 +47,15 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
 
         this.stage.hitArea = this.#hitArea = new PIXI.Rectangle();
 
+        const triggersSetting = this.parent.getTriggersSetting();
+
+        for (const id of triggersSetting.enabled) {
+            this.#enabledIds.add(id);
+        }
+
         this.#triggers = new Collection(
             R.pipe(
-                this.parent.getTriggersSources(),
+                triggersSetting.sources,
                 R.map((source) => {
                     const trigger = this.application.createTrigger(source);
                     return trigger && ([trigger.id, trigger] as const);
@@ -247,7 +255,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         }
 
         if (setEnabled) {
-            this.application.enableTrigger(trigger, true);
+            this.enableTrigger(trigger, true);
         }
     }
 
@@ -257,6 +265,29 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
 
         this.triggers.delete(id);
         this.parent.render();
+    }
+
+    async saveTriggers(): Promise<Required<TriggersSetting> | undefined> {
+        if (!this.application.isSettingApplication) return;
+
+        const sources = this.triggers.map((trigger) => trigger.toObject());
+        const ids = sources.map((source) => source.id);
+        const enabled = [...this.#enabledIds].filter((id) => R.isIncludedIn(id, ids));
+        const setting: Required<TriggersSetting> = { enabled, sources };
+
+        return game.settings.set(this.application.moduleId, this.application.settingKey, setting);
+    }
+
+    isEnabled({ id }: { id: string }): boolean {
+        return this.#enabledIds.has(id);
+    }
+
+    enableTrigger({ id }: { id: string }, enabled: boolean) {
+        if (enabled) {
+            this.#enabledIds.add(id);
+        } else {
+            this.#enabledIds.delete(id);
+        }
     }
 
     async editVariable(id: ConnectionId) {
@@ -391,7 +422,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         }
     }
 
-    _onUnclickLeft(event: FederatedEvent) {
+    _onUnclickLeft(_event: FederatedEvent) {
         this.nodes.clearSelected();
     }
 

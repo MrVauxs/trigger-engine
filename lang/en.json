@@ -118,6 +118,12 @@
                 }
             }
         },
+        "close-window": {
+            "title": "Close Triggers Menu",
+            "content": "Do you want to save the triggers before closing?",
+            "yes": "Save & Close",
+            "no": "Close w/o Saving"
+        },
         "edit-entry": {
             "array": "Is Array?",
             "label": "Label",
@@ -202,6 +208,12 @@
             "tags": {
                 "label": "Filter Tags"
             }
+        },
+        "save-triggers": {
+            "content": "Are you sure you want to save the triggers?",
+            "saved": "Your triggers have been saved.",
+            "title": "Save Triggers",
+            "yes": "Save"
         }
     }
 }

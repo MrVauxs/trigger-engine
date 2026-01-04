@@ -6,8 +6,8 @@ import {
     SearchSelectInputElement,
     TriggerApplication,
     TriggerData,
-    TriggerDataInput,
     TriggerDataOutput,
+    TriggersSetting,
     TriggerVariable,
     UpdateTriggerData,
 } from "engine";
@@ -205,7 +205,14 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
             }
 
             case "close-window": {
-                return;
+                const result = await confirmDialog("close-window");
+                if (result === null) return;
+
+                if (result) {
+                    this.blueprint.saveTriggers();
+                }
+
+                return this.close();
             }
 
             case "collapse-window": {
@@ -239,12 +246,12 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
                 return this.#importTriggers();
             }
 
-            case "reset-trigger": {
-                return;
-            }
-
             case "save-triggers": {
-                return;
+                const confirm = await confirmDialog("save-triggers");
+                if (!confirm) return;
+
+                const saved = await this.blueprint.saveTriggers();
+                return saved && info("save-triggers.saved");
             }
 
             case "select-node": {
@@ -648,7 +655,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
 
         return {
             groups,
-            isEnabled: this.application.isEnabled.bind(this.application),
+            isEnabled: (trigger) => this.blueprint.isEnabled(trigger),
             search: this.#search,
             tags: {
                 list: tags,
@@ -678,7 +685,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
             const trigger = this.blueprint.getTrigger(id);
 
             if (trigger) {
-                this.application.enableTrigger(trigger, el.checked);
+                this.blueprint.enableTrigger(trigger, el.checked);
             }
         });
 
@@ -716,7 +723,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
                 name: trigger?.name ?? "",
                 placeholder: trigger?.label ?? "",
                 priority: trigger?.priority ?? 0,
-                tags: trigger?.tags,
+                tags: trigger?.data.tags,
             },
             i18n: "edit-trigger",
             skipAnimate: true,
@@ -740,7 +747,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
 
 interface BlueprintApplication {
     get application(): TriggerApplication;
-    getTriggersSources(): TriggerDataInput[];
+    getTriggersSetting(): TriggersSetting;
 }
 
 function filterElements(
@@ -776,7 +783,6 @@ type EventAction =
     | "export-data"
     | "export-triggers"
     | "import-triggers"
-    | "reset-trigger"
     | "save-triggers"
     | "select-node"
     | "select-trigger"

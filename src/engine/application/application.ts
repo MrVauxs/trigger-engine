@@ -14,6 +14,7 @@ import {
     TriggerApplicationCollections,
     TriggerData,
     TriggerDataInput,
+    TriggerDataOutput,
     TriggerGateEntry,
     TriggerGateExit,
     TriggerHook,
@@ -33,7 +34,6 @@ class TriggerApplication {
     #applicationId: string;
     #applicationKey: string;
     #convertors: Collection<EntryConvertor>;
-    #enabledIds: Set<string> = new Set();
     #entries: Collection<typeof NodeEntry>;
     #events: Collection<typeof TriggerNode>;
     #hooks: Collection<typeof TriggerHook>;
@@ -83,11 +83,6 @@ class TriggerApplication {
         // setup settings
         if (this.isSettingApplication) {
             this.#setupSettings(options.setting);
-
-            const ids = game.settings.get<string[]>(moduleId, this.settingEnabledKey);
-            for (const id of ids) {
-                this.#enabledIds.add(id);
-            }
         }
     }
 
@@ -123,10 +118,6 @@ class TriggerApplication {
         return `${this.applicationId}-triggers`;
     }
 
-    get settingEnabledKey(): string {
-        return `${this.applicationId}-enabled`;
-    }
-
     get localizePath(): string {
         return `${this.moduleId}.${this.applicationId}`;
     }
@@ -145,18 +136,6 @@ class TriggerApplication {
 
     get hasMultipleEvents(): boolean {
         return this.events.size > 1;
-    }
-
-    isEnabled({ id }: { id: string }): boolean {
-        return this.#enabledIds.has(id);
-    }
-
-    enableTrigger({ id }: { id: string }, enabled: boolean) {
-        if (enabled) {
-            this.#enabledIds.add(id);
-        } else {
-            this.#enabledIds.delete(id);
-        }
     }
 
     localize(...args: LocalizeArgs): string | undefined {
@@ -218,8 +197,11 @@ class TriggerApplication {
                 return self;
             }
 
-            getTriggersSources(): TriggerDataInput[] {
-                return [test.toObject()];
+            getTriggersSetting(): TriggersSetting {
+                return {
+                    enabled: [test.id],
+                    sources: [test.toObject()],
+                };
             }
         };
     }
@@ -229,11 +211,10 @@ class TriggerApplication {
         const moduleId = this.moduleId;
         const applicationId = this.applicationId;
         const settingKey = this.settingKey;
-        const enabledKey = this.settingEnabledKey;
 
         game.settings.register(moduleId, settingKey, {
-            type: Array,
-            default: [],
+            type: Object,
+            default: {},
             scope: "world",
             config: false,
             name: settingKey,
@@ -242,24 +223,17 @@ class TriggerApplication {
             },
         });
 
-        game.settings.register(moduleId, enabledKey, {
-            type: Array,
-            default: [],
-            scope: "world",
-            name: enabledKey,
-            onChange: () => {
-                // TODO re-prepare hooks
-            },
-        });
-
         class SettingBlueprintApplication extends BlueprintApplication {
             get application(): TriggerApplication {
                 return self;
             }
 
-            getTriggersSources(): TriggerDataInput[] {
-                const setting = game.settings.get<TriggerDataInput[]>(moduleId, settingKey);
-                return utils.deepClone(setting);
+            getTriggersSetting(): TriggersSetting {
+                const setting = game.settings.get<Partial<TriggersSetting>>(moduleId, settingKey);
+                return {
+                    enabled: setting.enabled?.slice() ?? [],
+                    sources: utils.deepClone(setting?.sources ?? []),
+                };
             }
         }
 
@@ -297,7 +271,12 @@ type ApplicationMenuOptions = {
     name?: string;
 };
 
+type TriggersSetting = {
+    enabled: string[];
+    sources: TriggerDataInput[];
+};
+
 type TriggerApplicationMode = (typeof APPLICATION_MODES)[number] | "builtin";
 
 export { TriggerApplication };
-export type { ApplicationParentType, TriggerApplicationOptions };
+export type { ApplicationParentType, TriggerApplicationOptions, TriggersSetting };
