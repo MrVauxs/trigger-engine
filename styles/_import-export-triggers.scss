@@ -8,6 +8,14 @@
         overflow: hidden;
     }
 
+    .dialog-form {
+        gap: 0.5rem;
+    }
+
+    .dialog-content {
+        gap: 0.1rem;
+    }
+
     .triggers {
         overflow-y: auto;
     }
@@ -28,6 +36,14 @@
 
     .header:not(.main) {
         margin-block: 0.3em;
+    }
+
+    .keep-ids {
+        display: flex;
+        align-items: center;
+        gap: 0.3em;
+        align-self: end;
+        padding-right: 1.5rem;
     }
 
     .header.main,

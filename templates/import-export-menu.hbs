@@ -27,10 +27,10 @@
         </div>
         {{/each}}
     </div>
-    {{#if (eq category 'import')}}
-    <label class="keep-ids">
-        <input type="checkbox" name="keepids">
-        {{@root.i18n 'keep'}}:
-    </label>
-    {{/if}}
 </div>
+{{#if (eq category 'import')}}
+<label class="keep-ids">
+    <input type="checkbox" name="keepids">
+    {{@root.i18n 'keep'}}
+</label>
+{{/if}}

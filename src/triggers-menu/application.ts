@@ -5,7 +5,9 @@ import {
     OpenTrigger,
     SearchSelectInputElement,
     TriggerApplication,
+    TriggerData,
     TriggerDataInput,
+    TriggerDataOutput,
     TriggerVariable,
     UpdateTriggerData,
 } from "engine";
@@ -18,6 +20,7 @@ import {
     ApplicationRenderOptions,
     confirmDialog,
     createHTMLElement,
+    error,
     ExtendedMultiSelectElement,
     ExtendedTextInputElement,
     htmlClosest,
@@ -248,7 +251,7 @@ class BlueprintApplication extends apps.ApplicationV2<
             }
 
             case "import-triggers": {
-                return;
+                return this.#importTriggers();
             }
 
             case "reset-trigger": {
@@ -299,27 +302,99 @@ class BlueprintApplication extends apps.ApplicationV2<
         const result = await this.#importExportTriggers("export", this.blueprint.triggers.contents);
         if (!result) return;
 
-        const selected = result.selected.map((trigger) => trigger.toObject());
-        if (!selected.length) return;
-
-        const purged = purgeObject(selected);
+        const purged = purgeObject(result);
         const stringified = JSON.stringify(purged);
         const filename = `${MODULE.id}-${Date.now()}`;
 
         foundry.utils.saveDataToFile(stringified, "text/json", `${filename}.json`);
     }
 
-    async #importExportTriggers<T extends { id: string; folder: string | undefined }>(
+    async #importTriggers() {
+        const fileResult = await waitDialog<{ file: File }>({
+            i18n: "import-export-triggers",
+            content: `<input type="file" name="file" accept=".json">`,
+            title: localize("import-export-triggers.title.import"),
+            yes: {
+                label: localize("import-export-triggers.yes.import"),
+            },
+        });
+
+        if (!fileResult || !fileResult.file) return;
+
+        const triggers = await this.#parseTriggersData(fileResult.file);
+
+        if (!triggers?.length) {
+            return error("import-export-triggers.error");
+        }
+
+        const result = await this.#importExportTriggers("import", triggers);
+        if (!result) return;
+
+        for (const source of result) {
+            this.blueprint.addTrigger(source, false);
+        }
+
+        info("import-export-triggers.imported");
+        this.render();
+    }
+
+    async #parseTriggersData(file: File): Promise<TriggerData[] | undefined> {
+        try {
+            const content = await foundry.utils.readTextFromFile(file);
+            const jsonData = JSON.parse(content);
+
+            if (!R.isArray(jsonData)) {
+                throw new Error("must be an array of triggers data.");
+            }
+
+            const triggers = R.pipe(
+                jsonData,
+                R.map((data) => {
+                    try {
+                        if (!R.isPlainObject(data)) {
+                            throw new Error("invalid data type.");
+                        }
+
+                        const trigger = new TriggerData(data);
+                        return trigger;
+                    } catch (error: any) {
+                        MODULE.error(
+                            "an error occurred while trying to parse trigger data from file.",
+                            error,
+                        );
+                    }
+                }),
+                R.filter(R.isTruthy),
+            );
+
+            return triggers;
+        } catch (error: any) {
+            MODULE.error("an error occurred while trying to parse triggers data from file.", error);
+        }
+    }
+
+    async #importExportTriggers<T extends TriggerData | OpenTrigger>(
         category: "import" | "export",
         triggers: T[],
-    ): Promise<{ keepIds: boolean | undefined; selected: T[] } | undefined> {
+    ): Promise<WithPartial<TriggerDataOutput, "id">[] | undefined> {
+        const groups = R.map(this.#prepareTriggersGroups(triggers), (group) => {
+            const triggers = R.mapValues(group.triggers, (trigger) => {
+                return {
+                    id: trigger.id,
+                    label: trigger.name || trigger.id,
+                };
+            });
+
+            return {
+                folder: group.folder,
+                triggers,
+            };
+        });
+
         const result = await waitDialog<{ keepids?: boolean; selected: Record<string, boolean> }>({
             classes: ["trigger-engine-import-export"],
             content: "import-export-menu",
-            data: {
-                category,
-                groups: this.#prepareTriggersGroups(triggers),
-            },
+            data: { category, groups },
             expand: true,
             i18n: "import-export-triggers",
             onRender: (_event, dialog) => {
@@ -343,10 +418,20 @@ class BlueprintApplication extends apps.ApplicationV2<
 
         if (!result) return;
 
-        return {
-            keepIds: result.keepids,
-            selected: R.filter(triggers, (trigger) => trigger.id in result.selected),
-        };
+        const keepIds = result.keepids !== false;
+        const selected = R.pipe(
+            triggers,
+            R.filter((trigger) => trigger.id in result.selected),
+            R.map((trigger) => {
+                const source = trigger.toObject() as WithPartial<TriggerDataOutput, "id">;
+                if (!keepIds) {
+                    delete source.id;
+                }
+                return source;
+            }),
+        );
+
+        return selected.length ? selected : undefined;
     }
 
     async #addTriggerDescription(el: HTMLElement | null, triggerId?: string) {

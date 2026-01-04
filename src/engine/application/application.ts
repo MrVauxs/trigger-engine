@@ -69,8 +69,8 @@ class TriggerApplication {
         this.#events = new Collection(
             R.map(
                 this.#nodes.filter((node) => node.isEvent),
-                (node) => [node.type, node] as const
-            )
+                (node) => [node.type, node] as const,
+            ),
         );
 
         // if no event in the application, we had a default one
@@ -173,7 +173,7 @@ class TriggerApplication {
             const data = new TriggerData(source);
             return new OpenTrigger(this, data);
         } catch (error: any) {
-            MODULE.error(`an error ocurred while trying to create a Trigger.`, error);
+            MODULE.error(`an error concurred while trying to create a Trigger.`, error);
             return null;
         }
     }

@@ -8,7 +8,9 @@
 }
 
 #trigger-engine-blueprint {
-    --width: calc(100% - ((var(--sidebar-width) + 16px + 48px) * var(--ui-scale)));
+    --width: calc(
+        100% - ((var(--sidebar-width) + 16px + 48px) * var(--ui-scale))
+    );
     --height: calc(100% - 10px);
     --background: url("../../../ui/denim075.png") repeat;
     --background-color: #00000059;
@@ -83,7 +85,7 @@
             .controls {
                 display: flex;
                 align-items: center;
-                gap: 0.3em;
+                gap: 0.5em;
 
                 a {
                     text-align: center;

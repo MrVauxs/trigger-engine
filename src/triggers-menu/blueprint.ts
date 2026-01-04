@@ -40,7 +40,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
 
         this.stage.addChild(
             (this.#gridLayer = new BlueprintGridLayer(this)),
-            (this.#layers = new BlueprintLayers(this))
+            (this.#layers = new BlueprintLayers(this)),
         );
 
         this.stage.hitArea = this.#hitArea = new PIXI.Rectangle();
@@ -52,8 +52,8 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
                     const trigger = this.application.createTrigger(source, true);
                     return trigger && ([trigger.id, trigger] as const);
                 }),
-                R.filter(R.isTruthy)
-            )
+                R.filter(R.isTruthy),
+            ),
         );
 
         const handlers: ConstructorParameters<typeof MouseInteractionManager>[3] = {
@@ -81,7 +81,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
             this.stage,
             permissions,
             handlers,
-            { application: this }
+            { application: this },
         );
 
         this.#mouseManager.activate();
@@ -216,7 +216,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
                     to: 1,
                 },
             ],
-            { duration: Math.min(distance / 4, 500) }
+            { duration: Math.min(distance / 4, 500) },
         );
 
         if (select) {
@@ -224,9 +224,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         }
     }
 
-    addTrigger(source: TriggerDataInput) {
-        if (source.id && this.triggers.has(source.id)) return;
-
+    addTrigger(source: TriggerDataInput, setTrigger: boolean = true) {
         if (this.application.events.size === 1 && !source.nodes?.length) {
             const event = this.application.events.contents[0];
 
@@ -243,7 +241,10 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         if (!trigger) return;
 
         this.triggers.set(trigger.id, trigger);
-        this.trigger = trigger;
+
+        if (setTrigger) {
+            this.trigger = trigger;
+        }
     }
 
     async deleteTrigger(id: string) {
@@ -328,7 +329,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
 
     async openNodesMenu(
         event: PIXI.FederatedPointerEvent,
-        entry?: BaseBlueprintEntry
+        entry?: BaseBlueprintEntry,
     ): Promise<boolean | undefined> {
         if (this.locked) return;
 
