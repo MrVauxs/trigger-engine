@@ -28,7 +28,9 @@ import {
     info,
     localize,
     localizePath,
+    MODULE,
     MultiSelectTagsMode,
+    purgeObject,
     R,
     registerCustomElement,
     registerCustomElements,
@@ -297,13 +299,20 @@ class BlueprintApplication extends apps.ApplicationV2<
         const result = await this.#importExportTriggers("export", this.blueprint.triggers.contents);
         if (!result) return;
 
-        console.log(result);
+        const selected = result.selected.map((trigger) => trigger.toObject());
+        if (!selected.length) return;
+
+        const purged = purgeObject(selected);
+        const stringified = JSON.stringify(purged);
+        const filename = `${MODULE.id}-${Date.now()}`;
+
+        foundry.utils.saveDataToFile(stringified, "text/json", `${filename}.json`);
     }
 
-    async #importExportTriggers(
+    async #importExportTriggers<T extends { id: string; folder: string | undefined }>(
         category: "import" | "export",
-        triggers: PreparableTrigger[],
-    ): Promise<{ keepIds: boolean | undefined; selected: string[] } | undefined> {
+        triggers: T[],
+    ): Promise<{ keepIds: boolean | undefined; selected: T[] } | undefined> {
         const result = await waitDialog<{ keepids?: boolean; selected: Record<string, boolean> }>({
             classes: ["trigger-engine-import-export"],
             content: "import-export-menu",
@@ -336,7 +345,7 @@ class BlueprintApplication extends apps.ApplicationV2<
 
         return {
             keepIds: result.keepids,
-            selected: R.keys(R.pickBy(result.selected, (selected) => selected)),
+            selected: R.filter(triggers, (trigger) => trigger.id in result.selected),
         };
     }
 
@@ -529,7 +538,7 @@ class BlueprintApplication extends apps.ApplicationV2<
         };
     }
 
-    #prepareTriggersGroups<T extends PreparableTrigger>(
+    #prepareTriggersGroups<T extends { folder: string | undefined }>(
         triggersData: T[],
     ): { folder: string; triggers: T[] }[] {
         return R.pipe(
@@ -737,12 +746,6 @@ type TriggersGroup = {
 
 type BlueprintRenderOptions = ApplicationRenderOptions & {
     trigger: OpenTrigger | undefined;
-};
-
-type PreparableTrigger = {
-    folder: string | undefined;
-    id: string;
-    name: string | undefined;
 };
 
 export { BlueprintApplication, filterElements };

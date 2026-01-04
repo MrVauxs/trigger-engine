@@ -206,7 +206,7 @@ abstract class TriggerNode {
     //////////////////////////////
 
     /**
-     * Calls the next `executeable` node in the chain.
+     * Calls the next `executable` node in the chain.
      *
      * @param out key of the selected `out` bridge
      *
@@ -271,7 +271,7 @@ abstract class TriggerNode {
     /**
      * @abstract
      *
-     * A node with `in` or `outs` is considered an `executeable` node.
+     * A node with `in` or `outs` is considered an `executable` node.
      *
      * This method is called by by a previous node that have `outs`.
      *
@@ -298,7 +298,8 @@ abstract class TriggerNode {
 }
 
 interface TriggerNode
-    extends Pick<NodeData, "id" | "invalid">,
+    extends
+        Pick<NodeData, "id" | "invalid">,
         Pick<typeof TriggerNode, "category" | "isEvent" | "type"> {}
 
 export { TriggerNode };

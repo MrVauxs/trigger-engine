@@ -1,4 +1,4 @@
-import { TriggerApplication, TriggerData, TriggerNode } from "engine";
+import { TriggerApplication, TriggerData, TriggerDataOutput, TriggerNode } from "engine";
 
 class Trigger<TNode extends TriggerNode = TriggerNode> {
     #data: TriggerData;
@@ -44,7 +44,7 @@ class Trigger<TNode extends TriggerNode = TriggerNode> {
         return this.nodes.get(id);
     }
 
-    toObject() {
+    toObject(): TriggerDataOutput {
         return this.data.toObject();
     }
 }
