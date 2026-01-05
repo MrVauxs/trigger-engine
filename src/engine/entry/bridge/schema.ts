@@ -7,7 +7,9 @@ const zNodeBridgeSchema = z.object({
     state: zString.optional(),
 });
 
-type BridgeSchemaInput = z.infer<typeof zNodeBridgeSchema>;
+type BridgeSchemaInput<K extends string = string> = Prettify<
+    Omit<z.infer<typeof zNodeBridgeSchema>, "key"> & { key: K }
+>;
 type BridgeSchemaOutput = z.output<typeof zNodeBridgeSchema>;
 
 export { zNodeBridgeSchema };

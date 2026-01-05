@@ -10,25 +10,14 @@ import {
     Trigger,
 } from "engine";
 import { LocalizeArgs, MODULE, R } from "module-helpers";
-import {
-    getInputsSchemas,
-    getNodeStates,
-    getOutputsSchemas,
-    getOutsSchemas,
-    NodeData,
-    TriggerNode,
-} from ".";
+import { getInputsSchemas, getNodeStates, getOutputsSchemas, getOutsSchemas, NodeData, TriggerNode } from ".";
 
-function instantiateNode(
-    parent: OpenTrigger,
-    data: NodeData,
-    open: true
-): OpenTriggerNode | undefined;
-function instantiateNode(parent: Trigger, data: NodeData, open: boolean): TriggerNode | undefined;
+function instantiateNode(parent: OpenTrigger, data: NodeData, open: true): OpenTriggerNode | undefined;
+function instantiateNode<TNode extends TriggerNode>(parent: Trigger, data: NodeData, open: boolean): TNode | undefined;
 function instantiateNode(
     parent: Trigger,
     nodeData: NodeData,
-    open: boolean
+    open: boolean,
 ): TriggerNode | OpenTriggerNode | undefined {
     const NodeCls = parent.application.nodes.get(nodeData.type) as typeof TriggerNode;
     if (!NodeCls) return;
@@ -90,8 +79,8 @@ function instantiateNode(
     const nodeState = !nodeStates
         ? null
         : R.isString(nodeData.state) && R.isIncludedIn(nodeData.state, nodeStates)
-        ? nodeData.state
-        : nodeStates[0];
+          ? nodeData.state
+          : nodeStates[0];
 
     class TriggerNodeWrapper extends NodeCls {
         #in: NodeBridge | null;
@@ -112,7 +101,7 @@ function instantiateNode(
                         enumerable: true,
                         writable: false,
                     };
-                })
+                }),
             );
 
             // from private methods
@@ -131,8 +120,8 @@ function instantiateNode(
                             enumerable: false,
                             writable: false,
                         };
-                    })
-                )
+                    }),
+                ),
             );
 
             // from static accessors
@@ -145,7 +134,7 @@ function instantiateNode(
                         enumerable: true,
                         writable: false,
                     };
-                })
+                }),
             );
 
             // bridges
@@ -163,9 +152,9 @@ function instantiateNode(
                                 return [bridge.key, bridge] as const;
                             } catch (error) {}
                         }),
-                        R.filter(R.isTruthy)
+                        R.filter(R.isTruthy),
                     );
-                }
+                },
             );
 
             // entries
@@ -188,28 +177,18 @@ function instantiateNode(
                         schemas,
                         R.map((schema) => {
                             try {
-                                const entry = instantiateEntry(
-                                    parent,
-                                    this,
-                                    category,
-                                    schema,
-                                    nodeData,
-                                    open
-                                );
+                                const entry = instantiateEntry(parent, this, category, schema, nodeData, open);
 
                                 return entry ? ([entry.key, entry] as const) : undefined;
                             } catch (error: any) {
-                                MODULE.error(
-                                    "an error occured while instantiating a node entry",
-                                    error
-                                );
+                                MODULE.error("an error occurred while instantiating a node entry", error);
                             }
                         }),
-                        R.filter(R.isTruthy)
+                        R.filter(R.isTruthy),
                     );
 
                     return new Collection(entries);
-                }
+                },
             );
 
             this.#in = ins.at(0)?.[1] || null;
@@ -248,11 +227,6 @@ function instantiateNode(
                 });
             }
         }
-    }
-
-    interface TriggerNodeWrapper {
-        _execute(options?: Record<string, any>): Promise<boolean>;
-        _query(key: string): Promise<any>;
     }
 
     return new TriggerNodeWrapper();

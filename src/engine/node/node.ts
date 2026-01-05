@@ -11,7 +11,7 @@ import {
 import { LocalizeArgs, MODULE } from "module-helpers";
 import { NodeData } from ".";
 
-abstract class TriggerNode {
+class TriggerNode<TOuts extends string | never = "out"> {
     //////////////////////////////
     // ABSTRACT STATIC ACCESSORS
     //////////////////////////////
@@ -24,7 +24,7 @@ abstract class TriggerNode {
      * `<module-id>.<application-id>.node.<category>.<type>.title`
      */
     static get type(): string {
-        throw MODULE.Error("the 'type' static getter must be implemented.");
+        throw MODULE.Error("Method not implemented.");
     }
 
     //////////////////////////////
@@ -95,8 +95,8 @@ abstract class TriggerNode {
      * Localization path:
      * `<module-id>.<application-id>.node.<category>.<type>.outs.<key>`
      */
-    static get defineOuts(): string | BridgeSchemaInput[] | null {
-        return "out";
+    static get defineOuts(): BridgeSchemaInput[] | null {
+        return [{ key: "out" }];
     }
 
     /**
@@ -270,7 +270,6 @@ abstract class TriggerNode {
 
     /**
      * @abstract
-     *
      * A node with `in` or `outs` is considered an `executable` node.
      *
      * This method is called by by a previous node that have `outs`.
@@ -283,7 +282,9 @@ abstract class TriggerNode {
      * @see {@link TriggerNode#getInputValue}
      * @see {@link TriggerNode#setOutputValue}
      */
-    abstract _execute(options?: Record<string, any>): Promise<boolean>;
+    _execute(options?: Record<string, any>): Promise<boolean> {
+        throw MODULE.Error("Method not implemented.");
+    }
 
     /**
      * @abstract
@@ -294,12 +295,12 @@ abstract class TriggerNode {
      * @returns the computed value of the output type requested by the other node.
      * If the returned value isn't compatible with the connection type, the default value will be instead be returned.
      */
-    abstract _query(key: string): Promise<any>;
+    _query(key: string): Promise<any> {
+        throw MODULE.Error("Method not implemented.");
+    }
 }
 
 interface TriggerNode
-    extends
-        Pick<NodeData, "id" | "invalid">,
-        Pick<typeof TriggerNode, "category" | "isEvent" | "type"> {}
+    extends Pick<NodeData, "id" | "invalid">, Pick<typeof TriggerNode, "category" | "isEvent" | "type"> {}
 
 export { TriggerNode };

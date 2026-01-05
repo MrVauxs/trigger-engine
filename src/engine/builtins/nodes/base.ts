@@ -1,5 +1,5 @@
 import { TriggerNode } from "engine";
 
-abstract class BuiltInTriggerNode extends TriggerNode {}
+abstract class BuiltInTriggerNode<TOuts extends string | never = "out"> extends TriggerNode<TOuts> {}
 
 export { BuiltInTriggerNode };

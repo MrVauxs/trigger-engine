@@ -3,10 +3,7 @@ import { NodeEntry } from "engine";
 import { LocalizeArgs, MODULE, z } from "module-helpers";
 import { PreciseTextOptions } from "triggers-menu";
 
-abstract class NodeField<
-    TValue extends unknown = unknown,
-    TFieldSchema extends Record<string, any> = Record<string, any>,
->
+class NodeField<TValue extends unknown = unknown, TFieldSchema extends Record<string, any> = Record<string, any>>
     extends PIXI.Graphics
 {
     //////////////////////////////
@@ -15,11 +12,10 @@ abstract class NodeField<
 
     /**
      * @abstract
-     *
      * Defines the DataSchema for the input field that will be used in the triggers menu.
      */
     static get defineSchema(): NodeFieldSchema {
-        throw MODULE.Error("the 'defineSchema' static getter must be implemented.");
+        throw MODULE.Error("Method not implemented.");
     }
 
     //////////////////////////////
@@ -83,14 +79,20 @@ abstract class NodeField<
     //////////////////////////////
 
     /**
+     * @abstract
      * Draw the actual field.
      */
-    abstract draw(): void;
+    draw(): void {
+        throw MODULE.Error("Method not implemented.");
+    }
 
     /**
+     * @abstract
      * Event listener called when the field is clicked on. It is only registered if the entry isn't connected.
      */
-    abstract onClick(): Promise<TValue>;
+    onClick(): Promise<TValue> {
+        throw MODULE.Error("Method not implemented.");
+    }
 
     //////////////////////////////
     // IMMUTABLE METHODS

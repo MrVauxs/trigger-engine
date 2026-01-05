@@ -39,8 +39,7 @@ function instantiateEntry(
     const EntryCls = trigger.application.entries.get(entrySchema.type) as typeof NodeEntry;
     if (!EntryCls) return;
 
-    const fieldData =
-        "field" in entrySchema && R.isPlainObject(entrySchema.field) && entrySchema.field;
+    const fieldData = "field" in entrySchema && R.isPlainObject(entrySchema.field) && entrySchema.field;
     let entryField: Record<string, any> = {};
 
     if (category === "inputs" && !entrySchema.isArray) {
@@ -115,9 +114,7 @@ function instantiateEntry(
                     },
                     data: {
                         get() {
-                            return (
-                                (category === "inputs" && nodeData.inputs[entrySchema.key]) || {}
-                            );
+                            return (category === "inputs" && nodeData.inputs[entrySchema.key]) || {};
                         },
                     },
                     schema: {
@@ -128,10 +125,6 @@ function instantiateEntry(
                 });
             }
         }
-    }
-
-    interface NodeEntryWrapper {
-        isValidType(value: unknown): value is unknown;
     }
 
     return new NodeEntryWrapper();

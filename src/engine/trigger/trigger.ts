@@ -1,4 +1,4 @@
-import { TriggerApplication, TriggerData, TriggerDataOutput, TriggerNode } from "engine";
+import { TriggerApplication, TriggerData, TriggerDataOutput, TriggerNode, instantiateNode } from "engine";
 
 class Trigger<TNode extends TriggerNode = TriggerNode> {
     #data: TriggerData;
@@ -8,6 +8,12 @@ class Trigger<TNode extends TriggerNode = TriggerNode> {
     constructor(parent: TriggerApplication, data: TriggerData) {
         this.#data = data;
         this.#parent = parent;
+
+        Object.defineProperty(this, "nodes", {
+            get() {
+                return this.#nodes;
+            },
+        });
     }
 
     get application(): TriggerApplication {
@@ -35,18 +41,39 @@ class Trigger<TNode extends TriggerNode = TriggerNode> {
         return false;
     }
 
-    get nodes(): Collection<TNode> {
-        return this.#nodes;
-    }
-
     getNode(id: string): TNode | undefined {
-        // TODO we need to instantiate the node
-        return this.nodes.get(id);
+        // we instantiate the node on the fly
+        if (!this.#nodes.has(id)) {
+            try {
+                const nodeData = this.data.nodes.get(id);
+                if (!nodeData) return;
+
+                const node = instantiateNode<TNode>(this, nodeData, true);
+                if (!node || node.invalid) return;
+
+                this.#nodes.set(node.id, node);
+                return node;
+            } catch (error) {
+                return;
+            }
+        }
+
+        return this.#nodes.get(id);
     }
 
     toObject(): TriggerDataOutput {
         return this.data.toObject();
     }
+
+    test(): boolean {
+        for (const nodeData of this.data.nodes) {
+            const node = instantiateNode(this, nodeData, false);
+            if (!node || node.invalid) return false;
+        }
+        return true;
+    }
 }
+
+interface Trigger {}
 
 export { Trigger };

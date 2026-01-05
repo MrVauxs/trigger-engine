@@ -99,11 +99,6 @@ function instantiateField(
         }
     }
 
-    interface EntryFieldWrapper {
-        draw(): void;
-        onClick(): Promise<unknown>;
-    }
-
     return new EntryFieldWrapper();
 }
 

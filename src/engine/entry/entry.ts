@@ -1,10 +1,7 @@
 import { BaseEntrySchemaInput, NodeField } from "engine";
 import { MODULE } from "module-helpers";
 
-abstract class NodeEntry<
-    TValue extends unknown = unknown,
-    TFieldSchema extends Record<string, any> | undefined = undefined,
-> {
+class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<string, any> | undefined = undefined> {
     //////////////////////////////
     // ABSTRACT STATIC ACCESSORS
     //////////////////////////////
@@ -17,7 +14,7 @@ abstract class NodeEntry<
      * `<module-id>.<application-id>.entry.<type>.title`
      */
     static get type(): string {
-        throw MODULE.Error("the 'type' static getter must be implemented.");
+        throw MODULE.Error("Method not implemented.");
     }
 
     /**
@@ -25,7 +22,7 @@ abstract class NodeEntry<
      * The default value for this input.
      */
     static get default(): unknown {
-        throw MODULE.Error("the 'default' static getter must be implemented.");
+        throw MODULE.Error("Method not implemented.");
     }
 
     //////////////////////////////
@@ -82,9 +79,12 @@ abstract class NodeEntry<
     //////////////////////////////
 
     /**
+     * @abstract
      * @returns true if the provided value is of type `TValue`
      */
-    abstract isValidType(value: unknown): value is TValue;
+    isValidType(value: unknown): value is TValue {
+        throw MODULE.Error("Method not implemented.");
+    }
 
     //////////////////////////////
     // METHODS

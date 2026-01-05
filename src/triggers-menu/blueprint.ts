@@ -57,7 +57,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
             R.pipe(
                 triggersSetting.sources,
                 R.map((source) => {
-                    const trigger = this.application.createTrigger(source);
+                    const trigger = this.application.createTrigger(source, true);
                     return trigger && ([trigger.id, trigger] as const);
                 }),
                 R.filter(R.isTruthy),
@@ -245,7 +245,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
             ];
         }
 
-        const trigger = this.application.createTrigger(source);
+        const trigger = this.application.createTrigger(source, true);
         if (!trigger) return;
 
         this.triggers.set(trigger.id, trigger);

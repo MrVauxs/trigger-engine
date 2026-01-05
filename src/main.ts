@@ -1,21 +1,21 @@
-import {
-    NodeEntry,
-    openBlueprintMenu,
-    registerApplication,
-    TriggerHook,
-    TriggerNode,
-} from "engine";
+import { NodeEntry, TriggerApplication, TriggerHook, TriggerNode } from "engine";
 import { MODULE } from "module-helpers";
+import { id } from "../module.json";
+
+console.log(id);
 
 MODULE.register("trigger-engine", { game: "triggerEngine" });
 
 Hooks.once("init", async () => {
-    Hooks.callAll("triggerEngine.init", { registerApplication });
+    const args = {
+        registerApplication: TriggerApplication.register.bind(TriggerApplication),
+    };
+    Hooks.callAll("triggerEngine.init", args);
 });
 
 Hooks.once("setup", async () => {
-    // await prepareModuleTriggers();
     // prepareTriggers();
+    TriggerApplication.prepareApplications();
 });
 
 Hooks.once("ready", () => {
@@ -24,12 +24,12 @@ Hooks.once("ready", () => {
 });
 
 MODULE.apiExpose({
-    openBlueprintMenu,
+    openBlueprintMenu: TriggerApplication.openBlueprintMenu.bind(TriggerApplication),
 });
 
 globalThis.triggerEngine = {
     NodeEntry,
     TriggerHook,
     TriggerNode,
-    openBlueprintMenu,
+    openBlueprintMenu: TriggerApplication.openBlueprintMenu.bind(TriggerApplication),
 };

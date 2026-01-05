@@ -7,22 +7,24 @@ import {
     EntryConvertor,
     EXIT_GATE_TYPE,
     GATE_CATEGORY,
+    getBuiltins,
     GETTER_VARIABLE_TYPE,
+    instantiateHook,
     NodeEntry,
     OpenTrigger,
+    Trigger,
     TriggerApplicationCollection,
     TriggerApplicationCollections,
     TriggerData,
     TriggerDataInput,
-    TriggerDataOutput,
     TriggerGateEntry,
     TriggerGateExit,
-    TriggerHook,
+    TriggerHookWrapper,
     TriggerNode,
     TriggerVariableGetter,
     VARIABLE_CATEGORY,
 } from "engine";
-import { joinStr, LocalizeArgs, LocalizeData, MODULE, R } from "module-helpers";
+import { includesAny, joinStr, LocalizeArgs, LocalizeData, MODULE, R } from "module-helpers";
 import { BlueprintApplication } from "triggers-menu";
 import utils = foundry.utils;
 
@@ -31,15 +33,18 @@ const FORBIDDEN_NODE_CATEGORIES = [GATE_CATEGORY, VARIABLE_CATEGORY];
 const FORBIDDEN_NODE_TYPE = [EXIT_GATE_TYPE, ENTRY_GATE_TYPE, GETTER_VARIABLE_TYPE];
 
 class TriggerApplication {
+    static #instances: Collection<TriggerApplication> = new Collection();
+
     #applicationId: string;
     #applicationKey: string;
     #convertors: Collection<EntryConvertor>;
     #entries: Collection<typeof NodeEntry>;
     #events: Collection<typeof TriggerNode>;
-    #hooks: Collection<typeof TriggerHook>;
+    #hooks: { hook: TriggerHookWrapper; enabled: boolean }[];
     #mode: TriggerApplicationMode;
     #moduleId: string;
     #nodes: Collection<typeof TriggerNode>;
+    #triggerEvents: Record<string, { eventId: string; data: TriggerData }[]> = {};
 
     constructor(moduleId: string, applicationId: string, options: TriggerApplicationOptions = {}) {
         this.#mode = R.isIncludedIn(options.mode, APPLICATION_MODES) ? options.mode : "setting";
@@ -58,8 +63,22 @@ class TriggerApplication {
 
         this.#convertors = createCollection(options, "convertors");
         this.#entries = createCollection(options, "entries");
-        this.#hooks = new Collection();
         this.#nodes = createCollection(options, "nodes");
+
+        // hooks
+        this.#hooks = R.pipe(
+            [
+                ...(options.hooks ?? []), //
+                ...getBuiltins(options, "hooks").map(([_type, hook]) => hook),
+            ],
+            R.map((HookCls) => {
+                try {
+                    const hook = instantiateHook(this, HookCls);
+                    return { enabled: false, hook };
+                } catch (error: any) {}
+            }),
+            R.filter(R.isTruthy),
+        );
 
         // add mandatory stuff
         this.#nodes.set(ENTRY_GATE_TYPE, TriggerGateEntry);
@@ -83,6 +102,45 @@ class TriggerApplication {
         // setup settings
         if (this.isSettingApplication) {
             this.#setupSettings(options.setting);
+        }
+    }
+
+    static getApplicationKey(moduleId: string, applicationId: string): string | undefined {
+        if (
+            !R.isString(moduleId) || //
+            !R.isString(applicationId) ||
+            !game.modules.get(moduleId)?.active
+        )
+            return;
+
+        return `${moduleId}:${applicationId}`;
+    }
+
+    static register(moduleId: string, applicationId: string, options?: TriggerApplicationOptions) {
+        const applicationKey = this.getApplicationKey(moduleId, applicationId);
+        if (!applicationKey || this.#instances.has(applicationKey)) return;
+
+        const app = new TriggerApplication(moduleId, applicationId, options);
+        this.#instances.set(applicationKey, app);
+    }
+
+    static getApplication(moduleId: string, applicationId: string): TriggerApplication | undefined {
+        const applicationKey = this.getApplicationKey(moduleId, applicationId);
+        return applicationKey ? this.#instances.get(`${moduleId}:${applicationId}`) : undefined;
+    }
+
+    static async openBlueprintMenu(
+        moduleId: string,
+        applicationId: string,
+        source?: TriggerDataInput,
+    ): Promise<BlueprintApplication | undefined> {
+        const app = this.getApplication(moduleId, applicationId);
+        return app?.openMenu(source);
+    }
+
+    static prepareApplications() {
+        for (const application of this.#instances) {
+            application.prepare();
         }
     }
 
@@ -138,6 +196,92 @@ class TriggerApplication {
         return this.events.size > 1;
     }
 
+    prepare() {
+        const setting = this.getTriggersSetting();
+        if (!setting) return;
+
+        const { enabled, sources } = setting;
+        const triggers: TriggerData[] = R.pipe(
+            sources,
+            R.map((source) => {
+                if (!R.isObjectType(source) || !R.isIncludedIn(source.id, enabled)) return;
+                try {
+                    const trigger = this.createTrigger(source, false);
+                    return trigger?.test() && trigger.data;
+                } catch (error: any) {}
+            }),
+            R.filter(R.isTruthy),
+            // we sort them by priority
+            R.sortBy([(trigger) => trigger.priority, "desc"]),
+        );
+
+        this.#triggerEvents = {};
+        const events: string[] = [];
+        const otherNodes: string[] = [];
+
+        for (const trigger of triggers) {
+            for (const node of trigger.nodes) {
+                if (this.events.has(node.type)) {
+                    this.#triggerEvents[node.type] ??= [];
+                    this.#triggerEvents[node.type].push({
+                        data: trigger,
+                        eventId: node.id,
+                    });
+                    events.push(node.type);
+                } else {
+                    otherNodes.push(node.type);
+                }
+            }
+        }
+
+        MODULE.group(this.applicationKey);
+        MODULE.debug("PREPARE HOOKS:");
+        for (const hookData of this.#hooks) {
+            const hook = hookData.hook;
+            const wantedEvents = hook.events;
+            const wantedOtherNodes = hook.otherNodes;
+            const hookName = hook.name;
+
+            // previously enabled hooks are disabled
+            if (hookData.enabled) {
+                hook._disable();
+                hookData.enabled = false;
+            }
+
+            if (R.isArray(wantedEvents) && includesAny(events, wantedEvents)) {
+                hook._enable();
+                hookData.enabled = true;
+                MODULE.debug("[enabled]", hookName);
+            } else if (R.isArray(wantedOtherNodes) && includesAny(otherNodes, wantedOtherNodes)) {
+                hook._listen();
+                hookData.enabled = true;
+                MODULE.debug("[listening]", hookName);
+            } else {
+                MODULE.debug("[disabled]", hookName);
+            }
+        }
+        MODULE.groupEnd();
+    }
+
+    async executeEvent(event: string, args?: unknown) {
+        const triggers = this.#triggerEvents[event];
+        if (!triggers?.length) return;
+
+        const options = R.isObjectType(args) ? args : undefined;
+
+        for (const { data, eventId } of triggers) {
+            try {
+                const trigger = new Trigger(this, data);
+                const node = trigger.getNode(eventId);
+                if (!node) continue;
+
+                // we clone the options to avoid miss-handling downstream
+                const clonedOptions = foundry.utils.deepClone(options);
+                await node._execute(clonedOptions);
+            } catch (error: any) {}
+        }
+    }
+
     localize(...args: LocalizeArgs): string | undefined {
         const data = R.isObjectType(args.at(-1)) ? (args.pop() as LocalizeData) : undefined;
 
@@ -167,10 +311,12 @@ class TriggerApplication {
         }
     }
 
-    createTrigger(source: TriggerDataInput): OpenTrigger | null {
+    createTrigger(source: TriggerDataInput, open: true): OpenTrigger | null;
+    createTrigger(source: TriggerDataInput, open: false): Trigger | null;
+    createTrigger(source: TriggerDataInput, open: boolean): OpenTrigger | Trigger | null {
         try {
             const data = new TriggerData(source);
-            return new OpenTrigger(this, data);
+            return open ? new OpenTrigger(this, data) : new Trigger(this, data);
         } catch (error: any) {
             MODULE.error(`an error concurred while trying to create a Trigger.`, error);
             return null;
@@ -182,6 +328,17 @@ class TriggerApplication {
         return this.#convertors.get(key);
     }
 
+    getTriggersSetting(): TriggersSetting | undefined {
+        if (!this.isSettingApplication) return;
+
+        const setting = game.settings.get<Partial<TriggersSetting>>(this.moduleId, this.settingKey);
+
+        return {
+            enabled: setting.enabled?.slice() ?? [],
+            sources: utils.deepClone(setting?.sources ?? []),
+        };
+    }
+
     #getSettingApplication(): typeof BlueprintApplication | undefined {
         const menuKey = `${this.moduleId}.${this.settingMenuKey}`;
         return game.settings.menus.get(menuKey)?.type as typeof BlueprintApplication;
@@ -189,7 +346,7 @@ class TriggerApplication {
 
     #getFreeApplication(source: unknown): typeof BlueprintApplication | null {
         const self = this;
-        const test = this.createTrigger(R.isPlainObject(source) ? source : {});
+        const test = this.createTrigger(R.isPlainObject(source) ? source : {}, true);
         if (!test || test.invalid) return null;
 
         return class FreeBlueprintApplication extends BlueprintApplication {
@@ -219,7 +376,7 @@ class TriggerApplication {
             config: false,
             name: settingKey,
             onChange: () => {
-                // TODO prepareTriggers(R.values(APPLICATIONS));
+                TriggerApplication.prepareApplications();
             },
         });
 
@@ -229,11 +386,7 @@ class TriggerApplication {
             }
 
             getTriggersSetting(): TriggersSetting {
-                const setting = game.settings.get<Partial<TriggersSetting>>(moduleId, settingKey);
-                return {
-                    enabled: setting.enabled?.slice() ?? [],
-                    sources: utils.deepClone(setting?.sources ?? []),
-                };
+                return self.getTriggersSetting()!;
             }
         }
 
@@ -261,7 +414,7 @@ type TriggerApplicationOptions = TriggerApplicationCollections & {
 };
 
 type BuiltInOptions = {
-    [k in TriggerApplicationCollection]: true | (typeof BuiltInApplication)[k][number][0][];
+    [k in TriggerApplicationCollection]?: true | (typeof BuiltInApplication)[k][number][0][];
 };
 
 type ApplicationMenuOptions = {

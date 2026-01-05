@@ -207,9 +207,7 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
                 } else {
                     const output = otherNode.entries.outputs.find(({ schema: { key, type } }) => {
                         if (key !== otherEntryKey) return false;
-                        return (
-                            type === originType || !!this.application.getConvertor(type, originType)
-                        );
+                        return type === originType || !!this.application.getConvertor(type, originType);
                     });
 
                     if (!output) {
@@ -225,6 +223,10 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
             }
         }
     }
+}
+
+interface OpenTrigger {
+    get nodes(): Collection<OpenTriggerNode>;
 }
 
 export { OpenTrigger };
