@@ -129,7 +129,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
         return this;
     }
 
-    _onFirstRender(_context: object, _options: BlueprintRenderOptions) {
+    _onFirstRender() {
         this.bringToFront();
 
         // we wait one frame before initializing the canvas
@@ -158,7 +158,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
         return options.trigger ? this.#prepareTriggerContext(options.trigger) : this.#prepareTriggersContext(options);
     }
 
-    async _preFirstRender(_context: Record<string, unknown>, _options: BlueprintRenderOptions): Promise<void> {
+    async _preFirstRender(): Promise<void> {
         registerCustomElements("extended-multi-select", "extended-text-input");
         registerCustomElement("search-select-input", SearchSelectInputElement);
     }

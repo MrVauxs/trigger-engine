@@ -1,8 +1,7 @@
 import { MODULE } from "module-helpers";
 import { BuiltInTriggerHooks } from ".";
-import { TestEventExecuteOptions } from "..";
 
-class TestTriggerHook extends BuiltInTriggerHooks<TestEventExecuteOptions> {
+class TestTriggerHook extends BuiltInTriggerHooks {
     static get type(): "test-hook" {
         return "test-hook";
     }
@@ -13,15 +12,15 @@ class TestTriggerHook extends BuiltInTriggerHooks<TestEventExecuteOptions> {
 
     _enable(): void {
         MODULE.devExpose({
-            test: (args: TestEventExecuteOptions) => {
-                this.executeEvent("test-event", args);
+            test: (...args: any[]) => {
+                this.executeEvent("test-event", ...args);
             },
         });
     }
 
     _disable(): void {
         MODULE.devExpose({
-            test: (args: TestEventExecuteOptions) => {},
+            test: (...args: any[]) => {},
         });
     }
 }

@@ -25,6 +25,10 @@ class NodeBridge {
         return this.#schema;
     }
 
+    get slug(): string | undefined {
+        return this.schema.slug;
+    }
+
     get connection(): ConnectionId | undefined {
         return this.#category === "outputs" ? this.#nodeData.outs[this.key]?.connection : undefined;
     }

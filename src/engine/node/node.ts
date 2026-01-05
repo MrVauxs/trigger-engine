@@ -11,7 +11,7 @@ import {
 import { LocalizeArgs, MODULE } from "module-helpers";
 import { NodeData } from ".";
 
-class TriggerNode<TOuts extends string | never = "out"> {
+class TriggerNode {
     //////////////////////////////
     // ABSTRACT STATIC ACCESSORS
     //////////////////////////////
@@ -239,9 +239,18 @@ class TriggerNode<TOuts extends string | never = "out"> {
      *
      * @param output key of the `output` to set
      *
-     * @see {@link TriggerNode#_execute}
+     * @see {@link TriggerNode.defineOutputs}
      */
-    declare readonly setOutputValue: (output: string) => void;
+    declare readonly setOutputValue: (output: string, value: any) => void;
+
+    /**
+     * Set values for this node's custom outputs.
+     *
+     * @param slug slug of the custom outputs
+     *
+     * @see {@link TriggerNode.defineCustomOutputs}
+     */
+    declare readonly setCustomOutputValues: (slug: string, values: any[]) => void;
 
     //////////////////////////////
     // ABSTRACT METHODS

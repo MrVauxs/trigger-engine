@@ -275,6 +275,8 @@ class TriggerApplication {
                 const node = trigger.getNode(eventId);
                 if (!node) continue;
 
+                MODULE.debug("Execute Trigger", trigger);
+
                 // we clone the options to avoid miss-handling downstream
                 const clonedOptions = foundry.utils.deepClone(options);
                 await node._execute(clonedOptions);

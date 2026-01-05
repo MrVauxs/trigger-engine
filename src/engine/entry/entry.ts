@@ -100,7 +100,7 @@ class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<st
 
 interface NodeEntry
     extends
-        Pick<BaseEntrySchemaInput, "isArray" | "key" | "label" | "group" | "tooltip">,
+        Pick<BaseEntrySchemaInput, "isArray" | "key" | "label" | "group" | "slug" | "tooltip">,
         Pick<typeof NodeEntry, "type" | "color"> {
     readonly isArray: boolean;
 }

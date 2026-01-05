@@ -84,7 +84,7 @@ function instantiateEntry(
             // from schema accessors
             Object.defineProperties(
                 this,
-                R.fromKeys(["isArray", "key", "label", "group"] as const, (property) => {
+                R.fromKeys(["isArray", "key", "label", "group", "slug", "tooltip"] as const, (property) => {
                     return {
                         value: entrySchema[property],
                         configurable: false,

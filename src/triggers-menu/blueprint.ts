@@ -1,6 +1,5 @@
 import { ConnectionId, OpenTrigger, TriggerApplication, TriggerDataInput, TriggersSetting } from "engine";
 import {
-    MODULE,
     MouseInteractionManager,
     R,
     confirmDialog,
@@ -422,7 +421,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         }
     }
 
-    _onUnclickLeft(_event: FederatedEvent) {
+    _onUnclickLeft() {
         this.nodes.clearSelected();
     }
 

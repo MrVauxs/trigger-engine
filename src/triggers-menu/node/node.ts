@@ -157,11 +157,7 @@ class BlueprintNode extends PIXI.Container {
     }
 
     get title(): string | null {
-        return (
-            this.#node.exitGate?.data.custom.title ??
-            this.#node.data.custom.title ??
-            this.#node.title
-        );
+        return this.#node.exitGate?.data.custom.title ?? this.#node.data.custom.title ?? this.#node.title;
     }
 
     get label(): string {
@@ -443,7 +439,7 @@ class BlueprintNode extends PIXI.Container {
         }
     }
 
-    _onClickRight(event: FederatedEvent) {
+    _onClickRight() {
         this.blueprint.cancelMouse();
     }
 
@@ -500,7 +496,7 @@ class BlueprintNode extends PIXI.Container {
         }
     }
 
-    _onDragLeftDrop(event: FederatedEvent) {
+    _onDragLeftDrop() {
         this.blueprint.cancelMouse();
         this.parent.interactiveChildren = true;
     }
@@ -513,7 +509,7 @@ class BlueprintNode extends PIXI.Container {
         this.blueprint._onDragRightMove(event);
     }
 
-    _onDragRightDrop(event: FederatedEvent) {
+    _onDragRightDrop() {
         this.blueprint.cancelMouse();
     }
 
@@ -604,19 +600,13 @@ class BlueprintNode extends PIXI.Container {
         );
 
         const nbEntries = (section: [key: string, value: OpenNodeEntry[]][]): number => {
-            return R.sum(
-                section.map(([group, entries]) => entries.length + (group === "" ? 0 : 1)),
-            );
+            return R.sum(section.map(([group, entries]) => entries.length + (group === "" ? 0 : 1)));
         };
 
         const nbRows = Math.max(nbEntries(inputs) + minIndex, nbEntries(outputs) + outs.length);
         const rows: NodePart[] = R.times(nbRows, () => new PIXI.Container() as NodePart);
 
-        const addToRow = (
-            rowIndex: number,
-            column: 0 | 1,
-            el: BaseBlueprintEntry | PreciseText,
-        ) => {
+        const addToRow = (rowIndex: number, column: 0 | 1, el: BaseBlueprintEntry | PreciseText) => {
             const row = rows[rowIndex];
 
             if ("draw" in el) {
@@ -882,20 +872,12 @@ class BlueprintNode extends PIXI.Container {
         const label: CustomEntryDialogData["label"] = !schema.input?.replaceLabel && {
             value: "",
             placeholder:
-                this.#customEntryLocalize(schema.placeholder, category, schema, "placeholder") ??
-                schema.placeholder,
+                this.#customEntryLocalize(schema.placeholder, category, schema, "placeholder") ?? schema.placeholder,
         };
 
         const input: CustomEntryDialogData["input"] = schema.input && {
-            label:
-                this.#customEntryLocalize(schema.input.label, category, schema, "input.label") ??
-                "input",
-            placeholder: this.#customEntryLocalize(
-                schema.input.placeholder,
-                category,
-                schema,
-                "input.placeholder",
-            ),
+            label: this.#customEntryLocalize(schema.input.label, category, schema, "input.label") ?? "input",
+            placeholder: this.#customEntryLocalize(schema.input.placeholder, category, schema, "input.placeholder"),
             value: "",
         };
 
@@ -914,15 +896,12 @@ class BlueprintNode extends PIXI.Container {
 
             dialogData.array = (schema as BaseCustomEntrySchema).array ? {} : undefined;
 
-            dialogData.types = R.map(
-                selectedTypes?.length ? selectedTypes : availableTypes,
-                (type) => {
-                    return {
-                        value: type,
-                        label: this.rootLocalize("entry", type, "title") ?? type,
-                    };
-                },
-            );
+            dialogData.types = R.map(selectedTypes?.length ? selectedTypes : availableTypes, (type) => {
+                return {
+                    value: type,
+                    label: this.rootLocalize("entry", type, "title") ?? type,
+                };
+            });
         }
 
         const result = await waitDialog<{
@@ -970,11 +949,7 @@ class BlueprintNode extends PIXI.Container {
         }
 
         const parser =
-            category === "inputs"
-                ? zCustomInputData
-                : category === "outputs"
-                  ? zCustomOutputData
-                  : zCustomOutData;
+            category === "inputs" ? zCustomInputData : category === "outputs" ? zCustomOutputData : zCustomOutData;
 
         const entry = parser.safeParse(entrySchema)?.data;
         if (!entry) return;
@@ -1040,8 +1015,7 @@ class BlueprintNode extends PIXI.Container {
                 );
 
                 for (const schema of schemas) {
-                    const label =
-                        this.doubleLocalize(schema.label, category, schema.key) ?? schema.key;
+                    const label = this.doubleLocalize(schema.label, category, schema.key) ?? schema.key;
 
                     entries.push({
                         name: localize("blueprint.entry.add", { label }),

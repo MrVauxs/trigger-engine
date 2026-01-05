@@ -112,6 +112,8 @@ function instantiateNode(
                         ["executeNext", this.#executeNext],
                         ["localize", localize],
                         ["rootLocalize", rootLocalize],
+                        ["setOutputValue", this.#setOutputValue],
+                        ["setCustomOutputValues", this.#setCustomOutputValues],
                     ] as const,
                     R.fromEntries(),
                     R.mapValues((method) => {
@@ -242,6 +244,19 @@ function instantiateNode(
                 const id = `${parent.applicationKey}:${parent.id}:${this.id}`;
                 MODULE.error(`an error occurred while executing the node: ${id}`, error);
                 return true;
+            }
+        }
+
+        #setOutputValue(output: string, value: any) {
+            parent.setOutputValue(`${this.id}:outputs:${output}`, value);
+        }
+
+        #setCustomOutputValues(slug: string, values: any[]) {
+            const outputs = this.#outputs.filter((output) => output.slug === slug);
+
+            for (let i = 0; i < outputs.length; i++) {
+                const key = outputs[i].key;
+                this.#setOutputValue(key, values[i]);
             }
         }
     }
