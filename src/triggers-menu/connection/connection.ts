@@ -29,10 +29,7 @@ class BlueprintConnection extends PIXI.Graphics {
         const originCenter = this.parent.fromPoint(origin.connectorCenter);
         const targetCenter = this.parent.fromPoint(target.connectorCenter);
 
-        const halfPoint = drawCurvedLine(this, originCenter, targetCenter, [
-            origin.color,
-            target.color,
-        ]);
+        const halfPoint = drawCurvedLine(this, originCenter, targetCenter, [origin.color, target.color]);
 
         // we don't need a converter
         if (!isBlueprintEntry(origin) || origin.type === (target as BlueprintEntry).type) return;
@@ -57,10 +54,7 @@ class BlueprintConnection extends PIXI.Graphics {
             return converter;
         })());
 
-        converter.position.set(
-            halfPoint.x - converter.width / 2,
-            halfPoint.y - converter.height / 2
-        );
+        converter.position.set(halfPoint.x - converter.width / 2, halfPoint.y - converter.height / 2);
 
         this.addChild(converter);
     }
@@ -73,14 +67,24 @@ function drawCurvedLine(
     graphics: PIXI.Graphics,
     origin: Point,
     target: Point,
-    colors: [ColorSource] | [ColorSource, ColorSource]
+    colors: [ColorSource] | [ColorSource, ColorSource],
 ): Point {
     const halfPoint = calculateMidPoint(origin, target);
 
+    const changeLineStyle = (colorIndex: 0 | -1) => {
+        graphics.lineStyle({
+            alignment: 0.5,
+            cap: PIXI.LINE_CAP.ROUND,
+            color: colors.at(colorIndex),
+            smooth: true,
+            width: 6,
+        });
+    };
+
     graphics.moveTo(origin.x, origin.y);
-    graphics.lineStyle(6, colors.at(0), 1, 0.5);
+    changeLineStyle(0);
     graphics.quadraticCurveTo((origin.x + halfPoint.x) / 2, origin.y, halfPoint.x, halfPoint.y);
-    graphics.lineStyle(6, colors.at(-1), 1, 0.5);
+    changeLineStyle(-1);
     graphics.quadraticCurveTo((halfPoint.x + target.x) / 2, target.y, target.x, target.y);
 
     return halfPoint;
