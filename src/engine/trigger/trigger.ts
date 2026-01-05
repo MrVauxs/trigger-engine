@@ -20,6 +20,10 @@ class Trigger<TNode extends TriggerNode = TriggerNode> {
         return this.#parent;
     }
 
+    get applicationKey(): string {
+        return this.application.applicationKey;
+    }
+
     get data(): TriggerData {
         return this.#data;
     }

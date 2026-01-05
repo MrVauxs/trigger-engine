@@ -278,7 +278,10 @@ class TriggerApplication {
                 // we clone the options to avoid miss-handling downstream
                 const clonedOptions = foundry.utils.deepClone(options);
                 await node._execute(clonedOptions);
-            } catch (error: any) {}
+            } catch (error: any) {
+                const id = `${this.applicationKey}:${data.id}:${eventId}`;
+                MODULE.error(`an error occurred while executing the event: ${id}`, error);
+            }
         }
     }
 

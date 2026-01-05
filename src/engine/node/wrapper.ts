@@ -109,6 +109,7 @@ function instantiateNode(
                 this,
                 R.pipe(
                     [
+                        ["executeNext", this.#executeNext],
                         ["localize", localize],
                         ["rootLocalize", rootLocalize],
                     ] as const,
@@ -140,15 +141,15 @@ function instantiateNode(
             // bridges
             const [ins, outs] = R.map(
                 [
-                    !isEvent && NodeCls.hasIn ? [{ key: "in", state: undefined }] : [],
-                    getOutsSchemas(NodeCls, { data: nodeData, state: nodeState }),
+                    ["inputs", !isEvent && NodeCls.hasIn ? [{ key: "in", state: undefined }] : []],
+                    ["outputs", getOutsSchemas(NodeCls, { data: nodeData, state: nodeState })],
                 ] as const,
-                (schemas) => {
+                ([category, schemas]) => {
                     return R.pipe(
                         schemas,
                         R.map((schema) => {
                             try {
-                                const bridge = new NodeBridge(parent, this, schema);
+                                const bridge = new NodeBridge(category, nodeData, schema);
                                 return [bridge.key, bridge] as const;
                             } catch (error) {}
                         }),
@@ -225,6 +226,22 @@ function instantiateNode(
                         value: NodeCls.tags,
                     },
                 });
+            }
+        }
+
+        async #executeNext(out: string): Promise<boolean> {
+            try {
+                const connection = this.#outs.get(out)?.connection;
+                if (!connection) return true;
+
+                const [nodeId] = R.split(connection, ":");
+                const node = parent.getNode(nodeId);
+
+                return node?._execute() ?? true;
+            } catch (error: any) {
+                const id = `${parent.applicationKey}:${parent.id}:${this.id}`;
+                MODULE.error(`an error occurred while executing the node: ${id}`, error);
+                return true;
             }
         }
     }

@@ -1,10 +1,15 @@
-import { Trigger, TriggerNode } from "engine";
+import { ConnectionId, NodeData } from "engine";
 import { BridgeSchemaInput } from ".";
+import { EntryCategory } from "triggers-menu";
 
 class NodeBridge {
+    #category: EntryCategory;
     #schema: BridgeSchemaInput;
+    #nodeData: NodeData;
 
-    constructor(trigger: Trigger, parent: TriggerNode, schema: BridgeSchemaInput) {
+    constructor(category: EntryCategory, nodeData: NodeData, schema: BridgeSchemaInput) {
+        this.#category = category;
+        this.#nodeData = nodeData;
         this.#schema = schema;
     }
 
@@ -18,6 +23,10 @@ class NodeBridge {
 
     get schema(): BridgeSchemaInput {
         return this.#schema;
+    }
+
+    get connection(): ConnectionId | undefined {
+        return this.#category === "outputs" ? this.#nodeData.outs[this.key]?.connection : undefined;
     }
 }
 

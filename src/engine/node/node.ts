@@ -142,27 +142,6 @@ class TriggerNode<TOuts extends string | never = "out"> {
         return null;
     }
 
-    /**
-     * Adds an extra icon to the node to notify users of its special nature
-     */
-    static get canBreak(): boolean {
-        return false;
-    }
-
-    /**
-     * Adds an extra icon to the node to notify users of its special nature.
-     */
-    static get isLoop(): boolean {
-        return false;
-    }
-
-    /**
-     * Adds an extra icon to the node to notify users of its special nature
-     */
-    static get isAwait(): boolean {
-        return false;
-    }
-
     //////////////////////////////
     // ACCESSORS
     //////////////////////////////

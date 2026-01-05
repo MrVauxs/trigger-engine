@@ -2,9 +2,7 @@ import { NodeEntry, TriggerApplication, TriggerHook, TriggerNode } from "engine"
 import { MODULE } from "module-helpers";
 import { id } from "../module.json";
 
-console.log(id);
-
-MODULE.register("trigger-engine", { game: "triggerEngine" });
+MODULE.register(id, { game: "triggerEngine" });
 
 Hooks.once("init", async () => {
     const args = {
