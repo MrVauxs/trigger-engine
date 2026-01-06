@@ -111,6 +111,8 @@ function instantiateNode(
                 this,
                 R.pipe(
                     [
+                        ["getInputValue", this.#getInputValue],
+                        ["getCustomInputsValues", this.#getCustomInputsValues],
                         ["executeNext", this.#executeNext],
                         ["localize", localize],
                         ["rootLocalize", rootLocalize],
@@ -196,6 +198,26 @@ function instantiateNode(
                 },
             );
 
+            // some properties
+            Object.defineProperties(
+                this,
+                R.pipe(
+                    [
+                        ["triggerPath", parent.path],
+                        ["nodePath", `${parent.path}:${this.id}`],
+                    ] as const,
+                    R.fromEntries(),
+                    R.mapValues((value) => {
+                        return {
+                            value,
+                            configurable: false,
+                            enumerable: true,
+                            writable: false,
+                        };
+                    }),
+                ),
+            );
+
             this.#in = ins.at(0)?.[1] || null;
             this.#outs = new Collection(outs);
             this.#inputs = inputs;
@@ -233,20 +255,67 @@ function instantiateNode(
             }
         }
 
+        get #isExecutable(): boolean {
+            return !!this.#in || this.#outs.size > 0;
+        }
+
         async #executeNext(out: string): Promise<boolean> {
+            if (!this.#isExecutable) return true;
+
             try {
                 const connection = this.#outs.get(out)?.connection;
                 if (!connection) return true;
 
-                const [nodeId] = R.split(connection, ":");
-                const node = parent.getNode(nodeId);
-
+                const node = parent.getNodeFromEntryId(connection);
                 return node?._execute() ?? true;
             } catch (error: any) {
-                const id = `${parent.applicationKey}:${parent.id}:${this.id}`;
-                MODULE.error(`an error occurred while executing the node: ${id}`, error);
+                MODULE.error(`an error occurred while executing the node: ${this.nodePath}`, error);
                 return true;
             }
+        }
+
+        async #getInputValue(key: string): Promise<any> {
+            const input = this.#inputs.get(key);
+            if (!input) return;
+
+            const returnValue = (rawValue: any): any => {
+                if (input.isArray) {
+                    return R.pipe(
+                        R.isArray(rawValue) ? rawValue : [rawValue],
+                        R.filter(input.isValidType.bind(input)),
+                        R.map(input.processValue.bind(input)),
+                    );
+                } else {
+                    const value = R.isArray(rawValue) ? rawValue[0] : rawValue;
+                    return input.isValidType(value) ? input.processValue(value) : input.default;
+                }
+            };
+
+            if (input.connection) {
+                const [nodeId, _, otherKey] = R.split(input.connection, ":");
+                const otherNode = parent.getNode(nodeId) as TriggerNodeWrapper | undefined;
+
+                if (!otherNode) {
+                    return input.default;
+                }
+
+                const value = await otherNode.#getOutputValue(otherKey);
+                return returnValue(value);
+            } else {
+                return returnValue(input.value);
+            }
+        }
+
+        #getCustomInputsValues(slug: string): Promise<any[]> {
+            const results = this.#inputs
+                .filter((input) => input.slug === slug)
+                .map(async ({ key }) => this.#getInputValue(key));
+
+            return Promise.all(results);
+        }
+
+        async #getOutputValue(key: string): Promise<any> {
+            return this.#isExecutable ? this.#outputValues[key] : this._query(key);
         }
 
         #setOutputValue(key: string, value: any) {

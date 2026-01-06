@@ -1,6 +1,7 @@
 import { calculateMidPoint } from "module-helpers";
-import { BaseBlueprintEntry, BlueprintEntry, EntryId, isBlueprintEntry } from "triggers-menu";
+import { BaseBlueprintEntry, BlueprintEntry, isBlueprintEntry } from "triggers-menu";
 import { BlueprintConnectionsLayer } from ".";
+import { EntryId } from "engine";
 
 class BlueprintConnection extends PIXI.Graphics {
     #converter?: PIXI.Graphics;

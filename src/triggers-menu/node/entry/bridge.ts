@@ -1,6 +1,6 @@
-import { NodeBridge } from "engine";
+import { ConnectionId, NodeBridge, PreciseEntryCategory } from "engine";
 import { localize } from "module-helpers";
-import { BaseBlueprintEntry, EntryCategory, PreciseEntryCategory } from ".";
+import { BaseBlueprintEntry, EntryCategory } from ".";
 import { BlueprintNode } from "..";
 
 class BlueprintBridgeEntry extends BaseBlueprintEntry {
@@ -10,6 +10,10 @@ class BlueprintBridgeEntry extends BaseBlueprintEntry {
         super(parent, category);
 
         this.#data = data;
+    }
+
+    get connection(): ConnectionId | undefined {
+        return this.#data.connection;
     }
 
     get isConnectionInitiator(): boolean {

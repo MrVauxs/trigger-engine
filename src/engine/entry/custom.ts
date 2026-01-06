@@ -38,6 +38,7 @@ const zBaseSchema = z.object({
 const zBaseEntrySchema = zBaseSchema.extend({
     array: z.boolean().default(false),
     group: zString.optional(),
+    tooltip: z.string().trim().optional(),
     types: z.array(zString).default(() => []),
 });
 

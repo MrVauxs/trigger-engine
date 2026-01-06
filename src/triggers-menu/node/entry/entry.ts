@@ -33,6 +33,10 @@ class BlueprintEntry extends BaseBlueprintEntry {
         return this.#entry.schema;
     }
 
+    get connection() {
+        return this.#entry.connection;
+    }
+
     get label(): string {
         const variable = this.trigger.data.variables[this.id as ConnectionId]?.label;
         if (variable) return variable;
@@ -174,7 +178,7 @@ class BlueprintEntry extends BaseBlueprintEntry {
         };
 
         const node = this.node;
-        const rawValue = entry.data.value;
+        const rawValue = entry.value;
         const defaultValue = entry.default;
         const isConnected = this.isConnected;
         const options: NodeFieldOptions = {

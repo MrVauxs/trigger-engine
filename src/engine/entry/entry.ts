@@ -1,4 +1,4 @@
-import { BaseEntrySchemaOutput, NodeField, TriggerNode } from "engine";
+import { BaseEntrySchemaOutput, ConnectionId, NodeField, TriggerNode } from "engine";
 import { MODULE } from "module-helpers";
 
 class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<string, any> | undefined = undefined> {
@@ -110,7 +110,10 @@ class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<st
     }
 }
 
-interface NodeEntry
-    extends Omit<BaseEntrySchemaOutput, "hidden" | "state" | "type">, Pick<typeof NodeEntry, "type" | "color"> {}
+interface NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<string, any> | undefined = undefined>
+    extends Omit<BaseEntrySchemaOutput, "hidden" | "state" | "type">, Pick<typeof NodeEntry, "type" | "color"> {
+    get connection(): ConnectionId | undefined;
+    get value(): TValue | undefined;
+}
 
 export { NodeEntry };

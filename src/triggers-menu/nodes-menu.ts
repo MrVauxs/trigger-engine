@@ -3,6 +3,7 @@ import {
     BridgeSchemaInput,
     ConnectionId,
     ENTRY_GATE_TYPE,
+    EntryId,
     EXIT_GATE_TYPE,
     GATE_CATEGORY,
     getInputsSchemas,
@@ -16,6 +17,7 @@ import {
     NodeDataOutput,
     OpenTrigger,
     OpenTriggerNode,
+    PreciseEntryCategory,
     TriggerApplication,
     TriggerNode,
     VARIABLE_CATEGORY,
@@ -31,16 +33,7 @@ import {
     R,
     render,
 } from "module-helpers";
-import {
-    BaseBlueprintEntry,
-    Blueprint,
-    BlueprintEntry,
-    editLabelDialog,
-    EntryId,
-    filterElements,
-    isBlueprintEntry,
-    PreciseEntryCategory,
-} from ".";
+import { BaseBlueprintEntry, Blueprint, BlueprintEntry, editLabelDialog, filterElements, isBlueprintEntry } from ".";
 
 class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
     #abortController = new AbortController();
@@ -92,11 +85,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         return this.blueprint.trigger;
     }
 
-    static async wait(
-        blueprint: Blueprint,
-        position: Point,
-        entry?: BaseBlueprintEntry,
-    ): Promise<boolean | null> {
+    static async wait(blueprint: Blueprint, position: Point, entry?: BaseBlueprintEntry): Promise<boolean | null> {
         return new Promise((resolve: BlueprintNodesMenuResolve) => {
             new BlueprintNodesMenu(blueprint, position, resolve, entry).render(true);
         });
@@ -298,11 +287,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
             let hidden: { state: string | null; schema: T } | undefined;
 
             const schemaFn =
-                category === "outs"
-                    ? getOutsSchemas
-                    : category === "inputs"
-                      ? getInputsSchemas
-                      : getOutputsSchemas;
+                category === "outs" ? getOutsSchemas : category === "inputs" ? getInputsSchemas : getOutputsSchemas;
 
             for (const state of nodeStates) {
                 const schemas = schemaFn(OtherCls, { revealed: true, state }) as T[];
@@ -402,9 +387,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         }
 
         const entry = this.#entry;
-        const otherId: EntryId | undefined = otherIdSuffix
-            ? `${newNode.id}:${otherIdSuffix}`
-            : undefined;
+        const otherId: EntryId | undefined = otherIdSuffix ? `${newNode.id}:${otherIdSuffix}` : undefined;
 
         if (entry && otherId) {
             // we do it before creating the node so we don't have to update it
@@ -665,10 +648,7 @@ function localizeNodeProperty(
     return application.localize(path) ?? node[property];
 }
 
-function getNodePropertyLocalizePath(
-    node: typeof TriggerNode,
-    property: TriggerNodeStringProperty,
-): string {
+function getNodePropertyLocalizePath(node: typeof TriggerNode, property: TriggerNodeStringProperty): string {
     switch (property) {
         case "category": {
             return `category.${node.category}.title`;
@@ -685,17 +665,10 @@ function localizeNodeTag(application: TriggerApplication, tag: string): string {
 }
 
 type TriggerNodeStringProperty = keyof {
-    [P in keyof typeof TriggerNode as (typeof TriggerNode)[P] extends string
-        ? P
-        : never]: (typeof TriggerNode)[P];
+    [P in keyof typeof TriggerNode as (typeof TriggerNode)[P] extends string ? P : never]: (typeof TriggerNode)[P];
 };
 
-type EventAction =
-    | "create-gate"
-    | "paste-nodes"
-    | "select-gate"
-    | "select-node"
-    | "select-variable";
+type EventAction = "create-gate" | "paste-nodes" | "select-gate" | "select-node" | "select-variable";
 
 type NodesMenuContext = {
     events: NodesGroup[];

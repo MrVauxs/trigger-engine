@@ -1,7 +1,6 @@
 import {
     BaseEntrySchemaInput,
     NodeData,
-    NodeDataOutput,
     NodeEntry,
     NodeField,
     OpenTrigger,
@@ -81,6 +80,21 @@ function instantiateEntry(
 
             foundry.utils.deepFreeze(this.field);
 
+            // from data
+            Object.defineProperties(
+                this,
+                R.fromKeys(["connection", "value"] as const, (property) => {
+                    return {
+                        get() {
+                            return category === "inputs" ? nodeData.inputs[entrySchema.key]?.[property] : undefined;
+                        },
+                        configurable: false,
+                        enumerable: true,
+                        writable: false,
+                    };
+                }),
+            );
+
             // from schema accessors
             Object.defineProperties(
                 this,
@@ -112,11 +126,6 @@ function instantiateEntry(
                     category: {
                         value: category,
                     },
-                    data: {
-                        get() {
-                            return (category === "inputs" && nodeData.inputs[entrySchema.key]) || {};
-                        },
-                    },
                     schema: {
                         get() {
                             return entrySchema;
@@ -132,7 +141,6 @@ function instantiateEntry(
 
 interface OpenNodeEntry extends NodeEntry {
     category: EntryCategory;
-    get data(): ValueOf<NodeDataOutput["inputs"]>;
     get schema(): BaseEntrySchemaInput;
 }
 

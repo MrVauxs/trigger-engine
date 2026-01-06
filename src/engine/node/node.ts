@@ -149,6 +149,20 @@ class TriggerNode<
     }
 
     //////////////////////////////
+    // IMMUTABLE ACCESSORS
+    //////////////////////////////
+
+    /**
+     * The internal path for the parent trigger.
+     */
+    declare readonly triggerPath: string;
+
+    /**
+     * The internal path for the node.
+     */
+    declare readonly nodePath: string;
+
+    //////////////////////////////
     // ACCESSORS
     //////////////////////////////
 
@@ -221,7 +235,7 @@ class TriggerNode<
     declare readonly getInputValue: <K extends keyof TInputs>(input: K) => Promise<TInputs[K]>;
 
     // TODO
-    declare readonly setCustomInputsValues: (slug: TCustomInputs) => Promise<any[]>;
+    declare readonly getCustomInputsValues: (slug: TCustomInputs) => Promise<any[]>;
 
     /**
      * Localization helper with pre-defined path and optional (last argument) data object for `game.i18n.format`

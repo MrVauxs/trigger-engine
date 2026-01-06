@@ -1,9 +1,11 @@
 import {
     ConnectionId,
+    EntryCategory,
+    EntryId,
     isGateEntryNode,
     isGateExitNode,
-    isOppositeConnection,
     OpenTrigger,
+    PreciseEntryCategory,
 } from "engine";
 import { confirmDialog, localizePath, R } from "module-helpers";
 import { Blueprint } from "triggers-menu";
@@ -23,14 +25,15 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
         this.#parent = parent;
     }
 
+    abstract get canConnect(): boolean;
+    abstract get color(): ColorSource;
+    abstract get connection(): ConnectionId | undefined;
+    abstract get customSlug(): string | undefined;
+    abstract get hasConnector(): boolean;
+    abstract get isConnectionInitiator(): boolean;
+    abstract get isRevealed(): boolean;
     abstract get key(): string;
     abstract get label(): string;
-    abstract get color(): ColorSource;
-    abstract get canConnect(): boolean;
-    abstract get hasConnector(): boolean;
-    abstract get isRevealed(): boolean;
-    abstract get customSlug(): string | undefined;
-    abstract get isConnectionInitiator(): boolean;
 
     get id(): EntryId {
         return `${this.node.id}:${this.preciseCategory}:${this.key}`;
@@ -119,16 +122,6 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
         };
     }
 
-    get connection(): ConnectionId | undefined {
-        const key = this.key;
-        const category = this.preciseCategory;
-
-        return (
-            (isOppositeConnection(category) && this.node.data[category][key]?.connection) ||
-            undefined
-        );
-    }
-
     abstract _drawConnector(connector: PIXI.Graphics, isConnected: boolean): void;
     abstract _drawField(label: PreciseText): PIXI.Graphics | null;
 
@@ -187,16 +180,11 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
 
             for (const twoWays of this.node.trigger.linkedConnections) {
                 const [originId, targetId] = R.split(twoWays, "-");
-                const otherId =
-                    originId === entryId ? targetId : targetId === entryId ? originId : undefined;
+                const otherId = originId === entryId ? targetId : targetId === entryId ? originId : undefined;
                 const otherEntry = otherId && this.blueprint.nodes.getEntryFromId(otherId);
                 if (!otherEntry) continue;
 
-                otherEntry.node.removeConnection(
-                    otherEntry.preciseCategory,
-                    otherEntry.key,
-                    entryId,
-                );
+                otherEntry.node.removeConnection(otherEntry.preciseCategory, otherEntry.key, entryId);
             }
         }
 
@@ -207,18 +195,14 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
         const preciseCategory = this.preciseCategory;
         if (!this.isCustom || preciseCategory === "ins") return;
 
-        const nodes: (readonly [PreciseEntryCategory, BlueprintNode])[] = [
-            [preciseCategory, this.node],
-        ];
+        const nodes: (readonly [PreciseEntryCategory, BlueprintNode])[] = [[preciseCategory, this.node]];
 
         // we want to disconnect all the entry-gates too
         if (isGateExitNode(this.node)) {
             const oppositeCategory = this.oppositePreciseCategory;
 
             nodes.push(
-                ...this.node.parent
-                    .getGateEntries(this.node.id)
-                    .map((node) => [oppositeCategory, node] as const),
+                ...this.node.parent.getGateEntries(this.node.id).map((node) => [oppositeCategory, node] as const),
             );
         }
 
@@ -331,11 +315,5 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
     }
 }
 
-type EntryCategory = "inputs" | "outputs";
-
-type PreciseEntryCategory = "inputs" | "outputs" | "ins" | "outs";
-
-type EntryId = `${string}:${PreciseEntryCategory}:${string}`;
-
 export { BaseBlueprintEntry };
-export type { EntryCategory, EntryId, PreciseEntryCategory };
+export type { EntryCategory };

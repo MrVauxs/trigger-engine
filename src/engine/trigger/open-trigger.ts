@@ -1,5 +1,6 @@
 import {
     CreateNodeData,
+    EntryId,
     instantiateNode,
     isGateExitNode,
     isVariableGetterNode,
@@ -12,7 +13,7 @@ import {
     UpdateTriggerData,
 } from "engine";
 import { enrichHTML, MODULE, R } from "module-helpers";
-import { EntryId, TwoWaysEntryId } from "triggers-menu";
+import { TwoWaysEntryId } from "triggers-menu";
 
 class OpenTrigger extends Trigger<OpenTriggerNode> {
     #computed: boolean = false;
@@ -40,14 +41,6 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
                 } catch (error) {}
             }
         }
-    }
-
-    get applicationKey(): string {
-        return this.application.applicationKey;
-    }
-
-    get path(): string {
-        return `${this.applicationKey}:${this.id}`;
     }
 
     get linkedConnections(): Set<TwoWaysEntryId> {

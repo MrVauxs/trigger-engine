@@ -1,12 +1,6 @@
+import { EntryId } from "engine";
 import { subtractPoint } from "module-helpers";
-import {
-    BaseBlueprintEntry,
-    Blueprint,
-    BlueprintConnection,
-    BlueprintLayers,
-    drawCurvedLine,
-    EntryId,
-} from "triggers-menu";
+import { BaseBlueprintEntry, Blueprint, BlueprintConnection, BlueprintLayers, drawCurvedLine } from "triggers-menu";
 
 class BlueprintConnectionsLayer extends PIXI.Container {
     #abortController?: AbortController;

@@ -1,5 +1,6 @@
 import {
     ConnectionId,
+    EntryId,
     isGateEntryNode,
     isGateExitNode,
     NodeDataOutput,
@@ -7,7 +8,7 @@ import {
     OPPOSITE_CONNECTION_CATEGORY,
 } from "engine";
 import { info, R } from "module-helpers";
-import { BaseBlueprintEntry, BlueprintNode, EntryId } from ".";
+import { BaseBlueprintEntry, BlueprintNode } from ".";
 import { Blueprint, BlueprintLayers } from "..";
 
 class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
@@ -175,7 +176,7 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
         const replacementIds = R.pipe(
             sources,
             R.map((source) => source.id),
-            R.fromKeys(() => foundry.utils.randomID())
+            R.fromKeys(() => foundry.utils.randomID()),
         );
 
         for (const source of sources) {

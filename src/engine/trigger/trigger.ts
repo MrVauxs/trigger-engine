@@ -1,4 +1,5 @@
-import { TriggerApplication, TriggerData, TriggerDataOutput, TriggerNode, instantiateNode } from "engine";
+import { EntryId, TriggerApplication, TriggerData, TriggerDataOutput, TriggerNode, instantiateNode } from "engine";
+import { R } from "module-helpers";
 
 class Trigger<TNode extends TriggerNode = TriggerNode> {
     #data: TriggerData;
@@ -18,6 +19,10 @@ class Trigger<TNode extends TriggerNode = TriggerNode> {
 
     get application(): TriggerApplication {
         return this.#parent;
+    }
+
+    get path(): string {
+        return `${this.applicationKey}:${this.id}`;
     }
 
     get applicationKey(): string {
@@ -63,6 +68,11 @@ class Trigger<TNode extends TriggerNode = TriggerNode> {
         }
 
         return this.#nodes.get(id);
+    }
+
+    getNodeFromEntryId(id: EntryId): TNode | undefined {
+        const [nodeId] = R.split(id, ":");
+        return this.getNode(nodeId);
     }
 
     test(): boolean {
