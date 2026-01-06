@@ -38,10 +38,7 @@ class TextEntry extends BuiltInNodeEntry<string, TextFieldSchema> {
             return this.getSelectValue(this.field.default);
         }
 
-        return (
-            this.field.default ??
-            (this.field.type === "json" ? TextEntry.defaultJSON : super.default)
-        );
+        return this.field.default ?? (this.field.type === "json" ? TextEntry.defaultJSON : super.default);
     }
 
     get options(): EntrySelectOption[] {
@@ -52,9 +49,11 @@ class TextEntry extends BuiltInNodeEntry<string, TextFieldSchema> {
      * only called after we made sure this is a select
      */
     getSelectValue(value: string | undefined): string {
-        return this.options.find((option) => option.value === value)
-            ? (value as string)
-            : this.options[0].value;
+        return this.options.find((option) => option.value === value) ? (value as string) : this.options[0].value;
+    }
+
+    castValue(value: unknown): string {
+        return String(value || "");
     }
 
     isValidType(value: unknown): value is string {
@@ -87,9 +86,7 @@ class TextEntry extends BuiltInNodeEntry<string, TextFieldSchema> {
             const { path, exclude } = options;
             const prepared = this.#getOptionsFromPath(path);
 
-            return exclude?.length
-                ? prepared.filter(({ value }) => !R.isIncludedIn(value, exclude))
-                : prepared;
+            return exclude?.length ? prepared.filter(({ value }) => !R.isIncludedIn(value, exclude)) : prepared;
         }
 
         return [];

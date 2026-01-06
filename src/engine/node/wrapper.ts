@@ -86,6 +86,7 @@ function instantiateNode(
         #in: NodeBridge | null;
         #inputs: Collection<NodeEntry>;
         #outputs: Collection<NodeEntry>;
+        #outputValues: Record<string, any> = {};
         #outs: Collection<NodeBridge>;
 
         constructor() {
@@ -247,16 +248,16 @@ function instantiateNode(
             }
         }
 
-        #setOutputValue(output: string, value: any) {
-            parent.setOutputValue(`${this.id}:outputs:${output}`, value);
+        #setOutputValue(key: string, value: any) {
+            this.#outputValues[key] = this.#outputs.get("key")?.castValue(value);
         }
 
         #setCustomOutputValues(slug: string, values: any[]) {
             const outputs = this.#outputs.filter((output) => output.slug === slug);
 
             for (let i = 0; i < outputs.length; i++) {
-                const key = outputs[i].key;
-                this.#setOutputValue(key, values[i]);
+                const output = outputs[i];
+                this.#outputValues[output.key] = output.castValue(values[i]);
             }
         }
     }

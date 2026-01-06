@@ -1,4 +1,4 @@
-import { BaseEntrySchemaInput, NodeField } from "engine";
+import { BaseEntrySchemaInput, NodeField, TriggerNode } from "engine";
 import { MODULE } from "module-helpers";
 
 class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<string, any> | undefined = undefined> {
@@ -80,15 +80,25 @@ class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<st
 
     /**
      * @abstract
-     * @returns true if the provided value is of type `TValue`
+     * @returns true if the provided value is of type `TValue` excluding `undefined`.
      */
-    isValidType(value: unknown): value is TValue {
+    isValidType(value: unknown): value is Exclude<TValue, undefined> {
         throw MODULE.Error("Method not implemented.");
     }
 
     //////////////////////////////
     // METHODS
     //////////////////////////////
+
+    /**
+     * Cast the value from a different type.
+     *
+     * This is not equivalent to `EntryConvertor`, it doesn't necessarily expect `TValue`, but when setting an output
+     * value using {@link TriggerNode#setOutputValue}, it allows to provide a different type that will be cast here.
+     */
+    castValue(value: unknown): unknown {
+        return value;
+    }
 
     /**
      * Make the necessary modifications to the value to be used by the nodes.

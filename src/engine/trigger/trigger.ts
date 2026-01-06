@@ -1,9 +1,8 @@
-import { ConnectionId, TriggerApplication, TriggerData, TriggerDataOutput, TriggerNode, instantiateNode } from "engine";
+import { TriggerApplication, TriggerData, TriggerDataOutput, TriggerNode, instantiateNode } from "engine";
 
 class Trigger<TNode extends TriggerNode = TriggerNode> {
     #data: TriggerData;
     #nodes: Collection<TNode> = new Collection();
-    #outputValues: Record<string, any> = {};
     #parent: TriggerApplication;
 
     constructor(parent: TriggerApplication, data: TriggerData) {
@@ -64,14 +63,6 @@ class Trigger<TNode extends TriggerNode = TriggerNode> {
         }
 
         return this.#nodes.get(id);
-    }
-
-    setOutputValue(id: ConnectionId, value: any) {
-        this.#outputValues[id] = value;
-    }
-
-    getOutputValue(id: ConnectionId): any {
-        return this.#outputValues[id];
     }
 
     test(): boolean {
