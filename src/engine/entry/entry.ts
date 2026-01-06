@@ -1,4 +1,4 @@
-import { BaseEntrySchemaInput, NodeField, TriggerNode } from "engine";
+import { BaseEntrySchemaOutput, NodeField, TriggerNode } from "engine";
 import { MODULE } from "module-helpers";
 
 class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<string, any> | undefined = undefined> {
@@ -61,7 +61,7 @@ class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<st
     /**
      * @see {@link NodeEntry.default}
      *
-     * The default value of this instance.
+     * The default value of this instance. Should be modified by {@link NodeEntry#field}.
      */
     get default(): TValue {
         return (this.constructor as typeof NodeEntry).default as TValue;
@@ -102,6 +102,8 @@ class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<st
 
     /**
      * Make the necessary modifications to the value to be used by the nodes.
+     *
+     * This is called at the end of the chain and is mostly there to use {@link NodeEntry#field}.
      */
     processValue(value: TValue): TValue {
         return value;
@@ -109,10 +111,6 @@ class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<st
 }
 
 interface NodeEntry
-    extends
-        Pick<BaseEntrySchemaInput, "isArray" | "key" | "label" | "group" | "slug" | "tooltip">,
-        Pick<typeof NodeEntry, "type" | "color"> {
-    readonly isArray: boolean;
-}
+    extends Omit<BaseEntrySchemaOutput, "hidden" | "state" | "type">, Pick<typeof NodeEntry, "type" | "color"> {}
 
 export { NodeEntry };

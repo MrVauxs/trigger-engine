@@ -19,7 +19,7 @@ const zNodeInputSchema = zNodeEntrySchema.extend({
 });
 
 type BaseEntrySchemaInput = z.input<typeof zNodeEntrySchema>;
-type BaseEntrySchemaOutput = z.input<typeof zNodeEntrySchema>;
+type BaseEntrySchemaOutput = z.output<typeof zNodeEntrySchema>;
 
 type OutputEntrySchemaSource = BaseEntrySchemaInput;
 type OutputEntrySchema = BaseEntrySchemaOutput;

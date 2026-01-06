@@ -41,7 +41,7 @@ class BlueprintEntry extends BaseBlueprintEntry {
         return label ? game.i18n.localize(label) : (this.node.localize(this.category, key) ?? key);
     }
 
-    get isArray() {
+    get isArray(): boolean {
         return this.#entry.isArray;
     }
 
@@ -62,16 +62,12 @@ class BlueprintEntry extends BaseBlueprintEntry {
     }
 
     get FieldCls(): typeof NodeField | undefined {
-        const FieldCls = (this.#entry.constructor as typeof NodeEntry)
-            .FieldClass as typeof NodeField;
+        const FieldCls = (this.#entry.constructor as typeof NodeEntry).FieldClass as typeof NodeField;
         return FieldCls?.prototype instanceof NodeField ? FieldCls : undefined;
     }
 
     get hasConnector(): boolean {
-        return (
-            this.isOutput ||
-            (!this.node.isEvent && (!this.FieldCls || this.node.inputsHaveConnector))
-        );
+        return this.isOutput || (!this.node.isEvent && (!this.FieldCls || this.node.inputsHaveConnector));
     }
 
     get canConnect(): boolean {

@@ -27,7 +27,7 @@ function filterSchemasByState<T extends { state?: string }>(
     return state ? schemas.filter((schema) => !schema.state || schema.state === state) : schemas;
 }
 
-function parseSchemas<T extends BaseEntrySchemaInput | BridgeSchemaInput>(schemas: T[], parser: z.ZodObject): T[] {
+function parseSchemas(schemas: (BaseEntrySchemaInput | BridgeSchemaInput)[], parser: z.ZodObject) {
     return R.pipe(
         schemas,
         R.map((schema) => parser.safeParse(schema)?.data),
@@ -95,8 +95,8 @@ function getOutsSchemas(NodeCls: typeof TriggerNode, options?: SchemasFilterOpti
     return parseSchemas(filtered, zNodeBridgeSchema);
 }
 
-function getEntrySchemas<T extends BaseEntrySchemaInput>(
-    schemas: T[] | null,
+function getEntrySchemas(
+    schemas: BaseEntrySchemaInput[] | null,
     parser: z.ZodObject,
     options: SchemasFilterOptions,
     custom: {
@@ -104,14 +104,14 @@ function getEntrySchemas<T extends BaseEntrySchemaInput>(
         schemaParser: typeof zBaseEntrySchema;
         entries: Record<string, BaseCustomEntryData> | undefined;
     },
-): T[] {
+) {
     const filtered = filterSchemasByState(schemas ?? [], options).filter((schema) => {
         return !schema.hidden || options?.revealed === true || options?.revealed?.[schema.key] === true;
     });
 
     if (options?.data) {
         filtered.push(
-            ...filterByCustomSchemas(custom.rawSchemas, custom.schemaParser, custom.entries, (schema, entry): T => {
+            ...filterByCustomSchemas(custom.rawSchemas, custom.schemaParser, custom.entries, (schema, entry) => {
                 return {
                     field: (schema as CustomInputSchema).field,
                     group: schema.group,
