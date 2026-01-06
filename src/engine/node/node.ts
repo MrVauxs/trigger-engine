@@ -11,7 +11,13 @@ import {
 import { LocalizeArgs, MODULE } from "module-helpers";
 import { NodeData } from ".";
 
-class TriggerNode {
+class TriggerNode<
+    TOuts extends string | never = string,
+    TInputs extends Record<string, any> | never = Record<string, any>,
+    TOutputs extends Record<string, any> | never = Record<string, any>,
+    TCustomInputs extends string | never = string,
+    TCustomOutputs extends string | never = string,
+> {
     //////////////////////////////
     // ABSTRACT STATIC ACCESSORS
     //////////////////////////////
@@ -197,7 +203,7 @@ class TriggerNode {
      *
      * @see {@link TriggerNode#_execute}
      */
-    declare readonly executeNext: (out: string) => Promise<boolean>;
+    declare readonly executeNext: (out: TOuts) => Promise<boolean>;
 
     /**
      * Retrieve the computed value from one of this node's inputs.
@@ -212,7 +218,10 @@ class TriggerNode {
      *
      * @see {@link TriggerNode#_execute}
      */
-    declare readonly getInputValue: (input: string) => Promise<any>;
+    declare readonly getInputValue: <K extends keyof TInputs>(input: K) => Promise<TInputs[K]>;
+
+    // TODO
+    declare readonly setCustomInputsValues: (slug: TCustomInputs) => Promise<any[]>;
 
     /**
      * Localization helper with pre-defined path and optional (last argument) data object for `game.i18n.format`
@@ -241,16 +250,17 @@ class TriggerNode {
      *
      * @see {@link TriggerNode.defineOutputs}
      */
-    declare readonly setOutputValue: (output: string, value: any) => void;
+    declare readonly setOutputValue: <K extends keyof TOuts>(output: K, value: TOuts[K]) => void;
 
     /**
      * Set values for this node's custom outputs.
      *
-     * @param slug slug of the custom outputs
+     * @param slug of the custom outputs
+     * @param values array where each entry represents a one of the custom entry (same index order as seen in the node).
      *
      * @see {@link TriggerNode.defineCustomOutputs}
      */
-    declare readonly setCustomOutputValues: (slug: string, values: any[]) => void;
+    declare readonly setCustomOutputValues: (slug: TCustomOutputs, values: any[]) => void;
 
     //////////////////////////////
     // ABSTRACT METHODS

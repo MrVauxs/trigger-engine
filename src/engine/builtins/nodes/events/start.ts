@@ -2,7 +2,7 @@ import { IconObject } from "_zod";
 import { TriggerNode } from "engine";
 import { START_EVENT_TYPE } from "engine/application";
 
-class _StartTriggerNode extends TriggerNode {
+class _StartTriggerNode extends TriggerNode<"out"> {
     static get type(): string {
         return START_EVENT_TYPE;
     }

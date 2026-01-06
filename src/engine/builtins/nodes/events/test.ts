@@ -1,6 +1,6 @@
 import { TriggerNode } from "engine";
 
-class TestTriggerNode extends TriggerNode {
+class TestTriggerNode extends TriggerNode<"out"> {
     static get type(): "test-event" {
         return "test-event";
     }
