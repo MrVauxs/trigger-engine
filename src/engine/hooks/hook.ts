@@ -1,3 +1,4 @@
+import { ApplicationKey } from "engine";
 import { MODULE } from "module-helpers";
 
 class TriggerHook<TArgs extends Record<string, any> | never = never> {
@@ -25,6 +26,15 @@ class TriggerHook<TArgs extends Record<string, any> | never = never> {
     get otherNodes(): string[] {
         return [];
     }
+
+    //////////////////////////////
+    // IMMUTABLE ACCESSORS
+    //////////////////////////////
+
+    /**
+     * The internal key for the parent application.
+     */
+    declare readonly applicationKey: ApplicationKey;
 
     //////////////////////////////
     // ABSTRACT METHODS
@@ -64,7 +74,12 @@ class TriggerHook<TArgs extends Record<string, any> | never = never> {
     /**
      * Execute all triggers that have this event.
      */
-    declare executeEvent: (event: this["events"][number], args?: TArgs) => void;
+    declare executeEvent: (event: this["events"][number], args?: TArgs) => Promise<void>;
+
+    /**
+     * Execute the event of a specific trigger.
+     */
+    declare executeTriggerEvent: (triggerId: string, event: this["events"][number], args?: TArgs) => Promise<void>;
 }
 
 export { TriggerHook };

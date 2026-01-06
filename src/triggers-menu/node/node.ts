@@ -181,7 +181,7 @@ class BlueprintNode extends PIXI.Container {
     }
 
     get outerPadding(): Point {
-        return { x: 6, y: 4 };
+        return { x: 8, y: 4 };
     }
 
     get opacity(): number {

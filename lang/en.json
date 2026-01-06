@@ -1,4 +1,13 @@
 {
+    "TYPES": {
+        "RegionBehavior": {
+            "trigger-engine": {
+                "builtins": {
+                    "region": "Trigger Engine"
+                }
+            }
+        }
+    },
     "trigger-engine": {
         "blueprint": {
             "entry": {
@@ -119,15 +128,27 @@
                     }
                 },
                 "event": {
+                    "region-event": {
+                        "title": "Scene Region",
+                        "outputs": {
+                            "event": "Event"
+                        }
+                    },
                     "test-event": {
                         "title": "Test Event",
                         "subtitle": "game.trigger.test()"
                     }
                 }
             },
+            "region": {
+                "path": "Trigger Path"
+            },
             "tag": {
                 "debug": {
                     "title": "Debug"
+                },
+                "region": {
+                    "title": "Region"
                 }
             }
         },

@@ -1,7 +1,7 @@
+import { TriggerHook } from "engine";
 import { MODULE } from "module-helpers";
-import { BuiltInTriggerHooks } from ".";
 
-class TestTriggerHook extends BuiltInTriggerHooks {
+class TestHook extends TriggerHook {
     static get type(): "test-hook" {
         return "test-hook";
     }
@@ -25,4 +25,4 @@ class TestTriggerHook extends BuiltInTriggerHooks {
     }
 }
 
-export { TestTriggerHook };
+export { TestHook };

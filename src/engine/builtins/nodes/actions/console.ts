@@ -23,8 +23,8 @@ class ConsoleActionNode extends BaseActionNode<"out", never, never, "input"> {
         const values = await this.getCustomInputsValues("input");
 
         MODULE.group(this.nodePath);
-        for (const value of values) {
-            MODULE.log(value);
+        for (const { label, value } of values) {
+            MODULE.log(`${label}:`, value);
         }
         MODULE.groupEnd();
 

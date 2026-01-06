@@ -36,7 +36,7 @@ class TriggerApplication {
     static #instances: Collection<TriggerApplication> = new Collection();
 
     #applicationId: string;
-    #applicationKey: string;
+    #applicationKey: ApplicationKey;
     #convertors: Collection<EntryConvertor>;
     #entries: Collection<typeof NodeEntry>;
     #events: Collection<typeof TriggerNode>;
@@ -160,7 +160,7 @@ class TriggerApplication {
         return this.#applicationId;
     }
 
-    get applicationKey(): string {
+    get applicationKey(): ApplicationKey {
         return this.#applicationKey;
     }
 
@@ -270,21 +270,18 @@ class TriggerApplication {
         const options = R.isObjectType(args) ? args : undefined;
 
         for (const { data, eventId } of triggers) {
-            try {
-                const trigger = new Trigger(this, data);
-                const node = trigger.getNode(eventId);
-                if (!node) continue;
-
-                MODULE.debug("Execute Trigger", trigger);
-
-                // we clone the options to avoid miss-handling downstream
-                const clonedOptions = foundry.utils.deepClone(options);
-                await node._execute(clonedOptions);
-            } catch (error: any) {
-                const id = `${this.applicationKey}:${data.id}:${eventId}`;
-                MODULE.error(`an error occurred while executing the event: ${id}`, error);
-            }
+            await this.#execute(data, eventId, options);
         }
+    }
+
+    async executeTriggerEvent(triggerId: string, event: string, args?: unknown) {
+        const trigger = this.#triggerEvents[event]?.find(({ data }) => data.id === triggerId);
+        if (!trigger) return;
+
+        const { data, eventId } = trigger;
+        const options = R.isObjectType(args) ? args : undefined;
+
+        await this.#execute(data, eventId, options);
     }
 
     localize(...args: LocalizeArgs): string | undefined {
@@ -368,6 +365,23 @@ class TriggerApplication {
         };
     }
 
+    async #execute(data: TriggerData, eventId: string, options: object | undefined) {
+        try {
+            const trigger = new Trigger(this, data);
+            const node = trigger.getNode(eventId);
+            if (!node) return;
+
+            MODULE.debug("Execute Trigger", trigger);
+
+            // we clone the options to avoid miss-handling downstream
+            const clonedOptions = foundry.utils.deepClone(options);
+            await node._execute(clonedOptions);
+        } catch (error: any) {
+            const id = `${this.applicationKey}:${data.id}:${eventId}`;
+            MODULE.error(`an error occurred while executing the event: ${id}`, error);
+        }
+    }
+
     #setupSettings({ hint, icon, label, name }: ApplicationMenuOptions = {}) {
         const self = this;
         const moduleId = this.moduleId;
@@ -436,5 +450,7 @@ type TriggersSetting = {
 
 type TriggerApplicationMode = (typeof APPLICATION_MODES)[number] | "builtin";
 
+type ApplicationKey = `${string}:${string}`;
+
 export { TriggerApplication };
-export type { ApplicationParentType, TriggerApplicationOptions, TriggersSetting };
+export type { ApplicationKey, ApplicationParentType, TriggerApplicationOptions, TriggersSetting };

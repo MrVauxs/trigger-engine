@@ -1,4 +1,12 @@
-import { EntryId, TriggerApplication, TriggerData, TriggerDataOutput, TriggerNode, instantiateNode } from "engine";
+import {
+    ApplicationKey,
+    EntryId,
+    TriggerApplication,
+    TriggerData,
+    TriggerDataOutput,
+    TriggerNode,
+    instantiateNode,
+} from "engine";
 import { R } from "module-helpers";
 
 class Trigger<TNode extends TriggerNode = TriggerNode> {
@@ -21,11 +29,11 @@ class Trigger<TNode extends TriggerNode = TriggerNode> {
         return this.#parent;
     }
 
-    get path(): string {
+    get path(): TriggerPath {
         return `${this.applicationKey}:${this.id}`;
     }
 
-    get applicationKey(): string {
+    get applicationKey(): ApplicationKey {
         return this.application.applicationKey;
     }
 
@@ -88,6 +96,7 @@ class Trigger<TNode extends TriggerNode = TriggerNode> {
     }
 }
 
-interface Trigger {}
+type TriggerPath = `${ApplicationKey}:${string}`;
 
 export { Trigger };
+export type { TriggerPath };

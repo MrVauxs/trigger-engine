@@ -203,8 +203,8 @@ function instantiateNode(
                 this,
                 R.pipe(
                     [
-                        ["triggerPath", parent.path],
                         ["nodePath", `${parent.path}:${this.id}`],
+                        ["triggerPath", parent.path],
                     ] as const,
                     R.fromEntries(),
                     R.mapValues((value) => {
@@ -306,10 +306,15 @@ function instantiateNode(
             }
         }
 
-        #getCustomInputsValues(slug: string): Promise<any[]> {
+        #getCustomInputsValues(slug: string): Promise<{ label: string; value: any }[]> {
             const results = this.#inputs
                 .filter((input) => input.slug === slug)
-                .map(async ({ key }) => this.#getInputValue(key));
+                .map(async ({ key, label }): Promise<{ label: string; value: any }> => {
+                    return {
+                        label: label ?? "",
+                        value: await this.#getInputValue(key),
+                    };
+                });
 
             return Promise.all(results);
         }

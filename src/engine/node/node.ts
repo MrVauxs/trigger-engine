@@ -7,6 +7,7 @@ import {
     InputEntrySchemaSource,
     NodeField,
     OutputEntrySchemaSource,
+    TriggerPath,
 } from "engine";
 import { LocalizeArgs, MODULE } from "module-helpers";
 import { NodeData } from ".";
@@ -155,12 +156,12 @@ class TriggerNode<
     /**
      * The internal path for the parent trigger.
      */
-    declare readonly triggerPath: string;
+    declare readonly triggerPath: TriggerPath;
 
     /**
      * The internal path for the node.
      */
-    declare readonly nodePath: string;
+    declare readonly nodePath: TriggerNodePath;
 
     //////////////////////////////
     // ACCESSORS
@@ -235,7 +236,7 @@ class TriggerNode<
     declare readonly getInputValue: <K extends keyof TInputs>(input: K) => Promise<TInputs[K]>;
 
     // TODO
-    declare readonly getCustomInputsValues: (slug: TCustomInputs) => Promise<any[]>;
+    declare readonly getCustomInputsValues: (slug: TCustomInputs) => Promise<{ label: string; value: any }[]>;
 
     /**
      * Localization helper with pre-defined path and optional (last argument) data object for `game.i18n.format`
@@ -315,4 +316,7 @@ class TriggerNode<
 interface TriggerNode
     extends Pick<NodeData, "id" | "invalid">, Pick<typeof TriggerNode, "category" | "isEvent" | "type"> {}
 
+type TriggerNodePath = `${TriggerPath}:${string}`;
+
 export { TriggerNode };
+export type { TriggerNodePath };

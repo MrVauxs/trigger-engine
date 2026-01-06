@@ -1,4 +1,4 @@
-import { TriggerApplication } from "engine";
+import { TriggerApplication, TriggerPath } from "engine";
 import { R } from "module-helpers";
 import { TriggerHook } from ".";
 
@@ -16,11 +16,34 @@ function instantiateHook(parent: TriggerApplication, HookCls: typeof TriggerHook
                 },
             });
 
+            // some properties
+            Object.defineProperties(
+                this,
+                R.pipe(
+                    [
+                        ["name", HookCls.name],
+                        ["applicationKey", parent.applicationKey],
+                    ] as const,
+                    R.fromEntries(),
+                    R.mapValues((value) => {
+                        return {
+                            value,
+                            configurable: false,
+                            enumerable: true,
+                            writable: false,
+                        };
+                    }),
+                ),
+            );
+
             // from private methods
             Object.defineProperties(
                 this,
                 R.pipe(
-                    [["executeEvent", this.#executeEvent]] as const,
+                    [
+                        ["executeEvent", this.#executeEvent],
+                        ["executeTriggerEvent", this.#executeTriggerEvent],
+                    ] as const,
                     R.fromEntries(),
                     R.mapValues((method) => {
                         return {
@@ -36,6 +59,10 @@ function instantiateHook(parent: TriggerApplication, HookCls: typeof TriggerHook
 
         #executeEvent(event: string, args?: unknown) {
             parent.executeEvent(event, args);
+        }
+
+        #executeTriggerEvent(triggerId: string, event: string, args?: unknown) {
+            parent.executeTriggerEvent(triggerId, event, args);
         }
     }
 

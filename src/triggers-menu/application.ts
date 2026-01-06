@@ -219,6 +219,10 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
                 return this.collapseWindow();
             }
 
+            case "copy-path": {
+                return this.#copyTriggerPath(target);
+            }
+
             case "create-trigger": {
                 const folder = target.dataset.folder;
                 return this.#editTrigger(folder);
@@ -434,6 +438,12 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
         el.innerHTML = (await trigger?.enrichedDescription) || "<div></div>";
     }
 
+    #copyTriggerPath(el: HTMLElement) {
+        const path = el.dataset.path as string;
+        game.clipboard.copyPlainText(path);
+        return info("blueprint.trigger.copy.notify", { path });
+    }
+
     #createContextMenus() {
         this._createContextMenu(this.#triggerContextMenu, ".sidebar.triggers .trigger");
 
@@ -505,11 +515,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
             {
                 icon: `<i class="fa-solid fa-clipboard"></i>`,
                 name: localizePath("blueprint.trigger.copy.label"),
-                callback: (el) => {
-                    const path = el.dataset.path as string;
-                    game.clipboard.copyPlainText(path);
-                    return info("blueprint.trigger.copy.notify", { path });
-                },
+                callback: this.#copyTriggerPath.bind(this),
             },
             {
                 icon: `<i class="fa-solid fa-pen-to-square"></i>`,
@@ -777,6 +783,7 @@ type EventAction =
     | "back-menu"
     | "close-window"
     | "collapse-window"
+    | "copy-path"
     | "create-trigger"
     | "edit-trigger"
     | "expand-window"
