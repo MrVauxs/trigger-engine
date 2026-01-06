@@ -1,6 +1,7 @@
 import { NodeEntry, TriggerApplication, TriggerHook, TriggerNode } from "engine";
 import { MODULE } from "module-helpers";
 import { id } from "../module.json";
+import { registerPF2eApplication } from "pf2e";
 
 MODULE.register(id, { game: "triggerEngine" });
 
@@ -9,6 +10,10 @@ Hooks.once("init", async () => {
         registerApplication: TriggerApplication.register.bind(TriggerApplication),
     };
     Hooks.callAll("triggerEngine.init", args);
+
+    if (game.system.id === "pf2e") {
+        registerPF2eApplication();
+    }
 });
 
 Hooks.once("setup", async () => {
