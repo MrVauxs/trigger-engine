@@ -90,7 +90,6 @@ function instantiateEntry(
                         },
                         configurable: false,
                         enumerable: true,
-                        writable: false,
                     };
                 }),
             );

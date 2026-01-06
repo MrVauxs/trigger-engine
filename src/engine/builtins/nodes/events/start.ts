@@ -2,7 +2,7 @@ import { IconObject } from "_zod";
 import { TriggerNode } from "engine";
 import { START_EVENT_TYPE } from "engine/application";
 
-class _StartTriggerNode extends TriggerNode<"out"> {
+class _StartEventNode extends TriggerNode<"out"> {
     static get type(): string {
         return START_EVENT_TYPE;
     }
@@ -21,10 +21,6 @@ class _StartTriggerNode extends TriggerNode<"out"> {
     _execute(): Promise<boolean> {
         return this.executeNext("out");
     }
-
-    _query(): Promise<any> {
-        throw new Error("Method not implemented.");
-    }
 }
 
-export { _StartTriggerNode };
+export { _StartEventNode };

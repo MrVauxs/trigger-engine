@@ -3,7 +3,7 @@ import { z, zString } from "module-helpers";
 
 const zNodeHeaderBackground = z.union([
     z.number(),
-    z.string().regex(/^#[0-9A-F]{6}$/) as zTypedString<`#${string}`>,
+    z.string().regex(/^#[0-9A-Fa-f]{6}$/) as zTypedString<`#${string}`>,
 ]);
 
 const zNodeIconData = z.union([
@@ -14,7 +14,7 @@ const zNodeIconData = z.union([
 ]);
 
 const zNodeHeaderData = z.object({
-    background: zNodeHeaderBackground.default("#000000"),
+    background: zNodeHeaderBackground.default("#000000").catch("#000000"),
     icon: zNodeIconData.nullish(),
     subtitle: z.string().nullish(),
     title: zString,

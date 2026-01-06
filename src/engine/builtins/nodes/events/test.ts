@@ -1,6 +1,6 @@
 import { TriggerNode } from "engine";
 
-class TestTriggerNode extends TriggerNode<"out"> {
+class TestEventNode extends TriggerNode<"out"> {
     static get type(): "test-event" {
         return "test-event";
     }
@@ -20,10 +20,6 @@ class TestTriggerNode extends TriggerNode<"out"> {
     _execute(): Promise<boolean> {
         return this.executeNext("out");
     }
-
-    _query(): Promise<any> {
-        throw new Error("Method not implemented.");
-    }
 }
 
-export { TestTriggerNode };
+export { TestEventNode };

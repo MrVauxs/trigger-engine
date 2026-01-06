@@ -1,5 +1,5 @@
 import {
-    _StartTriggerNode,
+    _StartEventNode,
     BuiltInApplication,
     createCollection,
     createConvertorKey,
@@ -95,8 +95,8 @@ class TriggerApplication {
 
         // if no event in the application, we had a default one
         if (!this.#events.size) {
-            this.#events.set(_StartTriggerNode.type, _StartTriggerNode as typeof TriggerNode);
-            this.#nodes.set(_StartTriggerNode.type, _StartTriggerNode as typeof TriggerNode);
+            this.#events.set(_StartEventNode.type, _StartEventNode as typeof TriggerNode);
+            this.#nodes.set(_StartEventNode.type, _StartEventNode as typeof TriggerNode);
         }
 
         // setup settings

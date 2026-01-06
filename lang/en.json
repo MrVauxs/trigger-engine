@@ -85,6 +85,11 @@
             }
         },
         "builtins": {
+            "category": {
+                "action": {
+                    "title": "Action"
+                }
+            },
             "entry": {
                 "boolean": {
                     "title": "Boolean"
@@ -106,6 +111,11 @@
                     },
                     "__gate_exit__": {
                         "subtitle": "Exit Gate"
+                    }
+                },
+                "action": {
+                    "console-log": {
+                        "title": "Console Log"
                     }
                 },
                 "event": {

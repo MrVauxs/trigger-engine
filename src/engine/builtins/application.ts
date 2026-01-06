@@ -1,6 +1,6 @@
 import { mapConvertors } from "engine";
 import { MODULE, R } from "module-helpers";
-import { BooleanEntry, convertors, NumberEntry, TestTriggerHook, TestTriggerNode, TextEntry } from ".";
+import { BooleanEntry, convertors, NumberEntry, TestTriggerHook, TestEventNode, TextEntry, ConsoleActionNode } from ".";
 
 class BuiltInApplication {
     static get moduleId(): string {
@@ -21,7 +21,7 @@ class BuiltInApplication {
 
     static entries = R.map([BooleanEntry, NumberEntry, TextEntry], (entry) => [entry.type, entry] as const);
 
-    static nodes = R.map([TestTriggerNode], (node) => [node.type, node] as const);
+    static nodes = R.map([ConsoleActionNode, TestEventNode], (node) => [node.type, node] as const);
 
     static convertors = mapConvertors(convertors);
 
