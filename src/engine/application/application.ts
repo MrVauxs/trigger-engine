@@ -95,8 +95,8 @@ class TriggerApplication {
 
         // if no event in the application, we had a default one
         if (!this.#events.size) {
-            this.#events.set(_StartTriggerNode.type, _StartTriggerNode);
-            this.#nodes.set(_StartTriggerNode.type, _StartTriggerNode);
+            this.#events.set(_StartTriggerNode.type, _StartTriggerNode as typeof TriggerNode);
+            this.#nodes.set(_StartTriggerNode.type, _StartTriggerNode as typeof TriggerNode);
         }
 
         // setup settings
@@ -396,13 +396,13 @@ class TriggerApplication {
         }
 
         const settingPath = (...path: string[]): string => {
-            return `${moduleId}.${applicationId}.${path.join(".")}`;
+            return `${moduleId}.${applicationId}.setting.${path.join(".")}`;
         };
 
         game.settings.registerMenu(moduleId, this.settingMenuKey, {
-            name: name ?? settingPath(applicationId, "name"),
-            label: label ?? settingPath(applicationId, "label"),
-            hint: hint ?? settingPath(applicationId, "hint"),
+            name: name ?? settingPath("name"),
+            label: label ?? settingPath("label"),
+            hint: hint ?? settingPath("hint"),
             icon: icon ?? "fas fa-cogs",
             restricted: true,
             type: SettingBlueprintApplication,

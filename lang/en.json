@@ -92,6 +92,9 @@
                 "number": {
                     "title": "Number"
                 },
+                "target": {
+                    "title": "Target"
+                },
                 "text": {
                     "title": "Text"
                 }
@@ -207,6 +210,13 @@
             },
             "tags": {
                 "label": "Filter Tags"
+            }
+        },
+        "pf2e-trigger": {
+            "setting": {
+                "hint": "Register you own triggers with the module.",
+                "label": "Register Triggers",
+                "name": "PF2e Triggers Menu"
             }
         },
         "save-triggers": {
