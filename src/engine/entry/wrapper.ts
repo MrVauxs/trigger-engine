@@ -80,6 +80,13 @@ function instantiateEntry(
 
             foundry.utils.deepFreeze(this.field);
 
+            Object.defineProperty(this, "category", {
+                value: category,
+                configurable: false,
+                enumerable: true,
+                writable: false,
+            });
+
             // from data
             Object.defineProperties(
                 this,
@@ -122,9 +129,6 @@ function instantiateEntry(
 
             if (open) {
                 Object.defineProperties(this, {
-                    category: {
-                        value: category,
-                    },
                     schema: {
                         get() {
                             return entrySchema;
@@ -139,7 +143,6 @@ function instantiateEntry(
 }
 
 interface OpenNodeEntry extends NodeEntry {
-    category: EntryCategory;
     get schema(): BaseEntrySchemaInput;
 }
 

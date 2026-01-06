@@ -1,4 +1,4 @@
-import { BaseEntrySchemaOutput, ConnectionId, NodeField, TriggerNode } from "engine";
+import { BaseEntrySchemaOutput, ConnectionId, EntryCategory, NodeField, TriggerNode } from "engine";
 import { MODULE } from "module-helpers";
 
 class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<string, any> | undefined = undefined> {
@@ -67,13 +67,6 @@ class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<st
         return (this.constructor as typeof NodeEntry).default as TValue;
     }
 
-    /**
-     * Tooltip to display when the entry is hovered over.
-     */
-    get generatedTooltip(): string | HTMLElement | undefined {
-        return this.tooltip;
-    }
-
     //////////////////////////////
     // ABSTRACT METHODS
     //////////////////////////////
@@ -101,6 +94,13 @@ class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<st
     }
 
     /**
+     * Tooltip to display when the entry is hovered over.
+     */
+    generateTooltip(label: string, isConnected: boolean): string | HTMLElement | undefined {
+        return this.tooltip;
+    }
+
+    /**
      * Make the necessary modifications to the value to be used by the nodes.
      *
      * This is called at the end of the chain and is mostly there to use {@link NodeEntry#field}.
@@ -112,6 +112,7 @@ class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<st
 
 interface NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<string, any> | undefined = undefined>
     extends Omit<BaseEntrySchemaOutput, "hidden" | "state" | "type">, Pick<typeof NodeEntry, "type" | "color"> {
+    readonly category: EntryCategory;
     get connection(): ConnectionId | undefined;
     get value(): TValue | undefined;
 }

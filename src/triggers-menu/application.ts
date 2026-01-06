@@ -183,7 +183,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
             const wrapper = createHTMLElement("div", {
                 classes: ["ui"],
                 content: result + description,
-                dataset: { tooltipClass: "pf2e", tooltipDirection: "UP" },
+                dataset: { tooltipClass: "trigger-engine-field-tooltip", tooltipDirection: "UP" },
             });
 
             content.appendChild(wrapper);

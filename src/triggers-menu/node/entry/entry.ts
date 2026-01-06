@@ -100,7 +100,7 @@ class BlueprintEntry extends BaseBlueprintEntry {
         this.on("pointerenter", (event) => {
             event.stopPropagation();
 
-            const tooltip = this.#entry.generatedTooltip;
+            const tooltip = this.#entry.generateTooltip(this.label, this.isConnected);
             if (!tooltip) return;
 
             const offset = 5 * this.blueprint.scale;

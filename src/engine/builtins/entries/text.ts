@@ -45,6 +45,16 @@ class TextEntry extends BuiltInNodeEntry<string, TextFieldSchema> {
         return (this.#options ??= this.#prepareOptions());
     }
 
+    generateTooltip(label: string, isConnected: boolean): string | undefined {
+        if (
+            this.category === "inputs" &&
+            (this.isSelect || isConnected || (R.isString(this.value) && this.value !== this.default))
+        ) {
+            return this.tooltip ? `<div>${label}</div><hr><div>${this.tooltip}</div>` : label;
+        }
+        return this.tooltip;
+    }
+
     /**
      * only called after we made sure this is a select
      */
