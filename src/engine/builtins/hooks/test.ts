@@ -1,5 +1,4 @@
-import { TriggerHook } from "engine";
-import { MODULE } from "module-helpers";
+import { TestEventNode, TriggerHook } from "engine";
 
 class TestHook extends TriggerHook {
     static get type(): "test-hook" {
@@ -11,17 +10,13 @@ class TestHook extends TriggerHook {
     }
 
     _enable(): void {
-        MODULE.devExpose({
-            test: () => {
-                this.executeEvent("test-event");
-            },
+        foundry.utils.setProperty(globalThis, TestEventNode.functionPath, () => {
+            this.executeEvent("test-event");
         });
     }
 
     _disable(): void {
-        MODULE.devExpose({
-            test: () => {},
-        });
+        foundry.utils.setProperty(globalThis, TestEventNode.functionPath, () => {});
     }
 }
 

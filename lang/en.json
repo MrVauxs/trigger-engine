@@ -135,8 +135,7 @@
                         }
                     },
                     "test-event": {
-                        "title": "Test Event",
-                        "subtitle": "game.trigger.test()"
+                        "title": "Test Event"
                     }
                 }
             },
