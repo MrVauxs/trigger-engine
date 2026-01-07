@@ -9,14 +9,15 @@ Hooks.once("init", async () => {
     CONFIG.RegionBehavior.dataModels[MODULE.path("builtins.region")] = TriggerEngineRegionBehaviorType;
     CONFIG.RegionBehavior.typeIcons[MODULE.path("builtins.region")] = "fa-solid fa-land-mine-on";
 
-    Hooks.callAll("triggerEngine.init", {
-        registerApplication: TriggerApplication.register.bind(TriggerApplication),
-    });
+    // we allow third party modules to register their own application
+    Hooks.callAll("triggerEngine.registerApplication", TriggerApplication.register.bind(TriggerApplication));
 
+    // we register the pf2e-trigger application
     if (game.system.id === "pf2e") {
         registerPF2eApplication();
     }
 
+    // we prepare all the applications
     TriggerApplication.prepareApplications();
 });
 
