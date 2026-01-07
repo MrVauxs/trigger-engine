@@ -12,12 +12,7 @@ class TriggerGateExit extends TriggerNode<"out", never, never, never, "entry"> {
     }
 
     static get defineCustomOutputs(): CustomOutputSchema[] {
-        return [
-            {
-                array: true,
-                slug: "entry",
-            },
-        ];
+        return [{ array: true, slug: "entry" }];
     }
 
     get headerColor(): `#${string}` {

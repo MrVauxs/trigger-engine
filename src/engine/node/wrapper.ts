@@ -275,6 +275,7 @@ function instantiateNode(
             }
         }
 
+        // TODO use convertors
         async #getInputValue(key: string): Promise<any> {
             const input = this.#inputs.get(key);
             if (!input) return;
@@ -325,7 +326,10 @@ function instantiateNode(
         }
 
         #setOutputValue(key: string, value: any) {
-            this.#outputValues[key] = this.#outputs.get(key)?.castValue(value);
+            const output = this.#outputs.get(key);
+            if (output) {
+                this.#castAndSetOutputValue(output, value);
+            }
         }
 
         #setCustomOutputValues(slug: string, values: any[]) {
@@ -333,7 +337,19 @@ function instantiateNode(
 
             for (let i = 0; i < outputs.length; i++) {
                 const output = outputs[i];
-                this.#outputValues[output.key] = output.castValue(values[i]);
+                this.#castAndSetOutputValue(output, values[i]);
+            }
+        }
+
+        #castAndSetOutputValue(output: NodeEntry, value: any) {
+            if (output.isArray) {
+                this.#outputValues[output.key] = R.pipe(
+                    R.isArray(value) ? value : [value],
+                    R.map(output.castValue.bind(output)),
+                );
+            } else {
+                value = R.isArray(value) ? value[0] : value;
+                this.#outputValues[output.key] = output.castValue(value);
             }
         }
     }
