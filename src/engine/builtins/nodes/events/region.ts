@@ -1,12 +1,8 @@
-import { OutputEntrySchemaSource, TriggerNode } from "engine";
+import { BaseEventNode, OutputEntrySchemaSource } from "engine";
 
-class RegionEventNode extends TriggerNode<"out", never, Outputs> {
+class RegionEventNode extends BaseEventNode<never, Outputs> {
     static get type(): "region-event" {
         return "region-event";
-    }
-
-    static get isEvent(): boolean {
-        return true;
     }
 
     static get tags(): string[] {

@@ -1,9 +1,11 @@
-import { ApplicationKey, BaseBuiltinsHook, RegionEventOptions, TriggerPath } from "engine";
+import { ApplicationKey, BasesHook, RegionEventOptions, TriggerPath } from "engine";
 import { R, RegionEventPF2e, localize } from "module-helpers";
+import fields = foundry.data.fields;
 
 const HOOKS: Collection<RegionHook, ApplicationKey> = new Collection();
 
 class TriggerEngineRegionBehaviorType extends foundry.data.regionBehaviors.RegionBehaviorType {
+    declare gm: boolean;
     declare path: TriggerPath;
 
     static defineSchema() {
@@ -11,7 +13,13 @@ class TriggerEngineRegionBehaviorType extends foundry.data.regionBehaviors.Regio
             events: this._createEventsField({
                 events: R.values(CONST.REGION_EVENTS).filter((event) => event.startsWith("token")),
             }),
-            path: new foundry.data.fields.StringField({
+            gm: new fields.BooleanField({
+                required: false,
+                nullable: false,
+                initial: true,
+                label: localize("builtins.region.gm"),
+            }),
+            path: new fields.StringField({
                 required: true,
                 nullable: false,
                 trim: true,
@@ -23,7 +31,7 @@ class TriggerEngineRegionBehaviorType extends foundry.data.regionBehaviors.Regio
     }
 
     async _handleRegionEvent(event: RegionEventPF2e): Promise<void> {
-        if (!("token" in event.data)) return;
+        if (!("token" in event.data) || (this.gm && !game.user.isActiveGM)) return;
 
         const token = event.data.token;
         const actor = token.actor;
@@ -40,7 +48,7 @@ class TriggerEngineRegionBehaviorType extends foundry.data.regionBehaviors.Regio
     }
 }
 
-class RegionHook extends BaseBuiltinsHook<RegionEventOptions> {
+class RegionHook extends BasesHook<RegionEventOptions> {
     static get type(): "region-hook" {
         return "region-hook";
     }

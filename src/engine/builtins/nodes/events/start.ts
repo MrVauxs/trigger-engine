@@ -1,14 +1,10 @@
 import { IconObject } from "_zod";
-import { TriggerNode } from "engine";
+import { BaseEventNode } from "engine";
 import { START_EVENT_TYPE } from "engine/application";
 
-class _StartEventNode extends TriggerNode<"out"> {
+class _StartEventNode extends BaseEventNode {
     static get type(): string {
         return START_EVENT_TYPE;
-    }
-
-    static get isEvent(): boolean {
-        return true;
     }
 
     get icon(): IconObject {

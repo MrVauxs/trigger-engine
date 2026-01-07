@@ -1,16 +1,12 @@
-import { TriggerNode } from "engine";
+import { BaseEventNode } from "engine";
 
-class TestEventNode extends TriggerNode<"out"> {
+class TestEventNode extends BaseEventNode {
     static get functionPath(): string {
         return "game.triggerEngine.test";
     }
 
     static get type(): "test-event" {
         return "test-event";
-    }
-
-    static get isEvent(): boolean {
-        return true;
     }
 
     static get tags(): string[] {

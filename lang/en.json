@@ -140,6 +140,7 @@
                 }
             },
             "region": {
+                "gm": "GM Only?",
                 "path": "Trigger Path"
             },
             "tag": {
