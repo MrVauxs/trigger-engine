@@ -31,7 +31,6 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
     abstract get customSlug(): string | undefined;
     abstract get hasConnector(): boolean;
     abstract get isConnectionInitiator(): boolean;
-    abstract get isRevealed(): boolean;
     abstract get key(): string;
     abstract get label(): string;
 
@@ -72,7 +71,7 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
     }
 
     get isCustom(): boolean {
-        return this.isRevealed || !!this.customSlug;
+        return !!this.customSlug;
     }
 
     get isConnected(): boolean {
@@ -207,23 +206,13 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
         }
 
         for (const [category, node] of nodes) {
-            if (this.isRevealed) {
-                node.data.update({
-                    revealed: {
-                        [category]: {
-                            [this.key]: undefined,
-                        },
+            node.data.update({
+                custom: {
+                    [category]: {
+                        [this.key]: undefined,
                     },
-                });
-            } else {
-                node.data.update({
-                    custom: {
-                        [category]: {
-                            [this.key]: undefined,
-                        },
-                    },
-                });
-            }
+                },
+            });
         }
 
         // we remove the variable if any (and all the getters)
@@ -248,7 +237,7 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
             {
                 name: localizePath("blueprint.entry.remove.title"),
                 icon: `<i class="fa-solid fa-trash fa-fw"></i>`,
-                condition: (this.isCustom || this.isRevealed) && !isGateEntryNode(this.node),
+                condition: this.isCustom && !isGateEntryNode(this.node),
                 callback: async () => {
                     const confirm = await confirmDialog("blueprint.entry.remove");
                     return confirm && this.remove();

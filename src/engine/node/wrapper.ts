@@ -55,7 +55,6 @@ function instantiateNode(
 
         return [
             {
-                hidden: false,
                 isArray: data.isArray,
                 key: "entry",
                 label: data.label,

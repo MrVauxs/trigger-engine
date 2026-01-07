@@ -36,10 +36,6 @@ class BlueprintBridgeEntry extends BaseBlueprintEntry {
         return this.#data.schema.slug;
     }
 
-    get isRevealed(): boolean {
-        return false;
-    }
-
     get label(): string {
         const { key, label } = this.#data;
 

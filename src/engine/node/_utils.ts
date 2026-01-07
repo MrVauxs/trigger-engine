@@ -73,7 +73,7 @@ function filterByCustomSchemas<
 
 function getOutsSchemas(NodeCls: typeof TriggerNode, options?: SchemasFilterOptions): BridgeSchemaOutput[] {
     const schemas = NodeCls.isEvent ? [{ key: "out" }] : (NodeCls.defineOuts ?? []);
-    const filtered = R.isString(schemas) ? [{ key: schemas }] : filterSchemasByState(schemas, options);
+    const filtered = filterSchemasByState(schemas, options);
 
     if (options?.data) {
         filtered.push(
@@ -98,16 +98,14 @@ function getOutsSchemas(NodeCls: typeof TriggerNode, options?: SchemasFilterOpti
 function getEntrySchemas(
     schemas: BaseEntrySchemaInput[] | null,
     parser: z.ZodObject,
-    options: SchemasFilterOptions,
+    options: SchemasFilterOptions = {},
     custom: {
         rawSchemas: BaseCustomEntrySchema[] | null;
         schemaParser: typeof zBaseEntrySchema;
         entries: Record<string, BaseCustomEntryData> | undefined;
     },
 ) {
-    const filtered = filterSchemasByState(schemas ?? [], options).filter((schema) => {
-        return !schema.hidden || options?.revealed === true || options?.revealed?.[schema.key] === true;
-    });
+    const filtered = filterSchemasByState(schemas ?? [], options);
 
     if (options?.data) {
         filtered.push(
@@ -129,37 +127,19 @@ function getEntrySchemas(
 }
 
 function getInputsSchemas(NodeCls: typeof TriggerNode, options?: SchemasFilterOptions): InputEntrySchema[] {
-    return getEntrySchemas(
-        NodeCls.defineInputs,
-        zNodeInputSchema,
-        {
-            data: options?.data,
-            revealed: options?.revealed ?? options?.data?.revealed?.inputs,
-            state: options?.state,
-        },
-        {
-            entries: options?.data?.custom.inputs,
-            rawSchemas: NodeCls.defineCustomInputs,
-            schemaParser: zCustomInputSchema,
-        },
-    );
+    return getEntrySchemas(NodeCls.defineInputs, zNodeInputSchema, options, {
+        entries: options?.data?.custom.inputs,
+        rawSchemas: NodeCls.defineCustomInputs,
+        schemaParser: zCustomInputSchema,
+    });
 }
 
 function getOutputsSchemas(NodeCls: typeof TriggerNode, options?: SchemasFilterOptions): OutputEntrySchema[] {
-    return getEntrySchemas(
-        NodeCls.defineOutputs,
-        zNodeOutputSchema,
-        {
-            data: options?.data,
-            revealed: options?.revealed ?? options?.data?.revealed?.outputs,
-            state: options?.state,
-        },
-        {
-            entries: options?.data?.custom.outputs,
-            rawSchemas: NodeCls.defineCustomOutputs,
-            schemaParser: zCustomOutputSchema,
-        },
-    );
+    return getEntrySchemas(NodeCls.defineOutputs, zNodeOutputSchema, options, {
+        entries: options?.data?.custom.outputs,
+        rawSchemas: NodeCls.defineCustomOutputs,
+        schemaParser: zCustomOutputSchema,
+    });
 }
 
 function getNodeStates(NodeCls: typeof TriggerNode): string[] | null {
@@ -172,7 +152,6 @@ function getNodeStates(NodeCls: typeof TriggerNode): string[] | null {
 type SchemasFilterOptions = {
     state?: string | null;
     data?: NodeData;
-    revealed?: true | Record<string, boolean>;
 };
 
 export { getInputsSchemas, getNodeStates, getOutputsSchemas, getOutsSchemas };

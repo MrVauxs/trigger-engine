@@ -111,7 +111,7 @@ class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<st
 }
 
 interface NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<string, any> | undefined = undefined>
-    extends Omit<BaseEntrySchemaOutput, "hidden" | "state" | "type">, Pick<typeof NodeEntry, "type" | "color"> {
+    extends Omit<BaseEntrySchemaOutput, "state" | "type">, Pick<typeof NodeEntry, "type" | "color"> {
     readonly category: EntryCategory;
     get connection(): ConnectionId | undefined;
     get value(): TValue | undefined;

@@ -4,7 +4,6 @@ import {
     BaseCustomEntryDataSource,
     BaseCustomEntrySchema,
     BaseCustomSchema,
-    BaseEntrySchemaInput,
     ConnectionId,
     EntryCategory,
     EntryId,
@@ -822,29 +821,12 @@ class BlueprintNode extends PIXI.Container {
             this.blueprint.deleteVariable(entry.id as ConnectionId, false);
         }
 
-        // those revealed entries could only exist in the current state
-        const revealed = R.pipe(
-            toBeRemoved,
-            R.filter((entry) => !!entry.schema.hidden),
-            R.map((entry) => entry.id as ConnectionId),
-            R.fromKeys(() => undefined),
-        );
-
-        this.data.update({ revealed, state });
+        this.data.update({ state });
 
         this.refresh({
             forceComputeConnections: true,
             renderApplication: true,
         });
-    }
-
-    #revealEntry(category: EntryCategory, schema: BaseEntrySchemaInput) {
-        this.data.update({
-            revealed: {
-                [category]: { [schema.key]: true },
-            },
-        });
-        this.refresh();
     }
 
     #customEntryLocalize(
@@ -992,40 +974,6 @@ class BlueprintNode extends PIXI.Container {
                     }),
                 ),
             );
-        }
-
-        // hidden entries
-        if (!locked) {
-            const categories = [
-                ["inputs", "defineInputs"],
-                ["outputs", "defineOutputs"],
-            ] as const;
-
-            for (const [category, method] of categories) {
-                const allSchemas = (this.#node.constructor as typeof TriggerNode)[method] ?? [];
-                const schemas = R.pipe(
-                    allSchemas,
-                    R.filter((schema) => {
-                        return (
-                            !!schema.hidden &&
-                            (!schema.state || schema.state === this.#node.state) &&
-                            !this.data.revealed?.[category]?.[schema.key]
-                        );
-                    }),
-                );
-
-                for (const schema of schemas) {
-                    const label = this.doubleLocalize(schema.label, category, schema.key) ?? schema.key;
-
-                    entries.push({
-                        name: localize("blueprint.entry.add", { label }),
-                        icon: `<i class="fa-solid fa-pen-line"></i>`,
-                        callback: async () => {
-                            this.#revealEntry(category, schema);
-                        },
-                    });
-                }
-            }
         }
 
         // custom entries

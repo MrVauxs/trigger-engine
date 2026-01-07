@@ -22,7 +22,7 @@ class TriggerEngineRegionBehaviorType extends foundry.data.regionBehaviors.Regio
         };
     }
 
-    protected override async _handleRegionEvent(event: RegionEventPF2e): Promise<void> {
+    async _handleRegionEvent(event: RegionEventPF2e): Promise<void> {
         if (!("token" in event.data)) return;
 
         const token = event.data.token;

@@ -25,7 +25,6 @@ import {
 import {
     ApplicationClosingOptions,
     ApplicationConfiguration,
-    ApplicationRenderOptions,
     ExtendedMultiSelectElement,
     ExtendedTextInputElement,
     htmlQuery,
@@ -96,12 +95,12 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         return super.close(options);
     }
 
-    protected _onClose(options: ApplicationClosingOptions): void {
+    protected _onClose(): void {
         this.#abortController.abort();
         this.#resolve(null);
     }
 
-    async _prepareContext(options: ApplicationRenderOptions): Promise<NodesMenuContext> {
+    async _prepareContext(): Promise<NodesMenuContext> {
         const allNodes = this.#getNodes();
         const gateNodes = this.#getGateNodes();
         const [allEvents, nodes] = R.partition(allNodes, (node) => node.isEvent);
@@ -141,11 +140,11 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         };
     }
 
-    _renderHTML(context: NodesMenuContext, options: ApplicationRenderOptions): Promise<string> {
+    _renderHTML(context: NodesMenuContext): Promise<string> {
         return render(this.key, context);
     }
 
-    _replaceHTML(result: string, content: HTMLElement, options: ApplicationRenderOptions): void {
+    _replaceHTML(result: string, content: HTMLElement): void {
         content.innerHTML = result;
         this.#addEventListeners(content);
     }
@@ -284,21 +283,14 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
             category: "outs" | "inputs" | "outputs",
             callback: (entries: T[]) => T | undefined,
         ): T | undefined => {
-            let hidden: { state: string | null; schema: T } | undefined;
-
             const schemaFn =
                 category === "outs" ? getOutsSchemas : category === "inputs" ? getInputsSchemas : getOutputsSchemas;
 
             for (const state of nodeStates) {
-                const schemas = schemaFn(OtherCls, { revealed: true, state }) as T[];
+                const schemas = schemaFn(OtherCls, { state }) as T[];
                 const schema = callback(schemas);
 
                 if (schema) {
-                    if ((schema as BaseEntrySchemaInput).hidden) {
-                        hidden ??= { schema, state };
-                        continue;
-                    }
-
                     if (state) {
                         newSource.state = state;
                     } else {
@@ -307,22 +299,6 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
 
                     return schema;
                 }
-            }
-
-            if (hidden) {
-                if (hidden.state) {
-                    newSource.state = hidden.state;
-                } else {
-                    delete newSource.state;
-                }
-
-                newSource.revealed = {
-                    [category]: {
-                        [hidden.schema.key]: true,
-                    },
-                };
-
-                return hidden.schema;
             }
         };
 
@@ -540,7 +516,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
 
         return nodes.filter((node) => {
             const schemasFn = entryIsInput ? getOutputsSchemas : getInputsSchemas;
-            const entries = schemasFn(node, { revealed: true });
+            const entries = schemasFn(node);
 
             return entries.some((other) => {
                 if (!entryIsInput) {

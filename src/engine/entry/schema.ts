@@ -1,7 +1,6 @@
 import { z, zString } from "module-helpers";
 
 const zNodeEntrySchema = z.object({
-    hidden: z.boolean().default(false),
     isArray: z.boolean().default(false),
     key: zString,
     label: zString.optional(),

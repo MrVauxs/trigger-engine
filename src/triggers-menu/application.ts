@@ -602,7 +602,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
                     hasNodes: this.blueprint.nodes.some((node) => node.variableId === id),
                     id,
                     isArray: variable.isArray,
-                    isCustom: !!entry.schema.hidden || foundry.data.validators.isValidId(entry.key),
+                    isCustom: foundry.data.validators.isValidId(entry.key),
                     nodeId: id.split(":")[0],
                 };
             }),

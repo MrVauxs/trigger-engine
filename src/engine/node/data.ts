@@ -11,12 +11,6 @@ interface NodeData extends z.output<NodeDataSchema> {
     readonly _source: NodeDataInput;
 }
 
-const zRevealedRecord = z.record(zString, z.boolean()).default(() => ({}));
-const zRevealed = z.object({
-    inputs: zRevealedRecord,
-    outputs: zRevealedRecord,
-});
-
 const zNodeCustoms = z.object({
     title: z.string().optional(),
     inputs: z.record(zString, zCustomInputData).default(() => ({})),
@@ -30,7 +24,6 @@ const zNodeDataSchema = z.object({
     inputs: zEntryDataSchema,
     outs: zEntryDataSchema,
     position: zPosition,
-    revealed: zRevealed.default(() => ({ inputs: {}, outputs: {} })),
     state: z.string().trim().optional(),
     type: z.string().trim().readonly(),
 });

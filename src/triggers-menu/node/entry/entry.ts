@@ -55,10 +55,6 @@ class BlueprintEntry extends BaseBlueprintEntry {
         return this.isInput;
     }
 
-    get isRevealed(): boolean {
-        return !!this.#entry.schema.hidden;
-    }
-
     get customSlug(): string | undefined {
         return this.#entry.schema.slug;
     }
