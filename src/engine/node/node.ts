@@ -287,15 +287,13 @@ class TriggerNode<
      *
      * This method is called by by a previous node that have `outs`.
      *
-     * @param options is only provided to `event` nodes by the calling `TriggerHook`.
-     *
-     * @returns `false` if you want to break out of the last `loop`.
+     * @param args are passed by the hook calling the event (and optionally from the previous node if needed)
      *
      * @see {@link TriggerNode#executeNext}
      * @see {@link TriggerNode#getInputValue}
      * @see {@link TriggerNode#setOutputValue}
      */
-    _execute(options?: Record<string, any>): Promise<boolean> {
+    _execute(...args: any[]): Promise<any> {
         throw MODULE.Error("Method not implemented.");
     }
 

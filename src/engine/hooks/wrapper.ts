@@ -1,4 +1,4 @@
-import { TriggerApplication, TriggerPath } from "engine";
+import { TriggerApplication } from "engine";
 import { R } from "module-helpers";
 import { TriggerHook } from ".";
 
@@ -57,12 +57,12 @@ function instantiateHook(parent: TriggerApplication, HookCls: typeof TriggerHook
             );
         }
 
-        #executeEvent(event: string, args?: unknown) {
-            parent.executeEvent(event, args);
+        #executeEvent(event: string, ...args: any[]) {
+            parent.executeEvent(event, ...args);
         }
 
-        #executeTriggerEvent(triggerId: string, event: string, args?: unknown) {
-            parent.executeTriggerEvent(triggerId, event, args);
+        #executeTriggerEvent(triggerId: string, event: string, ...args: any[]) {
+            parent.executeTriggerEvent(triggerId, event, ...args);
         }
     }
 

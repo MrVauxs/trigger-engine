@@ -12,15 +12,15 @@ class TestHook extends TriggerHook {
 
     _enable(): void {
         MODULE.devExpose({
-            test: (...args: any[]) => {
-                this.executeEvent("test-event", ...args);
+            test: () => {
+                this.executeEvent("test-event");
             },
         });
     }
 
     _disable(): void {
         MODULE.devExpose({
-            test: (...args: any[]) => {},
+            test: () => {},
         });
     }
 }

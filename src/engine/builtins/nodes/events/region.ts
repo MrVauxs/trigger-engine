@@ -1,6 +1,6 @@
 import { OutputEntrySchemaSource, TriggerNode } from "engine";
 
-class RegionEventNode extends TriggerNode<"out"> {
+class RegionEventNode extends TriggerNode<"out", never, Outputs> {
     static get type(): "region-event" {
         return "region-event";
     }
@@ -36,9 +36,14 @@ class RegionEventNode extends TriggerNode<"out"> {
     }
 }
 
-type RegionEventOptions = {
-    target: TargetDocuments;
+type Outputs = {
     event: string;
+    target: TargetDocuments;
+};
+
+type RegionEventOptions = {
+    eventName: string;
+    target: TargetDocuments;
 };
 
 export { RegionEventNode };
