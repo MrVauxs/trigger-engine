@@ -17,8 +17,7 @@ class ExecuteEventNode extends BaseEventNode {
         return "\uf144";
     }
 
-    _execute({ userId, values }: ExecuteEventOptions): Promise<boolean> {
-        // TODO create a user entry
+    _execute({ values }: { values: any[] }): Promise<boolean> {
         this.setCustomOutputValues("output", values);
         return this.executeNext("out");
     }

@@ -57,12 +57,12 @@ function instantiateHook(parent: TriggerApplication, HookCls: typeof TriggerHook
             );
         }
 
-        #executeEvent(event: string, ...args: any[]) {
-            parent.executeEvent(event, ...args);
+        #executeEvent(userId: string, event: string, ...args: any[]) {
+            parent.executeEvent(userId, event, ...args);
         }
 
-        #executeTriggerEvent(triggerId: string, event: string, ...args: any[]) {
-            parent.executeTriggerEvent(triggerId, event, ...args);
+        #executeTriggerEvent(userId: string, triggerId: string, event: string, ...args: any[]) {
+            parent.executeTriggerEvent(userId, triggerId, event, ...args);
         }
     }
 

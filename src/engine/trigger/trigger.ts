@@ -7,16 +7,18 @@ import {
     TriggerNode,
     instantiateNode,
 } from "engine";
-import { R } from "module-helpers";
+import { R, UserPF2e } from "module-helpers";
 
 class Trigger<TNode extends TriggerNode = TriggerNode> {
     #data: TriggerData;
     #nodes: Collection<TNode> = new Collection();
     #parent: TriggerApplication;
+    #userId: string;
 
-    constructor(parent: TriggerApplication, data: TriggerData) {
+    constructor(parent: TriggerApplication, data: TriggerData, userId: string = game.userId) {
         this.#data = data;
         this.#parent = parent;
+        this.#userId = userId;
 
         Object.defineProperty(this, "nodes", {
             get() {
@@ -51,6 +53,14 @@ class Trigger<TNode extends TriggerNode = TriggerNode> {
 
     get invalid(): boolean {
         return this.data.invalid;
+    }
+
+    get userContext(): UserPF2e {
+        return game.users.get(this.#userId) ?? game.user;
+    }
+
+    set userContext(user) {
+        this.#userId = user.id;
     }
 
     // TODO need to actually implement that when module triggers is done
@@ -96,7 +106,22 @@ class Trigger<TNode extends TriggerNode = TriggerNode> {
     }
 }
 
+function getTriggerPathData(triggerPath: TriggerPath): TriggerPathData {
+    const [moduleId, applicationId, triggerId] = R.split(triggerPath, ":");
+    return {
+        moduleId,
+        applicationId,
+        triggerId,
+    };
+}
+
 type TriggerPath = `${ApplicationKey}:${string}`;
 
-export { Trigger };
-export type { TriggerPath };
+type TriggerPathData = {
+    moduleId: string;
+    applicationId: string;
+    triggerId: string;
+};
+
+export { Trigger, getTriggerPathData };
+export type { TriggerPath, TriggerPathData };

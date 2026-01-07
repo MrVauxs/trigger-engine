@@ -1,4 +1,4 @@
-import { ApplicationKey } from "engine";
+import { ApplicationKey, TriggerNode } from "engine";
 import { MODULE } from "module-helpers";
 
 class TriggerHook<TArgs extends any[] = []> {
@@ -73,13 +73,26 @@ class TriggerHook<TArgs extends any[] = []> {
 
     /**
      * Execute all triggers that have this event.
+     *
+     * @param userId the context the trigger should have.
+     * @param event the name of the event to execute.
+     * @param args the arguments to pass to the {@link TriggerNode#_execute} function.
      */
-    declare executeEvent: (event: this["events"][number], ...args: TArgs) => Promise<void>;
+    declare executeEvent: (userId: string, event: this["events"][number], ...args: TArgs) => Promise<void>;
 
     /**
+     * @see {@link TriggerHook#executeEvent}
+     *
      * Execute the event of a specific trigger.
+     *
+     * @param triggerId the id of the trigger belonging to the same application.
      */
-    declare executeTriggerEvent: (triggerId: string, event: this["events"][number], ...args: TArgs) => Promise<void>;
+    declare executeTriggerEvent: (
+        userId: string,
+        triggerId: string,
+        event: this["events"][number],
+        ...args: TArgs
+    ) => Promise<void>;
 }
 
 export { TriggerHook };

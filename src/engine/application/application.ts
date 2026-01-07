@@ -9,6 +9,7 @@ import {
     GATE_CATEGORY,
     getBuiltins,
     GETTER_VARIABLE_TYPE,
+    getTriggerPathData,
     instantiateHook,
     NodeEntry,
     OpenTrigger,
@@ -145,10 +146,11 @@ class TriggerApplication {
         }
     }
 
-    static executeTriggerEvent(triggerPath: TriggerPath, event: string, args?: unknown) {
-        const [moduleId, applicationId, triggerId] = R.split(triggerPath, ":");
+    static executeTriggerEvent(userId: string, triggerPath: TriggerPath, event: string, args?: unknown) {
+        const { applicationId, moduleId, triggerId } = getTriggerPathData(triggerPath);
         const application = this.getApplication(moduleId, applicationId);
-        application?.executeTriggerEvent(triggerId, event, args);
+
+        return application?.executeTriggerEvent(userId, triggerId, event, args);
     }
 
     get mode(): TriggerApplicationMode {
@@ -270,21 +272,21 @@ class TriggerApplication {
         MODULE.groupEnd();
     }
 
-    async executeEvent(event: string, ...args: any[]) {
+    async executeEvent(userId: string, event: string, ...args: any[]) {
         const triggers = this.#triggerEvents[event];
         if (!triggers?.length) return;
 
         for (const { data, eventId } of triggers) {
-            await this.#execute(data, eventId, ...args);
+            await this.#execute(userId, data, eventId, ...args);
         }
     }
 
-    async executeTriggerEvent(triggerId: string, event: string, ...args: any[]) {
+    async executeTriggerEvent(userId: string, triggerId: string, event: string, ...args: any[]) {
         const trigger = this.#triggerEvents[event]?.find(({ data }) => data.id === triggerId);
         if (!trigger) return;
 
         const { data, eventId } = trigger;
-        await this.#execute(data, eventId, ...args);
+        await this.#execute(userId, data, eventId, ...args);
     }
 
     localize(...args: LocalizeArgs): string | undefined {
@@ -368,9 +370,9 @@ class TriggerApplication {
         };
     }
 
-    async #execute(data: TriggerData, eventId: string, ...args: any[]) {
+    async #execute(userId: string, data: TriggerData, eventId: string, ...args: any[]) {
         try {
-            const trigger = new Trigger(this, data);
+            const trigger = new Trigger(this, data, userId);
             const node = trigger.getNode(eventId);
             if (!node) return;
 

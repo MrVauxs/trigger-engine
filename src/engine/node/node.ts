@@ -9,7 +9,7 @@ import {
     OutputEntrySchemaSource,
     TriggerPath,
 } from "engine";
-import { LocalizeArgs, MODULE } from "module-helpers";
+import { LocalizeArgs, MODULE, UserPF2e } from "module-helpers";
 import { NodeData } from ".";
 
 class TriggerNode<
@@ -162,6 +162,11 @@ class TriggerNode<
      * The internal path for the node.
      */
     declare readonly nodePath: TriggerNodePath;
+
+    /**
+     * User context getter and setter.
+     */
+    declare userContext: UserPF2e;
 
     //////////////////////////////
     // ACCESSORS

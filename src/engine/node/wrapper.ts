@@ -9,7 +9,7 @@ import {
     OutputEntrySchema,
     Trigger,
 } from "engine";
-import { LocalizeArgs, MODULE, R } from "module-helpers";
+import { LocalizeArgs, MODULE, R, UserPF2e } from "module-helpers";
 import { getInputsSchemas, getNodeStates, getOutputsSchemas, getOutsSchemas, NodeData, TriggerNode } from ".";
 
 function instantiateNode(parent: OpenTrigger, data: NodeData, open: true): OpenTriggerNode | undefined;
@@ -88,9 +88,24 @@ function instantiateNode(
         #outputs: Collection<NodeEntry>;
         #outputValues: Record<string, any> = {};
         #outs: Collection<NodeBridge>;
+        #userId?: string;
 
         constructor() {
             super();
+
+            const self = this;
+
+            Object.defineProperty(this, "userContext", {
+                get(): UserPF2e {
+                    return (self.#userId && game.users.get(self.#userId)) || parent.userContext;
+                },
+                set(value) {
+                    self.#userId = value.id;
+                    parent.userContext = value.id;
+                },
+                configurable: false,
+                enumerable: true,
+            });
 
             // from data accessors
             Object.defineProperties(

@@ -1,5 +1,6 @@
-import { ExecuteEventOptions, TriggerApplication, TriggerHook, TriggerPath } from "engine";
-import { R } from "module-helpers";
+import { TriggerApplication, TriggerHook, TriggerPath } from "engine";
+import { MODULE, R } from "module-helpers";
+import { ExecuteTriggerQueryOptions } from "queries";
 
 class ExecuteHook extends TriggerHook {
     static executePath = "game.triggerEngine.execute";
@@ -23,16 +24,29 @@ class ExecuteHook extends TriggerHook {
         foundry.utils.setProperty(globalThis, ExecuteHook.executeAsGmPath, () => {});
     }
 
-    #execute(triggerPath: TriggerPath, ...values: any[]) {
-        const args: ExecuteEventOptions = {
-            userId: game.userId,
+    #execute(triggerPath: TriggerPath, values: any[]) {
+        return TriggerApplication.executeTriggerEvent(game.userId, triggerPath, "execute-event", {
             values: R.isArray(values) ? values : [],
-        };
-
-        TriggerApplication.executeTriggerEvent(triggerPath, "execute-event", args);
+        });
     }
 
-    #executeAsGM(triggerPath: TriggerPath, values: any[]) {}
+    #executeAsGM(triggerPath: TriggerPath, values: any[]) {
+        if (game.user.isActiveGM) {
+            return this.#execute(triggerPath, values);
+        }
+
+        const queryArgs: ExecuteTriggerQueryOptions = {
+            args: {
+                values: R.isArray(values) ? values : [],
+            },
+            eventName: "execute-event",
+            triggerPath,
+            type: "execute-trigger",
+            userId: game.userId,
+        };
+
+        return game.users.activeGM?.query(MODULE.path("user-query"), queryArgs);
+    }
 }
 
 export { ExecuteHook };

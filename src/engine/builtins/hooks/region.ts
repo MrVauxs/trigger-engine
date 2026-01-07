@@ -40,7 +40,7 @@ class TriggerEngineRegionBehaviorType extends foundry.data.regionBehaviors.Regio
             target: { actor, token },
         };
 
-        TriggerApplication.executeTriggerEvent(this.path, "region-event", args);
+        TriggerApplication.executeTriggerEvent(game.userId, this.path, "region-event", args);
     }
 }
 
