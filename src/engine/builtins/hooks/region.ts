@@ -1,8 +1,6 @@
-import { ApplicationKey, BasesHook, RegionEventOptions, TriggerPath } from "engine";
+import { BasesHook, RegionEventOptions, TriggerApplication, TriggerPath } from "engine";
 import { R, RegionEventPF2e, localize } from "module-helpers";
 import fields = foundry.data.fields;
-
-const HOOKS: Collection<RegionHook, ApplicationKey> = new Collection();
 
 class TriggerEngineRegionBehaviorType extends foundry.data.regionBehaviors.RegionBehaviorType {
     declare gm: boolean;
@@ -37,14 +35,12 @@ class TriggerEngineRegionBehaviorType extends foundry.data.regionBehaviors.Regio
         const actor = token.actor;
         if (!actor) return;
 
-        const [moduleId, applicationId, triggerId] = R.split(this.path, ":");
-        const hook = HOOKS.get(`${moduleId}:${applicationId}`);
         const args: RegionEventOptions = {
             eventName: event.name,
             target: { actor, token },
         };
 
-        hook?.executeTriggerEvent(triggerId, "region-event", args);
+        TriggerApplication.executeTriggerEvent(this.path, "region-event", args);
     }
 }
 
@@ -57,13 +53,9 @@ class RegionHook extends BasesHook<RegionEventOptions> {
         return ["region-event"];
     }
 
-    _enable(): void {
-        HOOKS.set(this.applicationKey, this);
-    }
+    _enable(): void {}
 
-    _disable(): void {
-        HOOKS.delete(this.applicationKey);
-    }
+    _disable(): void {}
 }
 
 export { RegionHook, TriggerEngineRegionBehaviorType };

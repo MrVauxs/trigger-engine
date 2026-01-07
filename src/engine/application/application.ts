@@ -21,6 +21,7 @@ import {
     TriggerGateExit,
     TriggerHookWrapper,
     TriggerNode,
+    TriggerPath,
     TriggerVariableGetter,
     VARIABLE_CATEGORY,
 } from "engine";
@@ -81,9 +82,9 @@ class TriggerApplication {
         );
 
         // add mandatory stuff
-        this.#nodes.set(ENTRY_GATE_TYPE, TriggerGateEntry);
-        this.#nodes.set(EXIT_GATE_TYPE, TriggerGateExit);
-        this.#nodes.set(GETTER_VARIABLE_TYPE, TriggerVariableGetter);
+        this.#nodes.set(ENTRY_GATE_TYPE, TriggerGateEntry as any);
+        this.#nodes.set(EXIT_GATE_TYPE, TriggerGateExit as any);
+        this.#nodes.set(GETTER_VARIABLE_TYPE, TriggerVariableGetter as any);
 
         // events
         this.#events = new Collection(
@@ -142,6 +143,12 @@ class TriggerApplication {
         for (const application of this.#instances) {
             application.prepare();
         }
+    }
+
+    static executeTriggerEvent(triggerPath: TriggerPath, event: string, args?: unknown) {
+        const [moduleId, applicationId, triggerId] = R.split(triggerPath, ":");
+        const application = this.getApplication(moduleId, applicationId);
+        application?.executeTriggerEvent(triggerId, event, args);
     }
 
     get mode(): TriggerApplicationMode {
@@ -263,25 +270,21 @@ class TriggerApplication {
         MODULE.groupEnd();
     }
 
-    async executeEvent(event: string, args?: unknown) {
+    async executeEvent(event: string, ...args: any[]) {
         const triggers = this.#triggerEvents[event];
         if (!triggers?.length) return;
 
-        const options = R.isObjectType(args) ? args : undefined;
-
         for (const { data, eventId } of triggers) {
-            await this.#execute(data, eventId, options);
+            await this.#execute(data, eventId, ...args);
         }
     }
 
-    async executeTriggerEvent(triggerId: string, event: string, args?: unknown) {
+    async executeTriggerEvent(triggerId: string, event: string, ...args: any[]) {
         const trigger = this.#triggerEvents[event]?.find(({ data }) => data.id === triggerId);
         if (!trigger) return;
 
         const { data, eventId } = trigger;
-        const options = R.isObjectType(args) ? args : undefined;
-
-        await this.#execute(data, eventId, options);
+        await this.#execute(data, eventId, ...args);
     }
 
     localize(...args: LocalizeArgs): string | undefined {
@@ -365,7 +368,7 @@ class TriggerApplication {
         };
     }
 
-    async #execute(data: TriggerData, eventId: string, options: object | undefined) {
+    async #execute(data: TriggerData, eventId: string, ...args: any[]) {
         try {
             const trigger = new Trigger(this, data);
             const node = trigger.getNode(eventId);
@@ -373,9 +376,9 @@ class TriggerApplication {
 
             MODULE.debug("Execute Trigger", trigger);
 
-            // we clone the options to avoid miss-handling downstream
-            const clonedOptions = foundry.utils.deepClone(options);
-            await node._execute(clonedOptions);
+            // we clone the args to avoid miss-handling downstream
+            const clonedArgs = foundry.utils.deepClone(args);
+            await node._execute(...clonedArgs);
         } catch (error: any) {
             const id = `${this.applicationKey}:${data.id}:${eventId}`;
             MODULE.error(`an error occurred while executing the event: ${id}`, error);

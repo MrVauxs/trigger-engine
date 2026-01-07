@@ -21,7 +21,7 @@ class TriggerVariableGetter extends TriggerNode {
         return "\uf044";
     }
 
-    _execute(options?: Record<string, any>): Promise<boolean> {
+    _execute(...args: any[]): Promise<boolean> {
         throw new Error("Method not implemented.");
     }
 
