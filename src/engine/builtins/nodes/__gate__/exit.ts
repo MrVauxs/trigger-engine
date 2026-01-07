@@ -26,8 +26,9 @@ class TriggerGateExit extends TriggerNode<"out", never, never, never, "entry"> {
 
     get icon(): IconObject {
         return {
-            unicode: "\ue01c",
+            fontMult: 1.2,
             fontWeight: "400",
+            unicode: "\ue01c",
         };
     }
 
