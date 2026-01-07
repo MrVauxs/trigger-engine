@@ -112,6 +112,7 @@ function instantiateNode(
                     [
                         ["getInputValue", this.#getInputValue],
                         ["getCustomInputsValues", this.#getCustomInputsValues],
+                        ["getOutputValue", this.#getOutputValue],
                         ["executeNext", this.#executeNext],
                         ["localize", localize],
                         ["rootLocalize", rootLocalize],
@@ -258,7 +259,7 @@ function instantiateNode(
             return !!this.#in || this.#outs.size > 0;
         }
 
-        async #executeNext(out: string): Promise<boolean> {
+        async #executeNext(out: string, ...args: any[]): Promise<boolean> {
             if (!this.#isExecutable) return true;
 
             try {
@@ -266,7 +267,8 @@ function instantiateNode(
                 if (!connection) return true;
 
                 const node = parent.getNodeFromEntryId(connection);
-                return node?._execute() ?? true;
+
+                return node?._execute(...args) ?? true;
             } catch (error: any) {
                 MODULE.error(`an error occurred while executing the node: ${this.nodePath}`, error);
                 return true;
@@ -298,7 +300,7 @@ function instantiateNode(
                     return input.default;
                 }
 
-                const value = await otherNode.#getOutputValue(otherKey);
+                const value = await otherNode.getOutputValue(otherKey);
                 return returnValue(value);
             } else {
                 return returnValue(input.value);
@@ -334,6 +336,10 @@ function instantiateNode(
                 this.#outputValues[output.key] = output.castValue(values[i]);
             }
         }
+    }
+
+    interface TriggerNodeWrapper {
+        getOutputValue(key: string): Promise<any>;
     }
 
     return new TriggerNodeWrapper();

@@ -1,7 +1,7 @@
 import { IconObject } from "_zod";
 import { ENTRY_GATE_TYPE, GATE_CATEGORY, TriggerNode } from "engine";
 
-class TriggerGateEntry extends TriggerNode {
+class TriggerGateEntry extends TriggerNode<"out", never, never, "entry"> {
     static get category(): string {
         return GATE_CATEGORY;
     }
@@ -21,12 +21,9 @@ class TriggerGateEntry extends TriggerNode {
         };
     }
 
-    _execute(options?: Record<string, any>): Promise<boolean> {
-        throw new Error("Method not implemented.");
-    }
-
-    _query(key: string): Promise<any> {
-        throw new Error("Method not implemented.");
+    async _execute(): Promise<boolean> {
+        const values = (await this.getCustomInputsValues("entry")).map(({ value }) => value);
+        return this.executeNext("out", values);
     }
 }
 

@@ -13,7 +13,7 @@ class TriggerHook<TArgs extends any[] = []> {
      * @see {@link TriggerHook#_enable}.
      */
     get events(): string[] {
-        throw MODULE.Error("Method not implemented.");
+        throw MODULE.Error("'events' accessor not implemented.");
     }
 
     //////////////////////////////
@@ -45,7 +45,7 @@ class TriggerHook<TArgs extends any[] = []> {
      * This method is called if at least one trigger can be executed by this hook.
      */
     _enable() {
-        throw MODULE.Error("Method not implemented.");
+        throw MODULE.Error("'_enable' method not implemented.");
     }
 
     /**
@@ -53,7 +53,7 @@ class TriggerHook<TArgs extends any[] = []> {
      * This method is called during preparation before {@link TriggerHook#_enable} if is was previously enabled.
      */
     _disable() {
-        throw MODULE.Error("Method not implemented.");
+        throw MODULE.Error("'_disable' method not implemented.");
     }
 
     //////////////////////////////

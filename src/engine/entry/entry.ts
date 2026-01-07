@@ -14,7 +14,7 @@ class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<st
      * `<module-id>.<application-id>.entry.<type>.title`
      */
     static get type(): string {
-        throw MODULE.Error("Method not implemented.");
+        throw MODULE.Error("'type' accessor not implemented.");
     }
 
     /**
@@ -22,7 +22,7 @@ class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<st
      * The default value for this input.
      */
     static get default(): unknown {
-        throw MODULE.Error("Method not implemented.");
+        throw MODULE.Error("'default' accessor not implemented.");
     }
 
     //////////////////////////////
@@ -76,7 +76,7 @@ class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<st
      * @returns true if the provided value is of type `TValue` excluding `undefined`.
      */
     isValidType(value: unknown): value is Exclude<TValue, undefined> {
-        throw MODULE.Error("Method not implemented.");
+        throw MODULE.Error("'isValidType' method not implemented.");
     }
 
     //////////////////////////////

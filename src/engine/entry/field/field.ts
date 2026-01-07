@@ -15,7 +15,7 @@ class NodeField<TValue extends unknown = unknown, TFieldSchema extends Record<st
      * Defines the DataSchema for the input field that will be used in the triggers menu.
      */
     static get defineSchema(): NodeFieldSchema {
-        throw MODULE.Error("Method not implemented.");
+        throw MODULE.Error("'defineSchema' accessor not implemented.");
     }
 
     //////////////////////////////
@@ -83,7 +83,7 @@ class NodeField<TValue extends unknown = unknown, TFieldSchema extends Record<st
      * Draw the actual field.
      */
     draw(): void {
-        throw MODULE.Error("Method not implemented.");
+        throw MODULE.Error("'draw' method not implemented.");
     }
 
     /**
@@ -91,7 +91,7 @@ class NodeField<TValue extends unknown = unknown, TFieldSchema extends Record<st
      * Event listener called when the field is clicked on. It is only registered if the entry isn't connected.
      */
     onClick(): Promise<TValue> {
-        throw MODULE.Error("Method not implemented.");
+        throw MODULE.Error("'onClick' method not implemented.");
     }
 
     //////////////////////////////

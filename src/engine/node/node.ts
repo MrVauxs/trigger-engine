@@ -31,7 +31,7 @@ class TriggerNode<
      * `<module-id>.<application-id>.node.<category>.<type>.title`
      */
     static get type(): string {
-        throw MODULE.Error("Method not implemented.");
+        throw MODULE.Error("'type' accessor not implemented.");
     }
 
     //////////////////////////////
@@ -218,7 +218,7 @@ class TriggerNode<
      *
      * @see {@link TriggerNode#_execute}
      */
-    declare readonly executeNext: (out: TOuts) => Promise<boolean>;
+    declare readonly executeNext: (out: TOuts, ...args: any[]) => Promise<boolean>;
 
     /**
      * Retrieve the computed value from one of this node's inputs.
@@ -294,7 +294,7 @@ class TriggerNode<
      * @see {@link TriggerNode#setOutputValue}
      */
     _execute(...args: any[]): Promise<any> {
-        throw MODULE.Error("Method not implemented.");
+        throw MODULE.Error("'_execute' method not implemented.");
     }
 
     /**
@@ -307,7 +307,7 @@ class TriggerNode<
      * If the returned value isn't compatible with the connection type, the default value will be instead be returned.
      */
     _query(key: string): Promise<any> {
-        throw MODULE.Error("Method not implemented.");
+        throw MODULE.Error("'_query' method not implemented.");
     }
 }
 

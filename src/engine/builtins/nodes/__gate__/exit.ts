@@ -1,7 +1,8 @@
 import { IconObject } from "_zod";
 import { CustomOutputSchema, EXIT_GATE_TYPE, GATE_CATEGORY, TriggerNode } from "engine";
+import { R } from "module-helpers";
 
-class TriggerGateExit extends TriggerNode {
+class TriggerGateExit extends TriggerNode<"out", never, never, never, "entry"> {
     static get category(): string {
         return GATE_CATEGORY;
     }
@@ -30,12 +31,10 @@ class TriggerGateExit extends TriggerNode {
         };
     }
 
-    _execute(options?: Record<string, any>): Promise<boolean> {
-        throw new Error("Method not implemented.");
-    }
-
-    _query(key: string): Promise<any> {
-        throw new Error("Method not implemented.");
+    _execute(values?: any[]): Promise<boolean> {
+        values = R.isArray(values) ? values : [];
+        this.setCustomOutputValues("entry", foundry.utils.deepClone(values));
+        return this.executeNext("out");
     }
 }
 
