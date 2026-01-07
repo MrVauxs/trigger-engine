@@ -30,8 +30,9 @@ class RegionEventNode extends TriggerNode<"out", never, Outputs> {
         return "\uf867";
     }
 
-    _execute(options: RegionEventOptions): Promise<boolean> {
-        console.log(options);
+    _execute({ eventName, target }: RegionEventOptions): Promise<boolean> {
+        this.setOutputValue("event", eventName);
+        this.setOutputValue("target", target);
         return this.executeNext("out");
     }
 }
