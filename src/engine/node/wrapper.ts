@@ -275,7 +275,6 @@ function instantiateNode(
             }
         }
 
-        // TODO use convertors
         async #getInputValue(key: string): Promise<any> {
             const input = this.#inputs.get(key);
             if (!input) return;
@@ -301,7 +300,7 @@ function instantiateNode(
                     return input.default;
                 }
 
-                const value = await otherNode.getOutputValue(otherKey);
+                const value = await otherNode.getOutputValue(otherKey, input);
                 return returnValue(value);
             } else {
                 return returnValue(input.value);
@@ -314,15 +313,29 @@ function instantiateNode(
                 .map(async ({ key, label }): Promise<{ label: string; value: any }> => {
                     return {
                         label: label ?? "",
-                        value: await this.#getInputValue(key),
+                        value: await this.getInputValue(key),
                     };
                 });
 
             return Promise.all(results);
         }
 
-        async #getOutputValue(key: string): Promise<any> {
-            return this.#isExecutable ? this.#outputValues[key] : this._query(key);
+        async #getOutputValue(key: string, input: NodeEntry): Promise<any> {
+            const output = this.#outputs.get(key);
+            if (!output) return;
+
+            const value = await (this.#isExecutable ? this.#outputValues[key] : this._query(key));
+
+            if (output.type === input.type) {
+                return value;
+            }
+
+            const convertor = parent.application.getConvertor(output.type, input.type);
+            if (!convertor) return;
+
+            return R.isArray(value)
+                ? value.map(convertor.convertToInput.bind(convertor))
+                : convertor.convertToInput(value);
         }
 
         #setOutputValue(key: string, value: any) {
@@ -355,7 +368,7 @@ function instantiateNode(
     }
 
     interface TriggerNodeWrapper {
-        getOutputValue(key: string): Promise<any>;
+        getOutputValue(key: string, input: NodeEntry): Promise<any>;
     }
 
     return new TriggerNodeWrapper();
