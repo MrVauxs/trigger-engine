@@ -325,7 +325,7 @@ function instantiateNode(
         }
 
         #setOutputValue(key: string, value: any) {
-            this.#outputValues[key] = this.#outputs.get("key")?.castValue(value);
+            this.#outputValues[key] = this.#outputs.get(key)?.castValue(value);
         }
 
         #setCustomOutputValues(slug: string, values: any[]) {

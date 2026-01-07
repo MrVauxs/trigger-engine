@@ -162,7 +162,7 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
                         R.map(([key, { connection }]) => {
                             if (!connection) return;
 
-                            const entry = schemas.find(({ key }) => key === key);
+                            const entry = schemas.find((schema) => schema.key === key);
                             if (!entry) return;
 
                             const type = ("type" in entry ? entry.type : "bridge") as string;

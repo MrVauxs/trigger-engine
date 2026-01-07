@@ -265,7 +265,7 @@ class TriggerNode<
      *
      * @see {@link TriggerNode.defineOutputs}
      */
-    declare readonly setOutputValue: <K extends keyof TOuts>(output: K, value: TOuts[K]) => void;
+    declare readonly setOutputValue: <K extends keyof TOutputs>(output: K, value: TOutputs[K]) => void;
 
     /**
      * Set values for this node's custom outputs.
