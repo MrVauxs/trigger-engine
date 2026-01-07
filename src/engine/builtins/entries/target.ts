@@ -1,5 +1,5 @@
 import { NodeEntry } from "engine";
-import { ActorPF2e, isValidTargetDocuments } from "module-helpers";
+import { ActorPF2e, getTokenDocument, isValidTargetDocuments } from "module-helpers";
 
 class TargetEntry extends NodeEntry<TargetDocuments | undefined> {
     static get type(): "target" {
@@ -22,7 +22,7 @@ class TargetEntry extends NodeEntry<TargetDocuments | undefined> {
             };
         }
 
-        const token = value instanceof Token ? value.document : value instanceof TokenDocument ? value : undefined;
+        const token = getTokenDocument(value);
         const actor = token?.actor;
         if (actor) {
             return { actor, token };
