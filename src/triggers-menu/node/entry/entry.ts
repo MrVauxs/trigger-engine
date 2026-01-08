@@ -8,10 +8,9 @@ import {
     OpenNodeEntry,
     TriggerVariable,
 } from "engine";
-import { confirmDialog, localizePath } from "module-helpers";
+import { confirmDialog, createHTMLElement, localizePath, R } from "module-helpers";
 import { BaseBlueprintEntry } from ".";
 import { BlueprintNode, editLabelDialog } from "..";
-import { createHTMLElement, R } from "module-helpers/src";
 
 class BlueprintEntry extends BaseBlueprintEntry {
     #entry: OpenNodeEntry;

@@ -28,9 +28,11 @@ import {
     zCustomOutSchema,
 } from "engine";
 import {
+    addListener,
     confirmDialog,
     createHTMLElement,
     drawRectangleMask,
+    htmlQuery,
     localize,
     LocalizeArgs,
     localizeIfExist,
@@ -853,8 +855,7 @@ class BlueprintNode extends PIXI.Container {
 
         const label: CustomEntryDialogData["label"] = !schema.input?.replaceLabel && {
             value: "",
-            placeholder:
-                this.#customEntryLocalize(schema.placeholder, category, schema, "placeholder") ?? schema.placeholder,
+            placeholder: "",
         };
 
         const input: CustomEntryDialogData["input"] = schema.input && {
@@ -884,6 +885,10 @@ class BlueprintNode extends PIXI.Container {
                     label: this.rootLocalize("entry", type, "title") ?? type,
                 };
             });
+
+            if (dialogData.label) {
+                dialogData.label.placeholder = dialogData.types[0].label;
+            }
         }
 
         const result = await waitDialog<{
@@ -896,6 +901,15 @@ class BlueprintNode extends PIXI.Container {
             data: dialogData,
             disabled: true,
             i18n: "edit-entry",
+            onRender: (_, dialog) => {
+                const html = dialog.element;
+                const labelInput = htmlQuery<HTMLInputElement>(html, `[name="label"]`);
+                if (!labelInput) return;
+
+                addListener(html, `[name="type"]`, "change", (el: HTMLSelectElement) => {
+                    labelInput.placeholder = el.selectedOptions[0].innerText;
+                });
+            },
             title: localize("blueprint.entry", isEdit ? "edit" : "add", { label: title }),
             yes: {
                 label: localize("edit-entry.yes", isEdit ? "edit" : "add"),

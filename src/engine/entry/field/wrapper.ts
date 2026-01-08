@@ -1,7 +1,6 @@
-import { drawRectangleMask, R } from "module-helpers";
+import { drawRectangleMask, LocalizeArgs, R } from "module-helpers";
 import { BlueprintNode, NodeFieldOptions } from "triggers-menu";
 import { NodeField } from ".";
-import { LocalizeArgs } from "module-helpers/src";
 import { NodeEntry } from "..";
 
 function instantiateField(

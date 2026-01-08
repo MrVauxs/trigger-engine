@@ -31,7 +31,6 @@ const zInputField = z.object({
 const zBaseSchema = z.object({
     input: zInputField.optional(),
     label: zString.optional(),
-    placeholder: zString.optional(),
     slug: zString,
 });
 
