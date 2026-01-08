@@ -102,6 +102,9 @@
             "category": {
                 "action": {
                     "title": "Action"
+                },
+                "debug": {
+                    "title": "Debug"
                 }
             },
             "entry": {
@@ -128,9 +131,6 @@
                     }
                 },
                 "action": {
-                    "console-log": {
-                        "title": "Console Log"
-                    },
                     "execute-script": {
                         "inputs": {
                             "macro": "Macro UUID",
@@ -141,6 +141,11 @@
                             "script": "Script"
                         },
                         "title": "Execute Script"
+                    }
+                },
+                "debug": {
+                    "console-log": {
+                        "title": "Console Log"
                     }
                 },
                 "event": {

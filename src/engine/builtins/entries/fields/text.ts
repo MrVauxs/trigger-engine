@@ -120,7 +120,7 @@ class TextField extends InputField<string, TextFieldSchema> {
             ? this.value
             : this.isEnrichedInput
               ? this.value.replace(/\<\/?p\>/g, " ")
-              : this.value.replace(/\s{1}|\\n/g, this.field.type === "json" ? "" : " ");
+              : this.value.replace(/\s{1,}|\\n/g, this.field.type === "json" ? "" : " ");
     }
 
     get valueAlpha(): number {

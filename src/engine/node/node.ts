@@ -196,7 +196,7 @@ class TriggerNode<
      * `<module-id>.<application-id>.node.<category>.<type>.subtitle`
      */
     get subtitle(): string | null {
-        return this.localize("subtitle") ?? this.rootLocalize("category.action.title") ?? null;
+        return this.localize("subtitle") ?? this.rootLocalize("category", this.category, "title") ?? null;
     }
 
     /**

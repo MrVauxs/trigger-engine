@@ -1,0 +1,16 @@
+import { TriggerNode } from "engine";
+
+abstract class BaseDebugNode<
+    TOuts extends string | never = string,
+    TInputs extends Record<string, any> | never = Record<string, any>,
+    TOutputs extends Record<string, any> | never = Record<string, any>,
+    TCustomInputs extends string | never = string,
+    TCustomOutputs extends string | never = string,
+    TState extends string | never = string,
+> extends TriggerNode<TOuts, TInputs, TOutputs, TCustomInputs, TCustomOutputs, TState> {
+    static get category(): "debug" {
+        return "debug";
+    }
+}
+
+export { BaseDebugNode };
