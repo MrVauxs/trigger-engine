@@ -1,6 +1,9 @@
 import { TriggerNode } from "engine";
 
-abstract class BaseValueNode<TInput extends any> extends TriggerNode<never, { input: TInput }> {
+abstract class BaseValueNode<TInputs extends Record<string, any> = Record<string, any>> extends TriggerNode<
+    never,
+    TInputs
+> {
     static get category(): "value" {
         return "value";
     }
@@ -22,7 +25,7 @@ abstract class BaseValueNode<TInput extends any> extends TriggerNode<never, { in
     }
 
     get headerColor(): `#${string}` {
-        return "#757575";
+        return "#6b5646";
     }
 }
 

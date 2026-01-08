@@ -2,7 +2,7 @@ import { UserPF2e } from "module-helpers";
 import { BaseValueNode } from ".";
 import { BuiltinsInputEntry, BuiltinsOutputEntry } from "engine";
 
-class UserValueNode extends BaseValueNode<string> {
+class UserValueNode extends BaseValueNode<{ id: string }> {
     static get type(): "user-value" {
         return "user-value";
     }
@@ -14,7 +14,7 @@ class UserValueNode extends BaseValueNode<string> {
     static get defineInputs(): [BuiltinsInputEntry] {
         return [
             {
-                key: "input",
+                key: "id",
                 type: "text",
                 field: {
                     options: {
@@ -30,11 +30,11 @@ class UserValueNode extends BaseValueNode<string> {
     }
 
     static get defineOutputs(): [BuiltinsOutputEntry] {
-        return [{ key: "output", type: "user" }];
+        return [{ key: "user", type: "user" }];
     }
 
     async _query(): Promise<UserPF2e | undefined> {
-        const id = await this.getInputValue("input");
+        const id = await this.getInputValue("id");
         return game.users.get(id);
     }
 }
