@@ -162,7 +162,7 @@ function instantiateNode(
             // from application
             Object.defineProperties(
                 this,
-                R.fromKeys(["parseUserValues", "validateUserValue"] as const, (property) => {
+                R.fromKeys(["parseUserValue", "parseUserValues"] as const, (property) => {
                     return {
                         value: parent.application[property].bind(parent),
                         configurable: false,

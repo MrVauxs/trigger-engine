@@ -104,7 +104,7 @@ class TriggerHook<TArgs extends any[] = []> {
     /**
      * This is used to validate values provided by users at runtime.
      */
-    declare validateUserValue: (userEntry: { type: string; value: any }) => boolean;
+    declare parseUserValue: (userEntry: { type: string; value: any }) => boolean;
 }
 
 export { TriggerHook };

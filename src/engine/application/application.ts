@@ -272,21 +272,21 @@ class TriggerApplication {
         MODULE.groupEnd();
     }
 
-    validateUserValue<T extends UserValue>(userEntry: T): T["value"] | undefined {
-        if (!R.isObjectType(userEntry) || !R.isString(userEntry.type)) return;
+    parseUserValue<T extends UserValue>(userValue: T): T["value"] | undefined {
+        if (!R.isObjectType(userValue) || !R.isString(userValue.type)) return;
 
-        const entry = this.entries.get(userEntry.type);
+        const entry = this.entries.get(userValue.type);
         if (!entry) return;
 
-        return R.isArray(userEntry.value)
-            ? userEntry.value.filter(entry.isValidType.bind(entry))
-            : entry.isValidType(userEntry.value)
-              ? userEntry.value
-              : undefined;
+        return R.isArray(userValue.value)
+            ? userValue.value.filter(entry.isValidType.bind(entry))
+            : entry.isValidType(userValue.value)
+              ? userValue.value
+              : entry.default;
     }
 
     parseUserValues(values: UserValue[]): any[] {
-        return R.isArray(values) ? values.map(this.validateUserValue.bind(this)) : [];
+        return R.isArray(values) ? values.map(this.parseUserValue.bind(this)) : [];
     }
 
     async executeEvent(userId: string, event: string, ...args: any[]) {

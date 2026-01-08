@@ -40,7 +40,7 @@ function instantiateHook(parent: TriggerApplication, HookCls: typeof TriggerHook
             Object.defineProperties(
                 this,
                 R.fromKeys(
-                    ["executeEvent", "executeTriggerEvent", "parseUserValues", "validateUserValue"] as const,
+                    ["executeEvent", "executeTriggerEvent", "parseUserValue", "parseUserValues"] as const,
                     (property) => {
                         return {
                             value: parent[property].bind(parent),
