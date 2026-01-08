@@ -33,10 +33,6 @@ class BooleanEntry extends BuiltInNodeEntry<boolean, BooleanFieldSchema> {
     get default(): boolean {
         return this.field.default ?? super.default;
     }
-
-    castValue(value: unknown): boolean {
-        return Boolean(value);
-    }
 }
 
 export { BooleanEntry };

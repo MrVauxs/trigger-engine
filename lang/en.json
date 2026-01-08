@@ -119,6 +119,9 @@
                 },
                 "text": {
                     "title": "Text"
+                },
+                "user": {
+                    "title": "User"
                 }
             },
             "node": {

@@ -6,6 +6,7 @@ export * from "./fields";
 export * from "./number";
 export * from "./target";
 export * from "./text";
+export * from "./user";
 
 type BuiltinsOutputEntry = OutputTextEntry;
 

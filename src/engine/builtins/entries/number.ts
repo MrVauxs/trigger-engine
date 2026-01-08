@@ -34,10 +34,6 @@ class NumberEntry extends BuiltInNodeEntry<number, NumberFieldSchema> {
         return this.field.default ?? super.default;
     }
 
-    castValue(value: unknown): number {
-        return Number(value) || 0;
-    }
-
     processValue(value: number): number {
         const { min = -Infinity, max = Infinity, step } = this.field;
         const stepped = R.isNumber(step) ? roundToStep(value, step) : value;

@@ -14,6 +14,8 @@ import {
     ExecuteEventNode,
     ExecuteHook,
     ScriptActionNode,
+    ConfirmActionNode,
+    UserEntry,
 } from ".";
 
 class BuiltInApplication {
@@ -36,14 +38,14 @@ class BuiltInApplication {
     static convertors = mapConvertors(convertors);
 
     static entries = R.map(
-        [BooleanEntry, NumberEntry, TargetEntry, TextEntry],
+        [BooleanEntry, NumberEntry, TargetEntry, TextEntry, UserEntry],
         (entry) => [entry.type, entry] as const,
     );
 
     static hooks = R.map([ExecuteHook, RegionHook, TestHook], (entry) => [entry.type, entry] as const);
 
     static nodes = R.map(
-        [ConsoleActionNode, ExecuteEventNode, RegionEventNode, ScriptActionNode, TestEventNode],
+        [ConfirmActionNode, ConsoleActionNode, ExecuteEventNode, RegionEventNode, ScriptActionNode, TestEventNode],
         (node) => [node.type, node] as const,
     );
 }

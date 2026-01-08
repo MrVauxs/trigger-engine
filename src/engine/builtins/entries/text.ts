@@ -74,10 +74,6 @@ class TextEntry extends BuiltInNodeEntry<string, TextFieldSchema> {
         return this.options.find((option) => option.value === value) ? (value as string) : this.options[0].value;
     }
 
-    castValue(value: unknown): string {
-        return String(value || "");
-    }
-
     processValue(value: string): string {
         if (this.isSelect) {
             return this.getSelectValue(value);
