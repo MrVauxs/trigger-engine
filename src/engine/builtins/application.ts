@@ -16,6 +16,7 @@ import {
     ScriptActionNode,
     ConfirmActionNode,
     UserEntry,
+    UserValueNode,
 } from ".";
 
 class BuiltInApplication {
@@ -45,7 +46,15 @@ class BuiltInApplication {
     static hooks = R.map([ExecuteHook, RegionHook, TestHook], (entry) => [entry.type, entry] as const);
 
     static nodes = R.map(
-        [ConfirmActionNode, ConsoleActionNode, ExecuteEventNode, RegionEventNode, ScriptActionNode, TestEventNode],
+        [
+            ConfirmActionNode,
+            ConsoleActionNode,
+            ExecuteEventNode,
+            RegionEventNode,
+            ScriptActionNode,
+            TestEventNode,
+            UserValueNode,
+        ],
         (node) => [node.type, node] as const,
     );
 }
