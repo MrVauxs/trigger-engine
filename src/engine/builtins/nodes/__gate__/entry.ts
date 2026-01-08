@@ -22,7 +22,7 @@ class TriggerGateEntry extends TriggerNode<"out", never, never, "entry"> {
     }
 
     async _execute(): Promise<boolean> {
-        const values = (await this.getCustomInputsValues("entry")).map(({ value }) => value);
+        const values = await this.getCustomInputsValues("entry");
         return this.executeNext("out", values);
     }
 }

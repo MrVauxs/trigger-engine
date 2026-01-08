@@ -130,6 +130,17 @@
                 "action": {
                     "console-log": {
                         "title": "Console Log"
+                    },
+                    "execute-script": {
+                        "inputs": {
+                            "macro": "Macro UUID",
+                            "script": "Script Code"
+                        },
+                        "states": {
+                            "macro": "Macro",
+                            "script": "Script"
+                        },
+                        "title": "Execute Script"
                     }
                 },
                 "event": {
@@ -137,10 +148,10 @@
                         "title": "Execute Event"
                     },
                     "region-event": {
-                        "title": "Scene Region",
                         "outputs": {
                             "event": "Event"
-                        }
+                        },
+                        "title": "Scene Region"
                     },
                     "test-event": {
                         "title": "Test Event"

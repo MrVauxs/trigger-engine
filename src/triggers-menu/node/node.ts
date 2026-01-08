@@ -1009,7 +1009,7 @@ class BlueprintNode extends PIXI.Container {
                     const label = this.#customEntryLabel(category, schema);
 
                     entries.push({
-                        name: localize("blueprint.entry.add", { label }),
+                        name: localize("blueprint.entry.add.title", { label }),
                         icon: `<i class="fa-solid fa-gear"></i>`,
                         callback: async () => {
                             this.#addCustomEntry(category, schema);
