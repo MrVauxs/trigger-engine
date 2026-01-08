@@ -95,6 +95,16 @@ class TriggerHook<TArgs extends any[] = []> {
     ) => Promise<void>;
 
     /**
+     * Have the active GM execute the trigger instead.
+     * The executed trigger user context will be the user that called this function.
+     */
+    declare executeTriggerEventAsGM: (
+        triggerIdOrPath: string,
+        eventName: string,
+        args?: Record<string, any>,
+    ) => Promise<unknown>;
+
+    /**
      * @see {@link TriggerHook#validateUserValue}
      *
      * Parse & filter an array of user values.

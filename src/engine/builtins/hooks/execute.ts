@@ -1,6 +1,4 @@
 import { TriggerApplication, TriggerHook, TriggerPath, UserValue } from "engine";
-import { MODULE } from "module-helpers";
-import { ExecuteTriggerQueryOptions } from "queries";
 
 class ExecuteHook extends TriggerHook {
     static executePath = "game.triggerEngine.execute";
@@ -33,19 +31,11 @@ class ExecuteHook extends TriggerHook {
     #executeAsGM(triggerPath: TriggerPath, values: UserValue[]) {
         if (game.user.isActiveGM) {
             return this.#execute(triggerPath, values);
-        }
-
-        const queryArgs: ExecuteTriggerQueryOptions = {
-            args: {
+        } else {
+            return this.executeTriggerEventAsGM(triggerPath, "execute-event", {
                 values: this.parseUserValues(values),
-            },
-            eventName: "execute-event",
-            triggerPath,
-            type: "execute-trigger",
-            userId: game.userId,
-        };
-
-        return game.users.activeGM?.query(MODULE.path("user-query"), queryArgs);
+            });
+        }
     }
 }
 

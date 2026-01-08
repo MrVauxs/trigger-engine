@@ -29,6 +29,7 @@ import {
 import { includesAny, joinStr, LocalizeArgs, LocalizeData, MODULE, R } from "module-helpers";
 import { BlueprintApplication } from "triggers-menu";
 import utils = foundry.utils;
+import { ExecuteTriggerQueryOptions } from "queries";
 
 const APPLICATION_MODES = ["setting", "free"] as const;
 const FORBIDDEN_NODE_CATEGORIES = [GATE_CATEGORY, VARIABLE_CATEGORY];
@@ -304,6 +305,24 @@ class TriggerApplication {
 
         const { data, eventId } = trigger;
         await this.#execute(userId, data, eventId, ...args);
+    }
+
+    async executeTriggerEventAsGM(
+        triggerIdOrPath: string,
+        eventName: string,
+        args: Record<string, any> = {},
+    ): Promise<unknown> {
+        const triggerId = R.split(triggerIdOrPath, ":").at(-1);
+
+        const queryArgs: ExecuteTriggerQueryOptions = {
+            args,
+            eventName,
+            triggerPath: `${this.applicationKey}:${triggerId}`,
+            type: "execute-trigger",
+            userId: game.userId,
+        };
+
+        return game.users.activeGM?.query(MODULE.path("user-query"), queryArgs);
     }
 
     localize(...args: LocalizeArgs): string | undefined {
