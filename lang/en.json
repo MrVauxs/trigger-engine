@@ -102,6 +102,9 @@
             "category": {
                 "action": {
                     "title": "Action"
+                },
+                "event": {
+                    "title": "Event"
                 }
             },
             "entry": {
@@ -128,6 +131,9 @@
                     }
                 },
                 "action": {
+                    "await-dialog": {
+                        "title": "Await Confirmation"
+                    },
                     "console-log": {
                         "title": "Console Log"
                     },
@@ -165,6 +171,9 @@
             "tag": {
                 "debug": {
                     "title": "Debug"
+                },
+                "dialog": {
+                    "title": "Dialog"
                 },
                 "macro": {
                     "title": "Macro"
@@ -236,10 +245,12 @@
         },
         "node": {
             "entry": "Entry",
+            "false": "False",
             "in": "In",
             "input": "Input",
             "out": "Out",
-            "output": "Output"
+            "output": "Output",
+            "true": "True"
         },
         "nodes-menu": {
             "add": {

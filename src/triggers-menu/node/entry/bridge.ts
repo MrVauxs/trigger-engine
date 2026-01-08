@@ -1,5 +1,5 @@
 import { ConnectionId, NodeBridge, PreciseEntryCategory } from "engine";
-import { localize } from "module-helpers";
+import { localize, localizeIfExist } from "module-helpers";
 import { BaseBlueprintEntry, EntryCategory } from ".";
 import { BlueprintNode } from "..";
 
@@ -47,10 +47,7 @@ class BlueprintBridgeEntry extends BaseBlueprintEntry {
             return this.node.localize("in") ?? localize("node.in");
         }
 
-        return (
-            this.node.localize("outs", key) ?? //
-            (key === "out" ? localize("node.out") : key)
-        );
+        return this.node.localize("outs", key) ?? localizeIfExist("node", key) ?? key;
     }
 
     get color(): ColorSource {
