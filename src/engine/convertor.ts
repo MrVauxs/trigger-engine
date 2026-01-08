@@ -1,8 +1,6 @@
 import { R } from "module-helpers";
 
-function mapConvertors<T extends EntryConvertor>(
-    convertors: T[]
-): [ExtractConvertorsKeys<T>, EntryConvertor][] {
+function mapConvertors<T extends EntryConvertor>(convertors: T[]): [ExtractConvertorsKeys<T>, EntryConvertor][] {
     return R.pipe(
         convertors,
         R.filter(({ input, output, convertToInput }) => {
@@ -10,7 +8,7 @@ function mapConvertors<T extends EntryConvertor>(
         }),
         R.map((convertor) => {
             return [createConvertorKey(convertor.output, convertor.input), convertor] as const;
-        })
+        }),
     ) as [ExtractConvertorsKeys<T>, T][];
 }
 
@@ -28,7 +26,7 @@ type ExtractConvertorsKeys<T extends EntryConvertor> = T extends {
 type EntryConvertor<TInput extends any = any, TOutput extends any = any> = {
     input: string;
     output: string;
-    convertToInput: (value: TOutput) => TInput;
+    convertToInput: (value: TOutput) => Promise<TInput> | TInput;
 };
 
 export { createConvertorKey, mapConvertors };

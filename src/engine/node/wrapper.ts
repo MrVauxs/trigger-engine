@@ -369,11 +369,11 @@ function instantiateNode(
             }
 
             const convertor = parent.application.getConvertor(output.type, input.type);
-            if (!convertor) return;
+            if (!convertor || !output.isValidType(value)) return;
 
             return R.isArray(value)
-                ? value.map(convertor.convertToInput.bind(convertor))
-                : convertor.convertToInput(value);
+                ? await Promise.all(value.map(convertor.convertToInput.bind(convertor)))
+                : await convertor.convertToInput(value);
         }
 
         #setOutputValue(key: string, value: any) {
