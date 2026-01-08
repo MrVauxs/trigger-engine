@@ -159,6 +159,19 @@ function instantiateNode(
                 }),
             );
 
+            // from application
+            Object.defineProperties(
+                this,
+                R.fromKeys(["parseUserValues", "validateUserValue"] as const, (property) => {
+                    return {
+                        value: parent.application[property].bind(parent),
+                        configurable: false,
+                        enumerable: false,
+                        writable: false,
+                    };
+                }),
+            );
+
             // bridges
             const [ins, outs] = R.map(
                 [

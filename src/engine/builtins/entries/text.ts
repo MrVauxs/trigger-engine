@@ -25,6 +25,18 @@ class TextEntry extends BuiltInNodeEntry<string, TextFieldSchema> {
         return "{\n  \n}";
     }
 
+    static isValidType(value: unknown): value is string {
+        return R.isString(value);
+    }
+
+    static toJSON(value: string): string {
+        return value;
+    }
+
+    static fromJSON(value: JSONValue): string {
+        return String(value);
+    }
+
     get isSimpleInput(): boolean {
         return !this.field.type;
     }
@@ -64,10 +76,6 @@ class TextEntry extends BuiltInNodeEntry<string, TextFieldSchema> {
 
     castValue(value: unknown): string {
         return String(value || "");
-    }
-
-    isValidType(value: unknown): value is string {
-        return R.isString(value);
     }
 
     processValue(value: string): string {

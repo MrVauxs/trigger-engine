@@ -1,6 +1,7 @@
 import { BaseEntrySchemaOutput, ConnectionId, EntryCategory, NodeField, TriggerNode } from "engine";
 import { MODULE } from "module-helpers";
 
+// IMPORTANT an entry can never represent an array
 class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<string, any> | undefined = undefined> {
     //////////////////////////////
     // ABSTRACT STATIC ACCESSORS
@@ -44,6 +45,34 @@ class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<st
     }
 
     //////////////////////////////
+    // STATIC ABSTRACT METHODS
+    //////////////////////////////
+
+    /**
+     * @abstract
+     * @returns true if the provided value is of type `TValue` excluding `undefined`.
+     */
+    static isValidType(value: unknown): boolean {
+        throw MODULE.Error("'isValidType' method not implemented.");
+    }
+
+    /**
+     * @abstract
+     * Convert the value into something that stringifiable.
+     */
+    static toJSON(value: any): JSONValue {
+        throw MODULE.Error("'isValidType' method not implemented.");
+    }
+
+    /**
+     * @abstract
+     * Convert the value back from its stringifiable version.
+     */
+    static fromJSON(value: JSONValue): Promise<any> | any {
+        throw MODULE.Error("'isValidType' method not implemented.");
+    }
+
+    //////////////////////////////
     // IMMUTABLE ACCESSORS
     //////////////////////////////
 
@@ -68,16 +97,23 @@ class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<st
     }
 
     //////////////////////////////
-    // ABSTRACT METHODS
+    // IMMUTABLE METHODS
     //////////////////////////////
 
     /**
-     * @abstract
-     * @returns true if the provided value is of type `TValue` excluding `undefined`.
+     * @see {@link NodeEntry.isValidType}
      */
-    isValidType(value: unknown): value is Exclude<TValue, undefined> {
-        throw MODULE.Error("'isValidType' method not implemented.");
-    }
+    declare readonly isValidType: (value: unknown) => value is Exclude<TValue, undefined>;
+
+    /**
+     * @see {@link NodeEntry.toJSON}
+     */
+    declare readonly toJSON: (value: any) => JSONValue;
+
+    /**
+     * @see {@link NodeEntry.fromJSON}
+     */
+    declare readonly fromJSON: (value: JSONValue) => Promise<any> | any;
 
     //////////////////////////////
     // METHODS

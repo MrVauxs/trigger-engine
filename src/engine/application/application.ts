@@ -272,6 +272,23 @@ class TriggerApplication {
         MODULE.groupEnd();
     }
 
+    validateUserValue<T extends UserValue>(userEntry: T): T["value"] | undefined {
+        if (!R.isObjectType(userEntry) || !R.isString(userEntry.type)) return;
+
+        const entry = this.entries.get(userEntry.type);
+        if (!entry) return;
+
+        return R.isArray(userEntry.value)
+            ? userEntry.value.filter(entry.isValidType.bind(entry))
+            : entry.isValidType(userEntry.value)
+              ? userEntry.value
+              : undefined;
+    }
+
+    parseUserValues(values: UserValue[]): any[] {
+        return R.isArray(values) ? values.map(this.validateUserValue.bind(this)) : [];
+    }
+
     async executeEvent(userId: string, event: string, ...args: any[]) {
         const triggers = this.#triggerEvents[event];
         if (!triggers?.length) return;
@@ -457,5 +474,10 @@ type TriggerApplicationMode = (typeof APPLICATION_MODES)[number] | "builtin";
 
 type ApplicationKey = `${string}:${string}`;
 
+type UserValue = {
+    type: string;
+    value: any;
+};
+
 export { TriggerApplication };
-export type { ApplicationKey, ApplicationParentType, TriggerApplicationOptions, TriggersSetting };
+export type { ApplicationKey, ApplicationParentType, TriggerApplicationOptions, TriggersSetting, UserValue };

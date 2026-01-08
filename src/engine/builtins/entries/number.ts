@@ -18,16 +18,24 @@ class NumberEntry extends BuiltInNodeEntry<number, NumberFieldSchema> {
         return NumberField;
     }
 
+    static isValidType(value: unknown): value is number {
+        return R.isNumber(value);
+    }
+
+    static toJSON(value: number): number {
+        return value;
+    }
+
+    static fromJSON(value: JSONValue): number {
+        return Number(value);
+    }
+
     get default(): number {
         return this.field.default ?? super.default;
     }
 
     castValue(value: unknown): number {
         return Number(value) || 0;
-    }
-
-    isValidType(value: unknown): value is number {
-        return R.isNumber(value);
     }
 
     processValue(value: number): number {

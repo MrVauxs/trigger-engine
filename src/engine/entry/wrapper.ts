@@ -127,6 +127,19 @@ function instantiateEntry(
                 }),
             );
 
+            // from static methods
+            Object.defineProperties(
+                this,
+                R.fromKeys(["fromJSON", "isValidType", "toJSON"] as const, (property) => {
+                    return {
+                        value: EntryCls[property],
+                        configurable: false,
+                        enumerable: false,
+                        writable: false,
+                    };
+                }),
+            );
+
             if (open) {
                 Object.defineProperties(this, {
                     schema: {

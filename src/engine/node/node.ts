@@ -8,6 +8,7 @@ import {
     NodeField,
     OutputEntrySchemaSource,
     TriggerPath,
+    UserValue,
 } from "engine";
 import { LocalizeArgs, MODULE, UserPF2e } from "module-helpers";
 import { NodeData } from ".";
@@ -254,6 +255,13 @@ class TriggerNode<
     declare readonly localize: (...args: LocalizeArgs) => string | undefined;
 
     /**
+     * @see {@link TriggerNode#validateUserValue}
+     *
+     * Parse & filter an array of user values.
+     */
+    declare parseUserValues: (values: UserValue[]) => any[];
+
+    /**
      * @see {@link TriggerNode#localize}
      *
      * It points directly to the path:
@@ -281,6 +289,11 @@ class TriggerNode<
      * @see {@link TriggerNode.defineCustomOutputs}
      */
     declare readonly setCustomOutputValues: (slug: TCustomOutputs, values: any[]) => void;
+
+    /**
+     * This is used to validate values provided by users at runtime.
+     */
+    declare validateUserValue: (userEntry: { type: string; value: any }) => boolean;
 
     //////////////////////////////
     // ABSTRACT METHODS

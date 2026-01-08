@@ -1,5 +1,5 @@
-import { TriggerApplication, TriggerHook, TriggerPath } from "engine";
-import { MODULE, R } from "module-helpers";
+import { TriggerApplication, TriggerHook, TriggerPath, UserValue } from "engine";
+import { MODULE } from "module-helpers";
 import { ExecuteTriggerQueryOptions } from "queries";
 
 class ExecuteHook extends TriggerHook {
@@ -24,20 +24,20 @@ class ExecuteHook extends TriggerHook {
         foundry.utils.setProperty(globalThis, ExecuteHook.executeAsGmPath, () => {});
     }
 
-    #execute(triggerPath: TriggerPath, values: any[]) {
+    #execute(triggerPath: TriggerPath, values: UserValue[]) {
         return TriggerApplication.executeTriggerEvent(game.userId, triggerPath, "execute-event", {
-            values: R.isArray(values) ? values : [],
+            values: this.parseUserValues(values),
         });
     }
 
-    #executeAsGM(triggerPath: TriggerPath, values: any[]) {
+    #executeAsGM(triggerPath: TriggerPath, values: UserValue[]) {
         if (game.user.isActiveGM) {
             return this.#execute(triggerPath, values);
         }
 
         const queryArgs: ExecuteTriggerQueryOptions = {
             args: {
-                values: R.isArray(values) ? values : [],
+                values: this.parseUserValues(values),
             },
             eventName: "execute-event",
             triggerPath,

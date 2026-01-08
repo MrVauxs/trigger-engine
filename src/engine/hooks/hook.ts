@@ -1,4 +1,4 @@
-import { ApplicationKey, TriggerNode } from "engine";
+import { ApplicationKey, TriggerNode, UserValue } from "engine";
 import { MODULE } from "module-helpers";
 
 class TriggerHook<TArgs extends any[] = []> {
@@ -93,6 +93,18 @@ class TriggerHook<TArgs extends any[] = []> {
         event: this["events"][number],
         ...args: TArgs
     ) => Promise<void>;
+
+    /**
+     * @see {@link TriggerHook#validateUserValue}
+     *
+     * Parse & filter an array of user values.
+     */
+    declare parseUserValues: (values: UserValue[]) => any[];
+
+    /**
+     * This is used to validate values provided by users at runtime.
+     */
+    declare validateUserValue: (userEntry: { type: string; value: any }) => boolean;
 }
 
 export { TriggerHook };

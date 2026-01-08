@@ -36,33 +36,21 @@ function instantiateHook(parent: TriggerApplication, HookCls: typeof TriggerHook
                 ),
             );
 
-            // from private methods
+            // from application
             Object.defineProperties(
                 this,
-                R.pipe(
-                    [
-                        ["executeEvent", this.#executeEvent],
-                        ["executeTriggerEvent", this.#executeTriggerEvent],
-                    ] as const,
-                    R.fromEntries(),
-                    R.mapValues((method) => {
+                R.fromKeys(
+                    ["executeEvent", "executeTriggerEvent", "parseUserValues", "validateUserValue"] as const,
+                    (property) => {
                         return {
-                            value: method.bind(this),
+                            value: parent[property].bind(parent),
                             configurable: false,
                             enumerable: false,
                             writable: false,
                         };
-                    }),
+                    },
                 ),
             );
-        }
-
-        #executeEvent(userId: string, event: string, ...args: any[]) {
-            parent.executeEvent(userId, event, ...args);
-        }
-
-        #executeTriggerEvent(userId: string, triggerId: string, event: string, ...args: any[]) {
-            parent.executeTriggerEvent(userId, triggerId, event, ...args);
         }
     }
 

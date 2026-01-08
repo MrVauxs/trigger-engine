@@ -18,16 +18,24 @@ class BooleanEntry extends BuiltInNodeEntry<boolean, BooleanFieldSchema> {
         return BooleanField;
     }
 
+    static isValidType(value: unknown): value is boolean {
+        return R.isBoolean(value);
+    }
+
+    static toJSON(value: boolean): boolean {
+        return value;
+    }
+
+    static fromJSON(value: JSONValue): boolean {
+        return Boolean(value);
+    }
+
     get default(): boolean {
         return this.field.default ?? super.default;
     }
 
     castValue(value: unknown): boolean {
         return Boolean(value);
-    }
-
-    isValidType(value: unknown): value is boolean {
-        return R.isBoolean(value);
     }
 }
 
