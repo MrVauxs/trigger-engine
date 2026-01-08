@@ -75,7 +75,7 @@ class Trigger<TNode extends TriggerNode = TriggerNode> {
                 const nodeData = this.data.nodes.get(id);
                 if (!nodeData) return;
 
-                const node = instantiateNode<TNode>(this, nodeData, true);
+                const node = instantiateNode<TNode>(this, nodeData, false);
                 if (!node || node.invalid) return;
 
                 this.#nodes.set(node.id, node);

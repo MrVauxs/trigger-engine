@@ -1,5 +1,5 @@
 import { R } from "module-helpers";
-import { BuiltInNodeEntry, TextField, TextFieldSchema } from ".";
+import { BaseEntrySchema, BaseInputEntrySchema, BuiltInNodeEntry, TextField, TextFieldSchema } from ".";
 import validators = foundry.data.validators;
 
 class TextEntry extends BuiltInNodeEntry<string, TextFieldSchema> {
@@ -38,11 +38,11 @@ class TextEntry extends BuiltInNodeEntry<string, TextFieldSchema> {
     }
 
     get isSimpleInput(): boolean {
-        return !this.field.type;
+        return !this.field.type || (this.field.type === "select" && !this.options.length);
     }
 
     get isSelect(): boolean {
-        return this.isSimpleInput && !!this.options.length;
+        return this.field.type === "select" && !!this.options.length;
     }
 
     get default(): string {
@@ -132,5 +132,21 @@ type EntrySelectOption = {
     label?: string | { label: string };
 };
 
+type OutputTextEntry = BaseEntrySchema<"text">;
+
+type BaseField = {
+    default?: string;
+    trim?: boolean;
+};
+
+type SimpleField = Prettify<BaseField & { type?: "enriched" }>;
+type SelectField = Prettify<BaseField & { type: "select"; options: TextFieldSchema["options"] }>;
+type JsonField = Prettify<BaseField & { type: "json" }>;
+type JavascriptField = Prettify<BaseField & { type: "javascript" }>;
+
+type BuiltinsTextFieldSchema = SimpleField | SelectField | JsonField | JavascriptField;
+
+type InputTextEntry = BaseInputEntrySchema<"text", BuiltinsTextFieldSchema>;
+
 export { TextEntry };
-export type { EntrySelectOption };
+export type { EntrySelectOption, InputTextEntry, OutputTextEntry };

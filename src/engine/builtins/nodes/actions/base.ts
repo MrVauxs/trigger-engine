@@ -6,7 +6,8 @@ abstract class BaseActionNode<
     TOutputs extends Record<string, any> | never = Record<string, any>,
     TCustomInputs extends string | never = string,
     TCustomOutputs extends string | never = string,
-> extends TriggerNode<TOuts, TInputs, TOutputs, TCustomInputs, TCustomOutputs> {
+    TState extends string | never = string,
+> extends TriggerNode<TOuts, TInputs, TOutputs, TCustomInputs, TCustomOutputs, TState> {
     static get category(): "action" {
         return "action";
     }

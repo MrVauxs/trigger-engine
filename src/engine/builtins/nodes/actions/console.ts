@@ -20,7 +20,7 @@ class ConsoleActionNode extends BaseActionNode<"out", never, never, "input"> {
     }
 
     async _execute(): Promise<boolean> {
-        const values = await this.getCustomInputsValues("input");
+        const values = await this.getCustomInputs("input");
 
         MODULE.group(this.nodePath);
         for (const { label, value } of values) {

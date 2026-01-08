@@ -13,6 +13,7 @@ import {
     TargetEntry,
     ExecuteEventNode,
     ExecuteHook,
+    ScriptActionNode,
 } from ".";
 
 class BuiltInApplication {
@@ -42,7 +43,7 @@ class BuiltInApplication {
     static hooks = R.map([ExecuteHook, RegionHook, TestHook], (entry) => [entry.type, entry] as const);
 
     static nodes = R.map(
-        [ConsoleActionNode, ExecuteEventNode, RegionEventNode, TestEventNode],
+        [ConsoleActionNode, ExecuteEventNode, RegionEventNode, ScriptActionNode, TestEventNode],
         (node) => [node.type, node] as const,
     );
 }

@@ -8,7 +8,6 @@ import {
     NodeField,
     OutputEntrySchemaSource,
     TriggerPath,
-    UserValue,
 } from "engine";
 import { LocalizeArgs, MODULE, UserPF2e } from "module-helpers";
 import { NodeData } from ".";
@@ -19,6 +18,7 @@ class TriggerNode<
     TOutputs extends Record<string, any> | never = Record<string, any>,
     TCustomInputs extends string | never = string,
     TCustomOutputs extends string | never = string,
+    TState extends string | never = string,
 > {
     //////////////////////////////
     // ABSTRACT STATIC ACCESSORS
@@ -51,6 +51,7 @@ class TriggerNode<
 
     /**
      * A node can have multiple layout states. Must at least contain 2 states if used.
+     * The first entry is the default state.
      *
      * Localization path:
      * `<module-id>.<application-id>.node.<category>.<type>.states.<state>`
@@ -155,14 +156,19 @@ class TriggerNode<
     //////////////////////////////
 
     /**
-     * The internal path for the parent trigger.
-     */
-    declare readonly triggerPath: TriggerPath;
-
-    /**
      * The internal path for the node.
      */
     declare readonly nodePath: TriggerNodePath;
+
+    /**
+     * The current state of the node.
+     */
+    declare state: TState | null;
+
+    /**
+     * The internal path for the parent trigger.
+     */
+    declare readonly triggerPath: TriggerPath;
 
     /**
      * User context getter and setter.
@@ -242,7 +248,10 @@ class TriggerNode<
     declare readonly getInputValue: <K extends keyof TInputs>(input: K) => Promise<TInputs[K]>;
 
     // TODO
-    declare readonly getCustomInputsValues: (slug: TCustomInputs) => Promise<{ label: string; value: any }[]>;
+    declare readonly getCustomInputs: (slug: TCustomInputs) => Promise<{ label: string; value: any }[]>;
+
+    // TODO
+    declare readonly getCustomInputsValues: (slug: TCustomInputs) => Promise<any[]>;
 
     /**
      * Localization helper with pre-defined path and optional (last argument) data object for `game.i18n.format`
@@ -255,11 +264,16 @@ class TriggerNode<
     declare readonly localize: (...args: LocalizeArgs) => string | undefined;
 
     /**
+     * This is used to validate values provided by users at runtime.
+     */
+    declare parseUserValue: (userValue: unknown) => boolean;
+
+    /**
      * @see {@link TriggerNode#validateUserValue}
      *
      * Parse & filter an array of user values.
      */
-    declare parseUserValues: (values: UserValue[]) => any[];
+    declare parseUserValues: (userValues: unknown) => any[];
 
     /**
      * @see {@link TriggerNode#localize}
@@ -289,11 +303,6 @@ class TriggerNode<
      * @see {@link TriggerNode.defineCustomOutputs}
      */
     declare readonly setCustomOutputValues: (slug: TCustomOutputs, values: any[]) => void;
-
-    /**
-     * This is used to validate values provided by users at runtime.
-     */
-    declare parseUserValue: (userEntry: { type: string; value: any }) => boolean;
 
     //////////////////////////////
     // ABSTRACT METHODS

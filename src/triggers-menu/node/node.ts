@@ -815,15 +815,28 @@ class BlueprintNode extends PIXI.Container {
     }
 
     #switchState(state: string) {
-        // those are the entry that will be removed during switch
-        const toBeRemoved = this.outputs.filter((entry) => entry.schema.state === this.#node.state);
-
-        for (const entry of toBeRemoved) {
-            // we delete the variable
+        // we delete the variable
+        const outputs = this.outputs.filter((entry) => entry.schema.state === this.#node.state);
+        for (const entry of outputs) {
             this.blueprint.deleteVariable(entry.id as ConnectionId, false);
         }
 
-        this.data.update({ state });
+        // we clear the inputs values
+        const inputs = R.pipe(
+            this.inputs.contents,
+            R.filter((entry) => entry.schema.state === this.#node.state),
+            R.map((entry) => entry.key),
+            R.fromKeys((key) => {
+                return {
+                    value: undefined,
+                };
+            }),
+        );
+
+        this.data.update({
+            inputs,
+            state,
+        });
 
         this.refresh({
             forceComputeConnections: true,
@@ -1009,7 +1022,7 @@ class BlueprintNode extends PIXI.Container {
                     const label = this.#customEntryLabel(category, schema);
 
                     entries.push({
-                        name: localize("blueprint.entry.add", { label }),
+                        name: localize("blueprint.entry.add.title", { label }),
                         icon: `<i class="fa-solid fa-gear"></i>`,
                         callback: async () => {
                             this.#addCustomEntry(category, schema);

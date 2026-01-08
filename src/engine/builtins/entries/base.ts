@@ -1,4 +1,4 @@
-import { NodeEntry } from "engine";
+import { BaseEntrySchemaInput, NodeEntry } from "engine";
 
 abstract class BuiltInNodeEntry<
     TValue extends unknown,
@@ -17,4 +17,17 @@ abstract class BuiltInNodeEntry<
     }
 }
 
+type BaseEntrySchema<TType extends string> = Prettify<
+    Omit<BaseEntrySchemaInput, "type"> & {
+        type: TType;
+    }
+>;
+
+type BaseInputEntrySchema<TType extends string, TField extends Record<string, any> | undefined = any> = Prettify<
+    BaseEntrySchema<TType> & {
+        field?: TField;
+    }
+>;
+
 export { BuiltInNodeEntry };
+export type { BaseEntrySchema, BaseInputEntrySchema };

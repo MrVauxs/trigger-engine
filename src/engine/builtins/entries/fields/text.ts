@@ -5,7 +5,7 @@ import { EntrySelectOption, TextEntry } from "..";
 import elements = foundry.applications.elements;
 
 const NODE_INPUT_CODE_TYPES = ["javascript", "json"] as const;
-const NODE_INPUT_TEXT_TYPES = ["enriched", ...NODE_INPUT_CODE_TYPES] as const;
+const NODE_INPUT_TEXT_TYPES = ["enriched", "select", ...NODE_INPUT_CODE_TYPES] as const;
 
 class TextField extends InputField<string, TextFieldSchema> {
     static get defineSchema(): NodeFieldSchema {
@@ -134,9 +134,7 @@ class TextField extends InputField<string, TextFieldSchema> {
               ? label.label
               : value;
 
-        return parsedLabel
-            ? game.i18n.localize(parsedLabel)
-            : (this.localize("options", value) ?? value);
+        return parsedLabel ? game.i18n.localize(parsedLabel) : (this.localize("options", value) ?? value);
     }
 
     draw(): void {
@@ -190,19 +188,11 @@ class TextField extends InputField<string, TextFieldSchema> {
     }
 
     createInput(): HTMLInputElement {
-        if (this.isSelect) {
+        if (this.field.type === "select" && this.options.length) {
             const options = this.options.map((option): Required<SelectOption> => {
                 return { value: option.value, label: this.localizeOption(option) };
             });
             return new SearchSelectInputElement({ options, value: this.value }) as any;
-        }
-
-        if (this.isSimpleInput) {
-            return foundry.applications.fields.createTextInput({
-                name: "field",
-                placeholder: this.label.text,
-                value: this.value,
-            });
         }
 
         if (this.field.type === "enriched") {
@@ -215,19 +205,24 @@ class TextField extends InputField<string, TextFieldSchema> {
             }) as any;
         }
 
-        return foundry.applications.elements.HTMLCodeMirrorElement.create({
-            language: this.field.type,
+        if (R.isIncludedIn(this.field.type, ["javascript", "json"] as const)) {
+            return foundry.applications.elements.HTMLCodeMirrorElement.create({
+                language: this.field.type,
+                name: "field",
+                value: this.value,
+            }) as any;
+        }
+
+        return foundry.applications.fields.createTextInput({
             name: "field",
+            placeholder: this.label.text,
             value: this.value,
-        }) as any;
+        });
     }
 
     afterRender(input: HTMLInputElement | SearchSelectInputElement) {
         input.focus();
-        input.classList.toggle(
-            "bottom-half",
-            input.getBoundingClientRect().y > window.outerHeight / 2,
-        );
+        input.classList.toggle("bottom-half", input.getBoundingClientRect().y > window.outerHeight / 2);
     }
 
     afterAnimation(input: HTMLInputElement | SearchSelectInputElement): void {
@@ -245,10 +240,7 @@ class TextField extends InputField<string, TextFieldSchema> {
         }
     }
 
-    activateEventListeners(
-        input: HTMLInputElement,
-        returnValue: (value: string) => Promise<void>,
-    ): void {
+    activateEventListeners(input: HTMLInputElement, returnValue: (value: string) => Promise<void>): void {
         if (this.isSelect) {
             const closeInput = (value: string) => {
                 (input as unknown as SearchSelectInputElement).collapse();
@@ -310,14 +302,14 @@ interface TextField {
     readonly entry: TextEntry;
 }
 
-type TextEntryType = (typeof NODE_INPUT_TEXT_TYPES)[number];
+type TextFieldSchemaType = (typeof NODE_INPUT_TEXT_TYPES)[number];
 
 type TextFieldSchema = {
     default?: string;
     options?: string | string[] | { path: string; exclude?: string[] } | SelectOptions;
     trim: boolean;
-    type?: TextEntryType;
+    type?: TextFieldSchemaType;
 };
 
 export { TextField };
-export type { TextFieldSchema };
+export type { TextFieldSchema, TextFieldSchemaType };

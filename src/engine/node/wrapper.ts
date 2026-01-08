@@ -126,6 +126,7 @@ function instantiateNode(
                 R.pipe(
                     [
                         ["getInputValue", this.#getInputValue],
+                        ["getCustomInputs", this.#getCustomInputs],
                         ["getCustomInputsValues", this.#getCustomInputsValues],
                         ["getOutputValue", this.#getOutputValue],
                         ["executeNext", this.#executeNext],
@@ -164,7 +165,7 @@ function instantiateNode(
                 this,
                 R.fromKeys(["parseUserValue", "parseUserValues"] as const, (property) => {
                     return {
-                        value: parent.application[property].bind(parent),
+                        value: parent.application[property].bind(parent.application),
                         configurable: false,
                         enumerable: false,
                         writable: false,
@@ -232,6 +233,7 @@ function instantiateNode(
                 R.pipe(
                     [
                         ["nodePath", `${parent.path}:${this.id}`],
+                        ["state", nodeState],
                         ["triggerPath", parent.path],
                     ] as const,
                     R.fromEntries(),
@@ -269,9 +271,6 @@ function instantiateNode(
                     },
                     parent: {
                         value: parent,
-                    },
-                    state: {
-                        value: nodeState,
                     },
                     states: {
                         value: nodeStates,
@@ -335,7 +334,7 @@ function instantiateNode(
             }
         }
 
-        #getCustomInputsValues(slug: string): Promise<{ label: string; value: any }[]> {
+        #getCustomInputs(slug: string): Promise<{ label: string; value: any }[]> {
             const results = this.#inputs
                 .filter((input) => input.slug === slug)
                 .map(async ({ key, label }): Promise<{ label: string; value: any }> => {
@@ -344,6 +343,14 @@ function instantiateNode(
                         value: await this.getInputValue(key),
                     };
                 });
+
+            return Promise.all(results);
+        }
+
+        #getCustomInputsValues(slug: string): Promise<any[]> {
+            const results = this.#inputs
+                .filter((input) => input.slug === slug)
+                .map(async ({ key }) => this.getInputValue(key));
 
             return Promise.all(results);
         }
@@ -407,7 +414,6 @@ interface OpenTriggerNode extends TriggerNode {
     entries: NodeEntries;
     exitGate: OpenTriggerNode | undefined;
     parent: OpenTrigger;
-    state: string | null;
     states: string[] | null;
     tags: string[];
 }
