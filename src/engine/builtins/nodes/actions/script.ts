@@ -54,9 +54,7 @@ class ScriptActionNode extends BaseActionNode<
 
     async _execute(): Promise<boolean> {
         const values = await this.getCustomInputsValues("input");
-        const result = await (this.state === "macro"
-            ? this.#executeMacro(values)
-            : this.#executeScript(values));
+        const result = await (this.state === "macro" ? this.#executeMacro(values) : this.#executeScript(values));
 
         if (R.isBoolean(result)) {
             return result;

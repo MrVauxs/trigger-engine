@@ -1,6 +1,6 @@
 import { TriggerNode } from "engine";
 
-abstract class BaseDebugNode<
+abstract class BaseDialogNode<
     TOuts extends string | never = string,
     TInputs extends Record<string, any> | never = Record<string, any>,
     TOutputs extends Record<string, any> | never = Record<string, any>,
@@ -8,9 +8,13 @@ abstract class BaseDebugNode<
     TCustomOutputs extends string | never = string,
     TState extends string | never = string,
 > extends TriggerNode<TOuts, TInputs, TOutputs, TCustomInputs, TCustomOutputs, TState> {
-    static get category(): "debug" {
-        return "debug";
+    static get category(): "dialog" {
+        return "dialog";
+    }
+
+    get headerColor(): `#${string}` {
+        return "#2162bd";
     }
 }
 
-export { BaseDebugNode };
+export { BaseDialogNode };

@@ -1,8 +1,8 @@
 import { CustomInputSchema } from "engine";
 import { MODULE } from "module-helpers";
-import { BaseDebugNode } from ".";
+import { BaseActionNode } from ".";
 
-class ConsoleActionNode extends BaseDebugNode<"out", never, never, "input"> {
+class ConsoleActionNode extends BaseActionNode<"out", never, never, "input"> {
     static get type(): "console-log" {
         return "console-log";
     }
