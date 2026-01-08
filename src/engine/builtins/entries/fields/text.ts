@@ -17,11 +17,21 @@ class TextField extends InputField<string, TextFieldSchema> {
                     {
                         type: "object",
                         properties: {
-                            path: { type: "string" },
                             exclude: {
-                                type: "array",
-                                items: { type: "string" },
+                                anyOf: [
+                                    {
+                                        type: "array",
+                                        items: { type: "string" },
+                                    },
+                                    {
+                                        type: "object",
+                                        propertyNames: { type: "string" },
+                                    },
+                                ],
                             },
+                            label: { type: "string" },
+                            path: { type: "string" },
+                            value: { type: "string" },
                         },
                         required: ["path"],
                     },
@@ -42,6 +52,10 @@ class TextField extends InputField<string, TextFieldSchema> {
                         },
                     },
                 ],
+            },
+            tooltip: {
+                default: true,
+                type: "boolean",
             },
             trim: {
                 default: true,
@@ -91,11 +105,11 @@ class TextField extends InputField<string, TextFieldSchema> {
     }
 
     get targetFontSize(): number {
-        return this.isSimpleInput ? super.targetFontSize : 15;
+        return this.isSelect || this.isSimpleInput ? super.targetFontSize : 15;
     }
 
     get targetHeight(): number {
-        return this.isSimpleInput ? super.targetHeight : 400;
+        return this.isSelect || this.isSimpleInput ? super.targetHeight : 400;
     }
 
     get targetWidth(): number {
@@ -128,12 +142,7 @@ class TextField extends InputField<string, TextFieldSchema> {
     }
 
     localizeOption({ value, label }: EntrySelectOption) {
-        const parsedLabel = R.isString(label)
-            ? label
-            : R.isPlainObject(label) && "label" in label
-              ? label.label
-              : value;
-
+        const parsedLabel = R.isString(label) ? label : value;
         return parsedLabel ? game.i18n.localize(parsedLabel) : (this.localize("options", value) ?? value);
     }
 
@@ -226,12 +235,10 @@ class TextField extends InputField<string, TextFieldSchema> {
     }
 
     afterAnimation(input: HTMLInputElement | SearchSelectInputElement): void {
-        if (this.isSimpleInput) {
-            if (input instanceof HTMLInputElement) {
-                input.select();
-            } else {
-                input.expand();
-            }
+        if (input instanceof SearchSelectInputElement) {
+            input.expand();
+        } else if (this.isSimpleInput) {
+            input.select();
         } else {
             const selector = this.isEnrichedInput ? ".editor-content" : ".cm-content";
             const content = htmlQuery(input, selector);
@@ -306,10 +313,18 @@ type TextFieldSchemaType = (typeof NODE_INPUT_TEXT_TYPES)[number];
 
 type TextFieldSchema = {
     default?: string;
-    options?: string | string[] | { path: string; exclude?: string[] } | SelectOptions;
+    options?: string | string[] | TextFieldPathOptions | SelectOptions;
+    tooltip: boolean;
     trim: boolean;
     type?: TextFieldSchemaType;
 };
 
+type TextFieldPathOptions = {
+    exclude?: string[] | Record<string, boolean>;
+    label?: string;
+    path: string;
+    value?: string;
+};
+
 export { TextField };
-export type { TextFieldSchema, TextFieldSchemaType };
+export type { TextFieldPathOptions, TextFieldSchema, TextFieldSchemaType };

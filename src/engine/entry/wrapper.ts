@@ -8,7 +8,7 @@ import {
     Trigger,
     TriggerNode,
 } from "engine";
-import { R, z, zForceSafeParse } from "module-helpers";
+import { LocalizeArgs, R, z, zForceSafeParse } from "module-helpers";
 import { EntryCategory } from "triggers-menu";
 
 function instantiateEntry(
@@ -64,6 +64,10 @@ function instantiateEntry(
                 entryField = zForceSafeParse(fieldSchema, data) as any;
             }
         } catch (error) {}
+    }
+
+    function localize(...args: LocalizeArgs): string | undefined {
+        return parent.localize(...args);
     }
 
     class NodeEntryWrapper extends EntryCls {
@@ -138,6 +142,23 @@ function instantiateEntry(
                         writable: false,
                     };
                 }),
+            );
+
+            // from private methods
+            Object.defineProperties(
+                this,
+                R.pipe(
+                    [["localize", localize]] as const,
+                    R.fromEntries(),
+                    R.mapValues((method) => {
+                        return {
+                            value: method.bind(this),
+                            configurable: false,
+                            enumerable: false,
+                            writable: false,
+                        };
+                    }),
+                ),
             );
 
             if (open) {

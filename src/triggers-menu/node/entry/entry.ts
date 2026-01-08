@@ -43,7 +43,7 @@ class BlueprintEntry extends BaseBlueprintEntry {
         const { key, label } = this.#entry;
         return label
             ? game.i18n.localize(label)
-            : (this.node.localize(this.category, key) ?? this.node.rootLocalize("entry", key, "title") ?? key);
+            : (this.node.localize(this.category, key, "title") ?? this.node.rootLocalize("entry", key, "title") ?? key);
     }
 
     get isArray(): boolean {

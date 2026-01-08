@@ -105,6 +105,9 @@
                 },
                 "event": {
                     "title": "Event"
+                },
+                "value": {
+                    "title": "Value"
                 }
             },
             "entry": {
@@ -142,8 +145,12 @@
                     },
                     "execute-script": {
                         "inputs": {
-                            "macro": "Macro UUID",
-                            "script": "Script Code"
+                            "macro": {
+                                "title": "Macro UUID"
+                            },
+                            "script": {
+                                "title": "Script Code"
+                            }
                         },
                         "states": {
                             "macro": "Macro",
@@ -158,12 +165,19 @@
                     },
                     "region-event": {
                         "outputs": {
-                            "event": "Event"
+                            "event": {
+                                "title": "Event"
+                            }
                         },
                         "title": "Scene Region"
                     },
                     "test-event": {
                         "title": "Test Event"
+                    }
+                },
+                "value": {
+                    "user-value": {
+                        "title": "World User"
                     }
                 }
             },
@@ -183,6 +197,9 @@
                 },
                 "region": {
                     "title": "Region"
+                },
+                "user": {
+                    "title": "User"
                 }
             }
         },

@@ -1,5 +1,5 @@
 import { BaseEntrySchemaOutput, ConnectionId, EntryCategory, NodeField, TriggerNode } from "engine";
-import { MODULE } from "module-helpers";
+import { LocalizeArgs, MODULE } from "module-helpers";
 
 // IMPORTANT an entry can never represent an array
 class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<string, any> | undefined = undefined> {
@@ -101,19 +101,24 @@ class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<st
     //////////////////////////////
 
     /**
+     * @see {@link NodeEntry.fromJSON}
+     */
+    declare readonly fromJSON: (value: JSONValue) => Promise<any> | any;
+
+    /**
      * @see {@link NodeEntry.isValidType}
      */
     declare readonly isValidType: (value: unknown) => value is Exclude<TValue, undefined>;
 
     /**
+     * @see {@link TriggerNode#localize}
+     */
+    declare readonly localize: (...args: LocalizeArgs) => string | undefined;
+
+    /**
      * @see {@link NodeEntry.toJSON}
      */
     declare readonly toJSON: (value: any) => JSONValue;
-
-    /**
-     * @see {@link NodeEntry.fromJSON}
-     */
-    declare readonly fromJSON: (value: JSONValue) => Promise<any> | any;
 
     //////////////////////////////
     // METHODS
@@ -132,8 +137,8 @@ class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<st
     /**
      * Tooltip to display when the entry is hovered over.
      */
-    generateTooltip(label: string, isConnected: boolean): string | HTMLElement | undefined {
-        return this.tooltip;
+    generateTooltip(label: string, isConnected: boolean): string | undefined {
+        return this.localize(this.category, this.key, "tooltip");
     }
 
     /**

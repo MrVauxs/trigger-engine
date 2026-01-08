@@ -7,7 +7,6 @@ const zNodeEntrySchema = z.object({
     group: zString.optional(),
     slug: zString.optional(),
     state: zString.optional(),
-    tooltip: z.string().trim().optional(),
     type: zString,
 });
 

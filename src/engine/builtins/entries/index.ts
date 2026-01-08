@@ -1,3 +1,4 @@
+import { BaseEntrySchema } from ".";
 import { InputTextEntry, OutputTextEntry } from ".";
 
 export * from "./base";
@@ -8,8 +9,8 @@ export * from "./target";
 export * from "./text";
 export * from "./user";
 
-type BuiltinsOutputEntry = OutputTextEntry;
+type BuiltinsOutputEntry = OutputTextEntry | BaseEntrySchema<"user">;
 
-type BuiltinsInputEntry = InputTextEntry;
+type BuiltinsInputEntry = InputTextEntry | BaseEntrySchema<"user">;
 
 export type { BuiltinsOutputEntry, BuiltinsInputEntry };
