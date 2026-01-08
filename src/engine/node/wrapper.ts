@@ -294,8 +294,11 @@ function instantiateNode(
                 if (!connection) return true;
 
                 const node = parent.getNodeFromEntryId(connection);
+                if (!node) return true;
 
-                return node?._execute(...args) ?? true;
+                // we set the trigger context to the node's whenever it is executed
+                parent.userContext = node.userContext;
+                return node._execute(...args);
             } catch (error: any) {
                 MODULE.error(`an error occurred while executing the node: ${this.nodePath}`, error);
                 return true;
