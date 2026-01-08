@@ -877,7 +877,7 @@ class BlueprintNode extends PIXI.Container {
                 R.isIncludedIn(type, availableTypes),
             );
 
-            dialogData.array = (schema as BaseCustomEntrySchema).array ? {} : undefined;
+            dialogData.array = (schema as BaseCustomEntrySchema).array ? { value: false } : undefined;
 
             dialogData.types = R.map(selectedTypes?.length ? selectedTypes : availableTypes, (type) => {
                 return {
@@ -910,7 +910,7 @@ class BlueprintNode extends PIXI.Container {
                     labelInput.placeholder = el.selectedOptions[0].innerText;
                 });
             },
-            title: localize("blueprint.entry", isEdit ? "edit" : "add", { label: title }),
+            title: localize("blueprint.entry", isEdit ? "edit" : "add", "title", { label: title }),
             yes: {
                 label: localize("edit-entry.yes", isEdit ? "edit" : "add"),
             },
@@ -1084,7 +1084,7 @@ type PreciseTextOptions = Partial<PIXI.ITextStyle> & {
 };
 
 type CustomEntryDialogData = {
-    array?: {};
+    array?: { value: boolean };
     input?: { label: string; placeholder: string | undefined; value: string };
     label: { placeholder: string | undefined; value: string } | false;
     type: string | undefined;
@@ -1092,4 +1092,4 @@ type CustomEntryDialogData = {
 };
 
 export { BlueprintNode };
-export type { PreciseTextOptions };
+export type { CustomEntryDialogData, PreciseTextOptions };

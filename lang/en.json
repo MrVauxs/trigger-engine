@@ -11,9 +11,14 @@
     "trigger-engine": {
         "blueprint": {
             "entry": {
-                "add": "Add: {label}",
+                "add": {
+                    "title": "Add: {label}"
+                },
                 "disconnect": "Disconnect Entry",
-                "edit": "Edit: {label}",
+                "edit": {
+                    "label": "Edit Entry",
+                    "title": "Edit: {label}"
+                },
                 "remove": {
                     "content": "Are you sure you want to remove this entry?",
                     "title": "Remove Entry"
