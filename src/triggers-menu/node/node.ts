@@ -214,6 +214,10 @@ class BlueprintNode extends PIXI.Container {
     }
 
     get minWidth(): number {
+        return 100;
+    }
+
+    get minWidthHeader(): number {
         return 200;
     }
 
@@ -309,7 +313,7 @@ class BlueprintNode extends PIXI.Container {
         const body = this.#drawBody();
 
         const width = Math.min(
-            Math.max(header?.calculatedWith ?? 0, body.calculatedWith, this.minWidth),
+            Math.max(header?.calculatedWith ?? 0, body.calculatedWith, header ? this.minWidthHeader : this.minWidth),
             this.maxWidth,
         );
         const height = body.calculatedHeight + (header?.calculatedHeight ?? 0);
