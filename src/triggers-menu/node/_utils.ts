@@ -8,7 +8,7 @@ function alignHorizontally(
         offset: { x = 0, y = 0 } = {},
         reverse = false,
         spacing = 0,
-    }: { height?: number; offset?: Partial<Point>; reverse?: boolean; spacing?: number } = {}
+    }: { height?: number; offset?: Partial<Point>; reverse?: boolean; spacing?: number } = {},
 ) {
     const filtered = R.filter(elements, R.isTruthy);
     const entries = reverse ? R.reverse(filtered) : filtered;
@@ -45,8 +45,8 @@ function maxBottom(a?: PIXI.Container | NodePart, b?: PIXI.Container | NodePart)
 
 async function editLabelDialog(
     type: "gate" | "variable",
-    { placeholder, value }: { placeholder?: string; value?: string } = {}
-): Promise<string | undefined> {
+    { placeholder, value }: { placeholder?: string; value?: string } = {},
+): Promise<string | undefined | null> {
     const group = foundry.applications.fields.createFormGroup({
         label: localize("edit-label.label"),
         input: foundry.applications.fields.createTextInput({
@@ -66,6 +66,7 @@ async function editLabelDialog(
         },
     });
 
+    if (!result) return null;
     return result && result.label && (!value || value !== result.label) ? result.label : undefined;
 }
 

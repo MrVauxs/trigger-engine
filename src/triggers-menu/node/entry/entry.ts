@@ -254,6 +254,7 @@ class BlueprintEntry extends BaseBlueprintEntry {
                 callback: async () => {
                     const placeholder = this.label;
                     const label = await editLabelDialog("variable", { placeholder });
+                    if (label === null) return;
 
                     this.trigger.update({
                         variables: {
