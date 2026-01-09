@@ -25,7 +25,9 @@
 }
 
 #tooltip.trigger-engine-field-tooltip {
-    border: 1px solid #6d5c00;
+    --border-color: #584a75c4;
+
+    border: 1px solid var(--border-color);
     padding: 0.3rem 0.5rem;
 
     .title {
@@ -34,8 +36,16 @@
 
     hr {
         background: none;
-        border-top: 1px solid #6d5c00bf;
+        border-top: 1px solid var(--border-color);
         margin: 0.3rem 0;
+    }
+
+    code {
+        display: inline;
+        padding: 0 0.2em;
+        border: 0;
+        background: #302831c4;
+        box-shadow: inset 0 0 0px 1px var(--border-color);
     }
 }
 
