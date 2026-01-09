@@ -1,6 +1,6 @@
 import { GETTER_VARIABLE_TYPE, TriggerNode, VARIABLE_CATEGORY } from "engine";
 
-class TriggerVariableGetter extends TriggerNode {
+class TriggerVariableGetter extends TriggerNode<never, { entry: any }> {
     static get category(): string {
         return VARIABLE_CATEGORY;
     }
@@ -21,12 +21,8 @@ class TriggerVariableGetter extends TriggerNode {
         return "\uf044";
     }
 
-    _execute(...args: any[]): Promise<boolean> {
-        throw new Error("Method not implemented.");
-    }
-
-    _query(key: string): Promise<any> {
-        throw new Error("Method not implemented.");
+    _query(): Promise<any> {
+        return this.getInputValue("entry");
     }
 }
 
