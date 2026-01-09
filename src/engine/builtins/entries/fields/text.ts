@@ -1,5 +1,5 @@
 import { NodeFieldSchema } from "engine";
-import { R, htmlQuery } from "module-helpers";
+import { R, foundryLocalizeIfExist, htmlQuery } from "module-helpers";
 import { InputField, SearchSelectInputElement } from ".";
 import { TextEntry } from "../text";
 import elements = foundry.applications.elements;
@@ -19,6 +19,7 @@ class TextField extends InputField<string, TextFieldSchema> {
                         {
                             type: "object",
                             properties: {
+                                group: { type: "string" },
                                 label: { type: "string" },
                                 value: { type: "string" },
                             },
@@ -66,7 +67,7 @@ class TextField extends InputField<string, TextFieldSchema> {
         return this.entry.isSelect;
     }
 
-    get options(): SelectOptions {
+    get options(): SelectFieldOption[] {
         return this.entry.options;
     }
 
@@ -171,9 +172,18 @@ class TextField extends InputField<string, TextFieldSchema> {
 
     createInput(): HTMLInputElement {
         if (this.field.type === "select" && this.options.length) {
-            const options = this.options.map((option): Required<SelectOption> => {
-                return { value: option.value, label: this.localizeOption(option) };
+            const options: SelectFieldOptions = R.map(this.options, (option) => {
+                const group = option.group
+                    ? (this.localize("options", option.group) ?? foundryLocalizeIfExist(option.group))
+                    : undefined;
+
+                return {
+                    value: option.value,
+                    label: this.localizeOption(option),
+                    group,
+                };
             });
+
             return new SearchSelectInputElement({ options, value: this.value }) as any;
         }
 
@@ -286,11 +296,14 @@ type TextFieldSchemaType = (typeof NODE_INPUT_TEXT_TYPES)[number];
 
 type TextFieldSchema = {
     default?: string;
-    options?: string[] | SelectOptions;
+    options?: (SelectFieldOption | string)[];
     tooltip: boolean;
     trim: boolean;
     type?: TextFieldSchemaType;
 };
 
+type SelectFieldOption = Prettify<SelectOption & { group?: string }>;
+type SelectFieldOptions = Prettify<WithRequired<SelectFieldOption, "label">>[];
+
 export { TextField };
-export type { TextFieldSchema, TextFieldSchemaType };
+export type { SelectFieldOption, SelectFieldOptions, TextFieldSchema, TextFieldSchemaType };

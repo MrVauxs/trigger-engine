@@ -1,20 +1,12 @@
-import {
-    R,
-    addListenerAll,
-    createHTMLElement,
-    createInputElement,
-    htmlQuery,
-} from "module-helpers";
+import { R, addListenerAll, createHTMLElement, createInputElement, htmlQuery } from "module-helpers";
+import { SelectFieldOptions } from "..";
 
-class SearchSelectInputElement extends foundry.applications.elements.AbstractFormInputElement<
-    string,
-    string
-> {
+class SearchSelectInputElement extends foundry.applications.elements.AbstractFormInputElement<string, string> {
     #input!: HTMLInputElement;
-    #options: RequiredSelectOptions;
+    #options: SelectFieldOptions;
     #popup!: HTMLDivElement;
 
-    constructor({ options, value }: { options: RequiredSelectOptions; value: string }) {
+    constructor({ options, value }: { options: SelectFieldOptions; value: string }) {
         super();
 
         this._setValue(value || "");
@@ -44,14 +36,25 @@ class SearchSelectInputElement extends foundry.applications.elements.AbstractFor
 
         this.#popup = createHTMLElement("div", {
             classes: ["popup"],
-            content: this.#options.map(({ label, value }) => {
-                const classes: (string | false)[] = ["option", value === this.value && "selected"];
+            content: this.#options.flatMap(({ label, value, group }) => {
+                const elements: HTMLElement[] = [
+                    createHTMLElement("div", {
+                        classes: ["option", value === this.value && "selected"].filter(R.isTruthy),
+                        content: label,
+                        dataset: { label, value },
+                    }),
+                ];
 
-                return createHTMLElement("div", {
-                    classes: classes.filter(R.isTruthy),
-                    content: label,
-                    dataset: { label, value },
-                });
+                if (group) {
+                    elements.unshift(
+                        createHTMLElement("div", {
+                            classes: ["group"],
+                            content: group,
+                        }),
+                    );
+                }
+
+                return elements;
             }),
         });
 

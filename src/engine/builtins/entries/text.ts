@@ -1,9 +1,9 @@
 import { R } from "module-helpers";
-import { BaseInputEntrySchema, BuiltInNodeEntry, TextField, TextFieldSchema } from ".";
+import { BaseInputEntrySchema, BuiltInNodeEntry, SelectFieldOption, TextField, TextFieldSchema } from ".";
 import validators = foundry.data.validators;
 
 class TextEntry extends BuiltInNodeEntry<string, TextFieldSchema> {
-    #options?: SelectOptions;
+    #options?: SelectFieldOption[];
 
     static get type(): "text" {
         return "text";
@@ -53,10 +53,10 @@ class TextEntry extends BuiltInNodeEntry<string, TextFieldSchema> {
         return this.field.default ?? (this.field.type === "json" ? TextEntry.defaultJSON : super.default);
     }
 
-    get options(): SelectOptions {
+    get options(): SelectFieldOption[] {
         return (this.#options ??= R.map(
             this.field?.options ?? [],
-            (option): SelectOption => (R.isString(option) ? { value: option } : option),
+            (option): SelectFieldOption => (R.isString(option) ? { value: option } : option),
         ));
     }
 
@@ -107,4 +107,4 @@ type BuiltinsTextFieldSchema = SimpleField | SelectField | JsonField | Javascrip
 type InputTextEntry = BaseInputEntrySchema<"text", BuiltinsTextFieldSchema>;
 
 export { TextEntry };
-export type { InputTextEntry };
+export type { InputTextEntry, SelectField };
