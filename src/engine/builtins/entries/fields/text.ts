@@ -55,6 +55,10 @@ class TextField extends InputField<string, TextFieldSchema> {
         return 120;
     }
 
+    get innerWidth(): number {
+        return super.innerWidth - (this.isSelect ? this.decoratorWidth : 0);
+    }
+
     get decoratorWidth(): number {
         return 16;
     }
@@ -108,7 +112,7 @@ class TextField extends InputField<string, TextFieldSchema> {
         return this.isSimpleInput
             ? this.value
             : this.isEnrichedInput
-              ? this.value.replace(/\<\/?p\>/g, " ")
+              ? this.value.replace(/\<\/?p\>/g, " ").trim()
               : this.value.replace(/\s{1,}|\\n/g, this.field.type === "json" ? "" : " ");
     }
 
@@ -126,7 +130,6 @@ class TextField extends InputField<string, TextFieldSchema> {
         const label = this.label;
         const padding = this.innerPadding;
         const isSelect = this.isSelect;
-        const textWidth = isSelect ? this.width - this.decoratorWidth : this.width;
 
         label.x = this.innerPadding;
         label.position.set(this.innerPadding, 0);
@@ -134,6 +137,8 @@ class TextField extends InputField<string, TextFieldSchema> {
         label.style.lineHeight = this.lineHeight;
 
         if (isSelect) {
+            const textWidth = this.width - this.decoratorWidth;
+
             label.alpha = this.isConnected ? 0.5 : 0;
 
             this.lineStyle({
@@ -164,9 +169,9 @@ class TextField extends InputField<string, TextFieldSchema> {
             this.lineTo(rightPoint, highPoint);
         } else {
             label.alpha = this.isConnected || this.value === this.default ? 0.5 : 0;
+            this.addRectangleMask(label, 0, 0, this.width - padding * 2, this.height);
         }
 
-        this.addRectangleMask(label, 0, 0, textWidth - padding * 2, this.height);
         this.addChild(label);
     }
 
