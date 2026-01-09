@@ -41,6 +41,8 @@ function instantiateHook(parent: TriggerApplication, HookCls: typeof TriggerHook
                 this,
                 R.fromKeys(
                     [
+                        "convertToEmitable",
+                        "convertValuesToEmitable",
                         "executeEvent",
                         "executeTriggerEvent",
                         "executeTriggerEventAsGM",

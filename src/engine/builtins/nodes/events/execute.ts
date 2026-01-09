@@ -17,8 +17,9 @@ class ExecuteEventNode extends BaseEventNode {
         return "\uf144";
     }
 
-    _execute({ values }: { values: any[] }): Promise<boolean> {
-        this.setCustomOutputValues("output", values);
+    async _execute({ converted, values }: { converted?: boolean; values: any[] }): Promise<boolean> {
+        const parsed = converted ? await this.convertValuesFomEmitable(values) : values;
+        this.setCustomOutputValues("output", parsed);
         return this.executeNext("out");
     }
 }

@@ -1,4 +1,4 @@
-import { ApplicationKey, TriggerNode, UserValue } from "engine";
+import { ApplicationKey, EmitableUserValue, TriggerNode, UserValue } from "engine";
 import { MODULE } from "module-helpers";
 
 class TriggerHook<TArgs extends any[] = []> {
@@ -72,6 +72,16 @@ class TriggerHook<TArgs extends any[] = []> {
     //////////////////////////////
 
     /**
+     * Convert the user value into one that is sent via websocket.
+     */
+    declare convertToEmitable: (userValue: UserValue) => UserValue | undefined;
+
+    /**
+     * @see {@link TriggerHook#convertToEmitable}
+     */
+    declare convertValuesToEmitable: (values: UserValue[]) => (EmitableUserValue | undefined)[];
+
+    /**
      * Execute all triggers that have this event.
      *
      * @param userId the context the trigger should have.
@@ -105,16 +115,16 @@ class TriggerHook<TArgs extends any[] = []> {
     ) => Promise<unknown>;
 
     /**
+     * This is used to validate values provided by users at runtime.
+     */
+    declare parseUserValue: (userValue: UserValue, withType?: boolean) => boolean;
+
+    /**
      * @see {@link TriggerHook#validateUserValue}
      *
      * Parse & filter an array of user values.
      */
-    declare parseUserValues: (values: UserValue[]) => any[];
-
-    /**
-     * This is used to validate values provided by users at runtime.
-     */
-    declare parseUserValue: (userEntry: { type: string; value: any }) => boolean;
+    declare parseUserValues: (values: UserValue[], withType?: boolean) => any[];
 }
 
 export { TriggerHook };

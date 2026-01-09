@@ -4,10 +4,12 @@ import {
     CustomInputSchema,
     CustomOutputSchema,
     CustomOutSchema,
+    EmitableUserValue,
     InputEntrySchemaSource,
     NodeField,
     OutputEntrySchemaSource,
     TriggerPath,
+    UserValue,
 } from "engine";
 import { LocalizeArgs, MODULE, UserPF2e } from "module-helpers";
 import { NodeData } from ".";
@@ -218,6 +220,29 @@ class TriggerNode<
     //////////////////////////////
 
     /**
+     * Convert values back from their websocket version.
+     */
+    declare convertFromEmitable: (userValue: EmitableUserValue, withType?: boolean) => Promise<any | undefined>;
+
+    /**
+     * Convert the user value into one that is sent via websocket.
+     */
+    declare convertToEmitable: (userValue: UserValue) => UserValue | undefined;
+
+    /**
+     * @see {@link TriggerNode#convertFromEmitable}
+     */
+    declare convertValuesFomEmitable: (
+        values: (EmitableUserValue | undefined)[],
+        withType?: boolean,
+    ) => Promise<(any | undefined)[]>;
+
+    /**
+     * @see {@link TriggerNode#convertToEmitable}
+     */
+    declare convertValuesToEmitable: (values: UserValue[]) => (EmitableUserValue | undefined)[];
+
+    /**
      * Calls the next `executable` node in the chain.
      *
      * @param out key of the selected `out` bridge
@@ -266,14 +291,14 @@ class TriggerNode<
     /**
      * This is used to validate values provided by users at runtime.
      */
-    declare parseUserValue: (userValue: unknown) => boolean;
+    declare parseUserValue: (userValue: unknown, withType?: boolean) => any;
 
     /**
      * @see {@link TriggerNode#validateUserValue}
      *
      * Parse & filter an array of user values.
      */
-    declare parseUserValues: (userValues: unknown) => any[];
+    declare parseUserValues: (userValues: unknown, withType?: boolean) => any[];
 
     /**
      * @see {@link TriggerNode#localize}

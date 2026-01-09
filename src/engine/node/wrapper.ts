@@ -163,14 +163,24 @@ function instantiateNode(
             // from application
             Object.defineProperties(
                 this,
-                R.fromKeys(["parseUserValue", "parseUserValues"] as const, (property) => {
-                    return {
-                        value: parent.application[property].bind(parent.application),
-                        configurable: false,
-                        enumerable: false,
-                        writable: false,
-                    };
-                }),
+                R.fromKeys(
+                    [
+                        "convertFromEmitable",
+                        "convertToEmitable",
+                        "convertValuesFomEmitable",
+                        "convertValuesToEmitable",
+                        "parseUserValue",
+                        "parseUserValues",
+                    ] as const,
+                    (property) => {
+                        return {
+                            value: parent.application[property].bind(parent.application),
+                            configurable: false,
+                            enumerable: false,
+                            writable: false,
+                        };
+                    },
+                ),
             );
 
             // bridges

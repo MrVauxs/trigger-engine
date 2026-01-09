@@ -27,9 +27,9 @@ import {
     VARIABLE_CATEGORY,
 } from "engine";
 import { includesAny, joinStr, LocalizeArgs, LocalizeData, MODULE, R } from "module-helpers";
+import { ExecuteTriggerQueryOptions } from "queries";
 import { BlueprintApplication } from "triggers-menu";
 import utils = foundry.utils;
-import { ExecuteTriggerQueryOptions } from "queries";
 
 const APPLICATION_MODES = ["setting", "free"] as const;
 const FORBIDDEN_NODE_CATEGORIES = [GATE_CATEGORY, VARIABLE_CATEGORY];
@@ -273,21 +273,69 @@ class TriggerApplication {
         MODULE.groupEnd();
     }
 
-    parseUserValue<T extends UserValue>(userValue: T): T["value"] | undefined {
+    convertToEmitable(userValue: UserValue): EmitableUserValue | undefined {
+        const entry = this.entries.get(userValue.type);
+        if (!entry) return;
+
+        const value = R.isArray(userValue.value)
+            ? userValue.value.map(entry.toJSON.bind(entry))
+            : entry.toJSON(userValue.value);
+
+        return { type: userValue.type, value };
+    }
+
+    convertValuesToEmitable(values: UserValue[]): (EmitableUserValue | undefined)[] {
+        return values.map(this.convertToEmitable.bind(this));
+    }
+
+    async convertFromEmitable(value: EmitableUserValue | undefined, withType: true): Promise<any | undefined>;
+    async convertFromEmitable(value: EmitableUserValue | undefined, withType?: boolean): Promise<UserValue | undefined>;
+    async convertFromEmitable(value: EmitableUserValue | undefined, withType?: boolean) {
+        if (!value) return;
+
+        const entry = this.entries.get(value.type);
+        if (!entry) return;
+
+        const convertedValue = R.isArray(value.value)
+            ? await Promise.all(value.value.map(entry.fromJSON.bind(entry)))
+            : await entry.fromJSON(value.value);
+
+        return withType ? { type: value.type, value: convertedValue } : convertedValue;
+    }
+
+    async convertValuesFomEmitable(
+        values: (EmitableUserValue | undefined)[],
+        withType: true,
+    ): Promise<(UserValue | undefined)[]>;
+    async convertValuesFomEmitable(
+        values: (EmitableUserValue | undefined)[],
+        withType?: boolean,
+    ): Promise<(any | undefined)[]>;
+    async convertValuesFomEmitable(values: (EmitableUserValue | undefined)[], withType?: boolean) {
+        return Promise.all(values.map((value) => this.convertFromEmitable(value, withType)));
+    }
+
+    parseUserValue<T extends UserValue>(userValue: UserValue, withType: true): UserValue | undefined;
+    parseUserValue<T extends UserValue>(userValue: UserValue, withType?: boolean): T["value"] | undefined;
+    parseUserValue(userValue: UserValue, withType?: boolean) {
         if (!R.isObjectType(userValue) || !R.isString(userValue.type)) return;
 
         const entry = this.entries.get(userValue.type);
         if (!entry) return;
 
-        return R.isArray(userValue.value)
-            ? userValue.value.filter(entry.isValidType.bind(entry))
+        const value = R.isArray(userValue.value)
+            ? userValue.value.filter(entry.isValidType.bind(entry)).map((x) => foundry.utils.deepClone(x))
             : entry.isValidType(userValue.value)
-              ? userValue.value
+              ? foundry.utils.deepClone(userValue.value)
               : entry.default;
+
+        return withType ? { type: userValue.type, value } : value;
     }
 
-    parseUserValues(values: UserValue[]): any[] {
-        return R.isArray(values) ? values.map(this.parseUserValue.bind(this)) : [];
+    parseUserValues(userValues: UserValue[], withType: true): UserValue[];
+    parseUserValues(userValues: UserValue[], withType?: boolean): any[];
+    parseUserValues(userValues: UserValue[], withType?: boolean) {
+        return R.isArray(userValues) ? userValues.map((value) => this.parseUserValue(value, withType)) : [];
     }
 
     async executeEvent(userId: string, event: string, ...args: any[]) {
@@ -498,5 +546,17 @@ type UserValue = {
     value: any;
 };
 
+type EmitableUserValue = {
+    type: string;
+    value: JSONValue | JSONValue[];
+};
+
 export { TriggerApplication };
-export type { ApplicationKey, ApplicationParentType, TriggerApplicationOptions, TriggersSetting, UserValue };
+export type {
+    ApplicationKey,
+    ApplicationParentType,
+    EmitableUserValue,
+    TriggerApplicationOptions,
+    TriggersSetting,
+    UserValue,
+};

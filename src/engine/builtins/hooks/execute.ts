@@ -33,7 +33,8 @@ class ExecuteHook extends TriggerHook {
             return this.#execute(triggerPath, values);
         } else {
             return this.executeTriggerEventAsGM(triggerPath, "execute-event", {
-                values: this.parseUserValues(values),
+                converted: true,
+                values: this.parseUserValues(values, true).map(this.convertToEmitable.bind(this)),
             });
         }
     }
