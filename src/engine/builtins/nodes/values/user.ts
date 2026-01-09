@@ -40,13 +40,17 @@ class UserValueNode extends BaseValueNode<Inputs> {
 
     async _query(): Promise<UserPF2e | undefined> {
         const id = await this.getInputValue("id");
-        return id === "__active-gm__"
-            ? (game.users.activeGM ?? undefined)
-            : id === "__context-user__"
-              ? this.userContext
-              : id === "__self-user__"
-                ? game.user
-                : game.users.get(id);
+
+        switch (id) {
+            case "__active-gm__":
+                return game.users.activeGM ?? undefined;
+            case "__context-user__":
+                return this.userContext;
+            case "__self-user__":
+                return game.user;
+            default:
+                return game.users.get(id);
+        }
     }
 }
 
