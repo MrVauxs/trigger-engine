@@ -137,7 +137,23 @@
                     }
                 },
                 "action": {
-                    "await-dialog": {
+                    "await-confirm": {
+                        "inputs": {
+                            "content": {
+                                "title": "Prompt Content"
+                            },
+                            "key": {
+                                "title": "Localization Key"
+                            },
+                            "title": {
+                                "title": "Dialog Title",
+                                "tooltip": "Can be a localization key"
+                            }
+                        },
+                        "states": {
+                            "description": "Description",
+                            "localization": "Localization"
+                        },
                         "title": "Await Confirmation"
                     },
                     "console-log": {
