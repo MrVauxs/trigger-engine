@@ -1,22 +1,18 @@
 import { mapConvertors } from "engine";
 import { MODULE, R } from "module-helpers";
 import {
-    BooleanEntry,
-    convertors,
-    NumberEntry,
-    TestHook,
-    TestEventNode,
-    TextEntry,
+    ConfirmActionNode,
     ConsoleActionNode,
-    RegionHook,
-    RegionEventNode,
-    TargetEntry,
     ExecuteEventNode,
     ExecuteHook,
+    RegionEventNode,
+    RegionHook,
     ScriptActionNode,
-    ConfirmActionNode,
-    UserEntry,
+    TestEventNode,
+    TestHook,
     UserValueNode,
+    builtinsEntries,
+    convertors,
 } from ".";
 
 class BuiltInApplication {
@@ -38,10 +34,7 @@ class BuiltInApplication {
 
     static convertors = mapConvertors(convertors);
 
-    static entries = R.map(
-        [BooleanEntry, NumberEntry, TargetEntry, TextEntry, UserEntry],
-        (entry) => [entry.type, entry] as const,
-    );
+    static entries = R.map(builtinsEntries, (entry) => [entry.type, entry] as const);
 
     static hooks = R.map([ExecuteHook, RegionHook, TestHook], (entry) => [entry.type, entry] as const);
 

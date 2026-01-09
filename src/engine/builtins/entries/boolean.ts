@@ -1,5 +1,5 @@
 import { R } from "module-helpers";
-import { BooleanField, BooleanFieldSchema, BuiltInNodeEntry } from ".";
+import { BaseInputEntrySchema, BooleanField, BooleanFieldSchema, BuiltInNodeEntry } from ".";
 
 class BooleanEntry extends BuiltInNodeEntry<boolean, BooleanFieldSchema> {
     static get type(): "boolean" {
@@ -35,4 +35,7 @@ class BooleanEntry extends BuiltInNodeEntry<boolean, BooleanFieldSchema> {
     }
 }
 
+type InputBooleanEntry = BaseInputEntrySchema<"boolean", BooleanFieldSchema>;
+
 export { BooleanEntry };
+export type { InputBooleanEntry };

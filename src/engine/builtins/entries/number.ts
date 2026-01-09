@@ -1,5 +1,5 @@
 import { R, roundToStep } from "module-helpers";
-import { BuiltInNodeEntry, NumberField, NumberFieldSchema } from ".";
+import { BaseInputEntrySchema, BuiltInNodeEntry, NumberField, NumberFieldSchema } from ".";
 
 class NumberEntry extends BuiltInNodeEntry<number, NumberFieldSchema> {
     static get type(): "number" {
@@ -43,4 +43,7 @@ class NumberEntry extends BuiltInNodeEntry<number, NumberFieldSchema> {
     }
 }
 
+type InputNumberEntry = BaseInputEntrySchema<"number", Partial<NumberFieldSchema>>;
+
 export { NumberEntry };
+export type { InputNumberEntry };

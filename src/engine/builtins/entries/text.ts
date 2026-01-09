@@ -95,13 +95,7 @@ class TextEntry extends BuiltInNodeEntry<string, TextFieldSchema> {
     }
 }
 
-type OutputTextEntry = BaseEntrySchema<"text">;
-
-type BaseField = {
-    default?: string;
-    tooltip?: boolean;
-    trim?: boolean;
-};
+type BaseField = Partial<Omit<TextFieldSchema, "options" | "type">>;
 
 type SimpleField = Prettify<BaseField & { type?: "enriched" }>;
 type SelectField = Prettify<BaseField & { type: "select"; options: TextFieldSchema["options"] }>;
@@ -113,4 +107,4 @@ type BuiltinsTextFieldSchema = SimpleField | SelectField | JsonField | Javascrip
 type InputTextEntry = BaseInputEntrySchema<"text", BuiltinsTextFieldSchema>;
 
 export { TextEntry };
-export type { InputTextEntry, OutputTextEntry };
+export type { InputTextEntry };

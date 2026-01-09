@@ -1,7 +1,7 @@
 import { NodeFieldSchema } from "engine";
 import { R, htmlQuery } from "module-helpers";
 import { InputField, SearchSelectInputElement } from ".";
-import { TextEntry } from "..";
+import { TextEntry } from "../text";
 import elements = foundry.applications.elements;
 
 const NODE_INPUT_CODE_TYPES = ["javascript", "json"] as const;
