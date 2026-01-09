@@ -74,7 +74,8 @@ class ConfirmActionNode extends BaseActionNode<
             return this.executeNext("false");
         }
 
-        const user = (await this.getInputValue("user")) ?? this.userContext;
+        const userInput = await this.getInputValue("user");
+        const user = userInput?.active ? userInput : this.userContext;
         const queryArgs: ConfirmDialogQueryOptions = {
             _type: "confirm-dialog",
             content,
@@ -91,7 +92,7 @@ class ConfirmActionNode extends BaseActionNode<
         try {
             const result = user.isSelf
                 ? await createConfirmDialog(args)
-                : await user.query(MODULE.path("user-query"), args);
+                : await user.query(MODULE.path("user-query"), args, { timeout: args.timeout * 1000 });
 
             return !!result;
         } catch (error: any) {
