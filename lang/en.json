@@ -197,7 +197,14 @@
                 },
                 "value": {
                     "user-value": {
-                        "title": "World User"
+                        "title": "World User",
+                        "options": {
+                            "__active-gm__": "Active GM",
+                            "__self-user__": "Self User",
+                            "__context-user__": "Context User",
+                            "specials": "Specials",
+                            "users": "Users"
+                        }
                     }
                 }
             },

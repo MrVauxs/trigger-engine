@@ -1,8 +1,8 @@
 import { UserPF2e } from "module-helpers";
 import { BaseValueNode } from ".";
-import { BuiltinsInputEntry, BuiltinsOutputEntry } from "engine";
+import { BuiltinsInputEntry, BuiltinsOutputEntry, SelectField, SelectFieldOption } from "engine";
 
-class UserValueNode extends BaseValueNode<{ id: string }> {
+class UserValueNode extends BaseValueNode<Inputs> {
     static get type(): "user-value" {
         return "user-value";
     }
@@ -12,9 +12,14 @@ class UserValueNode extends BaseValueNode<{ id: string }> {
     }
 
     static get defineInputs(): [BuiltinsInputEntry] {
-        const options = game.users.map((user): SelectOption => {
-            return { value: user.id, label: user.name };
-        });
+        const options: SelectField["options"] = [
+            { value: "__context-user__", group: "specials" },
+            "__self-user__",
+            "__active-gm__",
+            ...game.users.map((user, index): SelectFieldOption => {
+                return { value: user.id, label: user.name, group: index === 0 ? "users" : undefined };
+            }),
+        ];
 
         return [
             {
@@ -35,8 +40,18 @@ class UserValueNode extends BaseValueNode<{ id: string }> {
 
     async _query(): Promise<UserPF2e | undefined> {
         const id = await this.getInputValue("id");
-        return game.users.get(id);
+        return id === "__active-gm__"
+            ? (game.users.activeGM ?? undefined)
+            : id === "__context-user__"
+              ? this.userContext
+              : id === "__self-user__"
+                ? game.user
+                : game.users.get(id);
     }
 }
+
+type Inputs = {
+    id: Stringptionel<"__context-user__" | "__self-user__" | "__active-gm__">;
+};
 
 export { UserValueNode };
