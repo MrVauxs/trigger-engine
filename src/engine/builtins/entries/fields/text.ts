@@ -1,7 +1,7 @@
 import { NodeFieldSchema } from "engine";
 import { R, htmlQuery } from "module-helpers";
 import { InputField, SearchSelectInputElement } from ".";
-import { EntrySelectOption, TextEntry } from "..";
+import { TextEntry } from "..";
 import elements = foundry.applications.elements;
 
 const NODE_INPUT_CODE_TYPES = ["javascript", "json"] as const;
@@ -12,46 +12,20 @@ class TextField extends InputField<string, TextFieldSchema> {
         return {
             default: { type: "string" },
             options: {
-                anyOf: [
-                    { type: "string" },
-                    {
-                        type: "object",
-                        properties: {
-                            exclude: {
-                                anyOf: [
-                                    {
-                                        type: "array",
-                                        items: { type: "string" },
-                                    },
-                                    {
-                                        type: "object",
-                                        propertyNames: { type: "string" },
-                                    },
-                                ],
+                type: "array",
+                items: {
+                    anyOf: [
+                        { type: "string" },
+                        {
+                            type: "object",
+                            properties: {
+                                label: { type: "string" },
+                                value: { type: "string" },
                             },
-                            label: { type: "string" },
-                            path: { type: "string" },
-                            value: { type: "string" },
+                            required: ["value"],
                         },
-                        required: ["path"],
-                    },
-                    {
-                        type: "array",
-                        items: {
-                            anyOf: [
-                                { type: "string" },
-                                {
-                                    type: "object",
-                                    properties: {
-                                        value: { type: "string" },
-                                        label: { type: "string" },
-                                    },
-                                    required: ["value"],
-                                },
-                            ],
-                        },
-                    },
-                ],
+                    ],
+                },
             },
             tooltip: {
                 default: true,
@@ -92,7 +66,7 @@ class TextField extends InputField<string, TextFieldSchema> {
         return this.entry.isSelect;
     }
 
-    get options(): EntrySelectOption[] {
+    get options(): SelectOptions {
         return this.entry.options;
     }
 
@@ -141,9 +115,8 @@ class TextField extends InputField<string, TextFieldSchema> {
         return this.isSelect ? 1 : super.valueAlpha;
     }
 
-    localizeOption({ value, label }: EntrySelectOption) {
-        const parsedLabel = R.isString(label) ? label : value;
-        return parsedLabel ? game.i18n.localize(parsedLabel) : (this.localize("options", value) ?? value);
+    localizeOption({ value, label }: SelectOption): string {
+        return R.isString(label) ? game.i18n.localize(label) : (this.localize("options", value) ?? value);
     }
 
     draw(): void {
@@ -313,18 +286,11 @@ type TextFieldSchemaType = (typeof NODE_INPUT_TEXT_TYPES)[number];
 
 type TextFieldSchema = {
     default?: string;
-    options?: string | string[] | TextFieldPathOptions | SelectOptions;
+    options?: string[] | SelectOptions;
     tooltip: boolean;
     trim: boolean;
     type?: TextFieldSchemaType;
 };
 
-type TextFieldPathOptions = {
-    exclude?: string[] | Record<string, boolean>;
-    label?: string;
-    path: string;
-    value?: string;
-};
-
 export { TextField };
-export type { TextFieldPathOptions, TextFieldSchema, TextFieldSchemaType };
+export type { TextFieldSchema, TextFieldSchemaType };

@@ -12,16 +12,16 @@ class UserValueNode extends BaseValueNode<{ id: string }> {
     }
 
     static get defineInputs(): [BuiltinsInputEntry] {
+        const options = game.users.map((user): SelectOption => {
+            return { value: user.id, label: user.name };
+        });
+
         return [
             {
                 key: "id",
                 type: "text",
                 field: {
-                    options: {
-                        label: "name",
-                        path: "game.users",
-                        value: "id",
-                    },
+                    options,
                     tooltip: false,
                     type: "select",
                 },

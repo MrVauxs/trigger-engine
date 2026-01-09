@@ -1,16 +1,9 @@
-import { R, isIterable } from "module-helpers";
-import {
-    BaseEntrySchema,
-    BaseInputEntrySchema,
-    BuiltInNodeEntry,
-    TextField,
-    TextFieldPathOptions,
-    TextFieldSchema,
-} from ".";
+import { R } from "module-helpers";
+import { BaseEntrySchema, BaseInputEntrySchema, BuiltInNodeEntry, TextField, TextFieldSchema } from ".";
 import validators = foundry.data.validators;
 
 class TextEntry extends BuiltInNodeEntry<string, TextFieldSchema> {
-    #options?: EntrySelectOption[];
+    #options?: SelectOptions;
 
     static get type(): "text" {
         return "text";
@@ -60,8 +53,11 @@ class TextEntry extends BuiltInNodeEntry<string, TextFieldSchema> {
         return this.field.default ?? (this.field.type === "json" ? TextEntry.defaultJSON : super.default);
     }
 
-    get options(): EntrySelectOption[] {
-        return (this.#options ??= this.#prepareOptions());
+    get options(): SelectOptions {
+        return (this.#options ??= R.map(
+            this.field?.options ?? [],
+            (option): SelectOption => (R.isString(option) ? { value: option } : option),
+        ));
     }
 
     generateTooltip(label: string, isConnected: boolean): string | undefined {
@@ -97,79 +93,7 @@ class TextEntry extends BuiltInNodeEntry<string, TextFieldSchema> {
 
         return this.field.trim !== false ? value.trim() : value;
     }
-
-    #prepareOptions(): EntrySelectOption[] {
-        const options = this.field?.options;
-
-        if (R.isString(options)) {
-            return this.#getOptionsFromPath({ path: options });
-        } else if (R.isArray(options)) {
-            return R.pipe(
-                options,
-                R.map((option) => {
-                    return R.isString(option) ? { value: option } : option;
-                }),
-            );
-        } else if (R.isPlainObject(options)) {
-            return this.#getOptionsFromPath(options);
-        }
-
-        return [];
-    }
-
-    #getOptionsFromPath(fieldOptions: TextFieldPathOptions): SelectOptions {
-        const options: SelectOptions = [];
-        const cursor = foundry.utils.getProperty(window, fieldOptions.path);
-        const fieldValue = fieldOptions.value || "value";
-        const fieldLabel = fieldOptions.label || "label";
-        const exclude = fieldOptions.exclude;
-        const excludeValues = R.isArray(exclude) ? exclude : undefined;
-        const excludeProperties = R.isObjectType(exclude) ? R.entries(exclude as Record<string, any>) : [];
-
-        const matchExcludeProperty = (entry: Record<string, any>): boolean => {
-            for (const [property, value] of excludeProperties) {
-                if (entry[property as keyof typeof entry] === value) {
-                    return true;
-                }
-            }
-            return false;
-        };
-
-        if (isIterable(cursor)) {
-            for (const entry of cursor) {
-                if (R.isString(entry)) {
-                    options.push({ value: entry });
-                } else if (R.isObjectType(entry)) {
-                    if (matchExcludeProperty(entry)) continue;
-
-                    const value = entry[fieldValue as keyof typeof entry];
-                    const label = entry[fieldLabel as keyof typeof entry];
-
-                    if (R.isString(value)) {
-                        options.push({ label, value });
-                    }
-                }
-            }
-        } else if (R.isObjectType<Record<string, any>>(cursor)) {
-            for (const [value, entry] of R.entries(cursor)) {
-                const isObj = R.isObjectType(entry);
-                if (isObj && matchExcludeProperty(entry)) continue;
-
-                options.push({
-                    label: isObj ? entry[fieldLabel as keyof typeof entry] : R.isString(entry) ? entry : undefined,
-                    value,
-                });
-            }
-        }
-
-        return excludeValues?.length ? options.filter(({ value }) => !R.isIncludedIn(value, excludeValues)) : options;
-    }
 }
-
-type EntrySelectOption = {
-    value: string;
-    label?: string | { label: string };
-};
 
 type OutputTextEntry = BaseEntrySchema<"text">;
 
@@ -189,4 +113,4 @@ type BuiltinsTextFieldSchema = SimpleField | SelectField | JsonField | Javascrip
 type InputTextEntry = BaseInputEntrySchema<"text", BuiltinsTextFieldSchema>;
 
 export { TextEntry };
-export type { EntrySelectOption, InputTextEntry, OutputTextEntry };
+export type { InputTextEntry, OutputTextEntry };
