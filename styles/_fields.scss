@@ -26,6 +26,17 @@
 
 #tooltip.trigger-engine-field-tooltip {
     border: 1px solid #6d5c00;
+    padding: 0.3rem 0.5rem;
+
+    .title {
+        text-align: center;
+    }
+
+    hr {
+        background: none;
+        border-top: 1px solid #6d5c00bf;
+        margin: 0.3rem 0;
+    }
 }
 
 input#trigger-engine-field {

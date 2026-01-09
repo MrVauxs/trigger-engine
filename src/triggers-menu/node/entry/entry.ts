@@ -8,7 +8,7 @@ import {
     OpenNodeEntry,
     TriggerVariable,
 } from "engine";
-import { confirmDialog, createHTMLElement, localizePath, R } from "module-helpers";
+import { confirmDialog, createHTMLElement, localizePath } from "module-helpers";
 import { BaseBlueprintEntry } from ".";
 import { BlueprintNode, editLabelDialog } from "..";
 
@@ -115,8 +115,7 @@ class BlueprintEntry extends BaseBlueprintEntry {
             game.tooltip.activate(anchor, {
                 cssClass: "trigger-engine-field-tooltip",
                 direction: this.isInput ? "LEFT" : "RIGHT",
-                html: tooltip instanceof HTMLElement ? tooltip : undefined,
-                text: R.isString(tooltip) ? tooltip : undefined,
+                html: tooltip,
             });
         });
 
