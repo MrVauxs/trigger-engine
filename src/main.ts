@@ -19,8 +19,10 @@ Hooks.once("init", async () => {
     if (game.system.id === "pf2e") {
         registerPF2eApplication();
     }
+});
 
-    // we prepare all the applications
+Hooks.once("ready", () => {
+    // we prepare all the applications once foundry is ready
     TriggerApplication.prepareApplications();
 });
 

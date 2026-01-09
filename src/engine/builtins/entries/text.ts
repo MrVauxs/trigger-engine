@@ -1,5 +1,5 @@
 import { R } from "module-helpers";
-import { BaseEntrySchema, BaseInputEntrySchema, BuiltInNodeEntry, TextField, TextFieldSchema } from ".";
+import { BaseInputEntrySchema, BuiltInNodeEntry, TextField, TextFieldSchema } from ".";
 import validators = foundry.data.validators;
 
 class TextEntry extends BuiltInNodeEntry<string, TextFieldSchema> {

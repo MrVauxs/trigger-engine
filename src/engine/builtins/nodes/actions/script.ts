@@ -25,17 +25,17 @@ class ScriptActionNode extends BaseActionNode<
     static get defineInputs(): BuiltinsInputEntry[] {
         return [
             {
+                key: "script",
+                type: "text",
                 field: {
                     type: "javascript",
                 },
-                key: "script",
                 state: "script",
-                type: "text",
             },
             {
                 key: "macro",
-                state: "macro",
                 type: "text",
+                state: "macro",
             },
         ];
     }

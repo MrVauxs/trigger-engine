@@ -145,6 +145,10 @@
                             "key": {
                                 "title": "Localization Key"
                             },
+                            "timeout": {
+                                "tooltip": "Set to <code>0</code> to disable",
+                                "title": "Timeout (s)"
+                            },
                             "title": {
                                 "title": "Dialog Title",
                                 "tooltip": "Can be a localization key"
@@ -224,6 +228,9 @@
             "content": "Do you want to save the triggers before closing?",
             "yes": "Save & Close",
             "no": "Close w/o Saving"
+        },
+        "confirm-dialog": {
+            "title": "Confirm Dialog"
         },
         "edit-entry": {
             "array": "Is Array?",

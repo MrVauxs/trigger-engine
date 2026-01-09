@@ -218,7 +218,7 @@ class TriggerApplication {
                 try {
                     const trigger = this.createTrigger(source, false);
                     return trigger?.test() && trigger.data;
-                } catch (error: any) {}
+                } catch (error) {}
             }),
             R.filter(R.isTruthy),
             // we sort them by priority
@@ -363,10 +363,10 @@ class TriggerApplication {
         const triggerId = R.split(triggerIdOrPath, ":").at(-1);
 
         const queryArgs: ExecuteTriggerQueryOptions = {
+            _type: "execute-trigger",
             args,
             eventName,
             triggerPath: `${this.applicationKey}:${triggerId}`,
-            type: "execute-trigger",
             userId: game.userId,
         };
 
