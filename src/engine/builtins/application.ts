@@ -1,13 +1,13 @@
 import { mapConvertors } from "engine";
 import { MODULE, R } from "module-helpers";
 import {
-    ConfirmActionNode,
-    ConsoleActionNode,
+    AwaitConfirmActionNode,
+    ConsoleLogActionNode,
     ExecuteEventNode,
     ExecuteHook,
     RegionEventNode,
     RegionHook,
-    ScriptActionNode,
+    ExecuteScriptActionNode,
     TestEventNode,
     TestHook,
     UserValueNode,
@@ -40,11 +40,11 @@ class BuiltInApplication {
 
     static nodes = R.map(
         [
-            ConfirmActionNode,
-            ConsoleActionNode,
+            AwaitConfirmActionNode,
+            ConsoleLogActionNode,
             ExecuteEventNode,
             RegionEventNode,
-            ScriptActionNode,
+            ExecuteScriptActionNode,
             TestEventNode,
             UserValueNode,
         ],

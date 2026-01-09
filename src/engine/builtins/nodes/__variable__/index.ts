@@ -1,1 +1,1 @@
-export * from "./getter";
+export * from "./getter-variable";

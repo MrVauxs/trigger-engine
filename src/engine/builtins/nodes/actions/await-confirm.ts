@@ -4,7 +4,7 @@ import { MODULE, R, UserPF2e, htmlQuery, localizePath } from "module-helpers";
 import { ConfirmDialogQueryOptions } from "queries";
 import { BaseActionNode } from ".";
 
-class ConfirmActionNode extends BaseActionNode<
+class AwaitConfirmActionNode extends BaseActionNode<
     "true" | "false",
     Inputs,
     never,
@@ -105,7 +105,7 @@ async function createConfirmDialog(options: ConfirmDialogQueryOptions): Promise<
     if (!R.isString(options.content) && !R.isString(options.key)) return null;
 
     let intervale: NodeJS.Timeout | undefined;
-    let timeout = R.isNumber(options.timeout) ? options.timeout : ConfirmActionNode.TIMEOUT;
+    let timeout = R.isNumber(options.timeout) ? options.timeout : AwaitConfirmActionNode.TIMEOUT;
 
     const titleKey = (R.isString(options.title) && options.title) || localizePath("confirm-dialog.title");
     const title = game.i18n.localize(titleKey);
@@ -148,4 +148,4 @@ type Inputs = {
     user: UserPF2e | undefined;
 };
 
-export { ConfirmActionNode, createConfirmDialog };
+export { AwaitConfirmActionNode, createConfirmDialog };

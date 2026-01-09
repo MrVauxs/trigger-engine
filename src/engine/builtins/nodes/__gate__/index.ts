@@ -1,2 +1,2 @@
-export * from "./entry";
-export * from "./exit";
+export * from "./entry-gate";
+export * from "./exit-gate";

@@ -2,7 +2,7 @@ import { CustomInputSchema } from "engine";
 import { MODULE } from "module-helpers";
 import { BaseActionNode } from ".";
 
-class ConsoleActionNode extends BaseActionNode<"out", never, never, "input"> {
+class ConsoleLogActionNode extends BaseActionNode<"out", never, never, "input"> {
     static get type(): "console-log" {
         return "console-log";
     }
@@ -32,4 +32,4 @@ class ConsoleActionNode extends BaseActionNode<"out", never, never, "input"> {
     }
 }
 
-export { ConsoleActionNode };
+export { ConsoleLogActionNode };

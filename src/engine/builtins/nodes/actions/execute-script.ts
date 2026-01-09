@@ -2,7 +2,7 @@ import { BuiltinsInputEntry, CustomInputSchema, CustomOutputSchema } from "engin
 import { R, isScriptMacro } from "module-helpers";
 import { BaseActionNode } from ".";
 
-class ScriptActionNode extends BaseActionNode<
+class ExecuteScriptActionNode extends BaseActionNode<
     "out",
     { script: string; macro: string },
     never,
@@ -86,4 +86,4 @@ class ScriptActionNode extends BaseActionNode<
     }
 }
 
-export { ScriptActionNode };
+export { ExecuteScriptActionNode };
