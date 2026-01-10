@@ -141,7 +141,7 @@ type Inputs = {
     localization: string;
     timeout: number;
     title: string;
-    user: UserPF2e | undefined;
+    user?: UserPF2e;
 };
 
 export { AwaitConfirmActionNode, createConfirmDialog };

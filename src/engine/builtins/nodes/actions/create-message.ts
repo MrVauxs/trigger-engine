@@ -82,10 +82,10 @@ class CreateMessageActionNode extends BaseActionNode<
 }
 
 type Inputs = {
-    author: UserPF2e | undefined;
+    author?: UserPF2e;
     content: string;
     localization: string;
-    speaker: TargetDocuments | undefined;
+    speaker?: TargetDocuments;
 };
 
 export { CreateMessageActionNode };

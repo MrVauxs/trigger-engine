@@ -2,7 +2,7 @@ import { BuiltinsInputEntry } from "engine";
 import { ItemPF2e } from "module-helpers";
 import { BaseActionNode } from ".";
 
-class DeleteItemActionNode extends BaseActionNode<"out", { item: ItemPF2e | undefined }> {
+class DeleteItemActionNode extends BaseActionNode<"out", { item?: ItemPF2e }> {
     static get type(): "delete-item" {
         return "delete-item";
     }

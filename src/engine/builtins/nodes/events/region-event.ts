@@ -11,14 +11,8 @@ class RegionEventNode extends BaseEventNode<never, Outputs> {
 
     static get defineOutputs(): OutputEntrySchemaSource[] {
         return [
-            {
-                key: "target",
-                type: "target",
-            },
-            {
-                key: "event",
-                type: "text",
-            },
+            { key: "target", type: "target" },
+            { key: "event", type: "text" },
         ];
     }
 
