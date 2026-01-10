@@ -114,6 +114,9 @@
                 "boolean": {
                     "title": "Boolean"
                 },
+                "item": {
+                    "title": "Item"
+                },
                 "localization": {
                     "title": "Localization Key"
                 },
@@ -169,6 +172,9 @@
                                 "title": "Speaker"
                             }
                         }
+                    },
+                    "delete-item": {
+                        "title": "Delete Item"
                     },
                     "execute-script": {
                         "inputs": {
@@ -229,6 +235,9 @@
                 },
                 "dialog": {
                     "title": "Dialog"
+                },
+                "item": {
+                    "title": "Item"
                 },
                 "macro": {
                     "title": "Macro"

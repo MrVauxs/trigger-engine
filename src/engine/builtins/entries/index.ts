@@ -1,6 +1,7 @@
 export * from "./base";
 export * from "./fields";
 export * from "./boolean";
+export * from "./item";
 export * from "./number";
 export * from "./target";
 export * from "./text";

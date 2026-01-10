@@ -4,13 +4,14 @@ import {
     InputBooleanEntry,
     InputNumberEntry,
     InputTextEntry,
+    ItemEntry,
     NumberEntry,
     TargetEntry,
     TextEntry,
     UserEntry,
 } from ".";
 
-const builtinsEntries = [BooleanEntry, NumberEntry, TargetEntry, TextEntry, UserEntry] as const;
+const builtinsEntries = [BooleanEntry, ItemEntry, NumberEntry, TargetEntry, TextEntry, UserEntry] as const;
 
 type BuiltinsEntryType = (typeof builtinsEntries)[number]["type"];
 
