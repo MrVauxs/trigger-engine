@@ -565,13 +565,17 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
                     ? localizeNodeProperty(this.application, Nodes[0], "category")
                     : this.localize("category", category);
 
-                const nodes = Nodes.map((node): PreparedNode => {
-                    return {
-                        tags: node.tags,
-                        title: localizeNodeProperty(this.application, node, "type"),
-                        type: node.type,
-                    };
-                });
+                const nodes = R.pipe(
+                    Nodes,
+                    R.map((node): PreparedNode => {
+                        return {
+                            tags: node.tags,
+                            title: localizeNodeProperty(this.application, node, "type"),
+                            type: node.type,
+                        };
+                    }),
+                    R.sortBy(R.prop("title")),
+                );
 
                 return {
                     action: "select-node",
