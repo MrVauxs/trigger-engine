@@ -1,4 +1,5 @@
 import { BuiltinsInputEntry } from "engine";
+import { UserPF2e, primaryPlayerOwner } from "module-helpers";
 import { BaseActionNode, localizeKeyOrDescription } from ".";
 
 class CreateMessageActionNode extends BaseActionNode<
@@ -35,6 +36,11 @@ class CreateMessageActionNode extends BaseActionNode<
                 state: "localization",
             },
             {
+                key: "author",
+                type: "user",
+                label: "Author",
+            },
+            {
                 key: "target",
                 type: "target",
             },
@@ -51,22 +57,32 @@ class CreateMessageActionNode extends BaseActionNode<
             this.state === "description" ? await this.getInputValue("content") : undefined,
         );
 
-        if (content) {
-            const target = await this.getInputValue("target");
-            const ChatMessage = getDocumentClass("ChatMessage");
-
-            await ChatMessage.create({
-                author: this.userContext.id,
-                content,
-                speaker: target ? ChatMessage.getSpeaker(target) : undefined,
-            });
+        if (!content) {
+            return this.executeNext("out");
         }
+
+        const ChatMessage = getDocumentClass("ChatMessage");
+        const target = await this.getInputValue("target");
+        const userContext = this.userContext;
+
+        const author =
+            (await this.getInputValue("author")) ??
+            (!userContext.isGM && target?.actor.testUserPermission(userContext, "OWNER")
+                ? userContext
+                : (target && primaryPlayerOwner(target.actor)) || userContext);
+
+        await ChatMessage.create({
+            author: author.id,
+            content,
+            speaker: target ? ChatMessage.getSpeaker(target) : undefined,
+        });
 
         return this.executeNext("out");
     }
 }
 
 type Inputs = {
+    author: UserPF2e | undefined;
     content: string;
     localization: string;
     target: TargetDocuments | undefined;
