@@ -41,7 +41,7 @@ class CreateMessageActionNode extends BaseActionNode<
                 label: "Author",
             },
             {
-                key: "target",
+                key: "speaker",
                 type: "target",
             },
         ];
@@ -62,19 +62,19 @@ class CreateMessageActionNode extends BaseActionNode<
         }
 
         const ChatMessage = getDocumentClass("ChatMessage");
-        const target = await this.getInputValue("target");
+        const speaker = await this.getInputValue("speaker");
         const userContext = this.userContext;
 
         const author =
             (await this.getInputValue("author")) ??
-            (!userContext.isGM && target?.actor.testUserPermission(userContext, "OWNER")
+            (!userContext.isGM && speaker?.actor.testUserPermission(userContext, "OWNER")
                 ? userContext
-                : (target && primaryPlayerOwner(target.actor)) || userContext);
+                : (speaker && primaryPlayerOwner(speaker.actor)) || userContext);
 
         await ChatMessage.create({
             author: author.id,
             content,
-            speaker: target ? ChatMessage.getSpeaker(target) : undefined,
+            speaker: speaker ? ChatMessage.getSpeaker(speaker) : undefined,
         });
 
         return this.executeNext("out");
@@ -85,7 +85,7 @@ type Inputs = {
     author: UserPF2e | undefined;
     content: string;
     localization: string;
-    target: TargetDocuments | undefined;
+    speaker: TargetDocuments | undefined;
 };
 
 export { CreateMessageActionNode };

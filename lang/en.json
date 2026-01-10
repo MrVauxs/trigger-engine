@@ -164,6 +164,9 @@
                         "inputs": {
                             "content": {
                                 "title": "Message Content"
+                            },
+                            "speaker": {
+                                "title": "Speaker"
                             }
                         }
                     },
