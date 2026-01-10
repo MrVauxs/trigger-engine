@@ -114,6 +114,9 @@
                 "boolean": {
                     "title": "Boolean"
                 },
+                "localization": {
+                    "title": "Localization Key"
+                },
                 "number": {
                     "title": "Number"
                 },
@@ -142,9 +145,6 @@
                             "content": {
                                 "title": "Prompt Content"
                             },
-                            "key": {
-                                "title": "Localization Key"
-                            },
                             "timeout": {
                                 "tooltip": "Set to <code>0</code> to disable",
                                 "title": "Timeout (s)"
@@ -154,14 +154,18 @@
                                 "tooltip": "Can be a localization key"
                             }
                         },
-                        "states": {
-                            "description": "Description",
-                            "localization": "Localization"
-                        },
                         "title": "Await Confirmation"
                     },
                     "console-log": {
                         "title": "Console Log"
+                    },
+                    "create-message": {
+                        "title": "Create Chat Message",
+                        "inputs": {
+                            "content": {
+                                "title": "Message Content"
+                            }
+                        }
                     },
                     "execute-script": {
                         "inputs": {
@@ -211,6 +215,10 @@
             "region": {
                 "gm": "GM Only?",
                 "path": "Trigger Path"
+            },
+            "state": {
+                "description": "Description",
+                "localization": "Localization"
             },
             "tag": {
                 "debug": {

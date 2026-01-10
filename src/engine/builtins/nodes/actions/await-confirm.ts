@@ -2,7 +2,7 @@ import { IconObject } from "_zod";
 import { BridgeSchemaInput, BuiltinsInputEntry } from "engine";
 import { MODULE, R, UserPF2e, htmlQuery, localizePath } from "module-helpers";
 import { ConfirmDialogQueryOptions } from "queries";
-import { BaseActionNode } from ".";
+import { BaseActionNode, localizeKeyOrDescription } from ".";
 
 class AwaitConfirmActionNode extends BaseActionNode<
     "true" | "false",
@@ -34,15 +34,15 @@ class AwaitConfirmActionNode extends BaseActionNode<
         return [
             { key: "title", type: "text" },
             {
-                key: "key",
-                type: "text",
-                state: "localization",
-            },
-            {
                 key: "content",
                 type: "text",
                 field: { type: "enriched" },
                 state: "description",
+            },
+            {
+                key: "localization",
+                type: "text",
+                state: "localization",
             },
             {
                 key: "timeout",
@@ -68,7 +68,7 @@ class AwaitConfirmActionNode extends BaseActionNode<
 
     async _execute(): Promise<boolean> {
         const content = this.state === "description" ? await this.getInputValue("content") : undefined;
-        const key = this.state === "localization" ? await this.getInputValue("key") : undefined;
+        const key = this.state === "localization" ? await this.getInputValue("localization") : undefined;
 
         if (!content && !key) {
             return this.executeNext("false");
@@ -110,12 +110,8 @@ async function createConfirmDialog(options: ConfirmDialogQueryOptions): Promise<
     const titleKey = (R.isString(options.title) && options.title) || localizePath("confirm-dialog.title");
     const title = game.i18n.localize(titleKey);
 
-    const content = options.key
-        ? game.i18n.localize(options.key)
-        : await foundry.applications.ux.TextEditor.implementation.enrichHTML(options.content as string);
-
     return foundry.applications.api.DialogV2.confirm({
-        content,
+        content: await localizeKeyOrDescription(options.key, options.content),
         render: (_, dialog) => {
             if (timeout > 0) {
                 setTimeout(() => {
@@ -142,7 +138,7 @@ async function createConfirmDialog(options: ConfirmDialogQueryOptions): Promise<
 
 type Inputs = {
     content: string;
-    key: string;
+    localization: string;
     timeout: number;
     title: string;
     user: UserPF2e | undefined;

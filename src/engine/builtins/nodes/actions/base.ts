@@ -17,4 +17,10 @@ abstract class BaseActionNode<
     }
 }
 
-export { BaseActionNode };
+async function localizeKeyOrDescription(key: string | undefined, description: string | undefined): Promise<string> {
+    return key
+        ? game.i18n.localize(key)
+        : foundry.applications.ux.TextEditor.implementation.enrichHTML(description as string);
+}
+
+export { BaseActionNode, localizeKeyOrDescription };
