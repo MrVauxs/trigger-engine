@@ -110,6 +110,9 @@
                     "title": "Value"
                 }
             },
+            "convertor": {
+                "user-target": "Retrieve the assigned actor"
+            },
             "entry": {
                 "boolean": {
                     "title": "Boolean"

@@ -50,7 +50,6 @@ import {
     BlueprintBridgeEntry,
     BlueprintEntry,
     BlueprintNodesLayer,
-    editLabelDialog,
     getBottom,
     getRight,
     maxBottom,
@@ -60,7 +59,7 @@ import {
     zNodeHeaderData,
     zNodeIconData,
 } from ".";
-import { Blueprint } from "..";
+import { Blueprint, editLabelDialog } from "..";
 
 class BlueprintNode extends PIXI.Container {
     #border?: PIXI.Graphics;

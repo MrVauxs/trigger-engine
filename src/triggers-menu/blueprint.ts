@@ -3,6 +3,7 @@ import {
     MouseInteractionManager,
     R,
     confirmDialog,
+    createHTMLElement,
     distanceToPoint,
     dividePointBy,
     subtractPoint,
@@ -376,6 +377,45 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         }
 
         return !!result;
+    }
+
+    addTooltip(target: PIXI.Container, tooltipFn: () => string | undefined, direction: TooltipDirection) {
+        target.eventMode = "static";
+        target.hitArea = new PIXI.Rectangle(0, 0, target.width, target.height);
+
+        target.on("pointerenter", (event) => {
+            event.stopPropagation();
+            console.log("enter");
+
+            const tooltip = tooltipFn();
+            if (!tooltip) return;
+
+            const offset = 5 * this.scale;
+            const { left, top, width, height } = this.getGlobalBounds(target);
+            const anchor = createHTMLElement("div", {
+                id: "trigger-engine-field-tooltip",
+                style: {
+                    left: `${left - offset}px`,
+                    top: `${top}px`,
+                    width: `${width + offset * 2}px`,
+                    height: `${height}px`,
+                },
+            });
+
+            document.body.appendChild(anchor);
+
+            game.tooltip.activate(anchor, {
+                cssClass: "trigger-engine-field-tooltip",
+                direction,
+                html: tooltip,
+            });
+        });
+
+        target.on("pointerleave", (event) => {
+            event.stopPropagation();
+            game.tooltip.deactivate();
+            document.getElementById("trigger-engine-field-tooltip")?.remove();
+        });
     }
 
     draw({

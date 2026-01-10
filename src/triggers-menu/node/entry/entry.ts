@@ -8,9 +8,10 @@ import {
     OpenNodeEntry,
     TriggerVariable,
 } from "engine";
-import { confirmDialog, createHTMLElement, localizePath } from "module-helpers";
+import { confirmDialog, localizePath } from "module-helpers";
+import { editLabelDialog } from "triggers-menu";
 import { BaseBlueprintEntry } from ".";
-import { BlueprintNode, editLabelDialog } from "..";
+import { BlueprintNode } from "..";
 
 class BlueprintEntry extends BaseBlueprintEntry {
     #entry: OpenNodeEntry;
@@ -89,41 +90,11 @@ class BlueprintEntry extends BaseBlueprintEntry {
     draw(): void {
         super.draw();
 
-        this.eventMode = "static";
-        this.hitArea = new PIXI.Rectangle(0, 0, this.width, this.height);
-
-        this.on("pointerenter", (event) => {
-            event.stopPropagation();
-
-            const tooltip = this.#entry.generateTooltip(this.label, this.isConnected);
-            if (!tooltip) return;
-
-            const offset = 5 * this.blueprint.scale;
-            const { left, top, width, height } = this.blueprint.getGlobalBounds(this);
-            const anchor = createHTMLElement("div", {
-                id: "trigger-engine-field-tooltip",
-                style: {
-                    left: `${left - offset}px`,
-                    top: `${top}px`,
-                    width: `${width + offset * 2}px`,
-                    height: `${height}px`,
-                },
-            });
-
-            document.body.appendChild(anchor);
-
-            game.tooltip.activate(anchor, {
-                cssClass: "trigger-engine-field-tooltip",
-                direction: this.isInput ? "LEFT" : "RIGHT",
-                html: tooltip,
-            });
-        });
-
-        this.on("pointerleave", (event) => {
-            event.stopPropagation();
-            game.tooltip.deactivate();
-            document.getElementById("trigger-engine-field-tooltip")?.remove();
-        });
+        this.blueprint.addTooltip(
+            this,
+            () => this.#entry.generateTooltip(this.label, this.isConnected),
+            this.isInput ? "LEFT" : "RIGHT",
+        );
     }
 
     _drawConnector(connector: PIXI.Graphics, isConnected: boolean) {

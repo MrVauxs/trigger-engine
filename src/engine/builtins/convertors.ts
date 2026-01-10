@@ -1,7 +1,14 @@
 import { EntryConvertor } from "engine";
-import { UserPF2e, primaryPlayerOwner } from "module-helpers";
+import { ItemPF2e, UserPF2e, primaryPlayerOwner } from "module-helpers";
 
 export default [
+    {
+        input: "text",
+        output: "item",
+        convertToInput: (value: ItemPF2e): string => {
+            return value.uuid;
+        },
+    },
     {
         input: "number",
         output: "text",

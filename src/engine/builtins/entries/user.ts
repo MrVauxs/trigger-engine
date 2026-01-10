@@ -11,7 +11,7 @@ class UserEntry extends NodeEntry<UserPF2e | undefined> {
     }
 
     static get color(): ColorSource {
-        return 0x8a8a8a;
+        return 0x1682c9;
     }
 
     static isValidType(value: unknown): value is UserPF2e {

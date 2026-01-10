@@ -1,10 +1,10 @@
+import { EntryId } from "engine";
 import { calculateMidPoint } from "module-helpers";
 import { BaseBlueprintEntry, BlueprintEntry, isBlueprintEntry } from "triggers-menu";
 import { BlueprintConnectionsLayer } from ".";
-import { EntryId } from "engine";
 
 class BlueprintConnection extends PIXI.Graphics {
-    #converter?: PIXI.Graphics;
+    #convertor?: PIXI.Graphics;
     #origin: EntryId;
     #target: EntryId;
 
@@ -13,6 +13,8 @@ class BlueprintConnection extends PIXI.Graphics {
 
         this.#origin = origin;
         this.#target = target;
+
+        this.eventMode = "static";
     }
 
     hasEntry(entry: BaseBlueprintEntry): boolean {
@@ -35,29 +37,45 @@ class BlueprintConnection extends PIXI.Graphics {
         // we don't need a converter
         if (!isBlueprintEntry(origin) || origin.type === (target as BlueprintEntry).type) return;
 
-        const converter = (this.#converter ??= (() => {
-            const padding = { x: 4, y: 2 };
-            const converter = new PIXI.Graphics();
-            const icon = origin.node.fontAwesomeIcon({ unicode: "\uf0ec" });
+        const convertorElement = (this.#convertor ??= this.#createConvertorElement(origin, target as BlueprintEntry));
 
-            const width = icon.width + padding.x * 2;
-            const height = icon.height + padding.y * 2;
+        convertorElement.position.set(
+            halfPoint.x - convertorElement.width / 2,
+            halfPoint.y - convertorElement.height / 2,
+        );
 
-            icon.position.set(padding.x, padding.y);
+        this.addChild(convertorElement);
+    }
 
-            converter.beginFill(0x0, 0.5);
-            converter.lineStyle({ color: 0x0, width: 2, alpha: 0.8 });
-            converter.drawRoundedRect(0, 0, width, height, 4);
-            converter.endFill();
+    #createConvertorElement(origin: BlueprintEntry, target: BlueprintEntry): PIXI.Graphics {
+        const padding = { x: 4, y: 2 };
+        const convertorElement = new PIXI.Graphics();
+        const icon = origin.node.fontAwesomeIcon({ unicode: "\uf0ec" });
 
-            converter.addChild(icon);
+        const width = icon.width + padding.x * 2;
+        const height = icon.height + padding.y * 2;
 
-            return converter;
-        })());
+        icon.position.set(padding.x, padding.y);
 
-        converter.position.set(halfPoint.x - converter.width / 2, halfPoint.y - converter.height / 2);
+        convertorElement.beginFill(0x0, 0.5);
+        convertorElement.lineStyle({ color: 0x0, width: 2, alpha: 0.8 });
+        convertorElement.drawRoundedRect(0, 0, width, height, 4);
+        convertorElement.endFill();
 
-        this.addChild(converter);
+        convertorElement.addChild(icon);
+
+        const [input, output] = origin.isInput ? [origin, target] : [target, origin];
+        const convertor = origin.node.trigger.application.getConvertor(
+            (output as BlueprintEntry).type,
+            (input as BlueprintEntry).type,
+        );
+
+        const tooltip = convertor && origin.node.rootLocalize("convertor", `${convertor.output}-${convertor.input}`);
+        if (tooltip) {
+            origin.node.blueprint.addTooltip(convertorElement, () => tooltip, "UP");
+        }
+
+        return convertorElement;
     }
 }
 

@@ -1,4 +1,4 @@
-import { localize, R, waitDialog } from "module-helpers";
+import { R } from "module-helpers";
 
 function alignHorizontally(
     parent: PIXI.Container,
@@ -43,37 +43,10 @@ function maxBottom(a?: PIXI.Container | NodePart, b?: PIXI.Container | NodePart)
     return Math.max(getBottom(a), getBottom(b));
 }
 
-async function editLabelDialog(
-    type: "gate" | "variable",
-    { placeholder, value }: { placeholder?: string; value?: string } = {},
-): Promise<string | undefined | null> {
-    const group = foundry.applications.fields.createFormGroup({
-        label: localize("edit-label.label"),
-        input: foundry.applications.fields.createTextInput({
-            name: "label",
-            autofocus: true,
-            placeholder: placeholder || value,
-            value: value,
-        }),
-    });
-
-    const result = await waitDialog<{ label: string }>({
-        content: group.outerHTML,
-        i18n: "edit-label",
-        title: localize("edit-label.title", type, value ? "edit" : "create"),
-        yes: {
-            label: localize("edit-label.yes", value ? "edit" : "create"),
-        },
-    });
-
-    if (!result) return null;
-    return result && result.label && (!value || value !== result.label) ? result.label : undefined;
-}
-
 type NodePart<T extends PIXI.DisplayObject = PIXI.DisplayObject> = PIXI.Container<T> & {
     calculatedHeight: number;
     calculatedWith: number;
 };
 
-export { alignHorizontally, editLabelDialog, getBottom, getRight, maxBottom, maxRight };
+export { alignHorizontally, getBottom, getRight, maxBottom, maxRight };
 export type { NodePart };
