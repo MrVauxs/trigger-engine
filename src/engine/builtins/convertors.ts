@@ -27,8 +27,10 @@ export default [
     {
         input: "user",
         output: "target",
-        convertToInput: (target: TargetDocuments): UserPF2e | undefined => {
-            return primaryPlayerOwner(target.actor) ?? undefined;
+        convertToInput: (target: TargetDocuments, userContext): UserPF2e | undefined => {
+            return !userContext.isGM && target.actor.testUserPermission(userContext, "OWNER")
+                ? userContext
+                : (primaryPlayerOwner(target.actor) ?? undefined);
         },
     },
 ] as const satisfies EntryConvertor[];
