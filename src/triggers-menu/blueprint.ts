@@ -385,7 +385,6 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
 
         target.on("pointerenter", (event) => {
             event.stopPropagation();
-            console.log("enter");
 
             const tooltip = tooltipFn();
             if (!tooltip) return;

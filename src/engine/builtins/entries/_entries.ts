@@ -1,3 +1,4 @@
+import { CustomOutputSchema } from "engine";
 import {
     BaseEntrySchema,
     BooleanEntry,
@@ -23,5 +24,11 @@ type BuiltinsInputEntry =
     | BaseEntrySchema<Exclude<BuiltinsEntryType, BuiltinsEntryWithField["type"]>>
     | BuiltinsEntryWithField;
 
+type BuiltinsCustomOutput = Prettify<
+    Omit<CustomOutputSchema, "types"> & {
+        types?: BuiltinsEntryType[];
+    }
+>;
+
 export { builtinsEntries };
-export type { BuiltinsInputEntry, BuiltinsOutputEntry };
+export type { BuiltinsCustomOutput, BuiltinsInputEntry, BuiltinsOutputEntry };

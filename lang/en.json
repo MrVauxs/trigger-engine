@@ -132,6 +132,9 @@
                 "text": {
                     "title": "Text"
                 },
+                "uuid": {
+                    "title": "Source UUID"
+                },
                 "user": {
                     "title": "User"
                 }
@@ -350,6 +353,29 @@
             }
         },
         "pf2e-trigger": {
+            "node": {
+                "action": {
+                    "create-item": {
+                        "customs": {
+                            "inputs": {
+                                "choices": {
+                                    "label": "ChoiceSet",
+                                    "tooltip": "<ul><li>flag:&lt;flag&gt;:&lt;index&gt;</li><li>rollOption:&lt;rollOption&gt;:&lt;index&gt;</li></ul>"
+                                }
+                            }
+                        },
+                        "groups": {
+                            "choices": "ChoiceSet Selections"
+                        },
+                        "inputs": {
+                            "duplicate": {
+                                "title": "Allow Duplicate?"
+                            }
+                        },
+                        "title": "Create Item"
+                    }
+                }
+            },
             "setting": {
                 "hint": "Register you own triggers with the module.",
                 "label": "Register Triggers",

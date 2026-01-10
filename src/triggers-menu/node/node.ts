@@ -192,6 +192,14 @@ class BlueprintNode extends PIXI.Container {
         return 0x000000;
     }
 
+    get connectorWidth(): number {
+        return 16;
+    }
+
+    get connectorSpacing(): number {
+        return 5;
+    }
+
     get borderRadius(): number {
         return 10;
     }
@@ -610,7 +618,7 @@ class BlueprintNode extends PIXI.Container {
         const nbRows = Math.max(nbEntries(inputs) + minIndex, nbEntries(outputs) + outs.length);
         const rows: NodePart[] = R.times(nbRows, () => new PIXI.Container() as NodePart);
 
-        const addToRow = (rowIndex: number, column: 0 | 1, el: BaseBlueprintEntry | PreciseText) => {
+        const addToRow = (rowIndex: number, column: 0 | 1, el: BaseBlueprintEntry | PIXI.Container) => {
             const row = rows[rowIndex];
 
             if ("draw" in el) {
@@ -627,9 +635,23 @@ class BlueprintNode extends PIXI.Container {
             }
         };
 
-        const createGroup = (group: string): PreciseText => {
-            const label = this.localize("group", group) ?? group;
-            return this.preciseText(label);
+        const createGroup = (group: string): PIXI.Container => {
+            const container = new PIXI.Container();
+            const localized = this.localize("groups", group) ?? group;
+            const label = this.preciseText(localized);
+
+            const icon = new PIXI.Graphics();
+
+            icon.beginFill("#ffffff");
+            icon.lineStyle(1, "#ffffff");
+            icon.drawCircle(this.connectorWidth / 2 - 1.5, 4, 4);
+            icon.endFill();
+
+            alignHorizontally(container, [icon, label], { height: this.entryHeight });
+
+            label.x = this.connectorWidth + this.connectorSpacing;
+
+            return container;
         };
 
         // we process all inputs first to make layout computation easier
@@ -790,10 +812,6 @@ class BlueprintNode extends PIXI.Container {
         }
     }
 
-    doubleLocalize(label: string | undefined, ...path: string[]): string | undefined {
-        return label ? game.i18n.localize(label) : this.localize(...path);
-    }
-
     refresh({
         forceComputeConnections,
         renderApplication,
@@ -829,7 +847,7 @@ class BlueprintNode extends PIXI.Container {
             this.inputs.contents,
             R.filter((entry) => entry.schema.state === this.#node.state),
             R.map((entry) => entry.key),
-            R.fromKeys((key) => {
+            R.fromKeys(() => {
                 return {
                     value: undefined,
                 };
@@ -853,7 +871,7 @@ class BlueprintNode extends PIXI.Container {
         schema: BaseCustomSchema,
         ...path: string[]
     ): string | undefined {
-        return this.doubleLocalize(label, "custom", category, schema.slug, ...path);
+        return label ? game.i18n.localize(label) : this.localize("customs", category, schema.slug, ...path);
     }
 
     #customEntryLabel(category: EntryCategory | "outs", schema: BaseCustomSchema): string {

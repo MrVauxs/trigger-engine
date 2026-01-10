@@ -1,5 +1,5 @@
 import { IconObject } from "_zod";
-import { CustomOutputSchema, EXIT_GATE_TYPE, GATE_CATEGORY, TriggerNode } from "engine";
+import { BuiltinsCustomOutput, EXIT_GATE_TYPE, GATE_CATEGORY, TriggerNode } from "engine";
 import { R } from "module-helpers";
 
 class TriggerGateExit extends TriggerNode<"out", never, never, never, "entry"> {
@@ -11,7 +11,7 @@ class TriggerGateExit extends TriggerNode<"out", never, never, never, "entry"> {
         return EXIT_GATE_TYPE;
     }
 
-    static get defineCustomOutputs(): CustomOutputSchema[] {
+    static get defineCustomOutputs(): BuiltinsCustomOutput[] {
         return [{ array: true, slug: "entry" }];
     }
 
@@ -38,4 +38,4 @@ function isGateExitNode(node: { type: string }): boolean {
     return node.type === EXIT_GATE_TYPE;
 }
 
-export { isGateExitNode, TriggerGateExit };
+export { TriggerGateExit, isGateExitNode };

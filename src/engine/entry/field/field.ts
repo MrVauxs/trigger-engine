@@ -32,8 +32,7 @@ class NodeField<TValue extends unknown = unknown, TFieldSchema extends Record<st
     declare readonly field: TFieldSchema;
 
     /**
-     * The already generated entry label in case you want to add it to the field instead of
-     * having it next to the connector on its own.
+     * The already generated entry label element in case you want to manipulate it.
      */
     declare readonly label: PreciseText;
 
@@ -62,7 +61,8 @@ class NodeField<TValue extends unknown = unknown, TFieldSchema extends Record<st
     declare readonly default: TValue;
 
     /**
-     * The current value of this input after going through {@link NodeEntry#isValidType} & {@link NodeEntry#processValue}
+     * The current value of this input after going through {@link NodeEntry#isValidType}
+     * & {@link NodeEntry#processValue}
      */
     declare readonly value: TValue;
 

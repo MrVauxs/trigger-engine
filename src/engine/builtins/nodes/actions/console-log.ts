@@ -1,4 +1,4 @@
-import { CustomInputSchema } from "engine";
+import { BuiltinsCustomOutput } from "engine";
 import { MODULE } from "module-helpers";
 import { BaseActionNode } from ".";
 
@@ -11,7 +11,7 @@ class ConsoleLogActionNode extends BaseActionNode<"out", never, never, "input"> 
         return ["debug"];
     }
 
-    static get defineCustomInputs(): CustomInputSchema[] {
+    static get defineCustomInputs(): BuiltinsCustomOutput[] {
         return [{ slug: "input", array: true }];
     }
 

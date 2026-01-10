@@ -28,10 +28,23 @@
     --border-color: #584a75c4;
 
     border: 1px solid var(--border-color);
-    padding: 0.3rem 0.5rem;
+    padding: 0.4rem 0.5rem;
 
     .title {
         text-align: center;
+    }
+
+    ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+
+        li {
+            &::before {
+                content: "-";
+                padding-inline: 0 0.4rem;
+            }
+        }
     }
 
     hr {

@@ -138,7 +138,9 @@ class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<st
      * Tooltip to display when the entry is hovered over.
      */
     generateTooltip(label: string, isConnected: boolean): string | undefined {
-        return this.localize(this.category, this.key, "tooltip");
+        return this.slug
+            ? this.localize("customs", this.category, this.slug, "tooltip")
+            : this.localize(this.category, this.key, "tooltip");
     }
 
     /**

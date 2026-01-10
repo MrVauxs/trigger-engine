@@ -1,4 +1,4 @@
-import { BaseEventNode, CustomOutputSchema } from "engine";
+import { BaseEventNode, BuiltinsCustomOutput } from "engine";
 
 class ExecuteEventNode extends BaseEventNode {
     static get type(): "execute-event" {
@@ -9,7 +9,7 @@ class ExecuteEventNode extends BaseEventNode {
         return ["macro"];
     }
 
-    static get defineCustomOutputs(): CustomOutputSchema[] {
+    static get defineCustomOutputs(): BuiltinsCustomOutput[] {
         return [{ array: true, slug: "output" }];
     }
 

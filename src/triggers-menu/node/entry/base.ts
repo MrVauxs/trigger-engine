@@ -91,7 +91,11 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
     }
 
     get connectorWidth(): number {
-        return 16;
+        return this.node.connectorWidth;
+    }
+
+    get connectorSpacing(): number {
+        return this.node.connectorSpacing;
     }
 
     get connectorCenter(): Point {
@@ -141,7 +145,7 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
         alignHorizontally(this, content, {
             height: this.node.entryHeight,
             reverse: this.isOutput,
-            spacing: 5,
+            spacing: this.connectorSpacing,
         });
 
         this.eventMode = "static";
