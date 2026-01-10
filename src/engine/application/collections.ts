@@ -42,7 +42,7 @@ type TriggerApplicationCollections = {
     convertors?: EntryConvertor[];
     entries?: (typeof NodeEntry)[];
     hooks?: (typeof TriggerHook)[];
-    nodes?: (typeof TriggerNode)[];
+    nodes?: (typeof TriggerNode<any, any, any, any, any, any>)[];
 };
 
 type TriggerApplicationCollection = Prettify<keyof TriggerApplicationCollections>;
