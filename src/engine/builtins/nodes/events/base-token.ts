@@ -1,12 +1,11 @@
-import { BaseEventNode, SpecialIcon, gmOnlySpecialIcon } from "engine";
-import { PF2eOutputEntry } from "pf2e";
+import { BaseEventNode, BuiltinsOutputEntry, SpecialIcon, gmOnlySpecialIcon } from "engine";
 
 abstract class BaseTokenEvent extends BaseEventNode<never, { target: TargetDocuments }> {
     static get tags(): string[] {
         return ["token"];
     }
 
-    static get defineOutputs(): PF2eOutputEntry[] {
+    static get defineOutputs(): BuiltinsOutputEntry[] {
         return [{ key: "target", type: "target" }];
     }
 

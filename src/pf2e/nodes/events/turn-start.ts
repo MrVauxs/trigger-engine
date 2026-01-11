@@ -1,5 +1,5 @@
 import { BaseEventNode, SpecialIcon, gmOnlySpecialIcon } from "engine";
-import { PF2eOutputEntry } from "pf2e";
+import { PF2eOutputEntry, TurnStartOptions } from "pf2e";
 
 class TurnStartEvent extends BaseEventNode<never, TurnStartOptions> {
     static get type(): "turn-start-event" {
@@ -32,10 +32,4 @@ class TurnStartEvent extends BaseEventNode<never, TurnStartOptions> {
     }
 }
 
-type TurnStartOptions = {
-    combatant: TargetDocuments;
-    round: number;
-};
-
 export { TurnStartEvent };
-export type { TurnStartOptions };

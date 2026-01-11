@@ -1,6 +1,5 @@
 import { BaseSingleHook } from "engine";
 import { CombatantPF2e } from "module-helpers";
-import { TurnStartOptions } from "pf2e";
 
 class TurnStartHook extends BaseSingleHook<TurnStartOptions> {
     static get type(): "turn-start-hook" {
@@ -27,4 +26,10 @@ class TurnStartHook extends BaseSingleHook<TurnStartOptions> {
     }
 }
 
+type TurnStartOptions = {
+    combatant: TargetDocuments;
+    round: number;
+};
+
 export { TurnStartHook };
+export type { TurnStartOptions };

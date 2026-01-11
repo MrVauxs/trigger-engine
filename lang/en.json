@@ -410,6 +410,43 @@
                     }
                 },
                 "event": {
+                    "aura-enter-event": {
+                        "title": "Aura Entered"
+                    },
+                    "aura-leave-event": {
+                        "title": "Aura Left"
+                    },
+                    "base-aura-event": {
+                        "inputs": {
+                            "affects": {
+                                "options": {
+                                    "all": "All",
+                                    "allies": "Allies",
+                                    "enemies": "Enemies"
+                                },
+                                "title": "Affects"
+                            },
+                            "slug": {
+                                "title": "Aura Slug"
+                            },
+                            "when": {
+                                "title": "Trigger When",
+                                "options": {
+                                    "always": "Always Trigger",
+                                    "combat": "Only in Combat",
+                                    "turn": "Only Current Turn"
+                                }
+                            }
+                        },
+                        "outputs": {
+                            "source": {
+                                "title": "Aura Source"
+                            },
+                            "target": {
+                                "title": "Affected Target"
+                            }
+                        }
+                    },
                     "turn-end-event": {
                         "title": "Turn End"
                     },

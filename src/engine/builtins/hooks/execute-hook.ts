@@ -25,7 +25,7 @@ class ExecuteHook extends TriggerHook {
     #execute(triggerPath: TriggerPath, values: UserValue[]) {
         return TriggerApplication.executeTriggerEvent(game.userId, triggerPath, "execute-event", {
             values: this.parseUserValues(values),
-        });
+        } satisfies ExecuteEventOptions);
     }
 
     #executeAsGM(triggerPath: TriggerPath, values: UserValue[]) {
@@ -35,9 +35,15 @@ class ExecuteHook extends TriggerHook {
             return this.executeTriggerEventAsGM(triggerPath, "execute-event", {
                 converted: true,
                 values: this.parseUserValues(values, true).map(this.convertToEmitable.bind(this)),
-            });
+            } satisfies ExecuteEventOptions);
         }
     }
 }
 
+type ExecuteEventOptions = {
+    converted?: boolean;
+    values: any[];
+};
+
 export { ExecuteHook };
+export type { ExecuteEventOptions };

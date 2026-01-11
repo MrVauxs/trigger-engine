@@ -1,4 +1,4 @@
-import { BaseEventNode, BuiltinsCustomOutput } from "engine";
+import { BaseEventNode, BuiltinsCustomOutput, ExecuteEventOptions } from "engine";
 
 class ExecuteEventNode extends BaseEventNode {
     static get type(): "execute-event" {
@@ -17,17 +17,11 @@ class ExecuteEventNode extends BaseEventNode {
         return "\uf144";
     }
 
-    async _execute({ converted, values }: { converted?: boolean; values: any[] }): Promise<boolean> {
+    async _execute({ converted, values }: ExecuteEventOptions): Promise<boolean> {
         const parsed = converted ? await this.convertValuesFomEmitable(values) : values;
         this.setCustomOutputValues("output", parsed);
         return this.executeNext("out");
     }
 }
 
-type ExecuteEventOptions = {
-    userId: string;
-    values: any[];
-};
-
 export { ExecuteEventNode };
-export type { ExecuteEventOptions };

@@ -1,12 +1,11 @@
-import { BaseEventNode, SpecialIcon, gmOnlySpecialIcon } from "engine";
-import { PF2eOutputEntry } from "pf2e";
+import { BaseEventNode, BuiltinsOutputEntry, SpecialIcon, gmOnlySpecialIcon } from "engine";
 
 abstract class BaseCombatantEvent extends BaseEventNode<never, { combatant: TargetDocuments }> {
     static get tags(): string[] {
         return ["combat", "combatant"];
     }
 
-    static get defineOutputs(): PF2eOutputEntry[] {
+    static get defineOutputs(): BuiltinsOutputEntry[] {
         return [{ key: "combatant", type: "target" }];
     }
 

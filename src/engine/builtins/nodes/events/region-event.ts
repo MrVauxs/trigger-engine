@@ -1,4 +1,4 @@
-import { BaseEventNode, BuiltinsOutputEntry } from "engine";
+import { BaseEventNode, BuiltinsOutputEntry, RegionEventOptions } from "engine";
 
 class RegionEventNode extends BaseEventNode<never, Outputs> {
     static get type(): "region-event" {
@@ -32,10 +32,4 @@ type Outputs = {
     target: TargetDocuments;
 };
 
-type RegionEventOptions = {
-    eventName: string;
-    target: TargetDocuments;
-};
-
 export { RegionEventNode };
-export type { RegionEventOptions };
