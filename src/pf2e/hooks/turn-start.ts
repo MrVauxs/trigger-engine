@@ -1,10 +1,8 @@
-import { BaseBuiltinsHook } from "engine";
-import { CombatantPF2e, createToggleableHook } from "module-helpers";
+import { CombatantPF2e } from "module-helpers";
 import { TurnStartOptions } from "pf2e";
+import { BaseSingleHook } from ".";
 
-class TurnStartHook extends BaseBuiltinsHook<TurnStartOptions> {
-    #hook = createToggleableHook("pf2e.startTurn", this.#onEvent.bind(this));
-
+class TurnStartHook extends BaseSingleHook<TurnStartOptions> {
     static get type(): "turn-start-hook" {
         return "turn-start-hook";
     }
@@ -17,20 +15,10 @@ class TurnStartHook extends BaseBuiltinsHook<TurnStartOptions> {
         return "pf2e.startTurn";
     }
 
-    _enable(): void {
-        if (game.user.isGM) {
-            this.#hook.activate();
-        }
-    }
-
-    _disable(): void {
-        this.#hook.disable();
-    }
-
-    #onEvent(combatant: CombatantPF2e): void {
+    _onEvent(combatant: CombatantPF2e): void {
         const actor = combatant.actor;
 
-        if (game.user.isActiveGM && this.isValidActor(actor)) {
+        if (this.isValidActor(actor)) {
             this.executeEvent(game.userId, "turn-start-event", {
                 combatant: { actor, token: combatant.token },
                 round: combatant.encounter?.round ?? 0,

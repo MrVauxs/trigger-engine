@@ -1,9 +1,7 @@
-import { BaseBuiltinsHook } from "engine";
-import { CombatantPF2e, createToggleableHook } from "module-helpers";
+import { CombatantPF2e } from "module-helpers";
+import { BaseSingleHook } from ".";
 
-class TurnEndHook extends BaseBuiltinsHook<TargetDocuments> {
-    #hook = createToggleableHook("pf2e.endTurn", this.#onEvent.bind(this));
-
+class TurnEndHook extends BaseSingleHook<TargetDocuments> {
     static get type(): "turn-end-hook" {
         return "turn-end-hook";
     }
@@ -16,20 +14,10 @@ class TurnEndHook extends BaseBuiltinsHook<TargetDocuments> {
         return "pf2e.endTurn";
     }
 
-    _enable(): void {
-        if (game.user.isGM) {
-            this.#hook.activate();
-        }
-    }
-
-    _disable(): void {
-        this.#hook.disable();
-    }
-
-    #onEvent(combatant: CombatantPF2e): void {
+    _onEvent(combatant: CombatantPF2e): void {
         const actor = combatant.actor;
 
-        if (game.user.isActiveGM && this.isValidActor(actor)) {
+        if (this.isValidActor(actor)) {
             this.executeEvent(game.userId, "turn-end-event", { actor, token: combatant.token });
         }
     }
