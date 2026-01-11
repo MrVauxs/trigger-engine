@@ -3,7 +3,11 @@ import { MODULE, R } from "module-helpers";
 import {
     AwaitConfirmActionNode,
     ConsoleLogActionNode,
+    CreateCombatantEvent,
+    CreateCombatantHook,
     CreateMessageActionNode,
+    DeleteCombatantEvent,
+    DeleteCombatantHook,
     DeleteItemActionNode,
     ExecuteEventNode,
     ExecuteHook,
@@ -16,6 +20,22 @@ import {
     builtinsEntries,
     convertors,
 } from ".";
+
+const hooks = [CreateCombatantHook, DeleteCombatantHook, ExecuteHook, RegionHook, TestHook] as const;
+
+const nodes = [
+    AwaitConfirmActionNode,
+    ConsoleLogActionNode,
+    CreateCombatantEvent,
+    CreateMessageActionNode,
+    DeleteCombatantEvent,
+    DeleteItemActionNode,
+    ExecuteEventNode,
+    ExecuteScriptActionNode,
+    RegionEventNode,
+    TestEventNode,
+    UserValueNode,
+] as const;
 
 class BuiltInApplication {
     static get moduleId(): string {
@@ -38,22 +58,9 @@ class BuiltInApplication {
 
     static entries = R.map(builtinsEntries, (entry) => [entry.type, entry] as const);
 
-    static hooks = R.map([ExecuteHook, RegionHook, TestHook], (entry) => [entry.type, entry] as const);
+    static hooks = R.map(hooks, (entry) => [entry.type, entry] as const);
 
-    static nodes = R.map(
-        [
-            AwaitConfirmActionNode,
-            ConsoleLogActionNode,
-            CreateMessageActionNode,
-            DeleteItemActionNode,
-            ExecuteEventNode,
-            ExecuteScriptActionNode,
-            RegionEventNode,
-            TestEventNode,
-            UserValueNode,
-        ],
-        (node) => [node.type, node] as const,
-    );
+    static nodes = R.map(nodes, (node) => [node.type, node] as const);
 }
 
 export { BuiltInApplication };

@@ -1,5 +1,5 @@
+import { BaseSingleHook } from "engine";
 import { TokenDocumentPF2e } from "module-helpers";
-import { BaseSingleHook } from ".";
 
 class TokenMovedHook extends BaseSingleHook<Required<TargetDocuments>> {
     static get type(): "token-moved-hook" {

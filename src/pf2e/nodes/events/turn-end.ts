@@ -1,30 +1,16 @@
-import { BaseEventNode, SpecialIcon, gmOnlySpecialIcon } from "engine";
-import { PF2eOutputEntry } from "pf2e";
+import { BaseCombatantEvent } from "engine";
 
-class TurnEndEvent extends BaseEventNode<never, { combatant: TargetDocuments }> {
+class TurnEndEvent extends BaseCombatantEvent {
     static get type(): "turn-end-event" {
         return "turn-end-event";
     }
 
     static get tags(): string[] {
-        return ["combat", "combatant", "turn"];
-    }
-
-    static get defineOutputs(): PF2eOutputEntry[] {
-        return [{ key: "combatant", type: "target" }];
+        return [...super.tags, "turn"];
     }
 
     get icon(): string {
         return "\uf253";
-    }
-
-    get specialIcons(): SpecialIcon[] {
-        return [gmOnlySpecialIcon];
-    }
-
-    async _execute(target: TargetDocuments): Promise<boolean> {
-        this.setOutputValue("combatant", target);
-        return this.executeNext("out");
     }
 }
 

@@ -199,6 +199,12 @@
                     }
                 },
                 "event": {
+                    "create-combatant-event": {
+                        "title": "Combatant Created"
+                    },
+                    "delete-combatant-event": {
+                        "title": "Combatant Removed"
+                    },
                     "execute-event": {
                         "title": "Execute Event"
                     },

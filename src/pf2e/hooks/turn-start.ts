@@ -1,6 +1,6 @@
+import { BaseSingleHook } from "engine";
 import { CombatantPF2e } from "module-helpers";
 import { TurnStartOptions } from "pf2e";
-import { BaseSingleHook } from ".";
 
 class TurnStartHook extends BaseSingleHook<TurnStartOptions> {
     static get type(): "turn-start-hook" {
