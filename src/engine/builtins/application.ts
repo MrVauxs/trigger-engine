@@ -16,12 +16,14 @@ import {
     RegionHook,
     TestEventNode,
     TestHook,
+    TokenMovedEvent,
+    TokenMovedHook,
     UserValueNode,
     builtinsEntries,
     convertors,
 } from ".";
 
-const hooks = [CreateCombatantHook, DeleteCombatantHook, ExecuteHook, RegionHook, TestHook] as const;
+const hooks = [CreateCombatantHook, DeleteCombatantHook, ExecuteHook, RegionHook, TestHook, TokenMovedHook] as const;
 
 const nodes = [
     AwaitConfirmActionNode,
@@ -34,6 +36,7 @@ const nodes = [
     ExecuteScriptActionNode,
     RegionEventNode,
     TestEventNode,
+    TokenMovedEvent,
     UserValueNode,
 ] as const;
 

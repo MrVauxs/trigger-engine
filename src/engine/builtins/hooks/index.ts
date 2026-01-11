@@ -6,3 +6,4 @@ export * from "./delete-combatant";
 export * from "./execute-hook";
 export * from "./region-hook";
 export * from "./test-hook";
+export * from "./token-moved";

@@ -6,3 +6,4 @@ export * from "./execute-event";
 export * from "./start-event";
 export * from "./region-event";
 export * from "./test-event";
+export * from "./token-moved";
