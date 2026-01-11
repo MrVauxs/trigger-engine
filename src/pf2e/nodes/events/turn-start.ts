@@ -1,4 +1,4 @@
-import { BaseEventNode } from "engine";
+import { BaseEventNode, SpecialIcon, gmOnlySpecialIcon } from "engine";
 import { PF2eOutputEntry } from "pf2e";
 
 class TurnStartEvent extends BaseEventNode<never, TurnStartOptions> {
@@ -19,6 +19,10 @@ class TurnStartEvent extends BaseEventNode<never, TurnStartOptions> {
 
     get icon(): string {
         return "\uf251";
+    }
+
+    get specialIcons(): SpecialIcon[] {
+        return [gmOnlySpecialIcon];
     }
 
     async _execute({ round, combatant }: TurnStartOptions): Promise<boolean> {

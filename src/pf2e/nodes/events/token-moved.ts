@@ -1,4 +1,4 @@
-import { BaseEventNode } from "engine";
+import { BaseEventNode, SpecialIcon, gmOnlySpecialIcon } from "engine";
 import { PF2eOutputEntry } from "pf2e";
 
 class TokenMovedEvent extends BaseEventNode<never, { target: TargetDocuments }> {
@@ -16,6 +16,10 @@ class TokenMovedEvent extends BaseEventNode<never, { target: TargetDocuments }> 
 
     get icon(): string {
         return "\uf554";
+    }
+
+    get specialIcons(): SpecialIcon[] {
+        return [gmOnlySpecialIcon];
     }
 
     async _execute(target: TargetDocuments): Promise<boolean> {

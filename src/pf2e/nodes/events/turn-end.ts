@@ -1,4 +1,4 @@
-import { BaseEventNode } from "engine";
+import { BaseEventNode, SpecialIcon, gmOnlySpecialIcon } from "engine";
 import { PF2eOutputEntry } from "pf2e";
 
 class TurnEndEvent extends BaseEventNode<never, { combatant: TargetDocuments }> {
@@ -16,6 +16,10 @@ class TurnEndEvent extends BaseEventNode<never, { combatant: TargetDocuments }> 
 
     get icon(): string {
         return "\uf253";
+    }
+
+    get specialIcons(): SpecialIcon[] {
+        return [gmOnlySpecialIcon];
     }
 
     async _execute(target: TargetDocuments): Promise<boolean> {

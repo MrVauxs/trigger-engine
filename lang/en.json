@@ -232,7 +232,8 @@
                 "path": "Trigger Path"
             },
             "special": {
-                "custom": "Has Custom Entries"
+                "custom": "Has Custom Entries",
+                "gm-only": "Executed by Active GM Only"
             },
             "state": {
                 "description": "Description",
