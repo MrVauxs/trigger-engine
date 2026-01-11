@@ -261,13 +261,13 @@ class TriggerApplication {
             if (R.isArray(wantedEvents) && includesAny(events, wantedEvents)) {
                 hook._enable();
                 hookData.enabled = true;
-                MODULE.debug("[enabled]", hookName);
+                MODULE.debug("[ENABLED]  ", hookName);
             } else if (R.isArray(wantedOtherNodes) && includesAny(otherNodes, wantedOtherNodes)) {
                 hook._listen();
                 hookData.enabled = true;
-                MODULE.debug("[listening]", hookName);
+                MODULE.debug("[LISTENING]", hookName);
             } else {
-                MODULE.debug("[disabled]", hookName);
+                MODULE.debug("[DISABLED] ", hookName);
             }
         }
         MODULE.groupEnd();

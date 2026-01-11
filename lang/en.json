@@ -353,6 +353,11 @@
             }
         },
         "pf2e-trigger": {
+            "entry": {
+                "combatant": {
+                    "title": "Combatant"
+                }
+            },
             "node": {
                 "action": {
                     "create-item": {
@@ -374,12 +379,31 @@
                         },
                         "title": "Create Item"
                     }
+                },
+                "event": {
+                    "turn-end-event": {
+                        "title": "Turn End"
+                    },
+                    "turn-start-event": {
+                        "title": "Turn Start"
+                    }
                 }
             },
             "setting": {
                 "hint": "Register you own triggers with the module.",
                 "label": "Register Triggers",
                 "name": "PF2e Triggers Menu"
+            },
+            "tag": {
+                "combat": {
+                    "title": "Combat"
+                },
+                "combatant": {
+                    "title": "Combatant"
+                },
+                "turn": {
+                    "title": "Turn"
+                }
             }
         },
         "save-triggers": {

@@ -41,8 +41,8 @@ function getBuiltins<C extends TriggerApplicationCollection>(
 type TriggerApplicationCollections = {
     convertors?: EntryConvertor[];
     entries?: (typeof NodeEntry)[];
-    hooks?: (typeof TriggerHook<any>)[];
-    nodes?: (typeof TriggerNode<any, any, any, any, any, any>)[];
+    hooks?: (typeof TriggerHook)[];
+    nodes?: (typeof TriggerNode)[];
 };
 
 type TriggerApplicationCollection = Prettify<keyof TriggerApplicationCollections>;
