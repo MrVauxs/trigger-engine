@@ -1,8 +1,12 @@
 import { TriggerApplication } from "engine";
-import { R } from "module-helpers";
+import { ActorPF2e, R } from "module-helpers";
 import { TriggerHook } from ".";
 
 function instantiateHook(parent: TriggerApplication, HookCls: typeof TriggerHook): TriggerHookWrapper {
+    function isValidActor(actor: Maybe<ActorPF2e>): actor is ActorPF2e {
+        return !!actor && !actor.pack;
+    }
+
     class TriggerHookWrapper extends HookCls {
         constructor() {
             super();
@@ -30,6 +34,23 @@ function instantiateHook(parent: TriggerApplication, HookCls: typeof TriggerHook
                             value,
                             configurable: false,
                             enumerable: true,
+                            writable: false,
+                        };
+                    }),
+                ),
+            );
+
+            // from private methods
+            Object.defineProperties(
+                this,
+                R.pipe(
+                    [["isValidActor", isValidActor]] as const,
+                    R.fromEntries(),
+                    R.mapValues((method) => {
+                        return {
+                            value: method.bind(this),
+                            configurable: false,
+                            enumerable: false,
                             writable: false,
                         };
                     }),

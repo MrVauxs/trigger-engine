@@ -1,5 +1,5 @@
 import { ApplicationKey, EmitableUserValue, TriggerNode, UserValue } from "engine";
-import { MODULE } from "module-helpers";
+import { ActorPF2e, MODULE } from "module-helpers";
 
 class TriggerHook<TArgs extends any[] = []> {
     //////////////////////////////
@@ -113,6 +113,11 @@ class TriggerHook<TArgs extends any[] = []> {
         eventName: string,
         args?: Record<string, any>,
     ) => Promise<unknown>;
+
+    /**
+     * Test if an actor is a world actor.
+     */
+    declare isValidActor: (actor: Maybe<ActorPF2e>) => actor is ActorPF2e;
 
     /**
      * This is used to validate values provided by users at runtime.
