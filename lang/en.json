@@ -381,6 +381,9 @@
                     }
                 },
                 "event": {
+                    "token-moved-event": {
+                        "title": "Token Moved"
+                    },
                     "turn-end-event": {
                         "title": "Turn End"
                     },
@@ -400,6 +403,9 @@
                 },
                 "combatant": {
                     "title": "Combatant"
+                },
+                "token": {
+                    "title": "Token"
                 },
                 "turn": {
                     "title": "Turn"
