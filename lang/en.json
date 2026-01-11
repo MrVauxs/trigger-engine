@@ -236,6 +236,9 @@
                 "localization": "Localization"
             },
             "tag": {
+                "chat": {
+                    "title": "Chat"
+                },
                 "debug": {
                     "title": "Debug"
                 },
