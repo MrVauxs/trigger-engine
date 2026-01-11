@@ -231,8 +231,8 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
 
             const source = node.data.toObject();
 
-            source.position.x += 200;
-            source.position.y += 100;
+            source.position.x += 100;
+            source.position.y += 50;
 
             for (const category of OPPOSITE_CONNECTION_CATEGORY) {
                 for (const [key, entry] of R.entries(source[category])) {
