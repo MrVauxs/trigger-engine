@@ -231,6 +231,9 @@
                 "gm": "GM Only?",
                 "path": "Trigger Path"
             },
+            "special": {
+                "custom": "Has Custom Entries"
+            },
             "state": {
                 "description": "Description",
                 "localization": "Localization"

@@ -182,13 +182,25 @@ class TriggerNode<
     //////////////////////////////
 
     /**
-     * The appearing title on the node.
-     *
-     * Localization path:
-     * `<module-id>.<application-id>.node.<category>.<type>.title`
+     * The background color for the header. Is only used if the node has a 'title'.
      */
-    get title(): string | null {
-        return this.localize("title") ?? null;
+    get headerColor(): `#${string}` | number | null {
+        return this.isEvent ? "#C40000" : "#0c0c0c";
+    }
+
+    /**
+     * The header icon. Is only used if the node has a 'title'.
+     */
+    get icon(): string | IconObject | null {
+        return null;
+    }
+
+    /**
+     * Icons added to the node to indicate some special features the node contains at first glance.
+     * They will be added next to the already existing ones (e.g. `custom`)
+     */
+    get specialIcons(): { icon: IconObject; name?: string }[] | null {
+        return null;
     }
 
     /**
@@ -202,17 +214,13 @@ class TriggerNode<
     }
 
     /**
-     * The appearing icon on the node. Is only used if the node has a 'title'.
+     * The appearing title on the node.
+     *
+     * Localization path:
+     * `<module-id>.<application-id>.node.<category>.<type>.title`
      */
-    get icon(): string | IconObject | null {
-        return null;
-    }
-
-    /**
-     * The background color for the header. Is only used if the node has a 'title'.
-     */
-    get headerColor(): `#${string}` | number | null {
-        return this.isEvent ? "#C40000" : "#0c0c0c";
+    get title(): string | null {
+        return this.localize("title") ?? null;
     }
 
     //////////////////////////////

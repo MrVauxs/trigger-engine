@@ -56,6 +56,7 @@ import {
     maxRight,
     NodeHeaderSource,
     NodePart,
+    zNodeHeaderBackground,
     zNodeHeaderData,
     zNodeIconData,
 } from ".";
@@ -150,6 +151,12 @@ class BlueprintNode extends PIXI.Container {
 
     get isVariable(): boolean {
         return this.category === VARIABLE_CATEGORY;
+    }
+
+    get isCustom(): boolean {
+        return (["inputs", "outputs", "outs"] as const).some((category) => {
+            return this.#node.entries[category].some((entry) => !!entry.slug);
+        });
     }
 
     get isDuplicable(): boolean {
@@ -368,6 +375,13 @@ class BlueprintNode extends PIXI.Container {
         // border
         this.addChild((this.#border = new PIXI.Graphics()));
         this.#drawBorder();
+
+        // special icons
+        const specials = this.#createSpecials();
+
+        if (specials) {
+            specials.x = width - specials.width + specials.children[0].width * 0.3;
+        }
 
         // set position
         const { x, y } = this.data.position;
@@ -726,6 +740,72 @@ class BlueprintNode extends PIXI.Container {
         body.calculatedHeight = nbRows * rowHeight + padding.y * 2;
 
         return body;
+    }
+
+    #createSpecials(): PIXI.Container<PIXI.Graphics> | undefined {
+        const headerColor = zNodeHeaderBackground.parse(this.#node.headerColor);
+
+        const specials = R.pipe(
+            this.#node.specialIcons ?? [],
+            R.map(({ icon, name }) => {
+                const parsed = zNodeIconData.safeParse(icon)?.data;
+                if (!parsed) return;
+
+                return {
+                    icon: parsed,
+                    name,
+                };
+            }),
+            R.filter(R.isTruthy),
+        );
+
+        if (this.isCustom) {
+            specials.push({
+                icon: { fontMult: 1, fontWeight: "800", unicode: "\uf013" },
+                name: "custom",
+            });
+        }
+
+        if (!specials.length) return;
+
+        const borderOptions = this.borderOptions;
+
+        const elements = R.map(specials, ({ icon: { unicode, fontMult, fontWeight }, name }) => {
+            const icon = this.fontAwesomeIcon({
+                fontMult: fontMult * 0.86,
+                fontWeight,
+                unicode,
+            });
+
+            const width = 22;
+            const height = 20;
+
+            icon.x = (width - icon.width) / 2;
+            icon.y = (height - icon.height) / 2;
+
+            const helper = new PIXI.Graphics();
+
+            helper.beginFill(headerColor, this.opacity);
+            helper.lineStyle(borderOptions);
+            helper.drawCircle(width / 2, height / 2, height * 0.5);
+            helper.endFill();
+
+            helper.addChild(icon);
+
+            if (name) {
+                this.blueprint.addTooltip(helper, () => this.rootLocalize("special", name), "UP");
+            }
+
+            return helper;
+        });
+
+        const wrapper = new PIXI.Container<PIXI.Graphics>();
+
+        alignHorizontally(wrapper, elements, { spacing: 3 });
+
+        wrapper.y = wrapper.height * -0.6;
+
+        return this.addChild(wrapper);
     }
 
     #createHeader(): NodeheaderPart | undefined {
