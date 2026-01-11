@@ -154,8 +154,8 @@ class BlueprintNode extends PIXI.Container {
     }
 
     get isCustom(): boolean {
-        return (["inputs", "outputs", "outs"] as const).some((category) => {
-            return this.#node.entries[category].some((entry) => !!entry.slug);
+        return (["defineCustomInputs", "defineCustomOutputs", "defineCustomOuts"] as const).some((category) => {
+            return (this.#node.constructor as typeof TriggerNode)[category]?.some((entry) => !!entry.slug);
         });
     }
 
