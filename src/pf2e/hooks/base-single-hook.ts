@@ -5,6 +5,7 @@ abstract class BaseSingleHook<TArgs extends Record<string, any>> extends BaseBui
 
     abstract get eventType(): string;
     abstract get eventName(): string;
+    abstract get gmOnly(): boolean;
 
     abstract onEvent(...args: any[]): void;
 
@@ -13,7 +14,9 @@ abstract class BaseSingleHook<TArgs extends Record<string, any>> extends BaseBui
     }
 
     _enable(): void {
-        Hooks.on(this.eventName, this.#eventHook);
+        if (!this.gmOnly || game.user.isActiveGM) {
+            Hooks.on(this.eventName, this.#eventHook);
+        }
     }
 
     _disable(): void {

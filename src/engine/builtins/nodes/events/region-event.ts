@@ -1,4 +1,4 @@
-import { BaseEventNode, OutputEntrySchemaSource } from "engine";
+import { BaseEventNode, BuiltinsOutputEntry } from "engine";
 
 class RegionEventNode extends BaseEventNode<never, Outputs> {
     static get type(): "region-event" {
@@ -9,7 +9,7 @@ class RegionEventNode extends BaseEventNode<never, Outputs> {
         return ["region"];
     }
 
-    static get defineOutputs(): OutputEntrySchemaSource[] {
+    static get defineOutputs(): BuiltinsOutputEntry[] {
         return [
             { key: "target", type: "target" },
             { key: "event", type: "text" },
