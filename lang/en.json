@@ -442,9 +442,6 @@
                         "outputs": {
                             "source": {
                                 "title": "Aura Source"
-                            },
-                            "target": {
-                                "title": "Affected Target"
                             }
                         }
                     },

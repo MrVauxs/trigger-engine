@@ -52,7 +52,7 @@ class TextField extends InputField<string, TextFieldSchema> {
     }
 
     get width(): number {
-        return 120;
+        return 140;
     }
 
     get innerWidth(): number {

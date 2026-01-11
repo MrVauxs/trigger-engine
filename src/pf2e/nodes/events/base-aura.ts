@@ -52,7 +52,6 @@ abstract class BaseAuraEvent extends BaseEventNode<Inputs, Outputs> {
             {
                 key: "target",
                 type: "target",
-                label: this.localizePath("outputs.target.title"),
             },
             {
                 key: "source",
