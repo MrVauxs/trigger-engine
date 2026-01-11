@@ -1,21 +1,13 @@
 import { BaseEventNode, SpecialIcon, gmOnlySpecialIcon } from "engine";
 import { PF2eOutputEntry } from "pf2e";
 
-class TokenMovedEvent extends BaseEventNode<never, { target: TargetDocuments }> {
-    static get type(): "token-moved-event" {
-        return "token-moved-event";
-    }
-
+abstract class BaseTokenEvent extends BaseEventNode<never, { target: TargetDocuments }> {
     static get tags(): string[] {
         return ["token"];
     }
 
     static get defineOutputs(): PF2eOutputEntry[] {
         return [{ key: "target", type: "target" }];
-    }
-
-    get icon(): string {
-        return "\uf554";
     }
 
     get specialIcons(): SpecialIcon[] {
@@ -28,4 +20,4 @@ class TokenMovedEvent extends BaseEventNode<never, { target: TargetDocuments }> 
     }
 }
 
-export { TokenMovedEvent };
+export { BaseTokenEvent };

@@ -761,7 +761,7 @@ class BlueprintNode extends PIXI.Container {
 
         if (this.isCustom) {
             specials.push({
-                icon: { fontMult: 1, fontWeight: "800", unicode: "\uf013" },
+                icon: { fontMult: 1, fontWeight: "900", unicode: "\uf013" },
                 name: "custom",
             });
         }

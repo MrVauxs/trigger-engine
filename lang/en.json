@@ -205,11 +205,20 @@
                     "create-combatant-event": {
                         "title": "Combatant Created"
                     },
+                    "create-token-event": {
+                        "title": "Token Created"
+                    },
                     "delete-combatant-event": {
                         "title": "Combatant Removed"
                     },
+                    "delete-token-event": {
+                        "title": "Token Removed"
+                    },
                     "execute-event": {
                         "title": "Execute Event"
+                    },
+                    "move-token-event": {
+                        "title": "Token Moved"
                     },
                     "region-event": {
                         "outputs": {
@@ -221,9 +230,6 @@
                     },
                     "test-event": {
                         "title": "Test Event"
-                    },
-                    "token-moved-event": {
-                        "title": "Token Moved"
                     }
                 },
                 "value": {

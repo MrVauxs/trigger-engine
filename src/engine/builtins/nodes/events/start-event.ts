@@ -10,7 +10,7 @@ class _StartEventNode extends BaseEventNode {
     get icon(): IconObject {
         return {
             unicode: "\uf11e",
-            fontWeight: "800",
+            fontWeight: "900",
         };
     }
 
