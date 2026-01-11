@@ -1,7 +1,9 @@
 import { TriggerApplication, TriggerApplicationOptions, TriggerHook, TriggerNode } from "engine";
 import { MODULE } from "module-helpers";
 import {
+    CreateCombatantHook,
     CreateItemActionNode,
+    DeleteCombatantHook,
     TokenMovedEvent,
     TokenMovedHook,
     TurnEndEvent,
@@ -10,7 +12,13 @@ import {
     TurnStartHook,
 } from ".";
 
-const hooks = [TokenMovedHook, TurnEndHook, TurnStartHook] as (typeof TriggerHook)[];
+const hooks = [
+    CreateCombatantHook,
+    DeleteCombatantHook,
+    TokenMovedHook,
+    TurnEndHook,
+    TurnStartHook,
+] as (typeof TriggerHook)[];
 
 const nodes = [CreateItemActionNode, TokenMovedEvent, TurnEndEvent, TurnStartEvent] as (typeof TriggerNode)[];
 
