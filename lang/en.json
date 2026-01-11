@@ -251,7 +251,8 @@
             },
             "special": {
                 "custom": "Has Custom Entries",
-                "gm-only": "Executed by Active GM Only"
+                "gm-only": "Executed by Active GM Only",
+                "state": "Has Multiple States"
             },
             "state": {
                 "description": "Description",
@@ -424,13 +425,13 @@
                                     "allies": "Allies",
                                     "enemies": "Enemies"
                                 },
-                                "title": "Affects"
+                                "title": "Affects Who?"
                             },
                             "slug": {
                                 "title": "Aura Slug"
                             },
                             "when": {
-                                "title": "Trigger When",
+                                "title": "Triggers When?",
                                 "options": {
                                     "always": "Always Trigger",
                                     "combat": "Only in Combat",

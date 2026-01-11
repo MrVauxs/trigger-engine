@@ -159,6 +159,10 @@ class BlueprintNode extends PIXI.Container {
         });
     }
 
+    get hasMultipleStates() {
+        return !!this.#node.states?.length;
+    }
+
     get isDuplicable(): boolean {
         return !this.isEvent && !this.isGate && !this.isVariable;
     }
@@ -763,6 +767,13 @@ class BlueprintNode extends PIXI.Container {
             specials.push({
                 icon: { fontMult: 1, fontWeight: "900", unicode: "\uf013" },
                 name: "custom",
+            });
+        }
+
+        if (this.hasMultipleStates) {
+            specials.push({
+                icon: { fontMult: 1, fontWeight: "900", unicode: "\uf364" },
+                name: "state",
             });
         }
 
