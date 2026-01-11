@@ -1,4 +1,4 @@
-import { BasesHook, RegionEventOptions, TriggerApplication, TriggerPath } from "engine";
+import { BaseBuiltinsHook, RegionEventOptions, TriggerApplication, TriggerPath } from "engine";
 import { R, RegionEventPF2e, localize } from "module-helpers";
 import fields = foundry.data.fields;
 
@@ -44,7 +44,7 @@ class TriggerEngineRegionBehaviorType extends foundry.data.regionBehaviors.Regio
     }
 }
 
-class RegionHook extends BasesHook<RegionEventOptions> {
+class RegionHook extends BaseBuiltinsHook<RegionEventOptions> {
     static get type(): "region-hook" {
         return "region-hook";
     }
