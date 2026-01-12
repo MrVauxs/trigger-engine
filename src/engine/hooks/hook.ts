@@ -13,7 +13,7 @@ class TriggerHook<TArgs extends Record<string, any> = Record<string, any>> {
     }
 
     /**
-     * Should this hook only be enabled for the GM client. You still have to account for activeGM yourself.
+     * Should this hook only be enabled for the GM clients. You still have to account for isActiveGM yourself.
      */
     get gmOnly(): boolean {
         return true;

@@ -120,8 +120,12 @@ class TextField extends InputField<string, TextFieldSchema> {
         return this.isSelect ? 1 : super.valueAlpha;
     }
 
+    localizeOptionOrGroupValue(value: string): string | undefined {
+        return this.localize(this.entry.category, this.entry.slug ?? this.entry.key, "options", value);
+    }
+
     localizeOption({ value, label }: SelectOption): string {
-        return R.isString(label) ? game.i18n.localize(label) : (this.localize("options", value) ?? value);
+        return R.isString(label) ? game.i18n.localize(label) : (this.localizeOptionOrGroupValue(value) ?? value);
     }
 
     draw(): void {
@@ -179,7 +183,9 @@ class TextField extends InputField<string, TextFieldSchema> {
         if (this.field.type === "select" && this.options.length) {
             const options: SelectFieldOptions = R.map(this.options, (option) => {
                 const group = option.group
-                    ? (this.localize("options", option.group) ?? foundryLocalizeIfExist(option.group))
+                    ? (this.localizeOptionOrGroupValue(option.group) ??
+                      foundryLocalizeIfExist(option.group) ??
+                      option.group)
                     : undefined;
 
                 return {

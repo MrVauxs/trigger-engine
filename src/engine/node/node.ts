@@ -194,7 +194,7 @@ class TriggerNode<
      * @see {@link TriggerNode#getInputValue}
      * @see {@link TriggerNode#setOutputValue}
      */
-    _execute(...args: any[]): Promise<any> {
+    _execute(...args: any[]): Promise<boolean> {
         throw MODULE.Error("'_execute' method not implemented.");
     }
 

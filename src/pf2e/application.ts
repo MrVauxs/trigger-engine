@@ -5,18 +5,21 @@ import {
     AuraHook,
     AuraLeaveEvent,
     CreateItemActionNode,
+    CreateMessageHook,
+    DamageTakenEvent,
     TurnEndEvent,
     TurnEndHook,
     TurnStartEvent,
     TurnStartHook,
 } from ".";
 
-const hooks = [AuraHook, TurnEndHook, TurnStartHook] as (typeof TriggerHook)[];
+const hooks = [AuraHook, CreateMessageHook, TurnEndHook, TurnStartHook] as (typeof TriggerHook)[];
 
 const nodes = [
     AuraEnterEvent,
     AuraLeaveEvent,
     CreateItemActionNode,
+    DamageTakenEvent,
     TurnEndEvent,
     TurnStartEvent,
 ] as (typeof TriggerNode)[];

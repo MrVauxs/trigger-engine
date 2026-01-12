@@ -32,7 +32,6 @@ abstract class BaseAuraEvent extends BaseEventNode<Inputs, Outputs> {
             {
                 key: "when",
                 type: "text",
-                label: this.localizePath("inputs.when.title"),
                 field: {
                     type: "select",
                     default: "turn",

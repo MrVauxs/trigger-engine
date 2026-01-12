@@ -234,14 +234,18 @@
                 },
                 "value": {
                     "user-value": {
-                        "title": "World User",
-                        "options": {
-                            "__active-gm__": "Active GM",
-                            "__self-user__": "Self User",
-                            "__context-user__": "Context User",
-                            "specials": "Specials",
-                            "users": "Users"
-                        }
+                        "inputs": {
+                            "id": {
+                                "options": {
+                                    "__active-gm__": "Active GM",
+                                    "__self-user__": "Self User",
+                                    "__context-user__": "Context User",
+                                    "specials": "Specials",
+                                    "users": "Users"
+                                }
+                            }
+                        },
+                        "title": "World User"
                     }
                 }
             },
@@ -266,6 +270,9 @@
                 },
                 "combatant": {
                     "title": "Combatant"
+                },
+                "damage": {
+                    "title": "Damage"
                 },
                 "debug": {
                     "title": "Debug"
@@ -387,6 +394,14 @@
             }
         },
         "pf2e-trigger": {
+            "entry": {
+                "options": {
+                    "title": "Roll Options"
+                },
+                "when": {
+                    "title": "Triggers When?"
+                }
+            },
             "node": {
                 "action": {
                     "create-item": {
@@ -430,7 +445,6 @@
                                 "title": "Aura Slug"
                             },
                             "when": {
-                                "title": "Triggers When?",
                                 "options": {
                                     "always": "Always Trigger",
                                     "combat": "Only in Combat",
@@ -443,6 +457,29 @@
                                 "title": "Aura Source"
                             }
                         }
+                    },
+                    "damage-taken-event": {
+                        "inputs": {
+                            "requires": {
+                                "tooltip": "Must originate from an Actor",
+                                "title": "Requires Origin?"
+                            },
+                            "when": {
+                                "options": {
+                                    "all": "All Damages",
+                                    "damage": "Damage Received",
+                                    "heal": "Heal Received",
+                                    "persistent": "Persistent Only",
+                                    "negated": "Negated Only"
+                                }
+                            }
+                        },
+                        "outputs": {
+                            "origin": {
+                                "title": "Origin"
+                            }
+                        },
+                        "title": "Damage Taken"
                     },
                     "turn-end-event": {
                         "title": "Turn End"
