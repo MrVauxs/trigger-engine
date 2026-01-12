@@ -21,6 +21,7 @@ class RegionEventNode extends BaseEventNode<never, Outputs> {
     }
 
     _execute({ eventName, target }: RegionEventOptions): Promise<boolean> {
+        this.sceneContext = target.token;
         this.setOutputValue("event", eventName);
         this.setOutputValue("target", target);
         return this.executeNext("out");

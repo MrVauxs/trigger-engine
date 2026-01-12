@@ -10,6 +10,7 @@ abstract class BaseTokenEvent extends BaseEventNode<never, { target: TargetDocum
     }
 
     async _execute(target: TargetDocuments): Promise<boolean> {
+        this.sceneContext = target.token;
         this.setOutputValue("target", target);
         return this.executeNext("out");
     }

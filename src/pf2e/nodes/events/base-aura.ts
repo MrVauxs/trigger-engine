@@ -76,6 +76,7 @@ abstract class BaseAuraEvent extends BaseEventNode<Inputs, Outputs> {
         const affects = await this.getInputValue("affects");
         if (!actorsRespectAlliance(aura.origin.actor, actor, affects)) return false;
 
+        this.sceneContext = target.token;
         this.setOutputValue("source", aura.origin);
         this.setOutputValue("target", target);
 

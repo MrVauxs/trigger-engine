@@ -10,6 +10,7 @@ abstract class BaseCombatantEvent extends BaseEventNode<never, { combatant: Targ
     }
 
     async _execute(target: TargetDocuments): Promise<boolean> {
+        this.sceneContext = target.token;
         this.setOutputValue("combatant", target);
         return this.executeNext("out");
     }
