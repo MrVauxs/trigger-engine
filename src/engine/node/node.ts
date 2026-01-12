@@ -11,7 +11,7 @@ import {
     TriggerPath,
     UserValue,
 } from "engine";
-import { LocalizeArgs, MODULE, UserPF2e } from "module-helpers";
+import { LocalizeArgs, MODULE, ScenePF2e, UserPF2e } from "module-helpers";
 import { NodeData } from ".";
 
 class TriggerNode<
@@ -161,6 +161,11 @@ class TriggerNode<
      * The internal path for the node.
      */
     declare readonly nodePath: TriggerNodePath;
+
+    /**
+     * Scene context getter and setter.
+     */
+    declare sceneContext: ScenePF2e | undefined;
 
     /**
      * The current state of the node.

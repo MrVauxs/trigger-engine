@@ -9,7 +9,7 @@ import {
     OutputEntrySchema,
     Trigger,
 } from "engine";
-import { LocalizeArgs, MODULE, R, UserPF2e } from "module-helpers";
+import { LocalizeArgs, MODULE, R, ScenePF2e, UserPF2e } from "module-helpers";
 import { getInputsSchemas, getNodeStates, getOutputsSchemas, getOutsSchemas, NodeData, TriggerNode } from ".";
 
 function instantiateNode(parent: OpenTrigger, data: NodeData, open: true): OpenTriggerNode | undefined;
@@ -88,6 +88,7 @@ function instantiateNode(
         #outputs: Collection<NodeEntry>;
         #outputValues: Record<string, any> = {};
         #outs: Collection<NodeBridge>;
+        #sceneId?: string;
         #userId?: string;
 
         constructor() {
@@ -95,13 +96,27 @@ function instantiateNode(
 
             const self = this;
 
+            // scene context
+            Object.defineProperty(this, "scene", {
+                get(): ScenePF2e | undefined {
+                    return (self.#sceneId && game.scenes.get(self.#sceneId)) || parent.sceneContext;
+                },
+                set(value: ScenePF2e) {
+                    self.#sceneId = value.id;
+                    parent.sceneContext = value;
+                },
+                configurable: false,
+                enumerable: true,
+            });
+
+            // user context
             Object.defineProperty(this, "userContext", {
                 get(): UserPF2e {
                     return (self.#userId && game.users.get(self.#userId)) || parent.userContext;
                 },
-                set(value) {
+                set(value: UserPF2e) {
                     self.#userId = value.id;
-                    parent.userContext = value.id;
+                    parent.userContext = value;
                 },
                 configurable: false,
                 enumerable: true,

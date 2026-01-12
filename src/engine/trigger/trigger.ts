@@ -7,12 +7,13 @@ import {
     TriggerNode,
     instantiateNode,
 } from "engine";
-import { R, UserPF2e } from "module-helpers";
+import { R, ScenePF2e, UserPF2e } from "module-helpers";
 
 class Trigger<TNode extends TriggerNode = TriggerNode> {
     #data: TriggerData;
     #nodes: Collection<TNode> = new Collection();
     #parent: TriggerApplication;
+    #sceneId?: string;
     #userId: string;
 
     constructor(parent: TriggerApplication, data: TriggerData, userId: string = game.userId) {
@@ -59,8 +60,16 @@ class Trigger<TNode extends TriggerNode = TriggerNode> {
         return game.users.get(this.#userId) ?? game.user;
     }
 
-    set userContext(user) {
+    set userContext(user: UserPF2e) {
         this.#userId = user.id;
+    }
+
+    get sceneContext(): ScenePF2e | undefined {
+        return (this.#sceneId && game.scenes.get(this.#sceneId)) || game.scenes.active;
+    }
+
+    set sceneContext(scene: ScenePF2e) {
+        this.#sceneId = scene.id;
     }
 
     // TODO need to actually implement that when module triggers is done
