@@ -114,16 +114,22 @@ class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<st
     }
 }
 
-interface NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<string, any> | undefined = undefined>
-    extends Omit<BaseEntrySchemaOutput, "state" | "type">, Pick<typeof NodeEntry, "type" | "color"> {
+interface NodeEntry<
+    TValue extends unknown = unknown,
+    TFieldSchema extends Record<string, any> | undefined = undefined,
+> extends Omit<BaseEntrySchemaOutput, "state" | "type"> {
     /** The entry category. */
     get category(): EntryCategory;
+    /** @see {@link NodeEntry.color} */
+    get color(): ColorSource;
     /** The connection path of this entry. */
     get connection(): ConnectionId | undefined;
     /** @see {@link NodeField.defineSchema} The field data for this instance. */
     get field(): TFieldSchema;
     /** The local value of this entry. */
     get value(): TValue | undefined;
+    /** @see {@link NodeEntry.type} */
+    get type(): string;
 
     /** @see {@link NodeEntry.fromJSON} */
     fromJSON(value: JSONValue): Promise<any> | any;
