@@ -7,7 +7,7 @@ import {
     TriggerNode,
     instantiateNode,
 } from "engine";
-import { R, ScenePF2e, UserPF2e } from "module-helpers";
+import { R, ScenePF2e, TokenDocumentPF2e, UserPF2e } from "module-helpers";
 
 class Trigger<TNode extends TriggerNode = TriggerNode> {
     #data: TriggerData;
@@ -68,8 +68,12 @@ class Trigger<TNode extends TriggerNode = TriggerNode> {
         return (this.#sceneId && game.scenes.get(this.#sceneId)) || game.scenes.active;
     }
 
-    set sceneContext(scene: ScenePF2e) {
-        this.#sceneId = scene.id;
+    set sceneContext(sceneOrToken: Maybe<ScenePF2e | TokenDocumentPF2e>) {
+        const scene = sceneOrToken instanceof TokenDocument ? sceneOrToken.scene : sceneOrToken;
+
+        if (scene) {
+            this.#sceneId = scene.id;
+        }
     }
 
     // TODO need to actually implement that when module triggers is done

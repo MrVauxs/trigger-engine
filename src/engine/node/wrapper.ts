@@ -9,7 +9,7 @@ import {
     OutputEntrySchema,
     Trigger,
 } from "engine";
-import { LocalizeArgs, MODULE, R, ScenePF2e, UserPF2e } from "module-helpers";
+import { LocalizeArgs, MODULE, R, ScenePF2e, TokenDocumentPF2e, UserPF2e } from "module-helpers";
 import { getInputsSchemas, getNodeStates, getOutputsSchemas, getOutsSchemas, NodeData, TriggerNode } from ".";
 
 function instantiateNode(parent: OpenTrigger, data: NodeData, open: true): OpenTriggerNode | undefined;
@@ -101,9 +101,13 @@ function instantiateNode(
                 get(): ScenePF2e | undefined {
                     return (self.#sceneId && game.scenes.get(self.#sceneId)) || parent.sceneContext;
                 },
-                set(value: ScenePF2e) {
-                    self.#sceneId = value.id;
-                    parent.sceneContext = value;
+                set(sceneOrToken: Maybe<ScenePF2e | TokenDocumentPF2e>) {
+                    const scene = sceneOrToken instanceof TokenDocument ? sceneOrToken.scene : sceneOrToken;
+
+                    if (scene) {
+                        self.#sceneId = scene.id;
+                        parent.sceneContext = scene;
+                    }
                 },
                 configurable: false,
                 enumerable: true,
@@ -114,9 +118,9 @@ function instantiateNode(
                 get(): UserPF2e {
                     return (self.#userId && game.users.get(self.#userId)) || parent.userContext;
                 },
-                set(value: UserPF2e) {
-                    self.#userId = value.id;
-                    parent.userContext = value;
+                set(user: UserPF2e) {
+                    self.#userId = user.id;
+                    parent.userContext = user;
                 },
                 configurable: false,
                 enumerable: true,

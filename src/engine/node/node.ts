@@ -11,7 +11,7 @@ import {
     TriggerPath,
     UserValue,
 } from "engine";
-import { LocalizeArgs, MODULE, ScenePF2e, UserPF2e } from "module-helpers";
+import { LocalizeArgs, MODULE, ScenePF2e, TokenDocumentPF2e, UserPF2e } from "module-helpers";
 
 class TriggerNode<
     TOuts extends string | never = string,
@@ -248,7 +248,7 @@ interface TriggerNode<
     get nodePath(): TriggerNodePath;
     /** Scene context getter and setter. */
     get sceneContext(): ScenePF2e | undefined;
-    set sceneContext(scene: ScenePF2e);
+    set sceneContext(sceneOrToken: Maybe<ScenePF2e | TokenDocumentPF2e>);
     /** The current state of the node. */
     get state(): TState | null;
     /** The internal path for the parent trigger. */
