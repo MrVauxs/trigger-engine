@@ -1,4 +1,4 @@
-import { BaseBuiltinsHook } from "engine";
+import { TriggerHook } from "engine";
 import {
     ActorPF2e,
     AuraData,
@@ -14,7 +14,7 @@ import {
     setInMemory,
 } from "module-helpers";
 
-class AuraHook extends BaseBuiltinsHook<AuraEventOptions> {
+class AuraHook extends TriggerHook<AuraEventOptions> {
     #active: boolean = false;
 
     #wrappers = [
@@ -142,7 +142,7 @@ class AuraHook extends BaseBuiltinsHook<AuraEventOptions> {
                     // we only execute triggers if the hook is actually active
                     if (this.#active && game.user.isActiveGM && this.isValidActor(actor)) {
                         const target = { actor, token: actorTokens.at(0) };
-                        this.executeEvent(game.userId, "aura-leave-event", { aura, target });
+                        this.executeEvent("aura-leave-event", { aura, target });
                     }
                 }
             }
@@ -183,7 +183,7 @@ class AuraHook extends BaseBuiltinsHook<AuraEventOptions> {
                 if (!already && this.#active && game.user.isActiveGM && this.isValidActor(actor)) {
                     const aura = { data: auraData, origin: source };
                     const target = { actor, token };
-                    this.executeEvent(game.user.id, "aura-enter-event", { aura, target });
+                    this.executeEvent("aura-enter-event", { aura, target });
                 }
             }
         }

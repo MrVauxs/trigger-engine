@@ -1,7 +1,7 @@
 import { ApplicationKey, EmitableUserValue, TriggerNode, UserValue } from "engine";
 import { ActorPF2e, MODULE } from "module-helpers";
 
-class TriggerHook<TArgs extends any[] = []> {
+class TriggerHook<TArgs extends Record<string, any> = Record<string, any>> {
     //////////////////////////////
     // ABSTRACT ACCESSORS
     //////////////////////////////
@@ -74,12 +74,12 @@ class TriggerHook<TArgs extends any[] = []> {
     /**
      * Convert the user value into one that is sent via websocket.
      */
-    declare convertToEmitable: (userValue: UserValue) => UserValue | undefined;
+    declare convertToEmitable: (type: string, value: any) => UserValue | undefined;
 
     /**
      * @see {@link TriggerHook#convertToEmitable}
      */
-    declare convertValuesToEmitable: (values: UserValue[]) => (EmitableUserValue | undefined)[];
+    declare convertValuesToEmitable: (values: (UserValue | undefined)[]) => (EmitableUserValue | undefined)[];
 
     /**
      * Execute all triggers that have this event.
@@ -88,7 +88,7 @@ class TriggerHook<TArgs extends any[] = []> {
      * @param event the name of the event to execute.
      * @param args the arguments to pass to the {@link TriggerNode#_execute} function.
      */
-    declare executeEvent: (userId: string, event: this["events"][number], ...args: TArgs) => Promise<void>;
+    declare executeEvent: (event: this["events"][number], args?: TArgs) => Promise<void>;
 
     /**
      * @see {@link TriggerHook#executeEvent}
@@ -97,22 +97,21 @@ class TriggerHook<TArgs extends any[] = []> {
      *
      * @param triggerId the id of the trigger belonging to the same application.
      */
-    declare executeTriggerEvent: (
-        userId: string,
-        triggerId: string,
-        event: this["events"][number],
-        ...args: TArgs
-    ) => Promise<void>;
+    declare executeTriggerEvent: (triggerId: string, event: this["events"][number], args?: TArgs) => Promise<void>;
 
     /**
-     * Have the active GM execute the trigger instead.
-     * The executed trigger user context will be the user that called this function.
+     * @see {@link TriggerHook#executeEvent}
+     *
+     * You must make sure to pass an argument that can be stringified.
      */
-    declare executeTriggerEventAsGM: (
-        triggerIdOrPath: string,
-        eventName: string,
-        args?: Record<string, any>,
-    ) => Promise<unknown>;
+    declare executeEventAsGM: (event: this["events"][number], args?: TArgs) => Promise<void>;
+
+    /**
+     * @see {@link TriggerHook#executeTriggerEvent}
+     *
+     * You must make sure to pass an argument that can be stringified.
+     */
+    declare executeTriggerEventAsGM: (triggerId: string, event: this["events"][number], args?: TArgs) => Promise<void>;
 
     /**
      * Test if an actor is a world actor.
@@ -122,14 +121,14 @@ class TriggerHook<TArgs extends any[] = []> {
     /**
      * This is used to validate values provided by users at runtime.
      */
-    declare parseUserValue: (userValue: UserValue, withType?: boolean) => boolean;
+    declare parseUserValue: (userValue: UserValue) => UserValue | undefined;
 
     /**
      * @see {@link TriggerHook#validateUserValue}
      *
      * Parse & filter an array of user values.
      */
-    declare parseUserValues: (values: UserValue[], withType?: boolean) => any[];
+    declare parseUserValues: (values: UserValue[]) => (UserValue | undefined)[];
 }
 
 export { TriggerHook };

@@ -1,4 +1,3 @@
-export * from "./base";
 export * from "./base-single-hook";
 export * from "./base-combatant";
 export * from "./base-token";

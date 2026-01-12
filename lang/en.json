@@ -251,7 +251,6 @@
             },
             "special": {
                 "custom": "Has Custom Entries",
-                "gm-only": "Executed by Active GM Only",
                 "state": "Has Multiple States"
             },
             "state": {

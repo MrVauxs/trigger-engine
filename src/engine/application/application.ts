@@ -27,7 +27,7 @@ import {
     VARIABLE_CATEGORY,
 } from "engine";
 import { includesAny, joinStr, LocalizeArgs, LocalizeData, MODULE, R } from "module-helpers";
-import { ExecuteTriggerQueryOptions } from "queries";
+import { ExecuteEventQueryOptions, ExecuteTriggerQueryOptions } from "queries";
 import { BlueprintApplication } from "triggers-menu";
 import utils = foundry.utils;
 
@@ -147,11 +147,30 @@ class TriggerApplication {
         }
     }
 
-    static executeTriggerEvent(userId: string, triggerPath: TriggerPath, event: string, args?: unknown) {
+    static async executeEvent(
+        userId: string,
+        applicationKey: ApplicationKey,
+        event: string,
+        args: Record<string, any> = {},
+    ) {
+        const [moduleId, applicationId] = R.split(applicationKey, ":");
+        const application = this.getApplication(moduleId, applicationId);
+        if (!application) return;
+
+        return application?._executeEvent(userId, event, args);
+    }
+
+    static async executeTriggerEvent(
+        userId: string,
+        triggerPath: TriggerPath,
+        event: string,
+        args: Record<string, any> = {},
+    ) {
         const { applicationId, moduleId, triggerId } = getTriggerPathData(triggerPath);
         const application = this.getApplication(moduleId, applicationId);
+        if (!application) return;
 
-        return application?.executeTriggerEvent(userId, triggerId, event, args);
+        return application?._executeTriggerEvent(userId, triggerId, event, args);
     }
 
     get mode(): TriggerApplicationMode {
@@ -273,24 +292,21 @@ class TriggerApplication {
         MODULE.groupEnd();
     }
 
-    convertToEmitable(userValue: UserValue): EmitableUserValue | undefined {
-        const entry = this.entries.get(userValue.type);
+    convertToEmitable(type: string, value: any): EmitableUserValue | undefined {
+        const entry = this.entries.get(type);
         if (!entry) return;
 
-        const value = R.isArray(userValue.value)
-            ? userValue.value.map(entry.toJSON.bind(entry))
-            : entry.toJSON(userValue.value);
-
-        return { type: userValue.type, value };
+        const converted = R.isArray(value) ? value.map(entry.toJSON.bind(entry)) : entry.toJSON(value);
+        return { type, value: converted };
     }
 
-    convertValuesToEmitable(values: UserValue[]): (EmitableUserValue | undefined)[] {
-        return values.map(this.convertToEmitable.bind(this));
+    convertValuesToEmitable(values: (UserValue | undefined)[]): (EmitableUserValue | undefined)[] {
+        return values.map((x) => {
+            return x ? this.convertToEmitable(x.type, x.value) : undefined;
+        });
     }
 
-    async convertFromEmitable(value: EmitableUserValue | undefined, withType: true): Promise<any | undefined>;
-    async convertFromEmitable(value: EmitableUserValue | undefined, withType?: boolean): Promise<UserValue | undefined>;
-    async convertFromEmitable(value: EmitableUserValue | undefined, withType?: boolean) {
+    async convertFromEmitable(value: EmitableUserValue | undefined, withType?: boolean): Promise<any> {
         if (!value) return;
 
         const entry = this.entries.get(value.type);
@@ -305,19 +321,12 @@ class TriggerApplication {
 
     async convertValuesFomEmitable(
         values: (EmitableUserValue | undefined)[],
-        withType: true,
-    ): Promise<(UserValue | undefined)[]>;
-    async convertValuesFomEmitable(
-        values: (EmitableUserValue | undefined)[],
         withType?: boolean,
-    ): Promise<(any | undefined)[]>;
-    async convertValuesFomEmitable(values: (EmitableUserValue | undefined)[], withType?: boolean) {
+    ): Promise<(UserValue | undefined)[]> {
         return Promise.all(values.map((value) => this.convertFromEmitable(value, withType)));
     }
 
-    parseUserValue<T extends UserValue>(userValue: UserValue, withType: true): UserValue | undefined;
-    parseUserValue<T extends UserValue>(userValue: UserValue, withType?: boolean): T["value"] | undefined;
-    parseUserValue(userValue: UserValue, withType?: boolean) {
+    parseUserValue(userValue: UserValue): UserValue | undefined {
         if (!R.isObjectType(userValue) || !R.isString(userValue.type)) return;
 
         const entry = this.entries.get(userValue.type);
@@ -329,39 +338,38 @@ class TriggerApplication {
               ? foundry.utils.deepClone(userValue.value)
               : entry.default;
 
-        return withType ? { type: userValue.type, value } : value;
+        return { type: userValue.type, value };
     }
 
-    parseUserValues(userValues: UserValue[], withType: true): UserValue[];
-    parseUserValues(userValues: UserValue[], withType?: boolean): any[];
-    parseUserValues(userValues: UserValue[], withType?: boolean) {
-        return R.isArray(userValues) ? userValues.map((value) => this.parseUserValue(value, withType)) : [];
+    parseUserValues(userValues: UserValue[]): (UserValue | undefined)[] {
+        return R.isArray(userValues) ? userValues.map((value) => this.parseUserValue(value)) : [];
     }
 
-    async executeEvent(userId: string, event: string, ...args: any[]) {
-        const triggers = this.#triggerEvents[event];
-        if (!triggers?.length) return;
-
-        for (const { data, eventId } of triggers) {
-            await this.#execute(userId, data, eventId, ...args);
-        }
+    async executeEvent(eventName: string, args: Record<string, any>) {
+        return await this._executeEvent(game.userId, eventName, args);
     }
 
-    async executeTriggerEvent(userId: string, triggerId: string, event: string, ...args: any[]) {
-        const trigger = this.#triggerEvents[event]?.find(({ data }) => data.id === triggerId);
-        if (!trigger) return;
+    async executeTriggerEvent(triggerId: string, eventName: string, args: Record<string, any>) {
+        return await this._executeTriggerEvent(game.userId, triggerId, eventName, args);
+    }
 
-        const { data, eventId } = trigger;
-        await this.#execute(userId, data, eventId, ...args);
+    async executeEventAsGM(eventName: string, args: Record<string, any> = {}) {
+        const queryArgs: ExecuteEventQueryOptions = {
+            _type: "execute-event",
+            applicationKey: this.applicationKey,
+            args,
+            eventName,
+            userId: game.userId,
+        };
+
+        return await game.users.activeGM?.query(MODULE.path("user-query"), queryArgs);
     }
 
     async executeTriggerEventAsGM(
-        triggerIdOrPath: string,
+        triggerId: string,
         eventName: string,
         args: Record<string, any> = {},
     ): Promise<unknown> {
-        const triggerId = R.split(triggerIdOrPath, ":").at(-1);
-
         const queryArgs: ExecuteTriggerQueryOptions = {
             _type: "execute-trigger",
             args,
@@ -430,6 +438,23 @@ class TriggerApplication {
         };
     }
 
+    async _executeEvent(userId: string, event: string, args: Record<string, any>) {
+        const triggers = this.#triggerEvents[event];
+        if (!triggers?.length) return;
+
+        for (const { data, eventId } of triggers) {
+            await this.#execute(userId, data, eventId, args);
+        }
+    }
+
+    async _executeTriggerEvent(userId: string, triggerId: string, event: string, args: Record<string, any>) {
+        const trigger = this.#triggerEvents[event]?.find(({ data }) => data.id === triggerId);
+        if (!trigger) return;
+
+        const { data, eventId } = trigger;
+        await this.#execute(userId, data, eventId, args);
+    }
+
     #getSettingApplication(): typeof BlueprintApplication | undefined {
         const menuKey = `${this.moduleId}.${this.settingMenuKey}`;
         return game.settings.menus.get(menuKey)?.type as typeof BlueprintApplication;
@@ -454,7 +479,7 @@ class TriggerApplication {
         };
     }
 
-    async #execute(userId: string, data: TriggerData, eventId: string, ...args: any[]) {
+    async #execute(userId: string, data: TriggerData, eventId: string, args: Record<string, any>) {
         try {
             const trigger = new Trigger(this, data, userId);
             const node = trigger.getNode(eventId);
@@ -464,7 +489,7 @@ class TriggerApplication {
 
             // we clone the args to avoid miss-handling downstream
             const clonedArgs = foundry.utils.deepClone(args);
-            await node._execute(...clonedArgs);
+            await node._execute(clonedArgs);
         } catch (error: any) {
             const id = `${this.applicationKey}:${data.id}:${eventId}`;
             MODULE.error(`an error occurred while executing the event: ${id}`, error);

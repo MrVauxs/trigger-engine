@@ -6,7 +6,7 @@ abstract class BaseCombatantHook extends BaseSingleHook<TargetDocuments> {
         const actor = combatant.actor;
 
         if (this.isValidActor(actor)) {
-            this.executeEvent(game.userId, this.events[0], { actor, token: combatant.token });
+            this.executeEvent(this.events[0], { actor, token: combatant.token });
         }
     }
 }

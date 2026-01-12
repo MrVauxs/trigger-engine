@@ -111,6 +111,7 @@ function getTriggerPathData(triggerPath: TriggerPath): TriggerPathData {
     return {
         moduleId,
         applicationId,
+        applicationKey: `${moduleId}:${applicationId}`,
         triggerId,
     };
 }
@@ -120,6 +121,7 @@ type TriggerPath = `${ApplicationKey}:${string}`;
 type TriggerPathData = {
     moduleId: string;
     applicationId: string;
+    applicationKey: ApplicationKey;
     triggerId: string;
 };
 

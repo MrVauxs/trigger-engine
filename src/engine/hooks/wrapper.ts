@@ -65,6 +65,7 @@ function instantiateHook(parent: TriggerApplication, HookCls: typeof TriggerHook
                         "convertToEmitable",
                         "convertValuesToEmitable",
                         "executeEvent",
+                        "executeEventAsGM",
                         "executeTriggerEvent",
                         "executeTriggerEventAsGM",
                         "parseUserValue",

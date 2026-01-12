@@ -235,7 +235,7 @@ class TriggerNode<
     /**
      * Convert the user value into one that is sent via websocket.
      */
-    declare convertToEmitable: (userValue: UserValue) => UserValue | undefined;
+    declare convertToEmitable: (type: string, value: any) => UserValue | undefined;
 
     /**
      * @see {@link TriggerNode#convertFromEmitable}
@@ -299,14 +299,14 @@ class TriggerNode<
     /**
      * This is used to validate values provided by users at runtime.
      */
-    declare parseUserValue: (userValue: unknown, withType?: boolean) => any;
+    declare parseUserValue: (userValue: unknown) => UserValue | undefined;
 
     /**
-     * @see {@link TriggerNode#validateUserValue}
+     * @see {@link TriggerNode#parseUserValue}
      *
      * Parse & filter an array of user values.
      */
-    declare parseUserValues: (userValues: unknown, withType?: boolean) => any[];
+    declare parseUserValues: (userValues: unknown) => (UserValue | undefined)[];
 
     /**
      * @see {@link TriggerNode#localize}

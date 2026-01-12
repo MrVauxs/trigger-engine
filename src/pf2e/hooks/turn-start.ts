@@ -18,7 +18,7 @@ class TurnStartHook extends BaseSingleHook<TurnStartOptions> {
         const actor = combatant.actor;
 
         if (this.isValidActor(actor)) {
-            this.executeEvent(game.userId, "turn-start-event", {
+            this.executeEvent("turn-start-event", {
                 combatant: { actor, token: combatant.token },
                 round: combatant.encounter?.round ?? 0,
             });

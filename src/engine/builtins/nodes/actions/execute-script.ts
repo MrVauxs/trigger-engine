@@ -60,7 +60,7 @@ class ExecuteScriptActionNode extends BaseActionNode<
             return result;
         }
 
-        const returnedValues = this.parseUserValues(result);
+        const returnedValues = this.parseUserValues(result).map((x) => x?.value);
         if (returnedValues.length) {
             this.setCustomOutputValues("output", returnedValues);
         }

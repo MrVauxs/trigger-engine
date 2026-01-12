@@ -11,7 +11,7 @@ class TestHook extends TriggerHook {
 
     _enable(): void {
         foundry.utils.setProperty(globalThis, TestEventNode.functionPath, () => {
-            this.executeEvent(game.userId, "test-event");
+            this.executeEvent("test-event");
         });
     }
 

@@ -1,4 +1,4 @@
-import { BaseEventNode, SpecialIcon, gmOnlySpecialIcon } from "engine";
+import { BaseEventNode } from "engine";
 import { R, actorsRespectAlliance, isCurrentCombatant, localizePath } from "module-helpers";
 import { AuraEventOptions, PF2eInputEntry, PF2eOutputEntry } from "pf2e";
 
@@ -63,10 +63,6 @@ abstract class BaseAuraEvent extends BaseEventNode<Inputs, Outputs> {
 
     static localizePath(...path: string[]): string {
         return localizePath(`pf2e-trigger.node.event.base-aura-event`, ...path);
-    }
-
-    get specialIcons(): SpecialIcon[] {
-        return [gmOnlySpecialIcon];
     }
 
     async _execute({ aura, target }: AuraEventOptions): Promise<boolean> {

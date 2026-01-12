@@ -1,21 +1,28 @@
-import { BaseBuiltinsHook, TriggerApplication, TriggerPath } from "engine";
+import { TriggerApplication, TriggerHook, TriggerPath } from "engine";
 import { R, RegionEventPF2e, localize } from "module-helpers";
 import fields = foundry.data.fields;
 
+class RegionHook extends TriggerHook<RegionEventOptions> {
+    static get type(): "region-hook" {
+        return "region-hook";
+    }
+
+    get events(): ["region-event"] {
+        return ["region-event"];
+    }
+
+    _enable(): void {}
+
+    _disable(): void {}
+}
+
 class TriggerEngineRegionBehaviorType extends foundry.data.regionBehaviors.RegionBehaviorType {
-    declare gm: boolean;
     declare path: TriggerPath;
 
     static defineSchema() {
         return {
             events: this._createEventsField({
                 events: R.values(CONST.REGION_EVENTS).filter((event) => event.startsWith("token")),
-            }),
-            gm: new fields.BooleanField({
-                required: false,
-                nullable: false,
-                initial: true,
-                label: localize("builtins.region.gm"),
             }),
             path: new fields.StringField({
                 required: true,
@@ -29,7 +36,7 @@ class TriggerEngineRegionBehaviorType extends foundry.data.regionBehaviors.Regio
     }
 
     async _handleRegionEvent(event: RegionEventPF2e): Promise<void> {
-        if (!("token" in event.data) || (this.gm && !game.user.isActiveGM)) return;
+        if (!("token" in event.data) || !game.user.isActiveGM) return;
 
         const token = event.data.token;
         const actor = token.actor;
@@ -40,22 +47,8 @@ class TriggerEngineRegionBehaviorType extends foundry.data.regionBehaviors.Regio
             target: { actor, token },
         };
 
-        TriggerApplication.executeTriggerEvent(game.userId, this.path, "region-event", args);
+        TriggerApplication.executeTriggerEvent(game.user.id, this.path, "region-event", args);
     }
-}
-
-class RegionHook extends BaseBuiltinsHook<RegionEventOptions> {
-    static get type(): "region-hook" {
-        return "region-hook";
-    }
-
-    get events(): ["region-event"] {
-        return ["region-event"];
-    }
-
-    _enable(): void {}
-
-    _disable(): void {}
 }
 
 type RegionEventOptions = {

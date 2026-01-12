@@ -1,17 +1,13 @@
-import { BaseBuiltinsHook } from "engine";
+import { TriggerHook } from "engine";
 
-abstract class BaseSingleHook<TArgs extends Record<string, any>> extends BaseBuiltinsHook<TArgs> {
+abstract class BaseSingleHook<TArgs extends Record<string, any>> extends TriggerHook<TArgs> {
     #hook = this.#onEvent.bind(this);
 
     abstract get eventName(): string;
     abstract _onEvent(...args: any[]): void;
 
-    get gmOnly(): boolean {
-        return true;
-    }
-
     _enable(): void {
-        if (!this.gmOnly || game.user.isGM) {
+        if (game.user.isGM) {
             Hooks.on(this.eventName, this.#hook);
         }
     }
@@ -21,7 +17,7 @@ abstract class BaseSingleHook<TArgs extends Record<string, any>> extends BaseBui
     }
 
     #onEvent(...args: any[]): void {
-        if (!this.gmOnly || game.user.isActiveGM) {
+        if (game.user.isActiveGM) {
             this._onEvent(...args);
         }
     }

@@ -1,8 +1,7 @@
-import { TriggerApplication, TriggerHook, TriggerPath, UserValue } from "engine";
+import { TriggerHook, TriggerPath, UserValue, getTriggerPathData } from "engine";
 
-class ExecuteHook extends TriggerHook {
+class ExecuteHook extends TriggerHook<ExecuteEventOptions> {
     static executePath = "game.triggerEngine.execute";
-    static executeAsGmPath = "game.triggerEngine.executeAsGM";
 
     static get type(): "execute-hook" {
         return "execute-hook";
@@ -14,27 +13,26 @@ class ExecuteHook extends TriggerHook {
 
     _enable(): void {
         foundry.utils.setProperty(globalThis, ExecuteHook.executePath, this.#execute.bind(this));
-        foundry.utils.setProperty(globalThis, ExecuteHook.executeAsGmPath, this.#executeAsGM.bind(this));
     }
 
     _disable(): void {
         foundry.utils.setProperty(globalThis, ExecuteHook.executePath, () => {});
-        foundry.utils.setProperty(globalThis, ExecuteHook.executeAsGmPath, () => {});
     }
 
     #execute(triggerPath: TriggerPath, values: UserValue[]) {
-        return TriggerApplication.executeTriggerEvent(game.userId, triggerPath, "execute-event", {
-            values: this.parseUserValues(values),
-        } satisfies ExecuteEventOptions);
-    }
+        const { applicationKey, triggerId } = getTriggerPathData(triggerPath);
+        if (this.applicationKey !== applicationKey) return;
 
-    #executeAsGM(triggerPath: TriggerPath, values: UserValue[]) {
+        const parsed = this.parseUserValues(values);
+
         if (game.user.isActiveGM) {
-            return this.#execute(triggerPath, values);
+            this.executeTriggerEvent(triggerId, "execute-event", {
+                values: parsed.map((x) => x?.value),
+            } satisfies ExecuteEventOptions);
         } else {
-            return this.executeTriggerEventAsGM(triggerPath, "execute-event", {
+            this.executeTriggerEventAsGM(triggerId, "execute-event", {
                 converted: true,
-                values: this.parseUserValues(values, true).map(this.convertToEmitable.bind(this)),
+                values: this.convertValuesToEmitable(parsed),
             } satisfies ExecuteEventOptions);
         }
     }
@@ -42,7 +40,7 @@ class ExecuteHook extends TriggerHook {
 
 type ExecuteEventOptions = {
     converted?: boolean;
-    values: any[];
+    values: (UserValue | undefined)[];
 };
 
 export { ExecuteHook };

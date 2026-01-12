@@ -1,4 +1,4 @@
-import { BaseEventNode, BuiltinsOutputEntry, SpecialIcon, gmOnlySpecialIcon } from "engine";
+import { BaseEventNode, BuiltinsOutputEntry } from "engine";
 
 abstract class BaseTokenEvent extends BaseEventNode<never, { target: TargetDocuments }> {
     static get tags(): string[] {
@@ -7,10 +7,6 @@ abstract class BaseTokenEvent extends BaseEventNode<never, { target: TargetDocum
 
     static get defineOutputs(): BuiltinsOutputEntry[] {
         return [{ key: "target", type: "target" }];
-    }
-
-    get specialIcons(): SpecialIcon[] {
-        return [gmOnlySpecialIcon];
     }
 
     async _execute(target: TargetDocuments): Promise<boolean> {
