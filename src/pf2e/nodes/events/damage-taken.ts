@@ -1,6 +1,6 @@
 import { IconObject } from "_zod";
 import { BaseEventNode } from "engine";
-import { ItemPF2e, R } from "module-helpers";
+import { R } from "module-helpers";
 import { CreateMessageHook, DamageTakenOptions, DamageTakenType, PF2eInputEntry, PF2eOutputEntry } from "pf2e";
 
 class DamageTakenEvent extends BaseEventNode<Inputs, Outputs> {
@@ -72,11 +72,6 @@ type Inputs = {
     when: DamageTakenType;
 };
 
-type Outputs = {
-    item: ItemPF2e | undefined;
-    options: string[];
-    origin: TargetDocuments | undefined;
-    target: TargetDocuments;
-};
+type Outputs = Omit<DamageTakenOptions, "types">;
 
 export { DamageTakenEvent };

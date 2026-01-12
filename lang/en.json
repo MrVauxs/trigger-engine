@@ -271,9 +271,6 @@
                 "combatant": {
                     "title": "Combatant"
                 },
-                "damage": {
-                    "title": "Damage"
-                },
                 "debug": {
                     "title": "Debug"
                 },
@@ -395,8 +392,17 @@
         },
         "pf2e-trigger": {
             "entry": {
+                "action": {
+                    "title": "Action"
+                },
                 "options": {
                     "title": "Roll Options"
+                },
+                "origin": {
+                    "title": "Origin"
+                },
+                "outcome": {
+                    "title": "Outcome"
                 },
                 "when": {
                     "title": "Triggers When?"
@@ -425,6 +431,9 @@
                     }
                 },
                 "event": {
+                    "attack-roll-event": {
+                        "title": "Attack Rolled"
+                    },
                     "aura-enter-event": {
                         "title": "Aura Entered"
                     },
@@ -474,11 +483,6 @@
                                 }
                             }
                         },
-                        "outputs": {
-                            "origin": {
-                                "title": "Origin"
-                            }
-                        },
                         "title": "Damage Taken"
                     },
                     "turn-end-event": {
@@ -495,6 +499,12 @@
                 "name": "PF2e Triggers Menu"
             },
             "tag": {
+                "attack": {
+                    "title": "Attack"
+                },
+                "damage": {
+                    "title": "Damage"
+                },
                 "turn": {
                     "title": "Turn"
                 }

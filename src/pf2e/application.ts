@@ -1,6 +1,7 @@
 import { TriggerApplication, TriggerApplicationOptions, TriggerHook, TriggerNode } from "engine";
 import { MODULE } from "module-helpers";
 import {
+    AttackRollEvent,
     AuraEnterEvent,
     AuraHook,
     AuraLeaveEvent,
@@ -16,6 +17,7 @@ import {
 const hooks = [AuraHook, CreateMessageHook, TurnEndHook, TurnStartHook] as (typeof TriggerHook)[];
 
 const nodes = [
+    AttackRollEvent,
     AuraEnterEvent,
     AuraLeaveEvent,
     CreateItemActionNode,

@@ -1,7 +1,16 @@
 import { TriggerHook } from "engine";
-import { ActorPF2e, ChatMessagePF2e, ItemPF2e, R, createToggleableHook, isValidTargetDocuments } from "module-helpers";
+import {
+    ActorPF2e,
+    ChatMessagePF2e,
+    ItemPF2e,
+    R,
+    ZeroToThree,
+    createToggleableHook,
+    degreeOfSuccessNumber,
+    isValidTargetDocuments,
+} from "module-helpers";
 
-class CreateMessageHook extends TriggerHook<DamageTakenOptions> {
+class CreateMessageHook extends TriggerHook<AttackRollOptions | DamageTakenOptions> {
     static damageTakenTypes = ["all", "damage", "heal", "persistent", "negated"] as const;
     static contextEvents = ["attack-roll", "damage-taken"] as const;
 
@@ -25,7 +34,21 @@ class CreateMessageHook extends TriggerHook<DamageTakenOptions> {
         const { appliedDamage, origin, context } = message.flags.pf2e;
         if (!context) return;
 
-        if (context.type === "damage-taken") {
+        if (context.type === "attack-roll") {
+            const target = message.target;
+            const source = { actor: message.actor, token: message.token };
+            const outcome = context.outcome ? degreeOfSuccessNumber(context.outcome) : undefined;
+            if (!isValidTargetDocuments(target) || !isValidTargetDocuments(source) || R.isNullish(outcome)) return;
+
+            this.executeEvent("attack-roll-event", {
+                action: (context as { action?: string }).action || "",
+                item: await getItem(origin?.uuid),
+                options: context.options ?? [],
+                origin: source,
+                outcome,
+                target,
+            } satisfies AttackRollOptions);
+        } else if (context.type === "damage-taken") {
             const target = { actor: message.actor, token: message.token };
             if (!isValidTargetDocuments(target)) return;
 
@@ -45,27 +68,6 @@ class CreateMessageHook extends TriggerHook<DamageTakenOptions> {
                 target,
                 types,
             } satisfies DamageTakenOptions);
-        } else if (context.type === "attack-roll") {
-            //     if (!context.target || !context.outcome) return;
-            //     const outcome = degreeOfSuccessNumber(context.outcome);
-            //     if (R.isNullish(outcome)) return;
-            //     const source = { actor: message.actor, token: message.token };
-            //     const target = {
-            //         actor: await fromUuid(context.target.actor),
-            //         token: context.target.token ? await fromUuid(context.target.token) : undefined,
-            //     };
-            //     if (!isValidTargetDocuments(target) || !isValidTargetDocuments(source)) return;
-            //     this.executeTriggers<AttackTriggerOptions>(
-            //         {
-            //             action: (context as { action?: string }).action ?? "",
-            //             item,
-            //             options: context?.options ?? [],
-            //             other: target,
-            //             outcome,
-            //             this: source,
-            //         },
-            //         "attack-roll"
-            //     );
         }
     }
 }
@@ -84,6 +86,15 @@ async function getItem(uuid: string | undefined): Promise<ItemPF2e | undefined> 
         : actor.items.get(itemId);
 }
 
+type AttackRollOptions = {
+    action: string;
+    item: ItemPF2e | undefined;
+    options: string[];
+    origin: TargetDocuments;
+    outcome: ZeroToThree;
+    target: TargetDocuments;
+};
+
 type DamageTakenOptions = {
     item: ItemPF2e | undefined;
     options: string[];
@@ -95,4 +106,4 @@ type DamageTakenOptions = {
 type DamageTakenType = (typeof CreateMessageHook.damageTakenTypes)[number];
 
 export { CreateMessageHook };
-export type { DamageTakenType, DamageTakenOptions };
+export type { AttackRollOptions, DamageTakenOptions, DamageTakenType };
