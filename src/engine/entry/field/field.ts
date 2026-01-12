@@ -1,5 +1,5 @@
 import { IconObject } from "_zod";
-import { NodeEntry } from "engine";
+import { NodeEntry, TriggerNode } from "engine";
 import { LocalizeArgs, MODULE, z } from "module-helpers";
 import { PreciseTextOptions } from "triggers-menu";
 
@@ -19,57 +19,10 @@ class NodeField<TValue extends unknown = unknown, TFieldSchema extends Record<st
     }
 
     //////////////////////////////
-    // IMMUTABLE ACCESSORS
-    //////////////////////////////
-
-    declare readonly entry: NodeEntry<TValue, TFieldSchema>;
-
-    /**
-     * @see {@link NodeField.defineSchema}
-     *
-     * The field data for this instance.
-     */
-    declare readonly field: TFieldSchema;
-
-    /**
-     * The already generated entry label element in case you want to manipulate it.
-     */
-    declare readonly label: PreciseText;
-
-    /**
-     * Is this entry currently connected to another node.
-     */
-    declare readonly isConnected: boolean;
-
-    /**
-     * The max height of an entry row.
-     *
-     * You should make sure everything fits in it to avoid overlapping between rows.
-     */
-    declare readonly maxHeight: number;
-
-    /**
-     * The base font size of nodes in 'px'.
-     */
-    declare readonly baseFontSize: number;
-
-    /**
-     * @see {@link NodeEntry.default}
-     *
-     * The default value of this input.
-     */
-    declare readonly default: TValue;
-
-    /**
-     * The current value of this input after going through {@link NodeEntry#isValidType}
-     * & {@link NodeEntry#processValue}
-     */
-    declare readonly value: TValue;
-
-    //////////////////////////////
     // ACCESSORS
     //////////////////////////////
 
+    /** The cursor when hovering over the field. */
     get cursor(): PIXI.Cursor {
         return "default";
     }
@@ -93,42 +46,50 @@ class NodeField<TValue extends unknown = unknown, TFieldSchema extends Record<st
     onClick(): Promise<TValue> {
         throw MODULE.Error("'onClick' method not implemented.");
     }
+}
 
-    //////////////////////////////
-    // IMMUTABLE METHODS
-    //////////////////////////////
-
+interface NodeField<TValue extends unknown = unknown, TFieldSchema extends Record<string, any> = Record<string, any>> {
+    /** The base font size of nodes in 'px'. */
+    get baseFontSize(): number;
+    /** @see {@link NodeEntry.default} */
+    get default(): TValue;
+    /** The parent entry instance. */
+    get entry(): NodeEntry<TValue, TFieldSchema>;
+    /** @see {@link NodeField.defineSchema} The field data for this instance. */
+    get field(): TFieldSchema;
+    /** Is this entry currently connected to another node. */
+    get isConnected(): boolean;
+    /** The already generated entry label element in case you want to manipulate it. */
+    get label(): PreciseText;
+    /** The max height of an entry row. You should make sure everything fits in it to avoid overlapping between rows. */
+    get maxHeight(): number;
     /**
-     * Creates a font-awesome icon in a canvas compatible form.
+     * The current value of this input after going through {@link NodeEntry#isValidType}
+     * & {@link NodeEntry#processValue}
      */
-    declare readonly createFontAwesomeIcon: (icon: IconObject) => PreciseText;
+    get value(): TValue;
 
-    /**
-     * Creates a text element in a canvas compatible form.
-     */
-    declare readonly createPreciseText: (text: string, options?: PreciseTextOptions) => PreciseText;
+    /** Creates a font-awesome icon in a canvas compatible form. */
+    createFontAwesomeIcon(icon: IconObject): PreciseText;
 
-    /**
-     * Creates a PIXI mask and applies it directly onto `parent`.
-     */
-    declare readonly addRectangleMask: (
+    /** Creates a text element in a canvas compatible form. */
+    createPreciseText(text: string, options?: PreciseTextOptions): PreciseText;
+
+    /** Creates a PIXI mask and applies it directly onto `parent`. */
+    addRectangleMask(
         parent: PIXI.Container,
         x: number,
         y: number,
         width: number,
         height: number,
         radius?: number | undefined,
-    ) => void;
+    ): void;
 
-    /**
-     * The bounds of the field in the viewport.
-     */
-    declare readonly getGlobalBounds: () => PIXI.Rectangle;
+    /** The bounds of the field in the viewport. */
+    getGlobalBounds(): PIXI.Rectangle;
 
-    /**
-     * @see {@link TriggerNode#localize}
-     */
-    declare readonly localize: (...args: LocalizeArgs) => string | undefined;
+    /** @see {@link TriggerNode#localize} */
+    localize(...args: LocalizeArgs): string | undefined;
 }
 
 type NodeFieldSchema = Record<string, z.core.JSONSchema.JSONSchema>;

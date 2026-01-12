@@ -30,16 +30,12 @@ class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<st
     // STATIC ACCESSORS
     //////////////////////////////
 
-    /**
-     * Class inheriting `NodeField` to represent the input field of this entry.
-     */
+    /** Class inheriting `NodeField` to represent the input field of this entry. */
     static get FieldClass(): typeof NodeField<unknown, Record<string, any>> | null {
         return null;
     }
 
-    /**
-     * The color of the node connection.
-     */
+    /** The color of the node connection. */
     static get color(): ColorSource {
         return 0x000000;
     }
@@ -73,17 +69,6 @@ class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<st
     }
 
     //////////////////////////////
-    // IMMUTABLE ACCESSORS
-    //////////////////////////////
-
-    /**
-     * @see {@link NodeField.defineSchema}
-     *
-     * The field data for this instance.
-     */
-    declare readonly field: TFieldSchema;
-
-    //////////////////////////////
     // ACCESSORS
     //////////////////////////////
 
@@ -95,30 +80,6 @@ class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<st
     get default(): TValue {
         return (this.constructor as typeof NodeEntry).default as TValue;
     }
-
-    //////////////////////////////
-    // IMMUTABLE METHODS
-    //////////////////////////////
-
-    /**
-     * @see {@link NodeEntry.fromJSON}
-     */
-    declare readonly fromJSON: (value: JSONValue) => Promise<any> | any;
-
-    /**
-     * @see {@link NodeEntry.isValidType}
-     */
-    declare readonly isValidType: (value: unknown) => value is Exclude<TValue, undefined>;
-
-    /**
-     * @see {@link TriggerNode#localize}
-     */
-    declare readonly localize: (...args: LocalizeArgs) => string | undefined;
-
-    /**
-     * @see {@link NodeEntry.toJSON}
-     */
-    declare readonly toJSON: (value: any) => JSONValue;
 
     //////////////////////////////
     // METHODS
@@ -155,9 +116,26 @@ class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<st
 
 interface NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<string, any> | undefined = undefined>
     extends Omit<BaseEntrySchemaOutput, "state" | "type">, Pick<typeof NodeEntry, "type" | "color"> {
-    readonly category: EntryCategory;
+    /** The entry category. */
+    get category(): EntryCategory;
+    /** The connection path of this entry. */
     get connection(): ConnectionId | undefined;
+    /** @see {@link NodeField.defineSchema} The field data for this instance. */
+    get field(): TFieldSchema;
+    /** The local value of this entry. */
     get value(): TValue | undefined;
+
+    /** @see {@link NodeEntry.fromJSON} */
+    fromJSON(value: JSONValue): Promise<any> | any;
+
+    /** @see {@link NodeEntry.isValidType} */
+    isValidType(value: unknown): value is Exclude<TValue, undefined>;
+
+    /** @see {@link TriggerNode#localize} */
+    localize(...args: LocalizeArgs): string | undefined;
+
+    /** @see {@link NodeEntry.toJSON} */
+    toJSON(value: any): JSONValue;
 }
 
 export { NodeEntry };

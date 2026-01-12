@@ -12,7 +12,6 @@ import {
     UserValue,
 } from "engine";
 import { LocalizeArgs, MODULE, ScenePF2e, UserPF2e } from "module-helpers";
-import { NodeData } from ".";
 
 class TriggerNode<
     TOuts extends string | never = string,
@@ -154,48 +153,15 @@ class TriggerNode<
     }
 
     //////////////////////////////
-    // IMMUTABLE ACCESSORS
-    //////////////////////////////
-
-    /**
-     * The internal path for the node.
-     */
-    declare readonly nodePath: TriggerNodePath;
-
-    /**
-     * Scene context getter and setter.
-     */
-    declare sceneContext: ScenePF2e | undefined;
-
-    /**
-     * The current state of the node.
-     */
-    declare state: TState | null;
-
-    /**
-     * The internal path for the parent trigger.
-     */
-    declare readonly triggerPath: TriggerPath;
-
-    /**
-     * User context getter and setter.
-     */
-    declare userContext: UserPF2e;
-
-    //////////////////////////////
     // ACCESSORS
     //////////////////////////////
 
-    /**
-     * The background color for the header. Is only used if the node has a 'title'.
-     */
+    /** The background color for the header. Is only used if the node has a 'title'. */
     get headerColor(): `#${string}` | number | null {
         return this.isEvent ? "#C40000" : "#0c0c0c";
     }
 
-    /**
-     * The header icon. Is only used if the node has a 'title'.
-     */
+    /** The header icon. Is only used if the node has a 'title'. */
     get icon(): string | IconObject | null {
         return null;
     }
@@ -227,120 +193,6 @@ class TriggerNode<
     get title(): string | null {
         return this.localize("title") ?? null;
     }
-
-    //////////////////////////////
-    // IMMUTABLE METHODS
-    //////////////////////////////
-
-    /**
-     * Convert values back from their websocket version.
-     */
-    declare convertFromEmitable: (userValue: EmitableUserValue, withType?: boolean) => Promise<any | undefined>;
-
-    /**
-     * Convert the user value into one that is sent via websocket.
-     */
-    declare convertToEmitable: (type: string, value: any) => UserValue | undefined;
-
-    /**
-     * @see {@link TriggerNode#convertFromEmitable}
-     */
-    declare convertValuesFomEmitable: (
-        values: (EmitableUserValue | undefined)[],
-        withType?: boolean,
-    ) => Promise<(any | undefined)[]>;
-
-    /**
-     * @see {@link TriggerNode#convertToEmitable}
-     */
-    declare convertValuesToEmitable: (values: UserValue[]) => (EmitableUserValue | undefined)[];
-
-    /**
-     * Calls the next `executable` node in the chain.
-     *
-     * @param out key of the selected `out` bridge
-     *
-     * @example
-     * return this.executeNext("out")
-     *
-     * @example
-     * return this.executeNext("true")
-     *
-     * @see {@link TriggerNode#_execute}
-     */
-    declare readonly executeNext: (out: TOuts, ...args: any[]) => Promise<boolean>;
-
-    /**
-     * Retrieve the computed value from one of this node's inputs.
-     *
-     * @param input key of the `input` from which you want to retrieve the value.
-     *
-     * If no connection exist with the input or the returned value is incompatible with its type,
-     * then the default value is returned instead.
-     *
-     * @example
-     * const number = await this.get("number");
-     *
-     * @see {@link TriggerNode#_execute}
-     */
-    declare readonly getInputValue: <K extends keyof TInputs>(input: K) => Promise<TInputs[K]>;
-
-    // TODO
-    declare readonly getCustomInputs: (slug: TCustomInputs) => Promise<{ label: string; value: any }[]>;
-
-    // TODO
-    declare readonly getCustomInputsValues: (slug: TCustomInputs) => Promise<any[]>;
-
-    /**
-     * Localization helper with pre-defined path and optional (last argument) data object for `game.i18n.format`
-     *
-     * It points directly to the path:
-     * `<module-id>.<application-id>.node.<category>.<type>.<...path>`
-     *
-     * @returns undefined if no key exist at that path
-     */
-    declare readonly localize: (...args: LocalizeArgs) => string | undefined;
-
-    /**
-     * This is used to validate values provided by users at runtime.
-     */
-    declare parseUserValue: (userValue: unknown) => UserValue | undefined;
-
-    /**
-     * @see {@link TriggerNode#parseUserValue}
-     *
-     * Parse & filter an array of user values.
-     */
-    declare parseUserValues: (userValues: unknown) => (UserValue | undefined)[];
-
-    /**
-     * @see {@link TriggerNode#localize}
-     *
-     * It points directly to the path:
-     * `<module-id>.<application-id>.<...path>`
-     *
-     * @returns undefined if no key exist at that path
-     */
-    declare readonly rootLocalize: (...args: LocalizeArgs) => string | undefined;
-
-    /**
-     * Set the value for one of this node's outputs.
-     *
-     * @param output key of the `output` to set
-     *
-     * @see {@link TriggerNode.defineOutputs}
-     */
-    declare readonly setOutputValue: <K extends keyof TOutputs>(output: K, value: TOutputs[K]) => void;
-
-    /**
-     * Set values for this node's custom outputs.
-     *
-     * @param slug of the custom outputs
-     * @param values array where each entry represents a one of the custom entry (same index order as seen in the node).
-     *
-     * @see {@link TriggerNode.defineCustomOutputs}
-     */
-    declare readonly setCustomOutputValues: (slug: TCustomOutputs, values: any[]) => void;
 
     //////////////////////////////
     // ABSTRACT METHODS
@@ -376,8 +228,139 @@ class TriggerNode<
     }
 }
 
-interface TriggerNode
-    extends Pick<NodeData, "id" | "invalid">, Pick<typeof TriggerNode, "category" | "isEvent" | "type"> {}
+interface TriggerNode<
+    TOuts extends string | never = string,
+    TInputs extends Record<string, any> | never = Record<string, any>,
+    TOutputs extends Record<string, any> | never = Record<string, any>,
+    TCustomInputs extends string | never = string,
+    TCustomOutputs extends string | never = string,
+    TState extends string | never = string,
+> {
+    /** @see {@link TriggerNode.category} */
+    get category(): string;
+    /** the id of the node  */
+    get id(): string;
+    /** @see {@link TriggerNode.isEvent} */
+    get isEvent(): boolean;
+    /** if the node is invalid */
+    get invalid(): boolean;
+    /** The internal path for the node. */
+    get nodePath(): TriggerNodePath;
+    /** Scene context getter and setter. */
+    get sceneContext(): ScenePF2e | undefined;
+    set sceneContext(scene: ScenePF2e);
+    /** The current state of the node. */
+    get state(): TState | null;
+    /** The internal path for the parent trigger. */
+    get triggerPath(): TriggerPath;
+    /** @see {@link TriggerNode.type} */
+    get type(): string;
+    /** User context getter and setter. */
+    get userContext(): UserPF2e;
+    set userContext(user: UserPF2e);
+
+    /** Convert values back from their websocket version. */
+    convertFromEmitable(userValue: EmitableUserValue, withType?: boolean): Promise<any | undefined>;
+
+    /** Convert the user value into one that is sent via websocket. */
+    convertToEmitable(type: string, value: any): UserValue | undefined;
+
+    /** @see {@link TriggerNode#convertFromEmitable} */
+    convertValuesFomEmitable(
+        values: (EmitableUserValue | undefined)[],
+        withType?: boolean,
+    ): Promise<(any | undefined)[]>;
+
+    /** @see {@link TriggerNode#convertToEmitable} */
+    convertValuesToEmitable(values: UserValue[]): (EmitableUserValue | undefined)[];
+
+    /**
+     * Calls the next `executable` node in the chain.
+     *
+     * @param out key of the selected `out` bridge
+     *
+     * @example
+     * return this.executeNext("out")
+     *
+     * @example
+     * return this.executeNext("true")
+     *
+     * @see {@link TriggerNode#_execute}
+     */
+    executeNext(out: TOuts, ...args: any[]): Promise<boolean>;
+
+    /**
+     * Retrieve the computed value from one of this node's inputs.
+     *
+     * @param input key of the `input` from which you want to retrieve the value.
+     *
+     * If no connection exist with the input or the returned value is incompatible with its type,
+     * then the default value is returned instead.
+     *
+     * @example
+     * const number = await this.get("number");
+     *
+     * @see {@link TriggerNode#_execute}
+     */
+    getInputValue<K extends keyof TInputs>(input: K): Promise<TInputs[K]>;
+
+    // TODO
+    getCustomInputs(slug: TCustomInputs): Promise<{ label: string; value: any }[]>;
+
+    // TODO
+    getCustomInputsValues(slug: TCustomInputs): Promise<any[]>;
+
+    /**
+     * Localization helper with pre-defined path and optional (last argument) data object for `game.i18n.format`
+     *
+     * It points directly to the path:
+     * `<module-id>.<application-id>.node.<category>.<type>.<...path>`
+     *
+     * @returns undefined if no key exist at that path
+     */
+    localize(...args: LocalizeArgs): string | undefined;
+
+    /**
+     * This is used to validate values provided by users at runtime.
+     */
+    parseUserValue(userValue: unknown): UserValue | undefined;
+
+    /**
+     * @see {@link TriggerNode#parseUserValue}
+     *
+     * Parse & filter an array of user values.
+     */
+    parseUserValues(userValues: unknown): (UserValue | undefined)[];
+
+    /**
+     * @see {@link TriggerNode#localize}
+     *
+     * It points directly to the path:
+     * `<module-id>.<application-id>.<...path>`
+     *
+     * @returns undefined if no key exist at that path
+     */
+    rootLocalize(...args: LocalizeArgs): string | undefined;
+
+    /**
+     * Set the value for one of this node's outputs.
+     *
+     * @param output key of the `output` to set
+     *
+     * @see {@link TriggerNode.defineOutputs}
+     */
+    setOutputValue<K extends keyof TOutputs>(output: K, value: TOutputs[K]): void;
+
+    /**
+     * Set values for this node's custom outputs.
+     *
+     * @param slug of the custom outputs
+     * @param values array where each entry represents a one of the custom entry (same index order as seen in the node).
+     *
+     * @see {@link TriggerNode.defineCustomOutputs}
+     */
+    setCustomOutputValues(slug: TCustomOutputs, values: any[]): void;
+}
 
 type TriggerNodePath = `${TriggerPath}:${string}`;
 

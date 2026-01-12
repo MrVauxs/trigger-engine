@@ -20,21 +20,10 @@ class TriggerHook<TArgs extends Record<string, any> = Record<string, any>> {
     // ACCESSORS
     //////////////////////////////
 
-    /**
-     * List of non-event node types that this hook has relation with.
-     */
+    /** List of non-event node types that this hook has relation with. */
     get otherNodes(): string[] {
         return [];
     }
-
-    //////////////////////////////
-    // IMMUTABLE ACCESSORS
-    //////////////////////////////
-
-    /**
-     * The internal key for the parent application.
-     */
-    declare readonly applicationKey: ApplicationKey;
 
     //////////////////////////////
     // ABSTRACT METHODS
@@ -66,20 +55,17 @@ class TriggerHook<TArgs extends Record<string, any> = Record<string, any>> {
      * This is useful if you need to have some background process running for exceptional nodes.
      */
     _listen() {}
+}
 
-    //////////////////////////////
-    // IMMUTABLE METHODS
-    //////////////////////////////
+interface TriggerHook<TArgs extends Record<string, any> = Record<string, any>> {
+    /** The internal key for the parent application. */
+    get applicationKey(): ApplicationKey;
 
-    /**
-     * Convert the user value into one that is sent via websocket.
-     */
-    declare convertToEmitable: (type: string, value: any) => UserValue | undefined;
+    /** Convert the user value into one that is sent via websocket. */
+    convertToEmitable(type: string, value: any): UserValue | undefined;
 
-    /**
-     * @see {@link TriggerHook#convertToEmitable}
-     */
-    declare convertValuesToEmitable: (values: (UserValue | undefined)[]) => (EmitableUserValue | undefined)[];
+    /** @see {@link TriggerHook#convertToEmitable} */
+    convertValuesToEmitable(values: (UserValue | undefined)[]): (EmitableUserValue | undefined)[];
 
     /**
      * Execute all triggers that have this event.
@@ -88,7 +74,7 @@ class TriggerHook<TArgs extends Record<string, any> = Record<string, any>> {
      * @param event the name of the event to execute.
      * @param args the arguments to pass to the {@link TriggerNode#_execute} function.
      */
-    declare executeEvent: (event: this["events"][number], args?: TArgs) => Promise<void>;
+    executeEvent(event: this["events"][number], args?: TArgs): Promise<void>;
 
     /**
      * @see {@link TriggerHook#executeEvent}
@@ -97,38 +83,34 @@ class TriggerHook<TArgs extends Record<string, any> = Record<string, any>> {
      *
      * @param triggerId the id of the trigger belonging to the same application.
      */
-    declare executeTriggerEvent: (triggerId: string, event: this["events"][number], args?: TArgs) => Promise<void>;
+    executeTriggerEvent(triggerId: string, event: this["events"][number], args?: TArgs): Promise<void>;
 
     /**
      * @see {@link TriggerHook#executeEvent}
      *
      * You must make sure to pass an argument that can be stringified.
      */
-    declare executeEventAsGM: (event: this["events"][number], args?: TArgs) => Promise<void>;
+    executeEventAsGM(event: this["events"][number], args?: TArgs): Promise<void>;
 
     /**
      * @see {@link TriggerHook#executeTriggerEvent}
      *
      * You must make sure to pass an argument that can be stringified.
      */
-    declare executeTriggerEventAsGM: (triggerId: string, event: this["events"][number], args?: TArgs) => Promise<void>;
+    executeTriggerEventAsGM(triggerId: string, event: this["events"][number], args?: TArgs): Promise<void>;
 
-    /**
-     * Test if an actor is a world actor.
-     */
-    declare isValidActor: (actor: Maybe<ActorPF2e>) => actor is ActorPF2e;
+    /** Test if an actor is a world actor. */
+    isValidActor(actor: Maybe<ActorPF2e>): actor is ActorPF2e;
 
-    /**
-     * This is used to validate values provided by users at runtime.
-     */
-    declare parseUserValue: (userValue: UserValue) => UserValue | undefined;
+    /** This is used to validate values provided by users at runtime. */
+    parseUserValue(userValue: UserValue): UserValue | undefined;
 
     /**
      * @see {@link TriggerHook#validateUserValue}
      *
      * Parse & filter an array of user values.
      */
-    declare parseUserValues: (values: UserValue[]) => (UserValue | undefined)[];
+    parseUserValues(values: UserValue[]): (UserValue | undefined)[];
 }
 
 export { TriggerHook };
