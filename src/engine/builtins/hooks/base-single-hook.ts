@@ -7,9 +7,7 @@ abstract class BaseSingleHook<TArgs extends Record<string, any>> extends Trigger
     abstract _onEvent(...args: any[]): void;
 
     _enable(): void {
-        if (game.user.isGM) {
-            Hooks.on(this.eventName, this.#hook);
-        }
+        Hooks.on(this.eventName, this.#hook);
     }
 
     _disable(): void {

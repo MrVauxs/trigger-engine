@@ -2,10 +2,6 @@ import { ApplicationKey, EmitableUserValue, TriggerNode, UserValue } from "engin
 import { ActorPF2e, MODULE } from "module-helpers";
 
 class TriggerHook<TArgs extends Record<string, any> = Record<string, any>> {
-    //////////////////////////////
-    // ABSTRACT ACCESSORS
-    //////////////////////////////
-
     /**
      * @abstract
      * List of event types that this hook can execute.
@@ -16,18 +12,17 @@ class TriggerHook<TArgs extends Record<string, any> = Record<string, any>> {
         throw MODULE.Error("'events' accessor not implemented.");
     }
 
-    //////////////////////////////
-    // ACCESSORS
-    //////////////////////////////
+    /**
+     * Should this hook only be enabled for the GM client. You still have to account for activeGM yourself.
+     */
+    get gmOnly(): boolean {
+        return true;
+    }
 
     /** List of non-event node types that this hook has relation with. */
     get otherNodes(): string[] {
         return [];
     }
-
-    //////////////////////////////
-    // ABSTRACT METHODS
-    //////////////////////////////
 
     /**
      * @abstract
@@ -44,10 +39,6 @@ class TriggerHook<TArgs extends Record<string, any> = Record<string, any>> {
     _disable() {
         throw MODULE.Error("'_disable' method not implemented.");
     }
-
-    //////////////////////////////
-    // METHODS
-    //////////////////////////////
 
     /**
      * This method is called if no trigger can be executed by this hook but some {@link TriggerHook#otherNodes} exist.

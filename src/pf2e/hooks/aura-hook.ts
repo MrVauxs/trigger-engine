@@ -53,7 +53,6 @@ class AuraHook extends TriggerHook<AuraEventOptions> {
 
     _disable(): void {
         this.#active = false;
-        if (!game.user.isGM) return;
 
         disableHooksAndWrappers(this.#wrappers);
 
@@ -68,8 +67,6 @@ class AuraHook extends TriggerHook<AuraEventOptions> {
     }
 
     _listen(): void {
-        if (!game.user.isGM) return;
-
         const scene = game.scenes.current;
         if (!scene || !canvas.ready || !scene.isInFocus || scene.grid.type !== CONST.GRID_TYPES.SQUARE) return;
 

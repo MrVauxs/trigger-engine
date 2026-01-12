@@ -11,6 +11,10 @@ class ExecuteHook extends TriggerHook<ExecuteEventOptions> {
         return ["execute-event"];
     }
 
+    get gmOnly(): boolean {
+        return false;
+    }
+
     _enable(): void {
         foundry.utils.setProperty(globalThis, ExecuteHook.executePath, this.#execute.bind(this));
     }

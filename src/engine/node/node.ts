@@ -21,10 +21,6 @@ class TriggerNode<
     TCustomOutputs extends string | never = string,
     TState extends string | never = string,
 > {
-    //////////////////////////////
-    // ABSTRACT STATIC ACCESSORS
-    //////////////////////////////
-
     /**
      * @abstract
      * Must be an unique key among your registered module's nodes (including builtins)
@@ -35,10 +31,6 @@ class TriggerNode<
     static get type(): string {
         throw MODULE.Error("'type' accessor not implemented.");
     }
-
-    //////////////////////////////
-    // STATIC ACCESSORS
-    //////////////////////////////
 
     /**
      * Used to sort nodes in the triggers menu
@@ -152,10 +144,6 @@ class TriggerNode<
         return null;
     }
 
-    //////////////////////////////
-    // ACCESSORS
-    //////////////////////////////
-
     /** The background color for the header. Is only used if the node has a 'title'. */
     get headerColor(): `#${string}` | number | null {
         return this.isEvent ? "#C40000" : "#0c0c0c";
@@ -193,10 +181,6 @@ class TriggerNode<
     get title(): string | null {
         return this.localize("title") ?? null;
     }
-
-    //////////////////////////////
-    // ABSTRACT METHODS
-    //////////////////////////////
 
     /**
      * @abstract

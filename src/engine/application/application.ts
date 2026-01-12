@@ -277,11 +277,13 @@ class TriggerApplication {
                 hookData.enabled = false;
             }
 
-            if (R.isArray(wantedEvents) && includesAny(events, wantedEvents)) {
+            const canEnable = !hook.gmOnly || game.user.isGM;
+
+            if (canEnable && R.isArray(wantedEvents) && includesAny(events, wantedEvents)) {
                 hook._enable();
                 hookData.enabled = true;
                 MODULE.debug("[ENABLED]  ", hookName);
-            } else if (R.isArray(wantedOtherNodes) && includesAny(otherNodes, wantedOtherNodes)) {
+            } else if (canEnable && R.isArray(wantedOtherNodes) && includesAny(otherNodes, wantedOtherNodes)) {
                 hook._listen();
                 hookData.enabled = true;
                 MODULE.debug("[LISTENING]", hookName);

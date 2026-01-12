@@ -3,10 +3,6 @@ import { LocalizeArgs, MODULE } from "module-helpers";
 
 // IMPORTANT an entry can never represent an array
 class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<string, any> | undefined = undefined> {
-    //////////////////////////////
-    // ABSTRACT STATIC ACCESSORS
-    //////////////////////////////
-
     /**
      * @abstract
      * Must be an unique key among your registered module's entries (including the builtins)
@@ -26,10 +22,6 @@ class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<st
         throw MODULE.Error("'default' accessor not implemented.");
     }
 
-    //////////////////////////////
-    // STATIC ACCESSORS
-    //////////////////////////////
-
     /** Class inheriting `NodeField` to represent the input field of this entry. */
     static get FieldClass(): typeof NodeField<unknown, Record<string, any>> | null {
         return null;
@@ -39,10 +31,6 @@ class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<st
     static get color(): ColorSource {
         return 0x000000;
     }
-
-    //////////////////////////////
-    // STATIC ABSTRACT METHODS
-    //////////////////////////////
 
     /**
      * @abstract
@@ -68,10 +56,6 @@ class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<st
         throw MODULE.Error("'isValidType' method not implemented.");
     }
 
-    //////////////////////////////
-    // ACCESSORS
-    //////////////////////////////
-
     /**
      * @see {@link NodeEntry.default}
      *
@@ -80,10 +64,6 @@ class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<st
     get default(): TValue {
         return (this.constructor as typeof NodeEntry).default as TValue;
     }
-
-    //////////////////////////////
-    // METHODS
-    //////////////////////////////
 
     /**
      * Cast the value from a different type.

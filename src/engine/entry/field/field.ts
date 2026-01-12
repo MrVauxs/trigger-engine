@@ -6,10 +6,6 @@ import { PreciseTextOptions } from "triggers-menu";
 class NodeField<TValue extends unknown = unknown, TFieldSchema extends Record<string, any> = Record<string, any>>
     extends PIXI.Graphics
 {
-    //////////////////////////////
-    // STATIC ACCESSORS
-    //////////////////////////////
-
     /**
      * @abstract
      * Defines the DataSchema for the input field that will be used in the triggers menu.
@@ -18,18 +14,10 @@ class NodeField<TValue extends unknown = unknown, TFieldSchema extends Record<st
         throw MODULE.Error("'defineSchema' accessor not implemented.");
     }
 
-    //////////////////////////////
-    // ACCESSORS
-    //////////////////////////////
-
     /** The cursor when hovering over the field. */
     get cursor(): PIXI.Cursor {
         return "default";
     }
-
-    //////////////////////////////
-    // ABSTRACT METHODS
-    //////////////////////////////
 
     /**
      * @abstract

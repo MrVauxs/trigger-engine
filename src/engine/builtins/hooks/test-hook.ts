@@ -9,6 +9,10 @@ class TestHook extends TriggerHook {
         return ["test-event"];
     }
 
+    get gmOnly(): boolean {
+        return false;
+    }
+
     _enable(): void {
         foundry.utils.setProperty(globalThis, TestEventNode.functionPath, () => {
             this.executeEvent("test-event");
