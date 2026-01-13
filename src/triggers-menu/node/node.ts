@@ -611,8 +611,9 @@ class BlueprintNode extends PIXI.Container {
         const body = new PIXI.Container() as NodePart;
         const entries = this.#node.entries;
 
+        const ins = Number(!!entries.in);
         const outs = isGateEntryNode(this.#node) ? [] : entries.outs.contents;
-        const minIndex = entries.in || outs.length ? 1 : 0;
+        // const minIndex = entries.in || outs.length ? 1 : 0;
         const [inputs, outputs] = R.pipe(
             ["inputs", "outputs"] as const,
             R.map((category) => {
@@ -637,7 +638,7 @@ class BlueprintNode extends PIXI.Container {
             return R.sum(section.map(([group, entries]) => entries.length + (group === "" ? 0 : 1)));
         };
 
-        const nbRows = Math.max(nbEntries(inputs) + minIndex, nbEntries(outputs) + outs.length);
+        const nbRows = Math.max(nbEntries(inputs) + ins, nbEntries(outputs) + outs.length);
         const rows: NodePart[] = R.times(nbRows, () => new PIXI.Container() as NodePart);
 
         const addToRow = (rowIndex: number, column: 0 | 1, el: BaseBlueprintEntry | PIXI.Container) => {
@@ -685,7 +686,7 @@ class BlueprintNode extends PIXI.Container {
             addToRow(0, 0, this.#in);
         }
 
-        let inputIndex = minIndex;
+        let inputIndex = ins;
         for (const [group, entries] of inputs) {
             if (group) {
                 const label = createGroup(group);
@@ -714,7 +715,7 @@ class BlueprintNode extends PIXI.Container {
             addToRow(i, 1, entry);
         }
 
-        let outputIndex = Math.max(outs.length, minIndex);
+        let outputIndex = outs.length;
         for (const [group, entries] of outputs) {
             if (group) {
                 const label = createGroup(group);
