@@ -149,7 +149,11 @@ class TriggerNode<
         return this.isEvent ? "#C40000" : "#0c0c0c";
     }
 
-    /** The header icon. Is only used if the node has a 'title'. */
+    /**
+     * The header icon. Is only used if the node has a 'title'.
+     *
+     * Return a string if an image.
+     */
     get icon(): string | IconObject | null {
         return null;
     }
@@ -273,6 +277,12 @@ interface TriggerNode<
      */
     executeNext(out: TOuts, ...args: any[]): Promise<boolean>;
 
+    // TODO
+    getCustomInputs(slug: TCustomInputs): Promise<{ label: string; value: any }[]>;
+
+    // TODO
+    getCustomInputsValues(slug: TCustomInputs): Promise<any[]>;
+
     /**
      * Retrieve the computed value from one of this node's inputs.
      *
@@ -288,11 +298,10 @@ interface TriggerNode<
      */
     getInputValue<K extends keyof TInputs>(input: K): Promise<TInputs[K]>;
 
-    // TODO
-    getCustomInputs(slug: TCustomInputs): Promise<{ label: string; value: any }[]>;
-
-    // TODO
-    getCustomInputsValues(slug: TCustomInputs): Promise<any[]>;
+    /**
+     * Retrieve the local value of this node's input.
+     */
+    getLocalValue<K extends keyof TInputs>(input: K): TInputs[K];
 
     /**
      * Localization helper with pre-defined path and optional (last argument) data object for `game.i18n.format`

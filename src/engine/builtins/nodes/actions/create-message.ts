@@ -1,6 +1,7 @@
 import { BuiltinsInputEntry } from "engine";
 import { UserPF2e, primaryPlayerOwner } from "module-helpers";
 import { BaseActionNode, localizeKeyOrDescription } from ".";
+import { IconObject } from "_zod";
 
 class CreateMessageActionNode extends BaseActionNode<
     "out",
@@ -47,8 +48,8 @@ class CreateMessageActionNode extends BaseActionNode<
         ];
     }
 
-    get icon(): string {
-        return "\uf4b6";
+    get icon(): IconObject {
+        return { unicode: "\uf4b6" };
     }
 
     async _execute(): Promise<boolean> {

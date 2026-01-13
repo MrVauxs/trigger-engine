@@ -1,3 +1,4 @@
+import { IconObject } from "_zod";
 import { BaseEventNode, BuiltinsOutputEntry, RegionEventOptions } from "engine";
 
 class RegionEventNode extends BaseEventNode<never, Outputs> {
@@ -16,8 +17,8 @@ class RegionEventNode extends BaseEventNode<never, Outputs> {
         ];
     }
 
-    get icon(): string {
-        return "\uf867";
+    get icon(): IconObject {
+        return { unicode: "\uf867" };
     }
 
     _execute({ eventName, target }: RegionEventOptions): Promise<boolean> {

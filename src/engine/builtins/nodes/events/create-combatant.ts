@@ -1,3 +1,4 @@
+import { IconObject } from "_zod";
 import { BaseCombatantEvent } from ".";
 
 class CreateCombatantEvent extends BaseCombatantEvent {
@@ -5,8 +6,8 @@ class CreateCombatantEvent extends BaseCombatantEvent {
         return "create-combatant-event";
     }
 
-    get icon(): string {
-        return "\uf71d";
+    get icon(): IconObject {
+        return { unicode: "\uf71d" };
     }
 }
 

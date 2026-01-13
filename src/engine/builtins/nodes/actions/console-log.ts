@@ -1,6 +1,7 @@
 import { BuiltinsCustomOutput } from "engine";
 import { MODULE } from "module-helpers";
 import { BaseActionNode } from ".";
+import { IconObject } from "_zod";
 
 class ConsoleLogActionNode extends BaseActionNode<"out", never, never, "input"> {
     static get type(): "console-log" {
@@ -15,8 +16,8 @@ class ConsoleLogActionNode extends BaseActionNode<"out", never, never, "input"> 
         return [{ slug: "input", array: true }];
     }
 
-    get icon(): string {
-        return "\uf120";
+    get icon(): IconObject {
+        return { unicode: "\uf120" };
     }
 
     async _execute(): Promise<boolean> {

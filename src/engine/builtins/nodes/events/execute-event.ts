@@ -1,3 +1,4 @@
+import { IconObject } from "_zod";
 import { BaseEventNode, BuiltinsCustomOutput, ExecuteEventOptions } from "engine";
 
 class ExecuteEventNode extends BaseEventNode {
@@ -13,8 +14,8 @@ class ExecuteEventNode extends BaseEventNode {
         return [{ array: true, slug: "output" }];
     }
 
-    get icon(): string {
-        return "\uf144";
+    get icon(): IconObject {
+        return { unicode: "\uf144" };
     }
 
     async _execute({ converted, values }: ExecuteEventOptions): Promise<boolean> {

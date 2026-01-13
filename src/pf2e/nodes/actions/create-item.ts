@@ -1,3 +1,4 @@
+import { IconObject } from "_zod";
 import { BaseActionNode, CustomInputSchema } from "engine";
 import { ActorPF2e, ChoiceSetSource, ItemPF2e, ItemType, R, getItemFromUuid, getItemSource } from "module-helpers";
 import { PF2eInputEntry, PF2eOutputEntry } from "pf2e";
@@ -29,8 +30,8 @@ class CreateItemActionNode extends BaseActionNode<"out", Inputs, { item?: ItemPF
         return [{ slug: "choices", group: "choices", types: ["text"] }];
     }
 
-    get icon(): string {
-        return "\uf466";
+    get icon(): IconObject {
+        return { unicode: "\uf466" };
     }
 
     async _execute(): Promise<boolean> {

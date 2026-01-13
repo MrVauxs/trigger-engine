@@ -1,4 +1,4 @@
-import { IconObject } from "_zod";
+import { IconObject, zIconObj } from "_zod";
 import {
     BaseCustomData,
     BaseCustomEntryDataSource,
@@ -8,11 +8,6 @@ import {
     EntryCategory,
     EntryId,
     GATE_CATEGORY,
-    isConnectionId,
-    isGateEntryNode,
-    isGateExitNode,
-    isOppositeConnection,
-    isVariableGetterNode,
     NodeData,
     OpenNodeEntry,
     OpenTrigger,
@@ -20,45 +15,49 @@ import {
     PreciseEntryCategory,
     TriggerNode,
     VARIABLE_CATEGORY,
+    isConnectionId,
+    isGateEntryNode,
+    isGateExitNode,
+    isOppositeConnection,
+    isVariableGetterNode,
     zCustomInputData,
     zCustomInputSchema,
     zCustomOutData,
+    zCustomOutSchema,
     zCustomOutputData,
     zCustomOutputSchema,
-    zCustomOutSchema,
 } from "engine";
 import {
+    LocalizeArgs,
+    MouseInteractionManager,
+    R,
     addListener,
     confirmDialog,
     createHTMLElement,
     drawRectangleMask,
     htmlQuery,
     localize,
-    LocalizeArgs,
     localizeIfExist,
     localizePath,
     mapToObjByKey,
-    MouseInteractionManager,
-    R,
     subtractPoint,
     waitDialog,
     warning,
 } from "module-helpers";
 import {
-    alignHorizontally,
     BaseBlueprintEntry,
     BlueprintBridgeEntry,
     BlueprintEntry,
     BlueprintNodesLayer,
+    NodeHeaderSource,
+    NodePart,
+    alignHorizontally,
     getBottom,
     getRight,
     maxBottom,
     maxRight,
-    NodeHeaderSource,
-    NodePart,
     zNodeHeaderBackground,
     zNodeHeaderData,
-    zNodeIconData,
 } from ".";
 import { Blueprint, editLabelDialog } from "..";
 
@@ -138,7 +137,7 @@ class BlueprintNode extends PIXI.Container {
     }
 
     get icon(): string | undefined {
-        return zNodeIconData.safeParse(this.#node.icon)?.data?.unicode;
+        return zIconObj.safeParse(this.#node.icon)?.data?.unicode;
     }
 
     get isEvent(): boolean {
@@ -752,7 +751,7 @@ class BlueprintNode extends PIXI.Container {
         const specials = R.pipe(
             this.#node.specialIcons ?? [],
             R.map(({ icon, name }) => {
-                const parsed = zNodeIconData.safeParse(icon)?.data;
+                const parsed = zIconObj.safeParse(icon)?.data;
                 if (!parsed) return;
 
                 return {
@@ -835,15 +834,34 @@ class BlueprintNode extends PIXI.Container {
 
         const padding = this.outerPadding;
         const headerEl = new PIXI.Container() as NodeheaderPart;
-        const iconEl = this.fontAwesomeIcon(data.icon);
         const titleEl = this.preciseText(data.title);
         const subtitleEl = this.preciseText(data.subtitle, {
             fontMult: 0.93,
             fontStyle: "italic",
             fill: "d9d9d9",
         });
+        const iconEl = R.isObjectType(data.icon)
+            ? this.fontAwesomeIcon(data.icon)
+            : R.isString(data.icon)
+              ? PIXI.Sprite.from(data.icon)
+              : undefined;
 
-        alignHorizontally(headerEl, [iconEl, titleEl], { offset: padding, spacing: 5 });
+        const iconIsImage = !!iconEl && !(iconEl instanceof foundry.canvas.containers.PreciseText);
+
+        if (iconIsImage) {
+            iconEl.width = titleEl.height + padding.y * 2;
+            iconEl.height = iconEl.width;
+
+            const mask = drawRectangleMask(0, 0, iconEl.width + 100, iconEl.height + 100, this.borderRadius);
+
+            iconEl.mask = mask;
+            iconEl.addChild(mask);
+        }
+
+        alignHorizontally(headerEl, [iconEl, titleEl], {
+            offset: iconIsImage ? new PIXI.Point() : padding,
+            spacing: 5,
+        });
 
         if (subtitleEl) {
             subtitleEl.x = titleEl.x + (iconEl ? 0 : 2);

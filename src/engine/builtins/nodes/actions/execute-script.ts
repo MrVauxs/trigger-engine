@@ -1,6 +1,7 @@
 import { BuiltinsCustomOutput, BuiltinsInputEntry, CustomInputSchema } from "engine";
 import { R, isScriptMacro } from "module-helpers";
 import { BaseActionNode } from ".";
+import { IconObject } from "_zod";
 
 class ExecuteScriptActionNode extends BaseActionNode<
     "out",
@@ -48,8 +49,29 @@ class ExecuteScriptActionNode extends BaseActionNode<
         return [{ slug: "output", array: true }];
     }
 
-    get icon(): string {
-        return "\uf121";
+    get title(): string | null {
+        return this.localMacro?.name ?? super.title;
+    }
+
+    get subtitle(): string | null {
+        return !!this.localMacro ? super.title : super.subtitle;
+    }
+
+    get icon(): IconObject | string {
+        const macro = this.localMacro;
+        return macro === null ? { unicode: "\uf127" } : (macro?.img ?? { unicode: "\uf121" });
+    }
+
+    get localMacro(): CompendiumIndexData | undefined | null {
+        if (this.state !== "macro") return;
+
+        const uuid = this.getLocalValue("macro");
+        if (!uuid) return;
+
+        const macro = fromUuidSync<CompendiumIndexData>(uuid ?? "");
+        if (!macro) return null;
+
+        return isScriptMacro(macro) || foundry.utils.parseUuid(macro.uuid)?.type === "Macro" ? macro : null;
     }
 
     async _execute(): Promise<boolean> {

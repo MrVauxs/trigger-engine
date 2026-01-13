@@ -1,3 +1,4 @@
+import { IconObject } from "_zod";
 import { BaseTokenEvent } from "engine";
 
 class DeleteTokenEvent extends BaseTokenEvent {
@@ -5,8 +6,8 @@ class DeleteTokenEvent extends BaseTokenEvent {
         return "delete-token-event";
     }
 
-    get icon(): string {
-        return "\uf2bd";
+    get icon(): IconObject {
+        return { unicode: "\uf2bd" };
     }
 }
 

@@ -202,7 +202,7 @@ class BlueprintEntry extends BaseBlueprintEntry {
                 });
             }
 
-            this.draw();
+            this.node.refresh();
         });
 
         return fieldElement;

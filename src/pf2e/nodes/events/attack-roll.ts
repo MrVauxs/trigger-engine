@@ -1,3 +1,4 @@
+import { IconObject } from "_zod";
 import { BaseEventNode } from "engine";
 import { AttackRollOptions, PF2eOutputEntry } from "pf2e";
 
@@ -22,8 +23,8 @@ class AttackRollEvent extends BaseEventNode<never, Outputs> {
         ];
     }
 
-    get icon(): string {
-        return "\uf71c";
+    get icon(): IconObject {
+        return { unicode: "\uf71c" };
     }
 
     async _execute({ action, item, options, origin, outcome, target }: AttackRollOptions): Promise<boolean> {

@@ -1,6 +1,7 @@
 import { BuiltinsInputEntry } from "engine";
 import { ItemPF2e } from "module-helpers";
 import { BaseActionNode } from ".";
+import { IconObject } from "_zod";
 
 class DeleteItemActionNode extends BaseActionNode<"out", { item?: ItemPF2e }> {
     static get type(): "delete-item" {
@@ -15,8 +16,8 @@ class DeleteItemActionNode extends BaseActionNode<"out", { item?: ItemPF2e }> {
         return [{ key: "item", type: "item" }];
     }
 
-    get icon(): string {
-        return "\uf1f8";
+    get icon(): IconObject {
+        return { unicode: "\uf1f8" };
     }
 
     async _execute(): Promise<boolean> {

@@ -1,3 +1,4 @@
+import { IconObject } from "_zod";
 import { BaseEventNode } from "engine";
 
 class TestEventNode extends BaseEventNode {
@@ -13,8 +14,8 @@ class TestEventNode extends BaseEventNode {
         return ["debug"];
     }
 
-    get icon(): string {
-        return "\ue4f3";
+    get icon(): IconObject {
+        return { unicode: "\ue4f3" };
     }
 
     get subtitle(): string {

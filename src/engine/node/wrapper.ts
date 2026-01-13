@@ -144,15 +144,16 @@ function instantiateNode(
                 this,
                 R.pipe(
                     [
-                        ["getInputValue", this.#getInputValue],
+                        ["executeNext", this.#executeNext],
                         ["getCustomInputs", this.#getCustomInputs],
                         ["getCustomInputsValues", this.#getCustomInputsValues],
+                        ["getInputValue", this.#getInputValue],
+                        ["getLocalValue", this.#getLocalValue],
                         ["getOutputValue", this.#getOutputValue],
-                        ["executeNext", this.#executeNext],
                         ["localize", localize],
                         ["rootLocalize", rootLocalize],
-                        ["setOutputValue", this.#setOutputValue],
                         ["setCustomOutputValues", this.#setCustomOutputValues],
+                        ["setOutputValue", this.#setOutputValue],
                     ] as const,
                     R.fromEntries(),
                     R.mapValues((method) => {
@@ -332,6 +333,14 @@ function instantiateNode(
                 MODULE.error(`an error occurred while executing the node: ${this.nodePath}`, error);
                 return true;
             }
+        }
+
+        #getLocalValue(key: string): any {
+            const input = this.#inputs.get(key);
+            if (!input) return;
+
+            const value = input?.value;
+            return R.isNonNullish(value) && input.isValidType(value) ? input.processValue(value) : input.default;
         }
 
         async #getInputValue(key: string): Promise<any> {

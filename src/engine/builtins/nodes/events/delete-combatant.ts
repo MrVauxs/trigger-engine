@@ -1,3 +1,4 @@
+import { IconObject } from "_zod";
 import { BaseCombatantEvent } from ".";
 
 class DeleteCombatantEvent extends BaseCombatantEvent {
@@ -5,8 +6,8 @@ class DeleteCombatantEvent extends BaseCombatantEvent {
         return "delete-combatant-event";
     }
 
-    get icon(): string {
-        return "\ue433";
+    get icon(): IconObject {
+        return { unicode: "\ue433" };
     }
 }
 

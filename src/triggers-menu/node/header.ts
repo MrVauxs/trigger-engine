@@ -1,4 +1,4 @@
-import { IconObject, zIconObj } from "_zod";
+import { zIconObj } from "_zod";
 import { z, zString } from "module-helpers";
 
 const zNodeHeaderBackground = z
@@ -6,12 +6,7 @@ const zNodeHeaderBackground = z
     .default("#000000")
     .catch("#000000");
 
-const zNodeIconData = z.union([
-    z.string().transform((value) => {
-        return { unicode: value, fontMult: 1, fontWeight: "400" } satisfies IconObject;
-    }),
-    zIconObj,
-]);
+const zNodeIconData = z.union([z.string(), zIconObj]);
 
 const zNodeHeaderData = z.object({
     background: zNodeHeaderBackground,

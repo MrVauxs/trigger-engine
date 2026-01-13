@@ -1,3 +1,4 @@
+import { IconObject } from "_zod";
 import { BaseAuraEvent } from "pf2e";
 
 class AuraLeaveEvent extends BaseAuraEvent {
@@ -5,8 +6,8 @@ class AuraLeaveEvent extends BaseAuraEvent {
         return "aura-leave-event";
     }
 
-    get icon(): string {
-        return "\uf192";
+    get icon(): IconObject {
+        return { unicode: "\uf192" };
     }
 }
 

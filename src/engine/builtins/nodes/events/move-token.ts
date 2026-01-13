@@ -1,3 +1,4 @@
+import { IconObject } from "_zod";
 import { BaseTokenEvent } from "engine";
 
 class MoveTokenEvent extends BaseTokenEvent {
@@ -5,8 +6,8 @@ class MoveTokenEvent extends BaseTokenEvent {
         return "move-token-event";
     }
 
-    get icon(): string {
-        return "\uf554";
+    get icon(): IconObject {
+        return { unicode: "\uf554" };
     }
 }
 

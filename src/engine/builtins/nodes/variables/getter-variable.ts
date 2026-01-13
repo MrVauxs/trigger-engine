@@ -1,3 +1,4 @@
+import { IconObject } from "_zod";
 import { GETTER_VARIABLE_TYPE, TriggerNode, VARIABLE_CATEGORY } from "engine";
 
 class TriggerVariableGetter extends TriggerNode<never, { entry: any }> {
@@ -17,8 +18,8 @@ class TriggerVariableGetter extends TriggerNode<never, { entry: any }> {
         return null;
     }
 
-    get icon(): string {
-        return "\uf044";
+    get icon(): IconObject {
+        return { unicode: "\uf044" };
     }
 
     _query(): Promise<any> {

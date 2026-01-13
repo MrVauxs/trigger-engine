@@ -1,3 +1,4 @@
+import { IconObject } from "_zod";
 import { BaseCombatantEvent } from "engine";
 
 class TurnEndEvent extends BaseCombatantEvent {
@@ -9,8 +10,8 @@ class TurnEndEvent extends BaseCombatantEvent {
         return [...super.tags, "turn"];
     }
 
-    get icon(): string {
-        return "\uf253";
+    get icon(): IconObject {
+        return { unicode: "\uf253" };
     }
 }
 

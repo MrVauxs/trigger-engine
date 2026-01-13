@@ -1,3 +1,4 @@
+import { IconObject } from "_zod";
 import { BaseEventNode } from "engine";
 import { PF2eOutputEntry, TurnStartOptions } from "pf2e";
 
@@ -17,8 +18,8 @@ class TurnStartEvent extends BaseEventNode<never, TurnStartOptions> {
         ];
     }
 
-    get icon(): string {
-        return "\uf251";
+    get icon(): IconObject {
+        return { unicode: "\uf251" };
     }
 
     async _execute({ round, combatant }: TurnStartOptions): Promise<boolean> {
