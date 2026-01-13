@@ -316,7 +316,7 @@ type TextFieldSchemaType = (typeof NODE_INPUT_TEXT_TYPES)[number];
 type TextFieldSchema = {
     connector: boolean;
     default?: string;
-    options?: (SelectFieldOption | string)[];
+    options?: (SelectFieldOption | string)[] | ReadonlyArray<string>;
     tooltip: boolean;
     trim: boolean;
     type?: TextFieldSchemaType;
