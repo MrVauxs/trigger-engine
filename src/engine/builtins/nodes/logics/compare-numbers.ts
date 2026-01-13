@@ -1,18 +1,14 @@
-import { BridgeSchemaInput, BuiltinsInputEntry, TriggerNode } from "engine";
+import { BaseLogicNode, BridgeSchemaInput, BuiltinsInputEntry, NodeEntry, NumberEntry } from "engine";
 
-abstract class CompareNumbersNode extends TriggerNode<"true" | "false", Inputs> {
+abstract class CompareNumbersNode extends BaseLogicNode<"true" | "false", Inputs> {
     static compareOptions = ["eq", "gt", "gte", "lt", "lte"] as const;
-
-    static get category(): "logic" {
-        return "logic";
-    }
 
     static get type(): "compare-numbers" {
         return "compare-numbers";
     }
 
-    static get tags(): string[] {
-        return ["number"];
+    static get baseEntry(): typeof NodeEntry<any, any> {
+        return NumberEntry;
     }
 
     static get defineOuts(): BridgeSchemaInput[] {
@@ -34,14 +30,6 @@ abstract class CompareNumbersNode extends TriggerNode<"true" | "false", Inputs> 
             },
             { key: "b", type: "number" },
         ];
-    }
-
-    get headerColor(): number {
-        return 0x07b88f;
-    }
-
-    get subtitle(): null {
-        return null;
     }
 
     async _execute(): Promise<boolean> {
