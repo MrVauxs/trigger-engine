@@ -12,7 +12,7 @@ abstract class BaseActionNode<
         return "action";
     }
 
-    get headerColor(): `#${string}` {
+    get headerColor(): ColorSource {
         return "#2162bd";
     }
 }

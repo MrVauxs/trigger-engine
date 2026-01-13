@@ -24,7 +24,7 @@ abstract class BaseValueNode<TInputs extends Record<string, any> = Record<string
         return null;
     }
 
-    get headerColor(): `#${string}` {
+    get headerColor(): ColorSource {
         return "#6b5646";
     }
 }

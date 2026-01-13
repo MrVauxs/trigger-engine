@@ -145,7 +145,7 @@ class TriggerNode<
     }
 
     /** The background color for the header. Is only used if the node has a 'title'. */
-    get headerColor(): `#${string}` | number | null {
+    get headerColor(): ColorSource | null {
         return this.isEvent ? "#C40000" : "#0c0c0c";
     }
 

@@ -1,15 +1,19 @@
 import { zIconObj } from "_zod";
 import { z, zString } from "module-helpers";
 
-const zNodeHeaderBackground = z
-    .union([z.number(), z.string().regex(/^#[0-9A-Fa-f]{6}$/) as zTypedString<`#${string}`>])
-    .default("#000000")
-    .catch("#000000");
+const zNodeHeaderBackground = z.custom<ColorSource>((value): boolean => {
+    try {
+        new PIXI.Color(value as any);
+        return true;
+    } catch (error: any) {
+        return false;
+    }
+});
 
 const zNodeIconData = z.union([z.string(), zIconObj]);
 
 const zNodeHeaderData = z.object({
-    background: zNodeHeaderBackground,
+    background: zNodeHeaderBackground.default("#000000").catch("#000000"),
     icon: zNodeIconData.nullish(),
     subtitle: z.string().nullish(),
     title: zString,

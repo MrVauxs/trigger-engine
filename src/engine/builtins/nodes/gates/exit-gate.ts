@@ -15,7 +15,7 @@ class TriggerGateExit extends TriggerNode<"out", never, never, never, "entry"> {
         return [{ array: true, slug: "entry" }];
     }
 
-    get headerColor(): `#${string}` {
+    get headerColor(): ColorSource {
         return "#C40000";
     }
 

@@ -10,7 +10,7 @@ class TriggerGateEntry extends TriggerNode<"out", never, never, "entry"> {
         return ENTRY_GATE_TYPE;
     }
 
-    get headerColor(): `#${string}` {
+    get headerColor(): ColorSource {
         return "#C40000";
     }
 
