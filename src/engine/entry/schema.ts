@@ -6,6 +6,7 @@ const zNodeEntrySchema = z.object({
     label: zString.optional(),
     group: zString.optional(),
     slug: zString.optional(),
+    spacing: z.number().default(0),
     state: zString.optional(),
     type: zString,
 });

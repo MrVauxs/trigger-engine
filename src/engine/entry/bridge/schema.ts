@@ -4,11 +4,12 @@ const zNodeBridgeSchema = z.object({
     key: zString,
     label: zString.optional(),
     slug: zString.optional(),
+    spacing: z.number().default(0),
     state: zString.optional(),
 });
 
 type BridgeSchemaInput<K extends string = string> = Prettify<
-    Omit<z.infer<typeof zNodeBridgeSchema>, "key"> & { key: K }
+    Omit<z.input<typeof zNodeBridgeSchema>, "key"> & { key: K }
 >;
 type BridgeSchemaOutput = z.output<typeof zNodeBridgeSchema>;
 

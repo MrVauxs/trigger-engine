@@ -635,7 +635,11 @@ class BlueprintNode extends PIXI.Container {
         );
 
         const nbEntries = (section: [key: string, value: OpenNodeEntry[]][]): number => {
-            return R.sum(section.map(([group, entries]) => entries.length + (group === "" ? 0 : 1)));
+            return R.sum(
+                section.map(([group, entries]) => {
+                    return R.sumBy(entries, (entry) => 1 + entry.spacing) + (group === "" ? 0 : 1);
+                }),
+            );
         };
 
         const nbRows = Math.max(nbEntries(inputs) + ins, nbEntries(outputs) + outs.length);
@@ -699,20 +703,22 @@ class BlueprintNode extends PIXI.Container {
                 this.#inputs.set(entry.key, entry);
                 this.#entries.push(entry);
 
+                inputIndex += input.spacing;
                 addToRow(inputIndex++, 0, entry);
             }
         }
 
         // we process all outputs after that
 
-        for (let i = 0; i < outs.length; i++) {
-            const out = outs[i];
+        let outsIndex = 0;
+        for (const out of outs) {
             const entry = new BlueprintBridgeEntry(this, "outputs", out);
 
             this.#outs.set(entry.key, entry);
             this.#entries.push(entry);
 
-            addToRow(i, 1, entry);
+            outsIndex += out.spacing;
+            addToRow(outsIndex++, 1, entry);
         }
 
         let outputIndex = outs.length;
@@ -728,6 +734,7 @@ class BlueprintNode extends PIXI.Container {
                 this.#outputs.set(entry.key, entry);
                 this.#entries.push(entry);
 
+                outputIndex += output.spacing;
                 addToRow(outputIndex++, 1, entry);
             }
         }

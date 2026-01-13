@@ -86,6 +86,7 @@ function getOutsSchemas(NodeCls: typeof TriggerNode, options?: SchemasFilterOpti
                         key: entry.id,
                         label: entry.label,
                         slug: entry.slug,
+                        spacing: 0,
                     };
                 },
             ),

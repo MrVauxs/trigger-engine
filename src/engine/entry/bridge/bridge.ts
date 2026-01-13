@@ -1,13 +1,13 @@
 import { ConnectionId, NodeData } from "engine";
-import { BridgeSchemaInput } from ".";
 import { EntryCategory } from "triggers-menu";
+import { BridgeSchemaOutput } from ".";
 
 class NodeBridge {
     #category: EntryCategory;
-    #schema: BridgeSchemaInput;
+    #schema: BridgeSchemaOutput;
     #nodeData: NodeData;
 
-    constructor(category: EntryCategory, nodeData: NodeData, schema: BridgeSchemaInput) {
+    constructor(category: EntryCategory, nodeData: NodeData, schema: BridgeSchemaOutput) {
         this.#category = category;
         this.#nodeData = nodeData;
         this.#schema = schema;
@@ -21,12 +21,16 @@ class NodeBridge {
         return this.#schema.label;
     }
 
-    get schema(): BridgeSchemaInput {
+    get schema(): BridgeSchemaOutput {
         return this.#schema;
     }
 
     get slug(): string | undefined {
         return this.schema.slug;
+    }
+
+    get spacing(): number {
+        return this.schema.spacing;
     }
 
     get connection(): ConnectionId | undefined {
