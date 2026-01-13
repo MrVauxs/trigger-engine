@@ -40,6 +40,10 @@ abstract class CompareNumbersNode extends TriggerNode<"true" | "false", Inputs> 
         return 0x07b88f;
     }
 
+    get subtitle(): null {
+        return null;
+    }
+
     async _execute(): Promise<boolean> {
         const entryA = await this.getInputValue("a");
         const entryB = await this.getInputValue("b");
