@@ -30,8 +30,27 @@ class CreateItemActionNode extends BaseActionNode<"out", Inputs, { item?: ItemPF
         return [{ slug: "choices", group: "choices", types: ["text"] }];
     }
 
-    get icon(): IconObject {
-        return { unicode: "\uf466" };
+    get title(): string | null {
+        return this.localItem?.name ?? super.title;
+    }
+
+    get subtitle(): string | null {
+        return this.localItem ? super.title : super.subtitle;
+    }
+
+    get icon(): IconObject | string {
+        const item = this.localItem;
+        return item === null ? { unicode: "\uf127" } : (item?.img ?? { unicode: "\uf466" });
+    }
+
+    get localItem(): CompendiumIndexData | undefined | null {
+        const uuid = this.getLocalValue("uuid");
+        if (!uuid) return;
+
+        const item = fromUuidSync<CompendiumIndexData>(uuid);
+        if (!item) return null;
+
+        return item instanceof Item || foundry.utils.parseUuid(item.uuid)?.type === "Item" ? item : null;
     }
 
     async _execute(): Promise<boolean> {

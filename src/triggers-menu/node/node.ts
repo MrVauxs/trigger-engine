@@ -356,6 +356,11 @@ class BlueprintNode extends PIXI.Container {
             this.addChild(header);
 
             body.y = header.calculatedHeight;
+
+            const mask = drawRectangleMask(0, 0, width, header.calculatedHeight, this.borderRadius);
+
+            header.mask = mask;
+            header.addChild(mask);
         }
 
         // body
@@ -851,15 +856,10 @@ class BlueprintNode extends PIXI.Container {
         if (iconIsImage) {
             iconEl.width = titleEl.height + padding.y * 2;
             iconEl.height = iconEl.width;
-
-            const mask = drawRectangleMask(0, 0, iconEl.width + 100, iconEl.height + 100, this.borderRadius);
-
-            iconEl.mask = mask;
-            iconEl.addChild(mask);
         }
 
         alignHorizontally(headerEl, [iconEl, titleEl], {
-            offset: iconIsImage ? new PIXI.Point() : padding,
+            offset: iconIsImage ? new PIXI.Point(0.5, 0.5) : padding,
             spacing: 5,
         });
 

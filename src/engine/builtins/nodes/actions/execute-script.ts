@@ -54,7 +54,7 @@ class ExecuteScriptActionNode extends BaseActionNode<
     }
 
     get subtitle(): string | null {
-        return !!this.localMacro ? super.title : super.subtitle;
+        return this.localMacro ? super.title : super.subtitle;
     }
 
     get icon(): IconObject | string {
@@ -68,7 +68,7 @@ class ExecuteScriptActionNode extends BaseActionNode<
         const uuid = this.getLocalValue("macro");
         if (!uuid) return;
 
-        const macro = fromUuidSync<CompendiumIndexData>(uuid ?? "");
+        const macro = fromUuidSync<CompendiumIndexData>(uuid);
         if (!macro) return null;
 
         return isScriptMacro(macro) || foundry.utils.parseUuid(macro.uuid)?.type === "Macro" ? macro : null;
