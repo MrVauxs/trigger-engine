@@ -308,6 +308,9 @@
                 "macro": {
                     "title": "Macro"
                 },
+                "number": {
+                    "title": "Number"
+                },
                 "region": {
                     "title": "Region"
                 },

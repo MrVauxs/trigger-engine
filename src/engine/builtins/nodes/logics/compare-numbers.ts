@@ -11,6 +11,10 @@ abstract class CompareNumbersNode extends TriggerNode<"true" | "false", Inputs> 
         return "compare-numbers";
     }
 
+    static get tags(): string[] {
+        return ["number"];
+    }
+
     static get defineOuts(): BridgeSchemaInput[] {
         return [{ key: "true" }, { key: "false" }];
     }
