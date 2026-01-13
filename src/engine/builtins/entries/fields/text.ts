@@ -10,6 +10,10 @@ const NODE_INPUT_TEXT_TYPES = ["enriched", "select", ...NODE_INPUT_CODE_TYPES] a
 class TextField extends InputField<string, TextFieldSchema> {
     static get defineSchema(): NodeFieldSchema {
         return {
+            connector: {
+                default: true,
+                type: "boolean",
+            },
             default: { type: "string" },
             options: {
                 type: "array",
@@ -40,6 +44,10 @@ class TextField extends InputField<string, TextFieldSchema> {
                 type: "string",
                 enum: NODE_INPUT_TEXT_TYPES as any,
             },
+            width: {
+                default: 140,
+                type: "number",
+            },
         };
     }
 
@@ -52,7 +60,7 @@ class TextField extends InputField<string, TextFieldSchema> {
     }
 
     get width(): number {
-        return 140;
+        return this.field.width;
     }
 
     get innerWidth(): number {
@@ -306,11 +314,13 @@ interface TextField {
 type TextFieldSchemaType = (typeof NODE_INPUT_TEXT_TYPES)[number];
 
 type TextFieldSchema = {
+    connector: boolean;
     default?: string;
     options?: (SelectFieldOption | string)[];
     tooltip: boolean;
     trim: boolean;
     type?: TextFieldSchemaType;
+    width: number;
 };
 
 type SelectFieldOption = Prettify<SelectOption & { group?: string }>;

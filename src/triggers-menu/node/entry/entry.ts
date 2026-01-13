@@ -69,7 +69,14 @@ class BlueprintEntry extends BaseBlueprintEntry {
     }
 
     get hasConnector(): boolean {
-        return this.isOutput || (!this.node.isEvent && (!this.FieldCls || this.node.inputsHaveConnector));
+        if (this.isOutput || !this.FieldCls) return true;
+        if (this.node.isEvent || !this.node.inputsHaveConnector) return false;
+
+        return (
+            !this.#entry.field ||
+            !("connector" in this.#entry.field) ||
+            (this.#entry.field as { connector: boolean }).connector !== false
+        );
     }
 
     get canConnect(): boolean {

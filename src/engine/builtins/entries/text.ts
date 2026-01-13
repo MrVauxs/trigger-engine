@@ -97,10 +97,10 @@ class TextEntry extends BuiltInNodeEntry<string, TextFieldSchema> {
 
 type BaseField = Partial<Omit<TextFieldSchema, "options" | "type">>;
 
-type SimpleField = Prettify<BaseField & { type?: "enriched" }>;
-type SelectField = Prettify<BaseField & { type: "select"; options: TextFieldSchema["options"] }>;
-type JsonField = Prettify<BaseField & { type: "json" }>;
-type JavascriptField = Prettify<BaseField & { type: "javascript" }>;
+type SimpleField = BaseField & { type?: "enriched" };
+type SelectField = BaseField & { type: "select"; options: TextFieldSchema["options"] };
+type JsonField = BaseField & { type: "json" };
+type JavascriptField = BaseField & { type: "javascript" };
 
 type BuiltinsTextFieldSchema = SimpleField | SelectField | JsonField | JavascriptField;
 
