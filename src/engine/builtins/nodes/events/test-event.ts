@@ -1,7 +1,8 @@
 import { IconObject } from "_zod";
-import { BaseEventNode } from "engine";
+import { BaseEventNode, BuiltinsOutputEntry } from "engine";
+import { R } from "module-helpers";
 
-class TestEventNode extends BaseEventNode {
+class TestEventNode extends BaseEventNode<never, { targets: TargetDocuments[] }> {
     static get functionPath(): string {
         return "game.triggerEngine.test";
     }
@@ -14,6 +15,10 @@ class TestEventNode extends BaseEventNode {
         return ["debug"];
     }
 
+    static get defineOutputs(): BuiltinsOutputEntry[] {
+        return [{ key: "targets", type: "target", isArray: true }];
+    }
+
     get icon(): IconObject {
         return { unicode: "\ue4f3" };
     }
@@ -23,6 +28,17 @@ class TestEventNode extends BaseEventNode {
     }
 
     _execute(): Promise<boolean> {
+        const targets = R.pipe(
+            canvas.tokens.controlled,
+            R.map((token): TargetDocuments | null => {
+                const actor = token.actor;
+                return actor ? { actor, token: token.document } : null;
+            }),
+            R.filter(R.isTruthy),
+        );
+
+        this.setOutputValue("targets", targets);
+
         return this.executeNext("out");
     }
 }
