@@ -3,6 +3,10 @@ import { R, actorsRespectAlliance, isCurrentCombatant, localizePath } from "modu
 import { AuraEventOptions, PF2eInputEntry, PF2eOutputEntry } from "pf2e";
 
 abstract class BaseAuraEvent extends BaseEventNode<Inputs, Outputs> {
+    static get type(): string {
+        return "base-aura-event";
+    }
+
     static get tags(): string[] {
         return ["aura"];
     }
@@ -61,7 +65,7 @@ abstract class BaseAuraEvent extends BaseEventNode<Inputs, Outputs> {
     }
 
     static localizePath(...path: string[]): string {
-        return localizePath(`pf2e-trigger.node.event.base-aura-event`, ...path);
+        return localizePath("pf2e-trigger.node", this.category, "base-aura-event", ...path);
     }
 
     async _execute({ aura, target }: AuraEventOptions): Promise<boolean> {

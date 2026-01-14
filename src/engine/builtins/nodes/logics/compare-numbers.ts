@@ -22,7 +22,7 @@ abstract class CompareNumbersNode extends BaseLogicNode<"true" | "false", Inputs
         return (this.#compareOptions ??= ["eq", "gt", "gte", "lt", "lte"].map((value) => {
             return {
                 value,
-                label: localizePath(`builtins.node.logic`, this.type, "inputs.compare.options", value),
+                label: localizePath("builtins.node", this.category, this.type, "inputs.compare.options", value),
             };
         }));
     }
