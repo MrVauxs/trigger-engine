@@ -298,7 +298,8 @@ class TriggerApplication {
         const entry = this.entries.get(type);
         if (!entry) return;
 
-        const converted = R.isArray(value) ? value.map(entry.toJSON.bind(entry)) : entry.toJSON(value);
+        const convert = (value: unknown) => (entry.isValidType(value) ? entry.toJSON(value) : undefined);
+        const converted = R.isArray(value) ? value.map(convert) : convert(value);
         return { type, value: converted };
     }
 

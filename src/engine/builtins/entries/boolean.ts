@@ -22,7 +22,7 @@ class BooleanEntry extends BuiltInNodeEntry<boolean, BooleanFieldSchema> {
         return R.isBoolean(value);
     }
 
-    static toJSON(value: boolean): boolean {
+    static toJSON(value: boolean): JSONValue {
         return value;
     }
 

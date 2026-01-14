@@ -1,5 +1,5 @@
 import { NodeEntry } from "engine";
-import { ActorPF2e, TokenDocumentPF2e, getTokenDocument, isValidTargetDocuments } from "module-helpers";
+import { ActorPF2e, R, TokenDocumentPF2e, getTokenDocument, isValidTargetDocuments } from "module-helpers";
 
 class TargetEntry extends NodeEntry<TargetDocuments | undefined> {
     static get type(): "target" {
@@ -25,11 +25,8 @@ class TargetEntry extends NodeEntry<TargetDocuments | undefined> {
         };
     }
 
-    static async fromJSON(value: {
-        actor: ActorUUID;
-        token?: TokenDocumentUUID;
-    }): Promise<TargetDocuments | undefined> {
-        const actor = await fromUuid<ActorPF2e>(value.actor);
+    static async fromJSON(value: { actor: string; token?: string }): Promise<TargetDocuments | undefined> {
+        const actor = R.isObjectType(value) ? await fromUuid<ActorPF2e>(value.actor) : undefined;
         if (!(actor instanceof Actor)) return;
 
         const token = value.token && (await fromUuid<TokenDocumentPF2e>(value.token));

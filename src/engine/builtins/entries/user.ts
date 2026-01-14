@@ -1,5 +1,5 @@
 import { NodeEntry } from "engine";
-import { UserPF2e } from "module-helpers";
+import { R, UserPF2e } from "module-helpers";
 
 class UserEntry extends NodeEntry<UserPF2e | undefined> {
     static get type(): "user" {
@@ -22,8 +22,8 @@ class UserEntry extends NodeEntry<UserPF2e | undefined> {
         return value.id;
     }
 
-    static async fromJSON(value: string): Promise<UserPF2e | undefined> {
-        return game.users.get(value);
+    static async fromJSON(value: unknown): Promise<UserPF2e | undefined> {
+        return R.isString(value) ? game.users.get(value) : undefined;
     }
 }
 

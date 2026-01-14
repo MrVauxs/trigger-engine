@@ -121,7 +121,7 @@ interface NodeEntry<
     localize(...args: LocalizeArgs): string | undefined;
 
     /** @see {@link NodeEntry.toJSON} */
-    toJSON(value: any): JSONValue;
+    toJSON(value: TValue): JSONValue;
 }
 
 export { NodeEntry };

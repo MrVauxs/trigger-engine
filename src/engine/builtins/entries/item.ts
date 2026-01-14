@@ -1,5 +1,5 @@
 import { NodeEntry } from "engine";
-import { ItemPF2e } from "module-helpers";
+import { ItemPF2e, R } from "module-helpers";
 
 class ItemEntry extends NodeEntry<ItemPF2e | undefined> {
     static get type(): "item" {
@@ -18,12 +18,12 @@ class ItemEntry extends NodeEntry<ItemPF2e | undefined> {
         return value instanceof Item;
     }
 
-    static toJSON(value: ItemPF2e): string {
+    static toJSON(value: ItemPF2e): ItemUUID {
         return value.uuid;
     }
 
-    static async fromJSON(value: string): Promise<ItemPF2e | undefined> {
-        const item = await fromUuid<ItemPF2e>(value);
+    static async fromJSON(value: unknown): Promise<ItemPF2e | undefined> {
+        const item = R.isString(value) ? await fromUuid<ItemPF2e>(value) : undefined;
         return item instanceof Item ? item : undefined;
     }
 }
