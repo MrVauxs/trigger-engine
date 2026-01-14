@@ -522,6 +522,11 @@
                     "turn-start-event": {
                         "title": "Turn Start"
                     }
+                },
+                "logic": {
+                    "compare-outcomes": {
+                        "title": "Compare Outcomes"
+                    }
                 }
             },
             "setting": {

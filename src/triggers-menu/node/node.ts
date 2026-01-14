@@ -207,7 +207,7 @@ class BlueprintNode extends PIXI.Container {
     }
 
     get connectorSpacing(): number {
-        return 5;
+        return 6;
     }
 
     get borderRadius(): number {
