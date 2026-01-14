@@ -641,7 +641,7 @@ function getNodePropertyLocalizePath(node: typeof TriggerNode, property: Trigger
 }
 
 function localizeNodeTag(application: TriggerApplication, tag: string): string {
-    return application.localize("tag", tag, "title") ?? tag;
+    return application.localize("tag", tag, "title") ?? application.localize("entry", tag, "title") ?? tag;
 }
 
 type TriggerNodeStringProperty = keyof {

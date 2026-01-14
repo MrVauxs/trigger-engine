@@ -302,20 +302,11 @@
                 "dialog": {
                     "title": "Dialog"
                 },
-                "item": {
-                    "title": "Item"
-                },
                 "macro": {
                     "title": "Macro"
                 },
-                "number": {
-                    "title": "Number"
-                },
                 "region": {
                     "title": "Region"
-                },
-                "user": {
-                    "title": "User"
                 },
                 "token": {
                     "title": "Token"
