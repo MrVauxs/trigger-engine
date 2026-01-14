@@ -13,6 +13,10 @@ function instantiateField(
         return node.localize(...args);
     }
 
+    function rootLocalize(...args: LocalizeArgs): string | undefined {
+        return node.rootLocalize(...args);
+    }
+
     class EntryFieldWrapper extends FieldCls {
         constructor() {
             super();
@@ -65,6 +69,7 @@ function instantiateField(
                         ["addRectangleMask", this.#addRectangleMask],
                         ["getGlobalBounds", this.#getGlobalBounds],
                         ["localize", localize],
+                        ["rootLocalize", rootLocalize],
                     ] as const,
                     R.fromEntries(),
                     R.mapValues((method) => {

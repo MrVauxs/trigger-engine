@@ -78,6 +78,9 @@ interface NodeField<TValue extends unknown = unknown, TFieldSchema extends Recor
 
     /** @see {@link TriggerNode#localize} */
     localize(...args: LocalizeArgs): string | undefined;
+
+    /** @see {@link TriggerNode#rootLocalize} */
+    rootLocalize(...args: LocalizeArgs): string | undefined;
 }
 
 type NodeFieldSchema = Record<string, z.core.JSONSchema.JSONSchema>;
