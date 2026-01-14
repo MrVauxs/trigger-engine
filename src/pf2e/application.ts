@@ -9,6 +9,7 @@ import {
     CreateItemActionNode,
     CreateMessageHook,
     DamageTakenEvent,
+    HasItemNode,
     TurnEndEvent,
     TurnEndHook,
     TurnStartEvent,
@@ -26,6 +27,7 @@ const nodes = [
     CompareOutcomesNode,
     CreateItemActionNode,
     DamageTakenEvent,
+    HasItemNode,
     TurnEndEvent,
     TurnStartEvent,
 ] as (typeof TriggerNode)[];

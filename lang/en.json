@@ -138,8 +138,14 @@
                 "number": {
                     "title": "Number"
                 },
+                "slug": {
+                    "title": "Item Slug"
+                },
                 "target": {
                     "title": "Target"
+                },
+                "targets": {
+                    "title": "Targets"
                 },
                 "text": {
                     "title": "Text"
@@ -410,6 +416,11 @@
             }
         },
         "pf2e-trigger": {
+            "category": {
+                "condition": {
+                    "title": "Condition"
+                }
+            },
             "convertor": {
                 "outcome-number": "A number between 0 and 3"
             },
@@ -450,6 +461,12 @@
                             }
                         },
                         "title": "Create Item"
+                    }
+                },
+                "condition": {
+                    "has-item": {
+                        "inputs": {},
+                        "title": "Has Item"
                     }
                 },
                 "event": {
