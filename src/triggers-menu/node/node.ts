@@ -664,7 +664,7 @@ class BlueprintNode extends PIXI.Container {
 
         const createGroup = (group: string): PIXI.Container => {
             const container = new PIXI.Container();
-            const localized = this.localize("groups", group) ?? group;
+            const localized = this.localize("groups", group) ?? this.rootLocalize("group", group) ?? group;
             const label = this.preciseText(localized);
 
             const icon = new PIXI.Graphics();
