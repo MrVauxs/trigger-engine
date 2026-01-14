@@ -10,6 +10,7 @@ import {
     CreateMessageHook,
     DamageTakenEvent,
     HasItemNode,
+    SendToChatActionNode,
     TurnEndEvent,
     TurnEndHook,
     TurnStartEvent,
@@ -28,6 +29,7 @@ const nodes = [
     CreateItemActionNode,
     DamageTakenEvent,
     HasItemNode,
+    SendToChatActionNode,
     TurnEndEvent,
     TurnStartEvent,
 ] as (typeof TriggerNode)[];

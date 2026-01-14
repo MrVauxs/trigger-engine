@@ -441,6 +441,9 @@
                     "title": "Triggers When?"
                 }
             },
+            "group": {
+                "toolbelt": "PF2e Toolbelt"
+            },
             "node": {
                 "action": {
                     "create-item": {
@@ -461,6 +464,9 @@
                             }
                         },
                         "title": "Create Item"
+                    },
+                    "send-chat": {
+                        "title": "Send Item to Chat"
                     }
                 },
                 "condition": {
