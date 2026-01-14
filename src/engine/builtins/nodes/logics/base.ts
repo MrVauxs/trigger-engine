@@ -1,5 +1,4 @@
-import { NodeEntry, TriggerNode } from "engine";
-import { MODULE } from "module-helpers";
+import { TriggerNode } from "engine";
 
 abstract class BaseLogicNode<
     TOuts extends string = string,
@@ -13,16 +12,8 @@ abstract class BaseLogicNode<
         return "logic";
     }
 
-    static get baseEntry(): typeof NodeEntry<any, any> {
-        throw MODULE.Error("'baseEntry' getter must be implemented.");
-    }
-
-    static get tags(): string[] {
-        return [this.baseEntry.type];
-    }
-
     get headerColor(): ColorSource {
-        return (this.constructor as typeof BaseLogicNode).baseEntry.color;
+        return "#7e18b5";
     }
 
     get subtitle(): null {

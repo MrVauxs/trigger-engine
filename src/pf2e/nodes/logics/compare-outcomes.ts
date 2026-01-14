@@ -1,14 +1,14 @@
-import { BaseLogicNode, BridgeSchemaInput, CompareEntry, CompareNumbersNode, NodeEntry } from "engine";
+import { BaseLogicNode, BridgeSchemaInput, CompareEntry, CompareNumbersNode } from "engine";
 import { DegreeOfSuccessString, degreeOfSuccessNumber } from "module-helpers";
-import { OutcomEntry, PF2eInputEntry } from "pf2e";
+import { PF2eInputEntry } from "pf2e";
 
 abstract class CompareOutcomesNode extends BaseLogicNode<"true" | "false", Inputs> {
     static get type(): "compare-outcomes" {
         return "compare-outcomes";
     }
 
-    static get baseEntry(): typeof NodeEntry<any, any> {
-        return OutcomEntry;
+    static get tags(): string[] {
+        return ["outcome"];
     }
 
     static get defineOuts(): BridgeSchemaInput[] {

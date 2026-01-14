@@ -1,4 +1,4 @@
-import { BaseLogicNode, BridgeSchemaInput, BuiltinsInputEntry, NodeEntry, NumberEntry } from "engine";
+import { BaseLogicNode, BridgeSchemaInput, BuiltinsInputEntry } from "engine";
 import { localizePath } from "module-helpers";
 
 const COMPARE_ENTRIES = ["eq", "gt", "gte", "lt", "lte"] as const;
@@ -10,8 +10,8 @@ abstract class CompareNumbersNode extends BaseLogicNode<"true" | "false", Inputs
         return "compare-numbers";
     }
 
-    static get baseEntry(): typeof NodeEntry<any, any> {
-        return NumberEntry;
+    static get tags(): string[] {
+        return ["number"];
     }
 
     static get defineOuts(): BridgeSchemaInput[] {
