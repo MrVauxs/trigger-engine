@@ -58,6 +58,7 @@ function instantiateNode(
                 isArray: data.isArray,
                 key: "entry",
                 label: data.label,
+                spacing: 0,
                 type: data.type,
             },
         ];
@@ -97,7 +98,7 @@ function instantiateNode(
             const self = this;
 
             // scene context
-            Object.defineProperty(this, "scene", {
+            Object.defineProperty(this, "sceneContext", {
                 get(): ScenePF2e | undefined {
                     return (self.#sceneId && game.scenes.get(self.#sceneId)) || parent.sceneContext;
                 },
@@ -206,7 +207,7 @@ function instantiateNode(
             // bridges
             const [ins, outs] = R.map(
                 [
-                    ["inputs", !isEvent && NodeCls.hasIn ? [{ key: "in", state: undefined }] : []],
+                    ["inputs", !isEvent && NodeCls.hasIn ? [{ key: "in", spacing: 0, state: undefined }] : []],
                     ["outputs", getOutsSchemas(NodeCls, { data: nodeData, state: nodeState })],
                 ] as const,
                 ([category, schemas]) => {
