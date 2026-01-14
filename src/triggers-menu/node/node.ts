@@ -1125,7 +1125,10 @@ class BlueprintNode extends PIXI.Container {
                     R.filter((state) => state !== this.#node.state),
                     R.map((state) => {
                         const label =
-                            this.#node.localize("states", state) ?? this.#node.rootLocalize("state", state) ?? state;
+                            this.#node.localize("states", state) ??
+                            this.#node.rootLocalize("state", state) ??
+                            this.#node.rootLocalize("entry", state, "title") ??
+                            state;
 
                         return {
                             name: localize("blueprint.node.state.title", { label }),
