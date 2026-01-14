@@ -12,6 +12,8 @@ import {
     TurnEndHook,
     TurnStartEvent,
     TurnStartHook,
+    pf2eConvertors,
+    pf2eEntries,
 } from ".";
 
 const hooks = [AuraHook, CreateMessageHook, TurnEndHook, TurnStartHook] as (typeof TriggerHook)[];
@@ -29,8 +31,8 @@ const nodes = [
 function registerPF2eApplication() {
     const options: TriggerApplicationOptions = {
         builtins: true,
-        convertors: [],
-        entries: [],
+        convertors: pf2eConvertors,
+        entries: pf2eEntries as any,
         hooks,
         nodes,
     };

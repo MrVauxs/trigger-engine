@@ -2,11 +2,11 @@ import { TriggerHook } from "engine";
 import {
     ActorPF2e,
     ChatMessagePF2e,
+    DegreeOfSuccessString,
     ItemPF2e,
     R,
-    ZeroToThree,
     createToggleableHook,
-    degreeOfSuccessNumber,
+    isDegreeOfSuccessValue,
     isValidTargetDocuments,
 } from "module-helpers";
 
@@ -37,15 +37,20 @@ class CreateMessageHook extends TriggerHook<AttackRollOptions | DamageTakenOptio
         if (context.type === "attack-roll") {
             const target = message.target;
             const source = { actor: message.actor, token: message.token };
-            const outcome = context.outcome ? degreeOfSuccessNumber(context.outcome) : undefined;
-            if (!isValidTargetDocuments(target) || !isValidTargetDocuments(source) || R.isNullish(outcome)) return;
+
+            if (
+                !isValidTargetDocuments(target) ||
+                !isValidTargetDocuments(source) ||
+                !isDegreeOfSuccessValue(context.outcome)
+            )
+                return;
 
             this.executeEvent("attack-roll-event", {
                 action: (context as { action?: string }).action || "",
                 item: await getItem(origin?.uuid),
                 options: context.options ?? [],
                 origin: source,
-                outcome,
+                outcome: context.outcome,
                 target,
             } satisfies AttackRollOptions);
         } else if (context.type === "damage-taken") {
@@ -91,7 +96,7 @@ type AttackRollOptions = {
     item: ItemPF2e | undefined;
     options: string[];
     origin: TargetDocuments;
-    outcome: ZeroToThree;
+    outcome: DegreeOfSuccessString;
     target: TargetDocuments;
 };
 

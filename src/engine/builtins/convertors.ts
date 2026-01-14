@@ -1,39 +1,39 @@
 import { EntryConvertor } from "engine";
 import { ItemPF2e, UserPF2e, primaryPlayerOwner } from "module-helpers";
 
-export default [
+const builtinsConvertors = [
     {
-        input: "text",
         output: "item",
+        input: "text",
         convertToInput: (value: ItemPF2e): string => {
             return value.uuid;
         },
     },
     {
-        input: "number",
         output: "text",
+        input: "number",
         convertToInput: (value: string): number => {
             return Number(value) || 0;
         },
     },
     {
-        input: "text",
         output: "number",
+        input: "text",
         convertToInput: (value: number): string => {
             return String(value);
         },
     },
     {
-        input: "target",
         output: "user",
+        input: "target",
         convertToInput: (user: UserPF2e): TargetDocuments | undefined => {
             const actor = user.character;
             return actor ? { actor } : undefined;
         },
     },
     {
-        input: "user",
         output: "target",
+        input: "user",
         convertToInput: (target: TargetDocuments, userContext): UserPF2e | undefined => {
             return !userContext.isGM && target.actor.testUserPermission(userContext, "OWNER")
                 ? userContext
@@ -41,3 +41,5 @@ export default [
         },
     },
 ] as const satisfies EntryConvertor[];
+
+export { builtinsConvertors };

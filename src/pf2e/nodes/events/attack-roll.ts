@@ -16,7 +16,7 @@ class AttackRollEvent extends BaseEventNode<never, Outputs> {
             { key: "origin", type: "target" },
             { key: "target", type: "target" },
             { key: "item", type: "item" },
-            { key: "outcome", type: "number" },
+            { key: "outcome", type: "outcome" },
             { key: "item", type: "item" },
             { key: "action", type: "text" },
             { key: "options", type: "text", isArray: true },

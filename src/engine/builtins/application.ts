@@ -24,8 +24,8 @@ import {
     TestEventNode,
     TestHook,
     UserValueNode,
+    builtinsConvertors,
     builtinsEntries,
-    convertors,
 } from ".";
 
 const hooks = [
@@ -74,7 +74,7 @@ class BuiltInApplication {
         return `${this.moduleId}.${this.applicationId}`;
     }
 
-    static convertors = mapConvertors(convertors);
+    static convertors = mapConvertors(builtinsConvertors);
 
     static entries = R.map(builtinsEntries, (entry) => [entry.type, entry] as const);
 
