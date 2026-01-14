@@ -71,6 +71,10 @@ class TextField extends InputField<string, TextFieldSchema> {
         return 16;
     }
 
+    get options(): SelectFieldOption[] {
+        return this.entry.options;
+    }
+
     get isSimpleInput(): boolean {
         return !this.field.type;
     }
@@ -79,15 +83,11 @@ class TextField extends InputField<string, TextFieldSchema> {
         return this.entry.isSelect;
     }
 
-    get options(): SelectFieldOption[] {
-        return this.entry.options;
-    }
-
     get isEnrichedInput(): boolean {
         return this.field.type === "enriched";
     }
 
-    get isJSON(): boolean {
+    get isJSONInput(): boolean {
         return this.field.type === "json";
     }
 
@@ -108,7 +108,7 @@ class TextField extends InputField<string, TextFieldSchema> {
     }
 
     get toDisplay(): string {
-        if (this.isJSON && this.value === this.default) {
+        if (this.isJSONInput && this.value === this.default) {
             return "";
         }
 
@@ -188,7 +188,7 @@ class TextField extends InputField<string, TextFieldSchema> {
     }
 
     createInput(): HTMLInputElement {
-        if (this.field.type === "select" && this.options.length) {
+        if (this.isSelect && this.options.length) {
             const options: SelectFieldOptions = R.map(this.options, (option) => {
                 const group = option.group
                     ? (this.localizeOptionOrGroupValue(option.group) ??
@@ -206,7 +206,7 @@ class TextField extends InputField<string, TextFieldSchema> {
             return new SearchSelectInputElement({ options, value: this.value }) as any;
         }
 
-        if (this.field.type === "enriched") {
+        if (this.isEnrichedInput) {
             return elements.HTMLProseMirrorElement.create({
                 collaborate: false,
                 compact: true,

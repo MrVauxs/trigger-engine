@@ -1,13 +1,18 @@
 import { BaseEntrySchema, BuiltinsInputEntry, BuiltinsOutputEntry } from "engine";
-import { OutcomEntry } from ".";
+import { InputOutcomeEntry, OutcomEntry } from ".";
 
 const pf2eEntries = [OutcomEntry] as const;
 
-type pf2eEntryType = (typeof pf2eEntries)[number]["type"];
+type PF2eEntryType = (typeof pf2eEntries)[number]["type"];
 
-type PF2eOutputEntry = BuiltinsOutputEntry | BaseEntrySchema<pf2eEntryType>;
+type PF2eEntryWithField = InputOutcomeEntry;
 
-type PF2eInputEntry = BuiltinsInputEntry | BaseEntrySchema<pf2eEntryType>;
+type PF2eOutputEntry = BuiltinsOutputEntry | BaseEntrySchema<PF2eEntryType>;
+
+type PF2eInputEntry =
+    | BuiltinsInputEntry
+    | PF2eEntryWithField
+    | BaseEntrySchema<Exclude<PF2eEntryType, PF2eEntryWithField["type"]>>;
 
 export { pf2eEntries };
 export type { PF2eInputEntry, PF2eOutputEntry };
