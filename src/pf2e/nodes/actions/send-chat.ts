@@ -1,6 +1,6 @@
 import { IconObject } from "_zod";
 import { BaseActionNode } from "engine";
-import { ItemPF2e, R, getFirstActiveToken } from "module-helpers";
+import { ItemPF2e, R, getFirstActiveToken, getTargetToken, getTargetsTokensUUIDs } from "module-helpers";
 import { PF2eInputEntry } from "pf2e";
 
 class SendToChatActionNode extends BaseActionNode<"out", Inputs> {
@@ -30,20 +30,14 @@ class SendToChatActionNode extends BaseActionNode<"out", Inputs> {
             return this.executeNext("out");
         }
 
-        const targets = R.pipe(
-            await this.getInputValue("targets"),
-            R.map(({ actor, token }) => {
-                return token?.uuid ?? getFirstActiveToken(actor)?.uuid;
-            }),
-            R.filter(R.isTruthy),
-        );
-
+        const targets = await this.getInputValue("targets");
         const message = await item.toMessage(null, { create: !targets.length });
 
         if (targets.length && message) {
             const source = message.toObject() as ChatMessageCreateData<ChatMessage>;
+            const targetsUUIDs: TokenDocumentUUID[] = getTargetsTokensUUIDs(targets);
 
-            foundry.utils.setProperty(source, "flags.pf2e-toolbelt.targetHelper.targets", targets);
+            foundry.utils.setProperty(source, "flags.pf2e-toolbelt.targetHelper.targets", targetsUUIDs);
             await getDocumentClass("ChatMessage").create(source);
         }
 

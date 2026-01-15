@@ -480,32 +480,20 @@
                         },
                         "title": "Create Item"
                     },
-                    "roll-save": {
-                        "groups": {
-                            "save": "Save Data"
-                        },
+                    "roll-damage": {
                         "inputs": {
-                            "adjustment": {
-                                "title": "Adjustment"
-                            },
-                            "against": {
-                                "title": "Against"
-                            },
-                            "index": {
-                                "title": "Instance Index"
-                            },
-                            "note": {
-                                "title": "Extra Node"
-                            },
-                            "options": {
-                                "title": "Extra Roll Options"
-                            },
-                            "traits": {
-                                "title": "Extra Traits"
+                            "formula": {
+                                "title": "Damage Formula"
                             }
                         },
                         "states": {
-                            "item": "Item Description"
+                            "none": "No Save"
+                        },
+                        "title": "Roll Damage"
+                    },
+                    "roll-save": {
+                        "groups": {
+                            "save": "Save Data"
                         },
                         "title": "Roll Save Check"
                     },
@@ -578,7 +566,12 @@
                         "title": "Turn End"
                     },
                     "turn-start-event": {
-                        "title": "Turn Start"
+                        "title": "Turn Start",
+                        "outputs": {
+                            "round": {
+                                "title": "Round"
+                            }
+                        }
                     }
                 },
                 "logic": {
@@ -591,6 +584,33 @@
                 "hint": "Register you own triggers with the module.",
                 "label": "Register Triggers",
                 "name": "PF2e Triggers Menu"
+            },
+            "shared": {
+                "difficulty-class": {
+                    "adjustment": {
+                        "title": "Adjustment"
+                    },
+                    "against": {
+                        "title": "Against"
+                    },
+                    "index": {
+                        "title": "Instance Index"
+                    }
+                },
+                "roll-data": {
+                    "note": {
+                        "title": "Extra Node"
+                    },
+                    "options": {
+                        "title": "Extra Roll Options"
+                    },
+                    "traits": {
+                        "title": "Extra Traits"
+                    }
+                }
+            },
+            "state": {
+                "item-description": "Item Description"
             },
             "tag": {
                 "attack": {

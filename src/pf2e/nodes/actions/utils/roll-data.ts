@@ -1,15 +1,20 @@
 import { TriggerNode } from "engine";
-import { R, RollNoteSource, getExtraRollOptions, splitListString } from "module-helpers";
+import { R, RollNoteSource, getExtraRollOptions, localizePath, splitListString } from "module-helpers";
 import { PF2eInputEntry } from "pf2e";
+
+function rollLocalizePath(...path: string[]): string {
+    return localizePath("pf2e-trigger.shared.roll-data", ...path);
+}
 
 function rollDataSchemas(): PF2eInputEntry[] {
     return [
-        { key: "options", type: "text", group: "roll" },
-        { key: "traits", type: "text", group: "roll" },
+        { key: "options", type: "text", group: "roll", label: rollLocalizePath("options.title") },
+        { key: "traits", type: "text", group: "roll", label: rollLocalizePath("traits.title") },
         {
             key: "note",
             type: "text",
             group: "roll",
+            label: rollLocalizePath("note.title"),
             field: { type: "enriched" },
         },
     ];
