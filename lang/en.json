@@ -483,7 +483,9 @@
                     },
                     "roll-save": {
                         "groups": {
-                            "dc": "Difficulty Class",
+                            "dc-item": "Difficulty Class (Item)",
+                            "dc-target": "Difficulty Class (Target)",
+                            "dc-value": "Difficulty Class (Value)",
                             "source": "Save Source"
                         },
                         "inputs": {

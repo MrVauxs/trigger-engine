@@ -47,20 +47,22 @@ class RollSaveActionNode extends BaseActionNode<"out", Inputs, Outputs, never, n
             // source
             { key: "origin", type: "target", group: "source" },
             { key: "item", type: "item", group: "source" },
-            // dc
+            // dc-value
             {
                 key: "value",
                 type: "number",
-                group: "dc",
+                group: "dc-value",
                 state: "value",
                 field: { default: 15, min: 0 },
             },
-            { key: "against", type: "text", group: "dc", state: "target" },
-            { key: "adjustment", type: "number", group: "dc", state: "target" },
+            // dc-target
+            { key: "against", type: "text", group: "dc-target", state: "target" },
+            { key: "adjustment", type: "number", group: "dc-target", state: "target" },
+            // dc-item
             {
                 key: "index",
                 type: "number",
-                group: "dc",
+                group: "dc-item",
                 state: "item",
                 field: { default: 1, min: 1 },
             },
