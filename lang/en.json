@@ -482,10 +482,7 @@
                     },
                     "roll-save": {
                         "groups": {
-                            "dc-item": "Difficulty Class (Item)",
-                            "dc-target": "Difficulty Class (Target)",
-                            "dc-value": "Difficulty Class (Value)",
-                            "source": "Save Source"
+                            "save": "Save Data"
                         },
                         "inputs": {
                             "adjustment": {
@@ -506,6 +503,9 @@
                             "traits": {
                                 "title": "Extra Traits"
                             }
+                        },
+                        "states": {
+                            "item": "Item Description"
                         },
                         "title": "Roll Save Check"
                     },
