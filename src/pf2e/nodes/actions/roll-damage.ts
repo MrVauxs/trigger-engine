@@ -32,8 +32,8 @@ class RollDamageActionNode extends BaseActionNode<"out", Inputs, never, never, n
             { key: "origin", type: "target" },
             { key: "item", type: "item" },
             { key: "targets", type: "target", isArray: true },
-            ...dcSchemas("toolbelt"),
             ...rollDataSchemas(),
+            ...dcSchemas("toolbelt"),
             { key: "private", type: "boolean", group: "toolbelt" },
         ];
     }

@@ -625,12 +625,19 @@ class BlueprintNode extends PIXI.Container {
                     return [];
                 }
 
-                return R.pipe(
+                const groups = R.pipe(
                     entries[category].contents,
                     R.groupBy((entry) => entry.group ?? ""),
                     R.entries(),
-                    R.sortBy(([group]) => group),
                 );
+
+                const emptyGroup = groups.findSplice(([group]) => group === "");
+
+                if (emptyGroup) {
+                    groups.unshift(emptyGroup);
+                }
+
+                return groups;
             }),
         );
 
