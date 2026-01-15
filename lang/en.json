@@ -428,6 +428,12 @@
                 "action": {
                     "title": "Action"
                 },
+                "basic": {
+                    "title": "Basic"
+                },
+                "index": {
+                    "title": "Index"
+                },
                 "options": {
                     "title": "Roll Options"
                 },
@@ -437,11 +443,21 @@
                 "outcome": {
                     "title": "Outcome"
                 },
+                "private": {
+                    "title": "Private"
+                },
+                "save": {
+                    "title": "Save Type"
+                },
+                "value": {
+                    "title": "Value"
+                },
                 "when": {
                     "title": "Triggers When?"
                 }
             },
             "group": {
+                "roll": "Roll Data",
                 "toolbelt": "PF2e Toolbelt"
             },
             "node": {
@@ -464,6 +480,30 @@
                             }
                         },
                         "title": "Create Item"
+                    },
+                    "roll-save": {
+                        "groups": {
+                            "dc": "Difficulty Class",
+                            "source": "Save Source"
+                        },
+                        "inputs": {
+                            "adjustment": {
+                                "title": "Adjustment"
+                            },
+                            "against": {
+                                "title": "Against"
+                            },
+                            "note": {
+                                "title": "Extra Node"
+                            },
+                            "options": {
+                                "title": "Extra Roll Options"
+                            },
+                            "traits": {
+                                "title": "Extra Traits"
+                            }
+                        },
+                        "title": "Roll Save Check"
                     },
                     "send-chat": {
                         "title": "Send Item to Chat"
@@ -557,6 +597,9 @@
                 },
                 "damage": {
                     "title": "Damage"
+                },
+                "save": {
+                    "title": "Save"
                 },
                 "turn": {
                     "title": "Turn"
