@@ -20,11 +20,16 @@ import {
 } from "engine";
 import { R, z } from "module-helpers";
 
-function filterSchemasByState<T extends { state?: string }>(
+function filterSchemasByState<T extends { state?: string | string[] }>(
     schemas: T[],
     { state }: { state?: string | null } = {},
 ): T[] {
-    return state ? schemas.filter((schema) => !schema.state || schema.state === state) : schemas;
+    return state
+        ? schemas.filter((schema) => {
+              const schemaStates = R.isString(schema.state) ? [schema.state] : schema.state;
+              return !schemaStates?.length || R.isIncludedIn(state, schemaStates);
+          })
+        : schemas;
 }
 
 function parseSchemas(schemas: (BaseEntrySchemaInput | BridgeSchemaInput)[], parser: z.ZodObject) {

@@ -1,5 +1,7 @@
 import { z, zString } from "module-helpers";
 
+const zEntrySchemaState = z.union([z.string(), z.array(z.string())]).optional();
+
 const zNodeEntrySchema = z.object({
     isArray: z.boolean().default(false),
     key: zString,
@@ -7,7 +9,7 @@ const zNodeEntrySchema = z.object({
     group: zString.optional(),
     slug: zString.optional(),
     spacing: z.number().default(0),
-    state: zString.optional(),
+    state: zEntrySchemaState,
     type: zString,
 });
 
@@ -34,12 +36,12 @@ type InputEntrySchema<TField extends Record<string, any> | undefined = any> = Pr
     }
 >;
 
-export { zNodeInputSchema, zNodeOutputSchema };
+export { zEntrySchemaState, zNodeInputSchema, zNodeOutputSchema };
 export type {
     BaseEntrySchemaInput,
     BaseEntrySchemaOutput,
-    InputEntrySchemaSource,
     InputEntrySchema,
-    OutputEntrySchemaSource,
+    InputEntrySchemaSource,
     OutputEntrySchema,
+    OutputEntrySchemaSource,
 };
