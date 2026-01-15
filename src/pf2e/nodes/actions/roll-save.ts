@@ -2,20 +2,24 @@ import { IconObject } from "_zod";
 import { BaseActionNode } from "engine";
 import {
     ActorPF2e,
-    CheckDC,
     ItemPF2e,
-    ModifierPF2e,
     R,
     SaveType,
     Statistic,
     StatisticRollParameters,
     ZeroToThree,
-    extractModifierAdjustments,
-    getExtraRollOptions,
     parseInlineParams,
     splitListString,
 } from "module-helpers";
-import { PF2eInputEntry, PF2eOutputEntry } from "pf2e";
+import {
+    PF2eInputEntry,
+    PF2eOutputEntry,
+    RollDataInputs,
+    getRollData,
+    getTargetDC,
+    getValueDC,
+    rollDataSchemas,
+} from "pf2e";
 
 class RollSaveActionNode extends BaseActionNode<"out", Inputs, Outputs, never, never, "value" | "target" | "item"> {
     static get type(): "roll-save" {
@@ -69,14 +73,7 @@ class RollSaveActionNode extends BaseActionNode<"out", Inputs, Outputs, never, n
                 field: { default: 1, min: 1 },
             },
             // roll data
-            { key: "options", type: "text", group: "roll" },
-            { key: "traits", type: "text", group: "roll" },
-            {
-                key: "note",
-                type: "text",
-                group: "roll",
-                field: { type: "enriched" },
-            },
+            ...rollDataSchemas(),
         ];
     }
 
@@ -99,17 +96,17 @@ class RollSaveActionNode extends BaseActionNode<"out", Inputs, Outputs, never, n
         const origin = (await this.getInputValue("origin"))?.actor;
         const isPrivate = await this.getInputValue("private");
         const rollOptions = item?.isOfType("action", "feat") ? [`target:action:slug:${item.slug}`] : undefined;
-        const options = splitListString(await this.getInputValue("options"));
-        const traits = splitListString(await this.getInputValue("traits"));
+        // const options = splitListString(await this.getInputValue("options"));
+        // const traits = splitListString(await this.getInputValue("traits"));
 
         const fortitude = target.actor.saves?.fortitude ?? origin?.saves?.fortitude;
         const StatisticCls = fortitude?.constructor as typeof Statistic | undefined;
 
-        const note = (await this.getInputValue("note"))
-            .replace(/\n/gm, "")
-            .replace(/<p>/gm, "")
-            .replace(/<\/p>/gm, " ")
-            .trim();
+        // const note = (await this.getInputValue("note"))
+        //     .replace(/\n/gm, "")
+        //     .replace(/<p>/gm, "")
+        //     .replace(/<\/p>/gm, " ")
+        //     .trim();
 
         const rollArgs: StatisticRollParameters = {
             dc: { value: 0, scope: "check" },
@@ -117,11 +114,12 @@ class RollSaveActionNode extends BaseActionNode<"out", Inputs, Outputs, never, n
             item: item as ItemPF2e<ActorPF2e>,
             rollMode: isPrivate ? "blindroll" : "publicroll",
             skipDialog: true,
-            extraRollNotes: note ? [{ text: note, selector: "all" }] : [],
         };
 
         let isBasic: boolean = false;
         let statistic: Statistic | null = null;
+        let extraOptions: string[] = [];
+        let extraTraits: string[] = [];
 
         state: if (this.state === "item") {
             if (!item) break state;
@@ -162,15 +160,12 @@ class RollSaveActionNode extends BaseActionNode<"out", Inputs, Outputs, never, n
                 rollArgs.dc = dc ?? { value, scope: "check" };
             }
 
-            const extraOptions = splitListString(rawParams.options ?? "");
-            const extraTraits = splitListString(rawParams.traits ?? "");
+            extraOptions = splitListString(rawParams.options ?? "");
+            extraTraits = splitListString(rawParams.traits ?? "");
 
             if (rawParams.overrideTraits && rawParams.overrideTraits?.trim()?.toLowerCase() !== "true") {
                 extraTraits.push(...splitListString(rawParams.overrideTraits));
             }
-
-            options.push(...extraOptions);
-            traits.push(...extraTraits);
         } else {
             const save = await this.getInputValue("save");
             statistic = target.actor.getStatistic(save);
@@ -197,10 +192,10 @@ class RollSaveActionNode extends BaseActionNode<"out", Inputs, Outputs, never, n
             return this.executeNext("out");
         }
 
-        rollArgs.extraRollOptions = getExtraRollOptions(
-            { options: R.unique(options), traits: R.unique(traits) },
-            isBasic,
-        );
+        const rollData = await getRollData.call(this, { extraOptions, extraTraits, isBasic });
+
+        rollArgs.extraRollNotes = rollData.extraRollNotes;
+        rollArgs.extraRollOptions = rollData.extraRollOptions;
 
         const rolled = await statistic.roll(rollArgs);
 
@@ -210,89 +205,16 @@ class RollSaveActionNode extends BaseActionNode<"out", Inputs, Outputs, never, n
     }
 }
 
-function getValueDC(
-    StatisticCls: typeof Statistic | undefined,
-    origin: ActorPF2e | undefined,
-    item: ItemPF2e | undefined,
-    rollOptions: string[] | undefined,
-    value: number,
-): CheckDC | undefined {
-    if (!origin || !StatisticCls) return;
-
-    const domains = ["saving-throw", "all"];
-
-    const modifiers = [
-        new game.pf2e.Modifier({
-            slug: "base",
-            label: "PF2E.ModifierTitle",
-            modifier: value - 10,
-            adjustments: extractModifierAdjustments(origin.synthetics.modifierAdjustments, domains, "base"),
-        }),
-    ];
-
-    const statistic = new StatisticCls(origin, {
-        slug: "fake",
-        label: game.i18n.localize("PF2E.SavingThrow"),
-        domains,
-        modifiers,
-        rollOptions,
-        check: {
-            type: "saving-throw",
-        },
-    });
-
-    return {
-        label: item ? game.i18n.format("PF2E.InlineCheck.DCWithName", { name: item.name }) : undefined,
-        scope: "check",
-        statistic: statistic.dc,
-        value: statistic.dc.value,
-    };
-}
-
-function getTargetDC(
-    origin: ActorPF2e | undefined,
-    rollOptions: string[] | undefined,
-    against: string,
-    adjustment: number,
-): CheckDC | undefined {
-    const statistic = origin?.getStatistic(against);
-    if (!statistic) return;
-
-    const modifiers: ModifierPF2e[] = [];
-
-    if (adjustment !== 0) {
-        modifiers.push(
-            new game.pf2e.Modifier({
-                label: "PF2E.InlineCheck.DCAdjustment",
-                modifier: adjustment,
-            }),
-        );
-    }
-
-    const defenseStat = statistic.clone({ modifiers, rollOptions });
-    const label = defenseStat.dc.label ?? game.i18n.format("PF2E.InlineCheck.DCWithName", { name: defenseStat.label });
-
-    return {
-        label,
-        scope: "check",
-        statistic: defenseStat.dc,
-        value: defenseStat.dc.value,
-    };
-}
-
-type Inputs = {
+type Inputs = RollDataInputs & {
     adjustment: number;
     against: string;
     basic: boolean;
     index: number;
     item?: ItemPF2e;
-    note: string;
-    options: string;
     origin?: TargetDocuments;
     private: boolean;
     save: SaveType;
     target?: TargetDocuments;
-    traits: string;
     value: number;
 };
 
