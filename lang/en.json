@@ -114,7 +114,8 @@
                 }
             },
             "convertor": {
-                "user-target": "Retrieve the assigned actor"
+                "user-target": "Retrieve the assigned actor",
+                "item-target": "Retrieve the parent actor"
             },
             "entry": {
                 "a": {
@@ -431,9 +432,7 @@
                 "basic": {
                     "title": "Basic"
                 },
-                "index": {
-                    "title": "Index"
-                },
+
                 "options": {
                     "title": "Roll Options"
                 },
@@ -494,6 +493,9 @@
                             },
                             "against": {
                                 "title": "Against"
+                            },
+                            "index": {
+                                "title": "Instance Index"
                             },
                             "note": {
                                 "title": "Extra Node"
