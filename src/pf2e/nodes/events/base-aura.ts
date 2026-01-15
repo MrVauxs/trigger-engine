@@ -70,8 +70,10 @@ abstract class BaseAuraEvent extends BaseEventNode<Inputs, Outputs> {
 
     async _execute({ aura, target }: AuraEventOptions): Promise<boolean> {
         const actor = target.actor;
-        if (aura.origin.actor.uuid === actor.uuid || aura.data.slug !== (await this.getInputValue("slug")))
+
+        if (aura.origin.actor.uuid === actor.uuid || aura.data.slug !== (await this.getInputValue("slug"))) {
             return false;
+        }
 
         const when = await this.getInputValue("when");
         if ((when === "combat" && !actor.combatant) || (when === "turn" && !isCurrentCombatant(actor))) return false;
@@ -88,8 +90,8 @@ abstract class BaseAuraEvent extends BaseEventNode<Inputs, Outputs> {
 }
 
 type Inputs = {
-    slug: string;
     affects: "all" | "allies" | "enemies";
+    slug: string;
     when: "always" | "combat" | "turn";
 };
 

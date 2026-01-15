@@ -505,6 +505,9 @@
                     "has-item": {
                         "inputs": {},
                         "title": "Has Item"
+                    },
+                    "inside-aura": {
+                        "title": "Is Inside Aura"
                     }
                 },
                 "event": {

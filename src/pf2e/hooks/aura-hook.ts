@@ -247,5 +247,5 @@ type AuraEventOptions = {
     target: TargetDocuments;
 };
 
-export { AuraHook };
+export { AuraHook, getAurasInMemory };
 export type { AuraEventOptions };

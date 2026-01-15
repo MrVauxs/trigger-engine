@@ -2,7 +2,7 @@ import { PF2eInputEntry, PF2eOutputEntry } from "pf2e";
 import { BaseConditionNode } from ".";
 import { ItemPF2e, findItemWithSlug, findItemWithSourceId } from "module-helpers";
 
-class HasItemNode extends BaseConditionNode<Inputs, { item?: ItemPF2e }, never, never, "uuid" | "slug"> {
+class HasItemConditionNode extends BaseConditionNode<Inputs, { item?: ItemPF2e }, never, never, "uuid" | "slug"> {
     static get type(): "has-item" {
         return "has-item";
     }
@@ -54,4 +54,4 @@ type Inputs = {
     uuid: string;
 };
 
-export { HasItemNode };
+export { HasItemConditionNode };
