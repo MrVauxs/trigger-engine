@@ -249,6 +249,9 @@
                     }
                 },
                 "logic": {
+                    "break-loop": {
+                        "title": "Break Current Loop"
+                    },
                     "compare-numbers": {
                         "inputs": {
                             "compare": {
@@ -310,6 +313,9 @@
                 },
                 "dialog": {
                     "title": "Dialog"
+                },
+                "loop": {
+                    "title": "Loop"
                 },
                 "macro": {
                     "title": "Macro"

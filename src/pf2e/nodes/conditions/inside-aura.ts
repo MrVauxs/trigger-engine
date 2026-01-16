@@ -8,7 +8,7 @@ class InsideAuraConditionNode extends BaseConditionNode<Inputs, { source: Target
     }
 
     static get tags(): string[] {
-        return ["aura"];
+        return ["aura", "loop"];
     }
 
     static get defineInputs(): PF2eInputEntry[] {

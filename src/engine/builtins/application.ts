@@ -2,6 +2,7 @@ import { mapConvertors } from "engine";
 import { MODULE, R } from "module-helpers";
 import {
     AwaitConfirmActionNode,
+    BreakLoopLogicNode,
     CompareNumbersLogicNode,
     ConsoleLogActionNode,
     CreateCombatantEvent,
@@ -41,6 +42,7 @@ const hooks = [
 
 const nodes = [
     AwaitConfirmActionNode,
+    BreakLoopLogicNode,
     CompareNumbersLogicNode,
     ConsoleLogActionNode,
     CreateCombatantEvent,
