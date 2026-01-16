@@ -186,6 +186,10 @@ class BlueprintNode extends PIXI.Container {
         return (this.#node.constructor as typeof TriggerNode).inputsHaveConnector;
     }
 
+    get inputsHaveField(): boolean {
+        return (this.#node.constructor as typeof TriggerNode).inputsHaveField;
+    }
+
     get fontSize(): number {
         return 15;
     }

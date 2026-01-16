@@ -16,6 +16,10 @@ abstract class BaseSplitterNode<
         return null;
     }
 
+    static get inputsHaveField(): boolean {
+        return false;
+    }
+
     get headerColor(): ColorSource {
         return "#853667";
     }

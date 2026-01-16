@@ -6,6 +6,7 @@ import {
     CustomOutSchema,
     EmitableUserValue,
     InputEntrySchemaSource,
+    NodeEntry,
     NodeField,
     OutputEntrySchemaSource,
     TriggerPath,
@@ -78,6 +79,16 @@ class TriggerNode<
      * This can only be used in conjunction with entries with a field.
      */
     static get inputsHaveConnector(): boolean {
+        return true;
+    }
+
+    /**
+     * Some nodes may want to only have connection inputs.
+     *
+     * This won't prevent the initialization of {@link NodeEntry.FieldClass}
+     * and {@link NodeEntry#field} as well as {@link NodeField#field} will remain accessible.
+     */
+    static get inputsHaveField(): boolean {
         return true;
     }
 

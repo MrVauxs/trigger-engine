@@ -140,7 +140,7 @@ class BlueprintEntry extends BaseBlueprintEntry {
     }
 
     _drawField(label: PreciseText): PIXI.Graphics | null {
-        if (!this.isInput || this.isArray) return null;
+        if (!this.isInput || this.isArray || !this.node.inputsHaveField) return null;
 
         const entry = this.#entry;
         const FieldCls = this.FieldCls;
