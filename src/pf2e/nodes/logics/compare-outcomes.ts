@@ -1,8 +1,8 @@
-import { BaseLogicNode, BridgeSchemaInput, CompareEntry, CompareNumbersNode } from "engine";
+import { BaseLogicNode, BridgeSchemaInput, CompareEntry, CompareNumbersLogicNode } from "engine";
 import { DegreeOfSuccessString, degreeOfSuccessNumber } from "module-helpers";
 import { PF2eInputEntry } from "pf2e";
 
-abstract class CompareOutcomesNode extends BaseLogicNode<"true" | "false", Inputs> {
+abstract class CompareOutcomesLogicNode extends BaseLogicNode<"true" | "false", Inputs> {
     static get type(): "compare-outcomes" {
         return "compare-outcomes";
     }
@@ -16,7 +16,7 @@ abstract class CompareOutcomesNode extends BaseLogicNode<"true" | "false", Input
     }
 
     static get defineInputs(): PF2eInputEntry[] {
-        return [{ key: "a", type: "outcome" }, CompareNumbersNode.defineInputs[1], { key: "b", type: "outcome" }];
+        return [{ key: "a", type: "outcome" }, CompareNumbersLogicNode.defineInputs[1], { key: "b", type: "outcome" }];
     }
 
     async _execute(): Promise<boolean> {
@@ -27,7 +27,7 @@ abstract class CompareOutcomesNode extends BaseLogicNode<"true" | "false", Input
         const numberA = degreeOfSuccessNumber(entryA)!;
         const numberB = degreeOfSuccessNumber(entryB)!;
 
-        const result = CompareNumbersNode.compareNumbers(numberA, numberB, compare);
+        const result = CompareNumbersLogicNode.compareNumbers(numberA, numberB, compare);
 
         return this.executeNext(result ? "true" : "false");
     }
@@ -39,4 +39,4 @@ type Inputs = {
     compare: CompareEntry;
 };
 
-export { CompareOutcomesNode };
+export { CompareOutcomesLogicNode };

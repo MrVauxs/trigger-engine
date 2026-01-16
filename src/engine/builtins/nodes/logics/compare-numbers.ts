@@ -3,7 +3,7 @@ import { localizePath } from "module-helpers";
 
 const COMPARE_ENTRIES = ["eq", "gt", "gte", "lt", "lte"] as const;
 
-abstract class CompareNumbersNode extends BaseLogicNode<"true" | "false", Inputs> {
+abstract class CompareNumbersLogicNode extends BaseLogicNode<"true" | "false", Inputs> {
     static #compareOptions: SelectOptions;
 
     static get type(): "compare-numbers" {
@@ -35,7 +35,7 @@ abstract class CompareNumbersNode extends BaseLogicNode<"true" | "false", Inputs
                 type: "text",
                 field: {
                     type: "select",
-                    options: CompareNumbersNode.compareOptions,
+                    options: CompareNumbersLogicNode.compareOptions,
                     connector: false,
                     tooltip: false,
                     width: 162,
@@ -66,7 +66,7 @@ abstract class CompareNumbersNode extends BaseLogicNode<"true" | "false", Inputs
         const entryA = await this.getInputValue("a");
         const entryB = await this.getInputValue("b");
         const compare = await this.getInputValue("compare");
-        const result = CompareNumbersNode.compareNumbers(entryA, entryB, compare);
+        const result = CompareNumbersLogicNode.compareNumbers(entryA, entryB, compare);
 
         return this.executeNext(result ? "true" : "false");
     }
@@ -80,5 +80,5 @@ type Inputs = {
 
 type CompareEntry = (typeof COMPARE_ENTRIES)[number];
 
-export { CompareNumbersNode };
+export { CompareNumbersLogicNode };
 export type { CompareEntry };
