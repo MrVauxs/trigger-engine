@@ -1,4 +1,5 @@
 import {
+    BaseEntry,
     ConnectionId,
     EntryCategory,
     EntryId,
@@ -7,9 +8,9 @@ import {
     OpenTrigger,
     PreciseEntryCategory,
 } from "engine";
-import { confirmDialog, localizePath, R } from "module-helpers";
+import { confirmDialog, localize, localizePath, R, waitDialog } from "module-helpers";
 import { Blueprint } from "triggers-menu";
-import { alignHorizontally, BlueprintNode } from "..";
+import { alignHorizontally, BlueprintNode, CustomEntryDialogData } from "..";
 
 abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
     #category: EntryCategory;
@@ -33,6 +34,7 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
     abstract get isConnectionInitiator(): boolean;
     abstract get key(): string;
     abstract get label(): string;
+    abstract get schema(): BaseEntry;
 
     get id(): EntryId {
         return `${this.node.id}:${this.preciseCategory}:${this.key}`;
@@ -229,6 +231,8 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
     }
 
     _contextMenuOptions(): ContextMenuEntry[] {
+        const isCustom = this.isCustom && !isGateEntryNode(this.node);
+
         return [
             {
                 name: localizePath("blueprint.entry.disconnect"),
@@ -239,15 +243,86 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
                 },
             },
             {
+                name: localizePath("blueprint.entry.edit.label"),
+                icon: `<i class="fa-solid fa-pen-to-square"></i>`,
+                condition: isCustom,
+                callback: () => {
+                    return this.#edit();
+                },
+            },
+            {
                 name: localizePath("blueprint.entry.remove.title"),
                 icon: `<i class="fa-solid fa-trash fa-fw"></i>`,
-                condition: this.isCustom && !isGateEntryNode(this.node),
+                condition: isCustom,
                 callback: async () => {
                     const confirm = await confirmDialog("blueprint.entry.remove");
                     return confirm && this.remove();
                 },
             },
         ];
+    }
+
+    async #edit() {
+        const { input, slug, label } = this.schema;
+        const category = this.preciseCategory;
+        if (category === "ins" || R.isNullish(slug)) return;
+
+        const node = this.node;
+        const definedSchema = node.getCustomCategorySchemas(category).find((schema) => schema.slug === slug);
+        if (!definedSchema) return;
+
+        const title = node.customEntryLabel(category, definedSchema);
+
+        const dialogInput: CustomEntryDialogData["input"] = definedSchema.input &&
+            R.isNonNullish(input) && {
+                label: node.customEntryInputLabel(category, definedSchema),
+                placeholder: String(input),
+                type: definedSchema.input.isNumber ? "number" : "text",
+                value: input,
+            };
+
+        const dialogLabel: CustomEntryDialogData["label"] = !definedSchema.input?.replaceLabel &&
+            R.isNonNullish(label) && {
+                value: label,
+                placeholder: label,
+            };
+
+        const dialogData: Pick<CustomEntryDialogData, "label" | "input"> = {
+            input: dialogInput,
+            label: dialogLabel,
+        };
+
+        const result = await waitDialog<{ label?: string; input?: string }>({
+            content: "edit-entry",
+            data: dialogData,
+            i18n: "edit-entry",
+            title: localize("blueprint.entry.edit.title", { label: title }),
+            yes: {
+                label: localize("edit-entry.yes.edit"),
+            },
+        });
+
+        if (!result) return;
+
+        const update: { label?: string; input?: string } = {};
+
+        if (result.label) {
+            update.label = result.label;
+        }
+
+        if (result.input) {
+            update.input = result.input;
+        }
+
+        node.data.update({
+            custom: {
+                [category]: {
+                    [this.key]: update,
+                },
+            },
+        });
+
+        node.refresh();
     }
 
     #clear() {

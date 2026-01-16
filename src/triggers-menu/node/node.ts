@@ -78,6 +78,12 @@ class BlueprintNode extends PIXI.Container {
 
     static SELECTED_COLOR: ColorSource = 0xff9829;
 
+    static customCategoryParsers = {
+        outs: ["defineCustomOuts", zCustomOutSchema],
+        inputs: ["defineCustomInputs", zCustomInputSchema],
+        outputs: ["defineCustomOutputs", zCustomOutputSchema],
+    } as const;
+
     constructor(node: OpenTriggerNode) {
         super();
 
@@ -608,6 +614,15 @@ class BlueprintNode extends PIXI.Container {
         return new foundry.canvas.containers.PreciseText(text, style);
     }
 
+    getCustomCategorySchemas(category: EntryCategory | "outs"): BaseCustomSchema[] {
+        const [method, parser] = BlueprintNode.customCategoryParsers[category];
+        return R.pipe(
+            (this.#node.constructor as typeof TriggerNode)[method] ?? [],
+            R.map((schema) => parser.safeParse(schema)?.data),
+            R.filter(R.isTruthy),
+        );
+    }
+
     #drawBorder() {
         const border = this.#border;
         if (!border) return;
@@ -969,6 +984,30 @@ class BlueprintNode extends PIXI.Container {
         });
     }
 
+    customEntryLocalize(
+        label: string | undefined,
+        category: EntryCategory | "outs",
+        schema: BaseCustomSchema,
+        ...path: string[]
+    ): string | undefined {
+        return label ? game.i18n.localize(label) : this.localize("customs", category, schema.slug, ...path);
+    }
+
+    customEntryLabel(category: EntryCategory | "outs", schema: BaseCustomSchema): string {
+        return (
+            this.customEntryLocalize(schema.label, category, schema, "label") ??
+            localizeIfExist("node", schema.slug) ??
+            schema.slug
+        );
+    }
+
+    customEntryInputLabel(category: EntryCategory | "outs", schema: BaseCustomSchema) {
+        return (
+            this.customEntryLocalize(schema.input?.label, category, schema, "input.label") ??
+            localize("edit-entry.input")
+        );
+    }
+
     #switchState(state: string) {
         // we delete the variable
         const outputs = this.outputs.filter((entry) => entry.schema.state === this.#node.state);
@@ -999,38 +1038,16 @@ class BlueprintNode extends PIXI.Container {
         });
     }
 
-    #customEntryLocalize(
-        label: string | undefined,
-        category: EntryCategory | "outs",
-        schema: BaseCustomSchema,
-        ...path: string[]
-    ): string | undefined {
-        return label ? game.i18n.localize(label) : this.localize("customs", category, schema.slug, ...path);
-    }
-
-    #customEntryLabel(category: EntryCategory | "outs", schema: BaseCustomSchema): string {
-        return (
-            this.#customEntryLocalize(schema.label, category, schema, "label") ??
-            localizeIfExist("node", schema.slug) ??
-            schema.slug
-        );
-    }
-
     async #addCustomEntry(category: EntryCategory | "outs", schema: BaseCustomSchema) {
-        const isEdit = false;
-
-        const title = this.#customEntryLabel(category, schema);
-
+        const title = this.customEntryLabel(category, schema);
         const label: CustomEntryDialogData["label"] = !schema.input?.replaceLabel && {
             value: "",
             placeholder: "",
         };
 
         const input: CustomEntryDialogData["input"] = schema.input && {
-            label:
-                this.#customEntryLocalize(schema.input.label, category, schema, "input.label") ??
-                localize("edit-entry.input"),
-            placeholder: this.#customEntryLocalize(schema.input.placeholder, category, schema, "input.placeholder"),
+            label: this.customEntryInputLabel(category, schema),
+            placeholder: this.customEntryLocalize(schema.input.placeholder, category, schema, "input.placeholder"),
             type: schema.input.isNumber ? "number" : "text",
             value: schema.input.isNumber ? 0 : "",
         };
@@ -1082,9 +1099,9 @@ class BlueprintNode extends PIXI.Container {
                     labelInput.placeholder = el.selectedOptions[0].innerText;
                 });
             },
-            title: localize("blueprint.entry", isEdit ? "edit" : "add", "title", { label: title }),
+            title: localize("blueprint.entry.add.title", { label: title }),
             yes: {
-                label: localize("edit-entry.yes", isEdit ? "edit" : "add"),
+                label: localize("edit-entry.yes.add"),
             },
         });
 
@@ -1169,21 +1186,11 @@ class BlueprintNode extends PIXI.Container {
 
         // custom entries
         if (!locked && !isGateEntryNode(this)) {
-            const categories = [
-                ["outs", "defineCustomOuts", zCustomOutSchema],
-                ["inputs", "defineCustomInputs", zCustomInputSchema],
-                ["outputs", "defineCustomOutputs", zCustomOutputSchema],
-            ] as const;
-
-            for (const [category, method, parser] of categories) {
-                const schemas = R.pipe(
-                    (this.#node.constructor as typeof TriggerNode)[method] ?? [],
-                    R.map((schema) => parser.safeParse(schema)?.data),
-                    R.filter(R.isTruthy),
-                );
+            for (const category of R.keys(BlueprintNode.customCategoryParsers)) {
+                const schemas = this.getCustomCategorySchemas(category);
 
                 for (const schema of schemas) {
-                    const label = this.#customEntryLabel(category, schema);
+                    const label = this.customEntryLabel(category, schema);
 
                     entries.push({
                         name: localize("blueprint.entry.add.title", { label }),
@@ -1262,12 +1269,12 @@ type PreciseTextOptions = Partial<PIXI.ITextStyle> & {
 
 type CustomEntryDialogData = {
     array?: { value: boolean };
-    input?: {
+    input?: MaybeFalsy<{
         label: string;
         placeholder: string | undefined;
         type: "number" | "text";
         value: number | string;
-    };
+    }>;
     label: { placeholder: string | undefined; value: string } | false;
     type: string | undefined;
     types?: RequiredSelectOptions;
