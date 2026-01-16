@@ -1,5 +1,4 @@
-import { BridgeSchemaInput } from "engine";
-import { PF2eInputEntry } from "pf2e";
+import { BridgeSchemaInput, BuiltinsInputEntry } from "engine";
 import { BaseSplitterNode } from ".";
 
 abstract class BooleanSplitterNode extends BaseSplitterNode<"true" | "false", { input: boolean }> {
@@ -15,7 +14,7 @@ abstract class BooleanSplitterNode extends BaseSplitterNode<"true" | "false", { 
         return [{ key: "true" }, { key: "false" }];
     }
 
-    static get defineInputs(): PF2eInputEntry[] {
+    static get defineInputs(): BuiltinsInputEntry[] {
         return [{ key: "input", type: "boolean" }];
     }
 

@@ -273,6 +273,9 @@
                 "splitter": {
                     "split-boolean": {
                         "title": "Split Boolean"
+                    },
+                    "split-number": {
+                        "title": "Split Number"
                     }
                 },
                 "value": {
@@ -347,6 +350,7 @@
         },
         "edit-entry": {
             "array": "Is Array?",
+            "input": "Input",
             "label": "Label",
             "required": "The field <strong>{name}</strong> is required.",
             "types": "Types",
