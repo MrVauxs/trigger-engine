@@ -1,5 +1,5 @@
 import {
-    BaseEntrySchemaInput,
+    BaseEntrySchemaOutput,
     ConnectionId,
     instantiateField,
     isVariableGetterNode,
@@ -29,7 +29,7 @@ class BlueprintEntry extends BaseBlueprintEntry {
         return this.#entry.key;
     }
 
-    get schema(): BaseEntrySchemaInput {
+    get schema(): BaseEntrySchemaOutput {
         return this.#entry.schema;
     }
 

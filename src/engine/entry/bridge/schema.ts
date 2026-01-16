@@ -1,14 +1,7 @@
-import { z, zString } from "module-helpers";
-import { zCustomInputValue, zEntrySchemaState } from "..";
+import { z } from "module-helpers";
+import { zBaseEntry } from "..";
 
-const zNodeBridgeSchema = z.object({
-    input: zCustomInputValue,
-    key: zString,
-    label: zString.optional(),
-    slug: zString.optional(),
-    spacing: z.number().default(0),
-    state: zEntrySchemaState,
-});
+const zNodeBridgeSchema = zBaseEntry;
 
 type BridgeSchemaInput<K extends string = string> = Prettify<
     Omit<z.input<typeof zNodeBridgeSchema>, "key"> & { key: K }

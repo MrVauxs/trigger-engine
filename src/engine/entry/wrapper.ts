@@ -1,5 +1,6 @@
 import {
     BaseEntrySchemaInput,
+    BaseEntrySchemaOutput,
     NodeData,
     NodeEntry,
     NodeField,
@@ -176,7 +177,7 @@ function instantiateEntry(
 }
 
 interface OpenNodeEntry extends NodeEntry {
-    get schema(): BaseEntrySchemaInput;
+    get schema(): BaseEntrySchemaOutput;
 }
 
 export { instantiateEntry };

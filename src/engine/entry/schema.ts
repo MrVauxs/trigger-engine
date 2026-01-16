@@ -1,15 +1,20 @@
 import { z, zString } from "module-helpers";
+import { zCustomInputValue } from ".";
 
 const zEntrySchemaState = z.union([z.string(), z.array(z.string())]).optional();
 
-const zNodeEntrySchema = z.object({
-    isArray: z.boolean().default(false),
+const zBaseEntry = z.object({
+    input: zCustomInputValue,
     key: zString,
     label: zString.optional(),
-    group: zString.optional(),
     slug: zString.optional(),
     spacing: z.number().default(0),
     state: zEntrySchemaState,
+});
+
+const zNodeEntrySchema = zBaseEntry.extend({
+    group: zString.optional(),
+    isArray: z.boolean().default(false),
     type: zString,
 });
 
@@ -18,6 +23,8 @@ const zNodeOutputSchema = zNodeEntrySchema;
 const zNodeInputSchema = zNodeEntrySchema.extend({
     field: z.record(zString, z.any()).optional(),
 });
+
+type BaseEntry = z.output<typeof zBaseEntry>;
 
 type BaseEntrySchemaInput = z.input<typeof zNodeEntrySchema>;
 type BaseEntrySchemaOutput = z.output<typeof zNodeEntrySchema>;
@@ -36,8 +43,9 @@ type InputEntrySchema<TField extends Record<string, any> | undefined = any> = Pr
     }
 >;
 
-export { zEntrySchemaState, zNodeInputSchema, zNodeOutputSchema };
+export { zBaseEntry, zEntrySchemaState, zNodeInputSchema, zNodeOutputSchema };
 export type {
+    BaseEntry,
     BaseEntrySchemaInput,
     BaseEntrySchemaOutput,
     InputEntrySchema,

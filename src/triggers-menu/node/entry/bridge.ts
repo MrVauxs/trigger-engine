@@ -1,4 +1,4 @@
-import { ConnectionId, NodeBridge, PreciseEntryCategory } from "engine";
+import { BridgeSchemaOutput, ConnectionId, NodeBridge, PreciseEntryCategory } from "engine";
 import { localize, localizeIfExist } from "module-helpers";
 import { BaseBlueprintEntry, EntryCategory } from ".";
 import { BlueprintNode } from "..";
@@ -30,6 +30,10 @@ class BlueprintBridgeEntry extends BaseBlueprintEntry {
 
     get key(): string {
         return this.#data.key;
+    }
+
+    get schema(): BridgeSchemaOutput {
+        return this.#data.schema;
     }
 
     get customSlug(): string | undefined {
