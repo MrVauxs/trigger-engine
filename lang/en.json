@@ -287,6 +287,8 @@
             },
             "special": {
                 "custom": "Has Custom Entries",
+                "emit": "Awaits User Input",
+                "loop": "Can Loop Over",
                 "state": "Has Multiple States"
             },
             "state": {

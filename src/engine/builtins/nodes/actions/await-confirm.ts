@@ -66,6 +66,10 @@ class AwaitConfirmActionNode extends BaseActionNode<
         };
     }
 
+    get isEmit(): boolean {
+        return true;
+    }
+
     async _execute(): Promise<boolean> {
         const content = this.state === "description" ? await this.getInputValue("content") : undefined;
         const key = this.state === "localization" ? await this.getInputValue("localization") : undefined;

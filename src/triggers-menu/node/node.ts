@@ -158,6 +158,14 @@ class BlueprintNode extends PIXI.Container {
         });
     }
 
+    get isEmit(): boolean {
+        return this.#node.isEmit;
+    }
+
+    get isLoop(): boolean {
+        return this.#node.isLoop;
+    }
+
     get hasMultipleStates() {
         return !!this.#node.states?.length;
     }
@@ -768,7 +776,7 @@ class BlueprintNode extends PIXI.Container {
     #createSpecials(): PIXI.Container<PIXI.Graphics> | undefined {
         const headerColor = zNodeHeaderBackground.parse(this.#node.headerColor);
 
-        const specials = R.pipe(
+        const specials: { icon: IconObject; name?: string }[] = R.pipe(
             this.#node.specialIcons ?? [],
             R.map(({ icon, name }) => {
                 const parsed = zIconObj.safeParse(icon)?.data;
@@ -782,18 +790,16 @@ class BlueprintNode extends PIXI.Container {
             R.filter(R.isTruthy),
         );
 
-        if (this.isCustom) {
-            specials.push({
-                icon: { fontMult: 1, fontWeight: "900", unicode: "\uf013" },
-                name: "custom",
-            });
-        }
+        const builtinsSpecials: [boolean, string, IconObject | string][] = [
+            [this.hasMultipleStates, "state", "\uf364"],
+            [this.isCustom, "custom", "\uf013"],
+            [this.isEmit, "emit", "\uf1eb"],
+            [this.isLoop, "loop", "\uf0e2"],
+        ] as const;
 
-        if (this.hasMultipleStates) {
-            specials.push({
-                icon: { fontMult: 1, fontWeight: "900", unicode: "\uf364" },
-                name: "state",
-            });
+        for (const [condition, name, icon] of builtinsSpecials) {
+            if (!condition) continue;
+            specials.push({ icon: R.isString(icon) ? { unicode: icon } : icon, name });
         }
 
         if (!specials.length) return;
@@ -802,8 +808,8 @@ class BlueprintNode extends PIXI.Container {
 
         const elements = R.map(specials, ({ icon: { unicode, fontMult, fontWeight }, name }) => {
             const icon = this.fontAwesomeIcon({
-                fontMult: fontMult * 0.86,
-                fontWeight,
+                fontMult: (fontMult ?? 1) * 0.86,
+                fontWeight: fontWeight ?? "900",
                 unicode,
             });
 

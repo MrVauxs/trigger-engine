@@ -158,6 +158,16 @@ class TriggerNode<
         return null;
     }
 
+    /** Used to display a special icon. */
+    get isEmit(): boolean {
+        return false;
+    }
+
+    /** Used to display a special icon. */
+    get isLoop(): boolean {
+        return false;
+    }
+
     /**
      * Icons added to the node to indicate some special features the node contains at first glance.
      * They will be added next to the already existing ones (e.g. `custom`)

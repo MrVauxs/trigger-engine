@@ -19,6 +19,10 @@ class InsideAuraConditionNode extends BaseConditionNode<Inputs, { source: Target
         return [BaseAuraEvent.defineOutputs[1]];
     }
 
+    get isLoop(): boolean {
+        return true;
+    }
+
     async _execute(): Promise<boolean> {
         const target = (await this.getInputValue("target"))?.actor;
         const slug = await this.getInputValue("slug");
