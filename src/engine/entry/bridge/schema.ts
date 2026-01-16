@@ -1,7 +1,8 @@
 import { z, zString } from "module-helpers";
-import { zEntrySchemaState } from "..";
+import { zCustomInputValue, zEntrySchemaState } from "..";
 
 const zNodeBridgeSchema = z.object({
+    input: zCustomInputValue,
     key: zString,
     label: zString.optional(),
     slug: zString.optional(),

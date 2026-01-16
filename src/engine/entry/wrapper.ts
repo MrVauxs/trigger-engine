@@ -38,7 +38,6 @@ function instantiateEntry(
     const EntryCls = trigger.application.entries.get(entrySchema.type) as typeof NodeEntry;
     if (!EntryCls) return;
 
-    const fieldData = "field" in entrySchema && R.isPlainObject(entrySchema.field) && entrySchema.field;
     let entryField: Record<string, any> = {};
 
     if (category === "inputs" && !entrySchema.isArray) {
@@ -59,7 +58,7 @@ function instantiateEntry(
                     type: "object",
                     properties: jsonSchema,
                 });
-                const data = R.isObjectType(fieldData) ? fieldData : {};
+                const data = "field" in entrySchema && R.isPlainObject(entrySchema.field) ? entrySchema.field : {};
 
                 entryField = zForceSafeParse(fieldSchema, data) as any;
             }

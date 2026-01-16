@@ -88,6 +88,7 @@ function getOutsSchemas(NodeCls: typeof TriggerNode, options?: SchemasFilterOpti
                 options.data.custom.outs,
                 (_, entry): BridgeSchemaOutput => {
                     return {
+                        input: entry.input,
                         key: entry.id,
                         label: entry.label,
                         slug: entry.slug,

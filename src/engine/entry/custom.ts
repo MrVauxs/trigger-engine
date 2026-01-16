@@ -2,9 +2,11 @@ import { z, zID, zString } from "module-helpers";
 
 // data
 
+const zCustomInputValue = z.union([zString, z.number()]).optional();
+
 const zBaseData = z.object({
     id: zID,
-    input: z.union([zString, z.number()]).optional(),
+    input: zCustomInputValue,
     label: zString,
     slug: zString,
 });
@@ -53,7 +55,7 @@ const zCustomOutSchema = zBaseSchema;
 
 type CustomOutData = z.input<typeof zCustomOutData>;
 
-type CustomOutSchema = z.input<typeof zCustomOutSchema>;
+type CustomOutSchema = WithRequired<z.input<typeof zCustomOutSchema>, "input">;
 
 // output
 
@@ -83,10 +85,11 @@ export {
     zBaseEntrySchema,
     zCustomInputData,
     zCustomInputSchema,
+    zCustomInputValue,
     zCustomOutData,
+    zCustomOutSchema,
     zCustomOutputData,
     zCustomOutputSchema,
-    zCustomOutSchema,
 };
 export type {
     BaseCustomData,
@@ -97,7 +100,7 @@ export type {
     CustomInputData,
     CustomInputSchema,
     CustomOutData,
+    CustomOutSchema,
     CustomOutputData,
     CustomOutputSchema,
-    CustomOutSchema,
 };

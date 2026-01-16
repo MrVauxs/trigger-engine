@@ -13,6 +13,14 @@ class NodeBridge {
         this.#schema = schema;
     }
 
+    get connection(): ConnectionId | undefined {
+        return this.#category === "outputs" ? this.#nodeData.outs[this.key]?.connection : undefined;
+    }
+
+    get input(): string | number | undefined {
+        return this.#schema.input;
+    }
+
     get key(): string {
         return this.#schema.key;
     }
@@ -31,10 +39,6 @@ class NodeBridge {
 
     get spacing(): number {
         return this.schema.spacing;
-    }
-
-    get connection(): ConnectionId | undefined {
-        return this.#category === "outputs" ? this.#nodeData.outs[this.key]?.connection : undefined;
     }
 }
 
