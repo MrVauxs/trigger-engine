@@ -506,6 +506,11 @@
                         "title": "Has Item"
                     },
                     "inside-aura": {
+                        "inputs": {
+                            "once": {
+                                "title": "Execute Once?"
+                            }
+                        },
                         "title": "Is Inside Aura"
                     }
                 },

@@ -248,4 +248,4 @@ type AuraEventOptions = {
 };
 
 export { AuraHook, getAurasInMemory };
-export type { AuraEventOptions };
+export type { ActorAura, AuraEventOptions };

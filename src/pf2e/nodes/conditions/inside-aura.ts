@@ -1,6 +1,6 @@
+import { actorsRespectAlliance } from "module-helpers";
 import { BaseAuraEvent, PF2eInputEntry, PF2eOutputEntry, getAurasInMemory } from "pf2e";
 import { BaseConditionNode } from ".";
-import { actorsRespectAlliance } from "module-helpers";
 
 class InsideAuraConditionNode extends BaseConditionNode<Inputs, { source: TargetDocuments }> {
     static get type(): "inside-aura" {
@@ -12,7 +12,11 @@ class InsideAuraConditionNode extends BaseConditionNode<Inputs, { source: Target
     }
 
     static get defineInputs(): PF2eInputEntry[] {
-        return [{ key: "target", type: "target" }, ...BaseAuraEvent.defineInputs.slice(0, 2)];
+        return [
+            { key: "target", type: "target" },
+            ...BaseAuraEvent.defineInputs.slice(0, 2),
+            { key: "once", type: "boolean" },
+        ];
     }
 
     static get defineOutputs(): PF2eOutputEntry[] {
@@ -20,7 +24,7 @@ class InsideAuraConditionNode extends BaseConditionNode<Inputs, { source: Target
     }
 
     get isLoop(): boolean {
-        return true;
+        return !this.getLocalValue("once");
     }
 
     async _execute(): Promise<boolean> {
@@ -31,6 +35,7 @@ class InsideAuraConditionNode extends BaseConditionNode<Inputs, { source: Target
             return this.executeNext("false");
         }
 
+        const once = await this.getInputValue("once");
         const affects = await this.getInputValue("affects");
         const auras = getAurasInMemory(target).filter(({ data, origin }) => {
             return data.slug === slug && actorsRespectAlliance(origin.actor, target, affects);
@@ -44,7 +49,7 @@ class InsideAuraConditionNode extends BaseConditionNode<Inputs, { source: Target
             this.setOutputValue("source", origin);
 
             const keepExecuting = await this.executeNext("true");
-            if (!keepExecuting) break;
+            if (once || !keepExecuting) break;
         }
 
         return true;
@@ -53,6 +58,7 @@ class InsideAuraConditionNode extends BaseConditionNode<Inputs, { source: Target
 
 type Inputs = {
     affects: "all" | "allies" | "enemies";
+    once: boolean;
     slug: string;
     target?: TargetDocuments;
 };
