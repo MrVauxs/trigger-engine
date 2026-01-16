@@ -457,7 +457,7 @@
             },
             "group": {
                 "roll": "Roll Data",
-                "toolbelt": "PF2e Toolbelt"
+                "save": "Save Data"
             },
             "node": {
                 "action": {
@@ -492,9 +492,6 @@
                         "title": "Roll Damage"
                     },
                     "roll-save": {
-                        "groups": {
-                            "save": "Save Data"
-                        },
                         "title": "Roll Save Check"
                     },
                     "send-chat": {

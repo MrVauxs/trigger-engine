@@ -21,12 +21,12 @@ function dcLocalizePath(...path: string[]): string {
     return localizePath("pf2e-trigger.shared.difficulty-class", ...path);
 }
 
-function dcSchemas(group: string = "save"): PF2eInputEntry[] {
+function dcSchemas(): PF2eInputEntry[] {
     return [
         {
             key: "save",
             type: "text",
-            group,
+            group: "save",
             state: ["value", "target"],
             field: {
                 type: "select",
@@ -40,23 +40,23 @@ function dcSchemas(group: string = "save"): PF2eInputEntry[] {
         {
             key: "value",
             type: "number",
-            group,
+            group: "save",
             state: "value",
             field: { default: 15, min: 0 },
         },
-        { key: "against", type: "text", group, label: dcLocalizePath("against.title"), state: "target" },
+        { key: "against", type: "text", group: "save", label: dcLocalizePath("against.title"), state: "target" },
         {
             key: "adjustment",
             type: "number",
-            group,
+            group: "save",
             label: dcLocalizePath("adjustment.title"),
             state: "target",
         },
-        { key: "basic", type: "boolean", group, state: ["value", "target"] },
+        { key: "basic", type: "boolean", group: "save", state: ["value", "target"] },
         {
             key: "index",
             type: "number",
-            group,
+            group: "save",
             label: dcLocalizePath("index.title"),
             state: "item-description",
             field: { default: 1, min: 1 },
