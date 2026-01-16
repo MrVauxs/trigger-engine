@@ -65,7 +65,8 @@ class TextEntry extends BuiltInNodeEntry<string, TextFieldSchema> {
 
         if (
             this.category === "inputs" &&
-            (this.isSelect || isConnected || (R.isString(this.value) && this.value !== this.default))
+            !isConnected &&
+            (this.isSelect || (R.isString(this.value) && this.value !== this.default))
         ) {
             if (this.field.tooltip) {
                 return tooltip ? `<div class="title">${label}</div><hr>${tooltip}` : label;
