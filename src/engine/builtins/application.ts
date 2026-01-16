@@ -26,6 +26,7 @@ import {
     RegionHook,
     TestEventNode,
     TestHook,
+    TextSplitterNode,
     UserValueNode,
     builtinsConvertors,
     builtinsEntries,
@@ -60,6 +61,7 @@ const nodes = [
     NumberSplitterNode,
     RegionEventNode,
     TestEventNode,
+    TextSplitterNode,
     UserValueNode,
 ] as const;
 

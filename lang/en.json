@@ -109,6 +109,9 @@
                 "logic": {
                     "title": "Logic"
                 },
+                "splitter": {
+                    "title": "Splitter"
+                },
                 "value": {
                     "title": "Value"
                 }
@@ -159,6 +162,9 @@
                 },
                 "user": {
                     "title": "User"
+                },
+                "value": {
+                    "title": "Value"
                 }
             },
             "node": {
@@ -275,7 +281,28 @@
                         "title": "Split Boolean"
                     },
                     "split-number": {
+                        "customs": {
+                            "outs": {
+                                "value": {
+                                    "input": {
+                                        "label": "Number Entry"
+                                    }
+                                }
+                            }
+                        },
                         "title": "Split Number"
+                    },
+                    "split-text": {
+                        "customs": {
+                            "outs": {
+                                "value": {
+                                    "input": {
+                                        "label": "Text Entry"
+                                    }
+                                }
+                            }
+                        },
+                        "title": "Split Text"
                     }
                 },
                 "value": {
@@ -410,7 +437,8 @@
             "input": "Input",
             "out": "Out",
             "output": "Output",
-            "true": "True"
+            "true": "True",
+            "value": "Value"
         },
         "nodes-menu": {
             "add": {
@@ -467,9 +495,6 @@
                 },
                 "save": {
                     "title": "Save Type"
-                },
-                "value": {
-                    "title": "Value"
                 },
                 "when": {
                     "title": "Triggers When?"

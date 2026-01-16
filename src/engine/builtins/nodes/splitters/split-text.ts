@@ -1,29 +1,26 @@
 import { BuiltinsInputEntry, CustomOutSchema } from "engine";
 import { BaseSplitterNode } from ".";
 
-abstract class NumberSplitterNode extends BaseSplitterNode<string, { input: number }> {
-    static get type(): "split-number" {
-        return "split-number";
+abstract class TextSplitterNode extends BaseSplitterNode<string, { input: string }> {
+    static get type(): "split-text" {
+        return "split-text";
     }
 
     static get tags(): string[] {
-        return ["number"];
+        return ["text"];
     }
 
     static get defineCustomOuts(): CustomOutSchema[] {
         return [
             {
                 slug: "value",
-                input: {
-                    isNumber: true,
-                    replaceLabel: true,
-                },
+                input: {},
             },
         ];
     }
 
     static get defineInputs(): BuiltinsInputEntry[] {
-        return [{ key: "input", type: "number" }];
+        return [{ key: "input", type: "text" }];
     }
 
     async _execute(): Promise<boolean> {
@@ -34,4 +31,4 @@ abstract class NumberSplitterNode extends BaseSplitterNode<string, { input: numb
     }
 }
 
-export { NumberSplitterNode };
+export { TextSplitterNode };

@@ -1067,6 +1067,7 @@ class BlueprintNode extends PIXI.Container {
             content: "edit-entry",
             data: dialogData,
             disabled: true,
+            focus: "input",
             i18n: "edit-entry",
             onRender: (_, dialog) => {
                 const html = dialog.element;
@@ -1090,14 +1091,14 @@ class BlueprintNode extends PIXI.Container {
             return;
         }
 
-        if (!dialogData.types?.length && !result.label && !schema.input?.replaceLabel) {
+        if (!dialogData.types?.length && !result.label && !schema.input) {
             warning("edit-entry.required", { name: localize("edit-entry.label") });
             return;
         }
 
         const entrySchema: BaseCustomData = {
             input: result.input,
-            label: (schema.input?.replaceLabel ? String(result.input) : result.label) ?? "",
+            label: result.label || (schema.input ? String(result.input) : ""),
             slug: schema.slug,
         };
 

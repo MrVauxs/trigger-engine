@@ -1,4 +1,4 @@
-import { TriggerNode } from "engine";
+import { BridgeSchemaInput, TriggerNode } from "engine";
 
 abstract class BaseSplitterNode<
     TOuts extends string = string,
@@ -10,6 +10,10 @@ abstract class BaseSplitterNode<
 > extends TriggerNode<TOuts, TInputs, TOutputs, TCustomInputs, TCustomOutputs, TState> {
     static get category(): string {
         return "splitter";
+    }
+
+    static get defineOuts(): BridgeSchemaInput[] | null {
+        return null;
     }
 
     get headerColor(): ColorSource {
