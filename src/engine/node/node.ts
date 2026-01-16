@@ -287,6 +287,9 @@ interface TriggerNode<
      */
     executeNext(out: TOuts, ...args: any[]): Promise<boolean>;
 
+    /** Returns the key of a custom out entry based on its input value */
+    getCustomOutKey(slug: string, input: string | number): string | undefined;
+
     // TODO
     getCustomInputs(slug: TCustomInputs): Promise<{ label: string; value: any }[]>;
 

@@ -150,6 +150,7 @@ function instantiateNode(
                         ["getCustomInputsValues", this.#getCustomInputsValues],
                         ["getInputValue", this.#getInputValue],
                         ["getLocalValue", this.#getLocalValue],
+                        ["getCustomOutKey", this.#getCustomOutKey],
                         ["getOutputValue", this.#getOutputValue],
                         ["localize", localize],
                         ["rootLocalize", rootLocalize],
@@ -334,6 +335,10 @@ function instantiateNode(
                 MODULE.error(`an error occurred while executing the node: ${this.nodePath}`, error);
                 return true;
             }
+        }
+
+        #getCustomOutKey(slug: string, input: string | number): string | undefined {
+            return this.#outs.find((out) => out.slug === slug && out.input === input)?.key;
         }
 
         #getLocalValue(key: string): any {
