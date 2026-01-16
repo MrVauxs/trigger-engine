@@ -495,7 +495,10 @@
                             }
                         },
                         "states": {
-                            "none": "No Save"
+                            "item": "Save (Item)",
+                            "none": "No Save",
+                            "target": "Save (Target)",
+                            "value": "Save (Value)"
                         },
                         "title": "Roll Damage"
                     },
@@ -621,9 +624,6 @@
                         "title": "Extra Traits"
                     }
                 }
-            },
-            "state": {
-                "item-description": "Item Description"
             },
             "tag": {
                 "attack": {

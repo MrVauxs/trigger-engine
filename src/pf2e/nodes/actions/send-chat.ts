@@ -1,6 +1,6 @@
 import { IconObject } from "_zod";
 import { BaseActionNode } from "engine";
-import { ItemPF2e, R, getFirstActiveToken, getTargetToken, getTargetsTokensUUIDs } from "module-helpers";
+import { ItemPF2e, getTargetsTokensUUIDs } from "module-helpers";
 import { PF2eInputEntry } from "pf2e";
 
 class SendToChatActionNode extends BaseActionNode<"out", Inputs> {
@@ -15,7 +15,7 @@ class SendToChatActionNode extends BaseActionNode<"out", Inputs> {
     static get defineInputs(): PF2eInputEntry[] {
         return [
             { key: "item", type: "item" },
-            { key: "targets", type: "target", group: "toolbelt", isArray: true },
+            { key: "targets", type: "target", isArray: true },
         ];
     }
 

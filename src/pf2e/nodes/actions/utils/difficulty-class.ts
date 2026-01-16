@@ -15,7 +15,7 @@ import {
 } from "module-helpers";
 import { PF2eInputEntry } from "pf2e";
 
-const dcStates = ["value", "target", "item-description"] as const;
+const dcStates = ["value", "target", "item"] as const;
 
 function dcLocalizePath(...path: string[]): string {
     return localizePath("pf2e-trigger.shared.difficulty-class", ...path);
@@ -58,7 +58,7 @@ function dcSchemas(): PF2eInputEntry[] {
             type: "number",
             group: "save",
             label: dcLocalizePath("index.title"),
-            state: "item-description",
+            state: "item",
             field: { default: 1, min: 1 },
         },
     ];
@@ -144,7 +144,7 @@ async function getDcData(
     const StatisticCls = fortitude?.constructor as typeof Statistic | undefined;
     const rollOptions = item?.isOfType("action", "feat") ? [`target:action:slug:${item.slug}`] : undefined;
 
-    if (this.state === "item-description") {
+    if (this.state === "item") {
         if (!item) return;
 
         const index = await this.getInputValue("index");
