@@ -1023,9 +1023,12 @@ class BlueprintNode extends PIXI.Container {
         };
 
         const input: CustomEntryDialogData["input"] = schema.input && {
-            label: this.#customEntryLocalize(schema.input.label, category, schema, "input.label") ?? "input",
+            label:
+                this.#customEntryLocalize(schema.input.label, category, schema, "input.label") ??
+                localize("edit-entry.input"),
             placeholder: this.#customEntryLocalize(schema.input.placeholder, category, schema, "input.placeholder"),
-            value: "",
+            type: schema.input.isNumber ? "number" : "text",
+            value: schema.input.isNumber ? 0 : "",
         };
 
         const dialogData: CustomEntryDialogData = {
@@ -1082,24 +1085,25 @@ class BlueprintNode extends PIXI.Container {
 
         if (!result) return;
 
-        if (schema.input && !result.input) {
-            warning("edit-entry.required", { name: input?.label });
+        if ((input?.type === "text" && !result.input) || (input?.type === "number" && !R.isNumber(result.input))) {
+            warning("edit-entry.required", { name: input.label });
             return;
         }
 
-        if (!dialogData.types && !result.label) {
+        if (!dialogData.types?.length && !result.label && !schema.input?.replaceLabel) {
             warning("edit-entry.required", { name: localize("edit-entry.label") });
             return;
         }
 
         const entrySchema: BaseCustomData = {
             input: result.input,
-            label:
-                (schema.input?.replaceLabel ? result.input : result.label) ||
-                dialogData.types?.find((type) => type.value === result.type)?.label ||
-                "",
+            label: (schema.input?.replaceLabel ? String(result.input) : result.label) ?? "",
             slug: schema.slug,
         };
+
+        if (dialogData.types?.length && (!input || (input?.type === "text" && !entrySchema.label))) {
+            entrySchema.label = dialogData.types.find((type) => type.value === result.type)?.label ?? "";
+        }
 
         if (result.type) {
             foundry.utils.mergeObject(entrySchema, {
@@ -1253,7 +1257,12 @@ type PreciseTextOptions = Partial<PIXI.ITextStyle> & {
 
 type CustomEntryDialogData = {
     array?: { value: boolean };
-    input?: { label: string; placeholder: string | undefined; value: string };
+    input?: {
+        label: string;
+        placeholder: string | undefined;
+        type: "number" | "text";
+        value: number | string;
+    };
     label: { placeholder: string | undefined; value: string } | false;
     type: string | undefined;
     types?: RequiredSelectOptions;
