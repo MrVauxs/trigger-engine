@@ -1,7 +1,7 @@
 import { BuiltinsInputEntry, CustomOutSchema } from "engine";
 import { BaseSplitterNode } from ".";
 
-abstract class TextSplitterNode extends BaseSplitterNode<string, string> {
+class TextSplitterNode extends BaseSplitterNode<string, string> {
     static get type(): "split-text" {
         return "split-text";
     }

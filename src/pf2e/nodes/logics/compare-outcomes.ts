@@ -2,7 +2,7 @@ import { BaseLogicNode, BridgeSchemaInput, CompareEntry, CompareNumbersLogicNode
 import { DegreeOfSuccessString, degreeOfSuccessNumber } from "module-helpers";
 import { PF2eInputEntry } from "pf2e";
 
-abstract class CompareOutcomesLogicNode extends BaseLogicNode<"true" | "false", Inputs> {
+class CompareOutcomesLogicNode extends BaseLogicNode<"true" | "false", Inputs> {
     static get type(): "compare-outcomes" {
         return "compare-outcomes";
     }

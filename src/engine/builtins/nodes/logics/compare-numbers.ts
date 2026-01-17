@@ -3,7 +3,7 @@ import { localizePath } from "module-helpers";
 
 const COMPARE_ENTRIES = ["eq", "gt", "gte", "lt", "lte"] as const;
 
-abstract class CompareNumbersLogicNode extends BaseLogicNode<"true" | "false", Inputs> {
+class CompareNumbersLogicNode extends BaseLogicNode<"true" | "false", Inputs> {
     static #compareOptions: SelectOptions;
 
     static get type(): "compare-numbers" {
