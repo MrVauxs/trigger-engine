@@ -14,6 +14,23 @@ class TargetEntry extends NodeEntry<TargetDocuments | undefined> {
         return 0xff3075;
     }
 
+    static castValue(value: unknown): unknown {
+        if (value instanceof Actor) {
+            return {
+                actor: value as ActorPF2e,
+                token: value.token,
+            };
+        }
+
+        const token = getTokenDocument(value);
+        const actor = token?.actor;
+        if (actor) {
+            return { actor, token };
+        }
+
+        return value;
+    }
+
     static isValidType(value: unknown): value is TargetDocuments {
         return isValidTargetDocuments(value);
     }
@@ -35,23 +52,6 @@ class TargetEntry extends NodeEntry<TargetDocuments | undefined> {
             actor,
             token: token instanceof TokenDocument ? token : undefined,
         };
-    }
-
-    castValue(value: unknown): unknown {
-        if (value instanceof Actor) {
-            return {
-                actor: value as ActorPF2e,
-                token: value.token,
-            };
-        }
-
-        const token = getTokenDocument(value);
-        const actor = token?.actor;
-        if (actor) {
-            return { actor, token };
-        }
-
-        return value;
     }
 }
 

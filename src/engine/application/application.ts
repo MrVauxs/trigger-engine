@@ -335,11 +335,14 @@ class TriggerApplication {
         const entry = this.entries.get(userValue.type);
         if (!entry) return;
 
+        const parseValue = (value: any) => {
+            const casted = entry.castValue(value);
+            return entry.isValidType(casted) ? foundry.utils.deepClone(value) : undefined;
+        };
+
         const value = R.isArray(userValue.value)
-            ? userValue.value.filter(entry.isValidType.bind(entry)).map((x) => foundry.utils.deepClone(x))
-            : entry.isValidType(userValue.value)
-              ? foundry.utils.deepClone(userValue.value)
-              : entry.default;
+            ? R.map(userValue.value, parseValue)
+            : (parseValue(userValue.value) ?? entry.default);
 
         return { type: userValue.type, value };
     }

@@ -25,6 +25,10 @@ class TextEntry extends BuiltInNodeEntry<string, TextFieldSchema> {
         return "{\n  \n}";
     }
 
+    static castValue(value: unknown): unknown {
+        return String(value);
+    }
+
     static isValidType(value: unknown): value is string {
         return R.isString(value);
     }

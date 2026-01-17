@@ -18,6 +18,10 @@ class BooleanEntry extends BuiltInNodeEntry<boolean, BooleanFieldSchema> {
         return BooleanField;
     }
 
+    static castValue(value: unknown): unknown {
+        return Boolean(value);
+    }
+
     static isValidType(value: unknown): value is boolean {
         return R.isBoolean(value);
     }

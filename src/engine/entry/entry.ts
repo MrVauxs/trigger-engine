@@ -33,6 +33,16 @@ class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<st
     }
 
     /**
+     * Cast the value from a different type.
+     *
+     * This is not equivalent to `EntryConvertor`, it doesn't necessarily expect `TValue`, but when setting an output
+     * value using {@link TriggerNode#setOutputValue}, it allows to provide a different type that will be cast here.
+     */
+    static castValue(value: unknown): unknown {
+        return value;
+    }
+
+    /**
      * @abstract
      * @returns true if the provided value is of type `TValue` excluding `undefined`.
      */
@@ -63,16 +73,6 @@ class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<st
      */
     get default(): TValue {
         return (this.constructor as typeof NodeEntry).default as TValue;
-    }
-
-    /**
-     * Cast the value from a different type.
-     *
-     * This is not equivalent to `EntryConvertor`, it doesn't necessarily expect `TValue`, but when setting an output
-     * value using {@link TriggerNode#setOutputValue}, it allows to provide a different type that will be cast here.
-     */
-    castValue(value: unknown): unknown {
-        return value;
     }
 
     /**
@@ -110,6 +110,9 @@ interface NodeEntry<
     get value(): TValue | undefined;
     /** @see {@link NodeEntry.type} */
     get type(): string;
+
+    /** @see {@link NodeEntry.castValue} */
+    castValue(value: unknown): unknown;
 
     /** @see {@link NodeEntry.fromJSON} */
     fromJSON(value: JSONValue): Promise<any> | any;

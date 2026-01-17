@@ -20,6 +20,7 @@ class ExecuteEvent extends BaseEventNode {
 
     async _execute({ converted, values }: ExecuteEventOptions): Promise<boolean> {
         const parsed = converted ? await this.convertValuesFomEmitable(values) : values;
+
         this.setCustomOutputValues("output", parsed);
         return this.executeNext("out");
     }

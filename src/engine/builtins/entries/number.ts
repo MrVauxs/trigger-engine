@@ -18,6 +18,11 @@ class NumberEntry extends BuiltInNodeEntry<number, NumberFieldSchema> {
         return NumberField;
     }
 
+    static castValue(value: unknown): unknown {
+        const casted = Number(value);
+        return R.isNumber(casted) ? casted : value;
+    }
+
     static isValidType(value: unknown): value is number {
         return R.isNumber(value);
     }

@@ -32,6 +32,11 @@ class OutcomEntry extends NodeEntry<DegreeOfSuccessString, OutputFieldSchema> {
         return 0x75db32;
     }
 
+    static castValue(value: unknown): any {
+        if (!isDegreeOfSuccessValue(value)) return value;
+        return R.isString(value) ? value : degreeOfSuccessString(value);
+    }
+
     static isValidType(value: unknown): value is DegreeOfSuccessString {
         return isDegreeOfSuccessValue(value);
     }
@@ -54,11 +59,6 @@ class OutcomEntry extends NodeEntry<DegreeOfSuccessString, OutputFieldSchema> {
 
     generateTooltip(): undefined {
         return undefined;
-    }
-
-    castValue(value: unknown): any {
-        if (!isDegreeOfSuccessValue(value)) return value;
-        return R.isString(value) ? value : degreeOfSuccessString(value);
     }
 
     getSelectValue(value: string | undefined): DegreeOfSuccessString {
