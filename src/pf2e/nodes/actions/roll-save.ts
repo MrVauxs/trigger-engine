@@ -29,8 +29,8 @@ class RollSaveActionNode extends BaseActionNode<"out", Inputs, Outputs, never, n
 
     static get defineInputs(): PF2eInputEntry[] {
         return [
-            { key: "target", type: "target" },
             { key: "origin", type: "target" },
+            { key: "target", type: "target" },
             { key: "item", type: "item" },
             { key: "private", type: "boolean" },
             ...dcSchemas(),
