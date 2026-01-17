@@ -633,6 +633,11 @@
                     "compare-outcomes": {
                         "title": "Compare Outcomes"
                     }
+                },
+                "value": {
+                    "item-value": {
+                        "title": "Cached Item"
+                    }
                 }
             },
             "setting": {

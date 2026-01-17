@@ -12,6 +12,7 @@ import {
     HasItemConditionNode,
     HasOptionConditionNode,
     InsideAuraConditionNode,
+    ItemValueNode,
     RollDamageActionNode,
     RollSaveActionNode,
     SendToChatActionNode,
@@ -43,13 +44,15 @@ const events = [
 
 const logics = [CompareOutcomesLogicNode] as (typeof TriggerNode)[];
 
+const values = [ItemValueNode] as (typeof TriggerNode)[];
+
 function registerPF2eApplication() {
     const options: TriggerApplicationOptions = {
         builtins: true,
         convertors: pf2eConvertors,
         entries: pf2eEntries as any,
         hooks: [AuraHook, CreateMessageHook, TurnEndHook, TurnStartHook] as (typeof TriggerHook)[],
-        nodes: [...actions, ...conditions, ...events, ...logics],
+        nodes: [...actions, ...conditions, ...events, ...logics, ...values],
     };
 
     TriggerApplication.register(MODULE.id, "pf2e-trigger", options);
