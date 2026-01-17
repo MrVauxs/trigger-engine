@@ -62,11 +62,11 @@ class AuraHook extends TriggerHook<AuraEventOptions> {
         for (const actor of sceneActors) {
             deleteInMemory(actor, "auras");
         }
-
-        activateHooksAndWrappers(this.#wrappers);
     }
 
     _listen(): void {
+        activateHooksAndWrappers(this.#wrappers);
+
         const scene = game.scenes.current;
         if (!scene || !canvas.ready || !scene.isInFocus || scene.grid.type !== CONST.GRID_TYPES.SQUARE) return;
 
