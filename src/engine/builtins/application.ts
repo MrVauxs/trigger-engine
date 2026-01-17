@@ -19,6 +19,7 @@ import {
     ExecuteEvent,
     ExecuteHook,
     ExecuteScriptActionNode,
+    ItemExtractorNode,
     ListContainsConditionNode,
     MoveTokenEvent,
     MoveTokenHook,
@@ -65,13 +66,15 @@ const events = [
     TestEvent,
 ] as const;
 
+const extractors = [ItemExtractorNode] as const;
+
 const logics = [BreakLoopLogicNode, CompareNumbersLogicNode] as const;
 
 const splitters = [BooleanSplitterNode, NumberSplitterNode, TextSplitterNode] as const;
 
 const values = [UserValueNode] as const;
 
-const nodes = [...actions, ...conditions, ...events, ...logics, ...splitters, ...values] as const;
+const nodes = [...actions, ...conditions, ...events, ...extractors, ...logics, ...splitters, ...values] as const;
 
 class BuiltInApplication {
     static get moduleId(): string {

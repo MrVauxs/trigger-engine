@@ -10,7 +10,15 @@ import {
     Trigger,
 } from "engine";
 import { LocalizeArgs, MODULE, R, ScenePF2e, TokenDocumentPF2e, UserPF2e } from "module-helpers";
-import { getInputsSchemas, getNodeStates, getOutputsSchemas, getOutsSchemas, NodeData, TriggerNode } from ".";
+import {
+    getInputsSchemas,
+    getNodeStates,
+    getOutputsSchemas,
+    getOutsSchemas,
+    NodeData,
+    TriggerNode,
+    TriggerNodeCustomOutput,
+} from ".";
 
 function instantiateNode(parent: OpenTrigger, data: NodeData, open: true): OpenTriggerNode | undefined;
 function instantiateNode<TNode extends TriggerNode>(parent: Trigger, data: NodeData, open: boolean): TNode | undefined;
@@ -151,6 +159,7 @@ function instantiateNode(
                         ["getInputValue", this.#getInputValue],
                         ["getLocalValue", this.#getLocalValue],
                         ["getCustomOutKey", this.#getCustomOutKey],
+                        ["getCustomOutputs", this.#getCustomOutputs],
                         ["getOutputValue", this.#getOutputValue],
                         ["localize", localize],
                         ["rootLocalize", rootLocalize],
@@ -339,6 +348,14 @@ function instantiateNode(
 
         #getCustomOutKey(slug: string, input: string | number): string | undefined {
             return this.#outs.find((out) => out.slug === slug && out.input === input)?.key;
+        }
+
+        #getCustomOutputs(slug: string): TriggerNodeCustomOutput[] {
+            return this.#outputs
+                .filter((output) => output.slug === slug)
+                .map(({ input, key, type }): TriggerNodeCustomOutput => {
+                    return { input, key, type };
+                });
         }
 
         #getLocalValue(key: string): any {

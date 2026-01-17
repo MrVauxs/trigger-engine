@@ -106,6 +106,9 @@
                 "event": {
                     "title": "Event"
                 },
+                "extractor": {
+                    "title": "Extractor"
+                },
                 "logic": {
                     "title": "Logic"
                 },
@@ -268,6 +271,11 @@
                     },
                     "test-event": {
                         "title": "Test Event"
+                    }
+                },
+                "extractor": {
+                    "extract-item": {
+                        "title": "Extract From Item"
                     }
                 },
                 "logic": {

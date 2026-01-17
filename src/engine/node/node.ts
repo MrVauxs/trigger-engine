@@ -298,8 +298,11 @@ interface TriggerNode<
      */
     executeNext(out: TOuts, ...args: any[]): Promise<boolean>;
 
-    /** Returns the key of a custom out entry based on its input value */
+    /** Returns the key of a custom out entry based on its input value. */
     getCustomOutKey(slug: string, input: string | number): string | undefined;
+
+    /** Returns a list of custom outputs data (not their value). */
+    getCustomOutputs(slug: TCustomOutputs): TriggerNodeCustomOutput[];
 
     // TODO
     getCustomInputs(slug: TCustomInputs): Promise<{ label: string; value: any }[]>;
@@ -381,5 +384,11 @@ interface TriggerNode<
 
 type TriggerNodePath = `${TriggerPath}:${string}`;
 
+type TriggerNodeCustomOutput = {
+    input: string | number | undefined;
+    key: string;
+    type: string;
+};
+
 export { TriggerNode };
-export type { TriggerNodePath };
+export type { TriggerNodeCustomOutput, TriggerNodePath };
