@@ -585,6 +585,9 @@
                             }
                         },
                         "title": "Is Inside Aura"
+                    },
+                    "is-dead": {
+                        "title": "Actor Is Dead"
                     }
                 },
                 "event": {

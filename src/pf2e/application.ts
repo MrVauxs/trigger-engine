@@ -12,6 +12,7 @@ import {
     HasItemConditionNode,
     HasOptionConditionNode,
     InsideAuraConditionNode,
+    IsDeadConditionNode,
     ItemValueNode,
     RollDamageActionNode,
     RollSaveActionNode,
@@ -31,7 +32,12 @@ const actions = [
     SendToChatActionNode,
 ] as (typeof TriggerNode)[];
 
-const conditions = [HasItemConditionNode, HasOptionConditionNode, InsideAuraConditionNode] as (typeof TriggerNode)[];
+const conditions = [
+    HasItemConditionNode,
+    HasOptionConditionNode,
+    InsideAuraConditionNode,
+    IsDeadConditionNode,
+] as (typeof TriggerNode)[];
 
 const events = [
     AttackRollEvent,
