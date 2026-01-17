@@ -726,6 +726,9 @@
                 "damage": {
                     "title": "Damage"
                 },
+                "outcome": {
+                    "title": "Degree of Success"
+                },
                 "save": {
                     "title": "Save"
                 },
