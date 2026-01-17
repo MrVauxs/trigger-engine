@@ -418,7 +418,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
         const keepIds = result.keepids !== false;
         const selected = R.pipe(
             triggers,
-            R.filter((trigger) => trigger.id in result.selected),
+            R.filter((trigger) => result.selected[trigger.id]),
             R.map((trigger) => {
                 const source = trigger.toObject() as WithPartial<TriggerDataOutput, "id">;
                 if (!keepIds) {
