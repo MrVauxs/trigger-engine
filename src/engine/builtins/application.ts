@@ -16,15 +16,15 @@ import {
     DeleteItemActionNode,
     DeleteTokenEvent,
     DeleteTokenHook,
-    ExecuteEventNode,
+    ExecuteEvent,
     ExecuteHook,
     ExecuteScriptActionNode,
     MoveTokenEvent,
     MoveTokenHook,
     NumberSplitterNode,
-    RegionEventNode,
+    RegionEvent,
     RegionHook,
-    TestEventNode,
+    TestEvent,
     TestHook,
     TextSplitterNode,
     UserValueNode,
@@ -43,27 +43,32 @@ const hooks = [
     TestHook,
 ] as const;
 
-const nodes = [
+const actions = [
     AwaitConfirmActionNode,
-    BooleanSplitterNode,
-    BreakLoopLogicNode,
-    CompareNumbersLogicNode,
     ConsoleLogActionNode,
-    CreateCombatantEvent,
     CreateMessageActionNode,
+    DeleteItemActionNode,
+    ExecuteScriptActionNode,
+] as const;
+
+const events = [
+    CreateCombatantEvent,
     CreateTokenEvent,
     DeleteCombatantEvent,
-    DeleteItemActionNode,
     DeleteTokenEvent,
-    ExecuteEventNode,
-    ExecuteScriptActionNode,
+    ExecuteEvent,
     MoveTokenEvent,
-    NumberSplitterNode,
-    RegionEventNode,
-    TestEventNode,
-    TextSplitterNode,
-    UserValueNode,
+    RegionEvent,
+    TestEvent,
 ] as const;
+
+const logics = [BreakLoopLogicNode, CompareNumbersLogicNode] as const;
+
+const splitters = [BooleanSplitterNode, NumberSplitterNode, TextSplitterNode] as const;
+
+const values = [UserValueNode] as const;
+
+const nodes = [...actions, ...events, ...logics, ...splitters, ...values] as const;
 
 class BuiltInApplication {
     static get moduleId(): string {

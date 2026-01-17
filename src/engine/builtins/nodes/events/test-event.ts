@@ -2,7 +2,7 @@ import { IconObject } from "_zod";
 import { BaseEventNode, BuiltinsOutputEntry } from "engine";
 import { R } from "module-helpers";
 
-class TestEventNode extends BaseEventNode<never, { targets: TargetDocuments[] }> {
+class TestEvent extends BaseEventNode<never, { targets: TargetDocuments[] }> {
     static get functionPath(): string {
         return "game.triggerEngine.test";
     }
@@ -24,7 +24,7 @@ class TestEventNode extends BaseEventNode<never, { targets: TargetDocuments[] }>
     }
 
     get subtitle(): string {
-        return `${TestEventNode.functionPath}()`;
+        return `${TestEvent.functionPath}()`;
     }
 
     _execute(): Promise<boolean> {
@@ -43,4 +43,4 @@ class TestEventNode extends BaseEventNode<never, { targets: TargetDocuments[] }>
     }
 }
 
-export { TestEventNode };
+export { TestEvent };

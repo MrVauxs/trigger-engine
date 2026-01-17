@@ -1,7 +1,7 @@
 import { IconObject } from "_zod";
 import { BaseEventNode, BuiltinsOutputEntry, RegionEventOptions } from "engine";
 
-class RegionEventNode extends BaseEventNode<never, Outputs> {
+class RegionEvent extends BaseEventNode<never, Outputs> {
     static get type(): "region-event" {
         return "region-event";
     }
@@ -34,4 +34,4 @@ type Outputs = {
     target: TargetDocuments;
 };
 
-export { RegionEventNode };
+export { RegionEvent };

@@ -1,4 +1,4 @@
-import { TestEventNode, TriggerHook } from "engine";
+import { TestEvent, TriggerHook } from "engine";
 
 class TestHook extends TriggerHook {
     static get type(): "test-hook" {
@@ -14,13 +14,13 @@ class TestHook extends TriggerHook {
     }
 
     _enable(): void {
-        foundry.utils.setProperty(globalThis, TestEventNode.functionPath, () => {
+        foundry.utils.setProperty(globalThis, TestEvent.functionPath, () => {
             this.executeEvent("test-event");
         });
     }
 
     _disable(): void {
-        foundry.utils.setProperty(globalThis, TestEventNode.functionPath, () => {});
+        foundry.utils.setProperty(globalThis, TestEvent.functionPath, () => {});
     }
 }
 

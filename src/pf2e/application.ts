@@ -10,6 +10,7 @@ import {
     CreateMessageHook,
     DamageTakenEvent,
     HasItemConditionNode,
+    HasOptionConditionNode,
     InsideAuraConditionNode,
     RollDamageActionNode,
     RollSaveActionNode,
@@ -22,31 +23,33 @@ import {
     pf2eEntries,
 } from ".";
 
-const hooks = [AuraHook, CreateMessageHook, TurnEndHook, TurnStartHook] as (typeof TriggerHook)[];
-
-const nodes = [
-    AttackRollEvent,
-    AuraEnterEvent,
-    AuraLeaveEvent,
-    CompareOutcomesLogicNode,
+const actions = [
     CreateItemActionNode,
-    DamageTakenEvent,
-    HasItemConditionNode,
-    InsideAuraConditionNode,
     RollDamageActionNode,
     RollSaveActionNode,
     SendToChatActionNode,
+] as (typeof TriggerNode)[];
+
+const conditions = [HasItemConditionNode, HasOptionConditionNode, InsideAuraConditionNode] as (typeof TriggerNode)[];
+
+const events = [
+    AttackRollEvent,
+    AuraEnterEvent,
+    AuraLeaveEvent,
+    DamageTakenEvent,
     TurnEndEvent,
     TurnStartEvent,
 ] as (typeof TriggerNode)[];
+
+const logics = [CompareOutcomesLogicNode] as (typeof TriggerNode)[];
 
 function registerPF2eApplication() {
     const options: TriggerApplicationOptions = {
         builtins: true,
         convertors: pf2eConvertors,
         entries: pf2eEntries as any,
-        hooks,
-        nodes,
+        hooks: [AuraHook, CreateMessageHook, TurnEndHook, TurnStartHook] as (typeof TriggerHook)[],
+        nodes: [...actions, ...conditions, ...events, ...logics],
     };
 
     TriggerApplication.register(MODULE.id, "pf2e-trigger", options);
