@@ -1067,12 +1067,16 @@ class BlueprintNode extends PIXI.Container {
 
             dialogData.array = (schema as BaseCustomEntrySchema).array ? { value: false } : undefined;
 
-            dialogData.types = R.map(selectedTypes?.length ? selectedTypes : availableTypes, (type) => {
-                return {
-                    value: type,
-                    label: this.rootLocalize("entry", type, "title") ?? type,
-                };
-            });
+            dialogData.types = R.pipe(
+                selectedTypes?.length ? selectedTypes : availableTypes,
+                R.map((type) => {
+                    return {
+                        value: type,
+                        label: this.rootLocalize("entry", type, "title") ?? type,
+                    };
+                }),
+                R.sortBy(R.prop("label")),
+            );
 
             if (dialogData.label) {
                 dialogData.label.placeholder = dialogData.types[0].label;

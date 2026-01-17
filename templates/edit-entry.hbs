@@ -27,7 +27,7 @@
     <label>{{@root.i18n 'types'}}</label>
     <div class="form-fields">
         <select name="type" {{disabled (lt types.length 2)}}>
-            {{selectOptions types selected=type sort=true}}
+            {{selectOptions types selected=type}}
         </select>
     </div>
 </div>
