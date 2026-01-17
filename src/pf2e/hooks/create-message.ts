@@ -58,13 +58,14 @@ class CreateMessageHook extends TriggerHook<AttackRollOptions | DamageTakenOptio
             if (!isValidTargetDocuments(target)) return;
 
             const originActor = origin?.actor ? await fromUuid<ActorPF2e>(origin.actor) : null;
-            const types: DamageTakenType[] = appliedDamage?.isHealing ? ["heal"] : ["all", "damage"];
 
-            if (!appliedDamage) {
-                types.push("negated");
-            } else if (appliedDamage.persistent.length) {
-                types.push("persistent");
-            }
+            const types: DamageTakenType[] = !appliedDamage
+                ? ["all", "negated"]
+                : appliedDamage.isHealing
+                  ? ["heal"]
+                  : appliedDamage.persistent.length
+                    ? ["all", "damage", "persistent"]
+                    : ["all", "damage"];
 
             this.executeEvent("damage-taken-event", {
                 item: await getItem(origin?.uuid),
