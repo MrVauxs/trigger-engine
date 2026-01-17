@@ -26,6 +26,7 @@ class DamageTakenEvent extends BaseEventNode<Inputs, Outputs> {
                 type: "text",
                 field: {
                     type: "select",
+                    default: "damage",
                     options: CreateMessageHook.damageTakenTypes,
                 },
             },
