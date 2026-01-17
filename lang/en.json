@@ -480,7 +480,9 @@
                 "basic": {
                     "title": "Basic"
                 },
-
+                "option": {
+                    "title": "Roll Option"
+                },
                 "options": {
                     "title": "Roll Options"
                 },
@@ -548,15 +550,25 @@
                 },
                 "condition": {
                     "has-item": {
+                        "outputs": {
+                            "target": {
+                                "title": "Parent"
+                            }
+                        },
                         "title": "Has Item"
                     },
                     "has-option": {
-                        "title": "Has RollOption"
+                        "title": "Has Roll Option"
                     },
                     "inside-aura": {
                         "inputs": {
                             "once": {
                                 "title": "Execute Once?"
+                            }
+                        },
+                        "outputs": {
+                            "target": {
+                                "title": "Aura Target"
                             }
                         },
                         "title": "Is Inside Aura"

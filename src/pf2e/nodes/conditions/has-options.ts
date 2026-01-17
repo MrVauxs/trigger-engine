@@ -1,6 +1,6 @@
+import { hasRollOption } from "module-helpers";
 import { PF2eInputEntry } from "pf2e";
 import { BaseConditionNode } from ".";
-import { hasRollOption } from "module-helpers";
 
 class HasOptionConditionNode extends BaseConditionNode<Inputs> {
     static get type(): "has-option" {

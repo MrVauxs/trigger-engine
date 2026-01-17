@@ -2,7 +2,7 @@ import { PF2eInputEntry, PF2eOutputEntry } from "pf2e";
 import { BaseConditionNode } from ".";
 import { ItemPF2e, findItemWithSlug, findItemWithSourceId } from "module-helpers";
 
-class HasItemConditionNode extends BaseConditionNode<Inputs, { item?: ItemPF2e }, never, never, "uuid" | "slug"> {
+class HasItemConditionNode extends BaseConditionNode<Inputs, Outputs, never, never, "uuid" | "slug"> {
     static get type(): "has-item" {
         return "has-item";
     }
@@ -24,20 +24,25 @@ class HasItemConditionNode extends BaseConditionNode<Inputs, { item?: ItemPF2e }
     }
 
     static get defineOutputs(): PF2eOutputEntry[] {
-        return [{ key: "item", type: "item" }];
+        return [
+            { key: "target", type: "target" },
+            { key: "item", type: "item" },
+        ];
     }
 
     async _execute(): Promise<boolean> {
-        const actor = (await this.getInputValue("target"))?.actor;
+        const target = await this.getInputValue("target");
 
-        if (!actor) {
+        if (!target?.actor) {
             return this.executeNext("false");
         }
 
+        this.setOutputValue("target", target);
+
         const item =
             this.state === "slug"
-                ? findItemWithSlug(actor, await this.getInputValue("slug"))
-                : findItemWithSourceId(actor, await this.getInputValue("uuid"));
+                ? findItemWithSlug(target.actor, await this.getInputValue("slug"))
+                : findItemWithSourceId(target.actor, await this.getInputValue("uuid"));
 
         if (item) {
             this.setOutputValue("item", item);
@@ -52,6 +57,11 @@ type Inputs = {
     slug: string;
     target?: TargetDocuments;
     uuid: string;
+};
+
+type Outputs = {
+    item?: ItemPF2e;
+    target?: TargetDocuments;
 };
 
 export { HasItemConditionNode };

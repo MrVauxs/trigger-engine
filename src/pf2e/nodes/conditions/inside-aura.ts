@@ -2,7 +2,7 @@ import { actorsRespectAlliance } from "module-helpers";
 import { BaseAuraEvent, PF2eInputEntry, PF2eOutputEntry, getAurasInMemory } from "pf2e";
 import { BaseConditionNode } from ".";
 
-class InsideAuraConditionNode extends BaseConditionNode<Inputs, { source: TargetDocuments }> {
+class InsideAuraConditionNode extends BaseConditionNode<Inputs, Outputs> {
     static get type(): "inside-aura" {
         return "inside-aura";
     }
@@ -20,7 +20,7 @@ class InsideAuraConditionNode extends BaseConditionNode<Inputs, { source: Target
     }
 
     static get defineOutputs(): PF2eOutputEntry[] {
-        return [BaseAuraEvent.defineOutputs[1]];
+        return [BaseAuraEvent.defineOutputs[1], { key: "target", type: "target" }];
     }
 
     get isLoop(): boolean {
@@ -28,17 +28,19 @@ class InsideAuraConditionNode extends BaseConditionNode<Inputs, { source: Target
     }
 
     async _execute(): Promise<boolean> {
-        const target = (await this.getInputValue("target"))?.actor;
+        const target = await this.getInputValue("target");
         const slug = await this.getInputValue("slug");
 
         if (!target || !slug) {
             return this.executeNext("false");
         }
 
+        this.setOutputValue("target", target);
+
         const once = await this.getInputValue("once");
         const affects = await this.getInputValue("affects");
-        const auras = getAurasInMemory(target).filter(({ data, origin }) => {
-            return data.slug === slug && actorsRespectAlliance(origin.actor, target, affects);
+        const auras = getAurasInMemory(target.actor).filter(({ data, origin }) => {
+            return data.slug === slug && actorsRespectAlliance(origin.actor, target.actor, affects);
         });
 
         if (!auras.length) {
@@ -60,6 +62,11 @@ type Inputs = {
     affects: "all" | "allies" | "enemies";
     once: boolean;
     slug: string;
+    target?: TargetDocuments;
+};
+
+type Outputs = {
+    source?: TargetDocuments;
     target?: TargetDocuments;
 };
 
