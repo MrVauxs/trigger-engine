@@ -23,6 +23,10 @@ class BaseConditionNode<
     get icon(): IconObject {
         return { unicode: "\ue14f" };
     }
+
+    async executeNextIf(condition?: boolean): Promise<boolean> {
+        return this.executeNext(condition ? "true" : "false");
+    }
 }
 
 export { BaseConditionNode };
