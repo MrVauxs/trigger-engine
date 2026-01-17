@@ -2,12 +2,9 @@ import { BridgeSchemaInput, TriggerNode } from "engine";
 
 abstract class BaseSplitterNode<
     TOuts extends string = string,
-    TInputs extends Record<string, any> = Record<string, any>,
+    TInput extends any = any,
     TOutputs extends Record<string, any> = Record<string, any>,
-    TCustomInputs extends string = string,
-    TCustomOutputs extends string = string,
-    TState extends string = string,
-> extends TriggerNode<TOuts, TInputs, TOutputs, TCustomInputs, TCustomOutputs, TState> {
+> extends TriggerNode<TOuts, { input: TInput }, TOutputs, never, never, never> {
     static get category(): string {
         return "splitter";
     }

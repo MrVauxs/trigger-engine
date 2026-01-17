@@ -1,7 +1,7 @@
 import { BridgeSchemaInput, BuiltinsInputEntry } from "engine";
 import { BaseSplitterNode } from ".";
 
-abstract class BooleanSplitterNode extends BaseSplitterNode<"true" | "false", { input: boolean }> {
+abstract class BooleanSplitterNode extends BaseSplitterNode<"true" | "false", boolean> {
     static get type(): "split-boolean" {
         return "split-boolean";
     }
