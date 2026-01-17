@@ -548,8 +548,10 @@
                 },
                 "condition": {
                     "has-item": {
-                        "inputs": {},
                         "title": "Has Item"
+                    },
+                    "has-option": {
+                        "title": "Has RollOption"
                     },
                     "inside-aura": {
                         "inputs": {
