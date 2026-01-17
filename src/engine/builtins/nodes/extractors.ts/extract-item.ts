@@ -1,8 +1,8 @@
-import { BuiltinsCustomOutput, BuiltinsInputEntry } from "engine";
-import { ItemPF2e, R } from "module-helpers";
+import { BuiltinsInputEntry } from "engine";
+import { ItemPF2e } from "module-helpers";
 import { BaseExtractorNode } from ".";
 
-abstract class ItemExtractorNode extends BaseExtractorNode<ItemPF2e | undefined, "path"> {
+class ItemExtractorNode extends BaseExtractorNode<ItemPF2e, ItemPF2e> {
     static get type(): "extract-item" {
         return "extract-item";
     }
@@ -15,25 +15,8 @@ abstract class ItemExtractorNode extends BaseExtractorNode<ItemPF2e | undefined,
         return [{ key: "input", type: "item" }];
     }
 
-    static get defineCustomOutputs(): BuiltinsCustomOutput[] | null {
-        return [{ slug: "path", array: true, input: {} }];
-    }
-
-    async _execute(): Promise<boolean> {
-        const item = await this.getInputValue("input");
-
-        if (!item) {
-            return this.executeNext("out");
-        }
-
-        const entries = this.getCustomOutputs("path");
-
-        for (const { key, input } of entries) {
-            const value = R.isString(input) ? foundry.utils.getProperty(item, input) : undefined;
-            this.setOutputValue(key, value);
-        }
-
-        return this.executeNext("out");
+    _castDocument(item: ItemPF2e): ItemPF2e {
+        return item;
     }
 }
 

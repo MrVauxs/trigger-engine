@@ -127,6 +127,9 @@
                 "a": {
                     "title": "Entry A"
                 },
+                "actor": {
+                    "title": "Actor"
+                },
                 "b": {
                     "title": "Entry B"
                 },
@@ -274,6 +277,9 @@
                     }
                 },
                 "extractor": {
+                    "extract-actor": {
+                        "title": "Extract From Actor"
+                    },
                     "extract-item": {
                         "title": "Extract From Item"
                     }

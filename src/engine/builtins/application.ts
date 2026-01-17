@@ -1,6 +1,7 @@
 import { mapConvertors } from "engine";
 import { MODULE, R } from "module-helpers";
 import {
+    ActorExtractorNode,
     AwaitConfirmActionNode,
     BooleanSplitterNode,
     BreakLoopLogicNode,
@@ -66,7 +67,7 @@ const events = [
     TestEvent,
 ] as const;
 
-const extractors = [ItemExtractorNode] as const;
+const extractors = [ActorExtractorNode, ItemExtractorNode] as const;
 
 const logics = [BreakLoopLogicNode, CompareNumbersLogicNode] as const;
 
