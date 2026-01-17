@@ -1,8 +1,7 @@
 import { z, zID, zString } from "module-helpers";
+import { zCustomInputValue } from ".";
 
 // data
-
-const zCustomInputValue = z.union([zString, z.number()]).optional();
 
 const zBaseData = z.object({
     id: zID,
@@ -85,7 +84,6 @@ export {
     zBaseEntrySchema,
     zCustomInputData,
     zCustomInputSchema,
-    zCustomInputValue,
     zCustomOutData,
     zCustomOutSchema,
     zCustomOutputData,
