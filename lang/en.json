@@ -673,7 +673,12 @@
                 },
                 "logic": {
                     "compare-outcomes": {
-                        "title": "Compare Outcomes"
+                        "title": "Compare Degree of Success"
+                    }
+                },
+                "splitter": {
+                    "split-outcome": {
+                        "title": "Split Degree of Success"
                     }
                 },
                 "value": {

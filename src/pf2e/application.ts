@@ -14,6 +14,7 @@ import {
     InsideAuraConditionNode,
     IsDeadConditionNode,
     ItemValueNode,
+    OutcomeSplitterNode,
     RollDamageActionNode,
     RollSaveActionNode,
     SendToChatActionNode,
@@ -48,9 +49,11 @@ const events = [
     TurnStartEvent,
 ] as (typeof TriggerNode)[];
 
-const logics = [CompareOutcomesLogicNode] as (typeof TriggerNode)[];
+const logics = [CompareOutcomesLogicNode];
 
-const values = [ItemValueNode] as (typeof TriggerNode)[];
+const splitters = [OutcomeSplitterNode];
+
+const values = [ItemValueNode];
 
 function registerPF2eApplication() {
     const options: TriggerApplicationOptions = {
@@ -58,7 +61,7 @@ function registerPF2eApplication() {
         convertors: pf2eConvertors,
         entries: pf2eEntries as any,
         hooks: [AuraHook, CreateMessageHook, TurnEndHook, TurnStartHook] as (typeof TriggerHook)[],
-        nodes: [...actions, ...conditions, ...events, ...logics, ...values],
+        nodes: [...actions, ...conditions, ...events, ...logics, ...splitters, ...values] as (typeof TriggerNode)[],
     };
 
     TriggerApplication.register(MODULE.id, "pf2e-trigger", options);
