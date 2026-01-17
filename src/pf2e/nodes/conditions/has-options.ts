@@ -1,6 +1,6 @@
+import { BaseConditionNode } from "engine";
 import { hasRollOption } from "module-helpers";
 import { PF2eInputEntry } from "pf2e";
-import { BaseConditionNode } from ".";
 
 class HasOptionConditionNode extends BaseConditionNode<Inputs> {
     static get type(): "has-option" {
@@ -21,9 +21,9 @@ class HasOptionConditionNode extends BaseConditionNode<Inputs> {
     async _execute(): Promise<boolean> {
         const option = await this.getInputValue("option");
         const target = (await this.getInputValue("target"))?.actor;
-        const out = !!target && !!option && hasRollOption(target, option);
+        const result = !!target && !!option && hasRollOption(target, option);
 
-        return this.executeNext(out ? "true" : "false");
+        return this.executeNext(result ? "true" : "false");
     }
 }
 

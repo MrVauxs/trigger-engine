@@ -19,6 +19,7 @@ import {
     ExecuteEvent,
     ExecuteHook,
     ExecuteScriptActionNode,
+    ListContainsConditionNode,
     MoveTokenEvent,
     MoveTokenHook,
     NumberSplitterNode,
@@ -51,6 +52,8 @@ const actions = [
     ExecuteScriptActionNode,
 ] as const;
 
+const conditions = [ListContainsConditionNode] as const;
+
 const events = [
     CreateCombatantEvent,
     CreateTokenEvent,
@@ -68,7 +71,7 @@ const splitters = [BooleanSplitterNode, NumberSplitterNode, TextSplitterNode] as
 
 const values = [UserValueNode] as const;
 
-const nodes = [...actions, ...events, ...logics, ...splitters, ...values] as const;
+const nodes = [...actions, ...conditions, ...events, ...logics, ...splitters, ...values] as const;
 
 class BuiltInApplication {
     static get moduleId(): string {

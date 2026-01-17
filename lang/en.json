@@ -133,6 +133,9 @@
                 "combatant": {
                     "title": "Combatant"
                 },
+                "entry": {
+                    "title": "Entry"
+                },
                 "input": {
                     "title": "Input"
                 },
@@ -224,6 +227,16 @@
                             "script": "Script"
                         },
                         "title": "Execute Script"
+                    }
+                },
+                "condition": {
+                    "list-contains": {
+                        "inputs": {
+                            "list": {
+                                "title": "Text List"
+                            }
+                        },
+                        "title": "Text List Contains"
                     }
                 },
                 "event": {

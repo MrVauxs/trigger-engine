@@ -1,6 +1,6 @@
 import { PF2eInputEntry, PF2eOutputEntry } from "pf2e";
-import { BaseConditionNode } from ".";
 import { ItemPF2e, findItemWithSlug, findItemWithSourceId } from "module-helpers";
+import { BaseConditionNode } from "engine";
 
 class HasItemConditionNode extends BaseConditionNode<Inputs, Outputs, never, never, "uuid" | "slug"> {
     static get type(): "has-item" {

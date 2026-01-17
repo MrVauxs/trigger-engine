@@ -1,6 +1,6 @@
+import { BaseConditionNode } from "engine";
 import { actorsRespectAlliance } from "module-helpers";
 import { BaseAuraEvent, PF2eInputEntry, PF2eOutputEntry, getAurasInMemory } from "pf2e";
-import { BaseConditionNode } from ".";
 
 class InsideAuraConditionNode extends BaseConditionNode<Inputs, Outputs> {
     static get type(): "inside-aura" {
