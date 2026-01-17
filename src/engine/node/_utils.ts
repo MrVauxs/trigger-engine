@@ -120,6 +120,7 @@ function getEntrySchemas(
                 return {
                     field: (schema as CustomInputSchema).field,
                     group: schema.group,
+                    input: entry.input,
                     isArray: entry.isArray,
                     key: entry.id,
                     label: entry.label,

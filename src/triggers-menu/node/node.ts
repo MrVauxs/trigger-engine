@@ -654,7 +654,7 @@ class BlueprintNode extends PIXI.Container {
 
                 const groups = R.pipe(
                     entries[category].contents,
-                    R.groupBy((entry) => entry.group ?? ""),
+                    R.groupBy((entry) => entry.schema.group ?? ""),
                     R.entries(),
                 );
 
@@ -671,7 +671,7 @@ class BlueprintNode extends PIXI.Container {
         const nbEntries = (section: [key: string, value: OpenNodeEntry[]][]): number => {
             return R.sum(
                 section.map(([group, entries]) => {
-                    return R.sumBy(entries, (entry) => 1 + entry.spacing) + (group === "" ? 0 : 1);
+                    return R.sumBy(entries, (entry) => 1 + entry.schema.spacing) + (group === "" ? 0 : 1);
                 }),
             );
         };
@@ -737,7 +737,7 @@ class BlueprintNode extends PIXI.Container {
                 this.#inputs.set(entry.key, entry);
                 this.#entries.push(entry);
 
-                inputIndex += input.spacing;
+                inputIndex += input.schema.spacing;
                 addToRow(inputIndex++, 0, entry);
             }
         }
@@ -768,7 +768,7 @@ class BlueprintNode extends PIXI.Container {
                 this.#outputs.set(entry.key, entry);
                 this.#entries.push(entry);
 
-                outputIndex += output.spacing;
+                outputIndex += output.schema.spacing;
                 addToRow(outputIndex++, 1, entry);
             }
         }
@@ -1123,12 +1123,16 @@ class BlueprintNode extends PIXI.Container {
 
         const entrySchema: BaseCustomData = {
             input: result.input,
-            label: result.label || (schema.input ? String(result.input) : ""),
+            label: result.label ?? "",
             slug: schema.slug,
         };
 
-        if (dialogData.types?.length && !result.label && (!input || (input?.type === "text" && !entrySchema.label))) {
+        if (!result.label && dialogData.types?.length) {
             entrySchema.label = dialogData.types.find((type) => type.value === result.type)?.label ?? "";
+        }
+
+        if (!result.label && schema.input) {
+            entrySchema.label = String(result.input);
         }
 
         if (result.type) {

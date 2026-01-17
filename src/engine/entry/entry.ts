@@ -97,7 +97,7 @@ class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<st
 interface NodeEntry<
     TValue extends unknown = unknown,
     TFieldSchema extends Record<string, any> | undefined = undefined,
-> extends Omit<BaseEntrySchemaOutput, "state" | "type"> {
+> extends Pick<BaseEntrySchemaOutput, "input" | "isArray" | "key" | "label" | "slug"> {
     /** The entry category. */
     get category(): EntryCategory;
     /** @see {@link NodeEntry.color} */
