@@ -2,8 +2,10 @@ import { BuiltinsInputEntry, TriggerNode } from "engine";
 
 const descriptionStates = ["description", "localization"];
 
+let DESCRIPTION_SCHEMAS: BuiltinsInputEntry[] | undefined;
+
 function descriptionSchemas(): BuiltinsInputEntry[] {
-    return [
+    return (DESCRIPTION_SCHEMAS ??= [
         {
             key: "content",
             type: "text",
@@ -15,7 +17,7 @@ function descriptionSchemas(): BuiltinsInputEntry[] {
             type: "text",
             state: "localization",
         },
-    ];
+    ]);
 }
 
 async function getDescriptionInputs(
