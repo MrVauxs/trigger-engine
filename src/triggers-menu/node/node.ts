@@ -1038,6 +1038,22 @@ class BlueprintNode extends PIXI.Container {
         });
     }
 
+    validateCustomEntryInput(
+        input: CustomEntryDialogData["input"],
+        schema: BaseCustomSchema,
+        result: EditEntryData,
+    ): boolean {
+        if (input && schema.input?.validation) {
+            const regex = new RegExp(schema.input.validation);
+
+            if (!regex.test(result.input ?? "")) {
+                warning("edit-entry.validation", { name: input.label, pattern: schema.input.validation });
+                return false;
+            }
+        }
+        return true;
+    }
+
     async #addCustomEntry(category: EntryCategory | "outs", schema: BaseCustomSchema) {
         const title = this.customEntryLabel(category, schema);
         const label: CustomEntryDialogData["label"] = !schema.input?.replaceLabel && {
@@ -1083,12 +1099,7 @@ class BlueprintNode extends PIXI.Container {
             }
         }
 
-        const result = await waitDialog<{
-            label?: string;
-            input?: string;
-            array?: boolean;
-            type?: string;
-        }>({
+        const result = await waitDialog<EditEntryData>({
             content: "edit-entry",
             data: dialogData,
             disabled: true,
@@ -1109,16 +1120,7 @@ class BlueprintNode extends PIXI.Container {
             },
         });
 
-        if (!result) return;
-
-        if (input && schema.input?.validation) {
-            const regex = new RegExp(schema.input.validation);
-
-            if (!regex.test(result.input ?? "")) {
-                warning("edit-entry.validation", { name: input.label, pattern: schema.input.validation });
-                return;
-            }
-        }
+        if (!result || !this.validateCustomEntryInput(input, schema, result)) return;
 
         if ((input?.type === "text" && !result.input) || (input?.type === "number" && !R.isNumber(result.input))) {
             warning("edit-entry.required", { name: input.label });
@@ -1295,6 +1297,13 @@ type CustomEntryDialogData = {
     label: { placeholder: string | undefined; value: string } | false;
     type: string | undefined;
     types?: RequiredSelectOptions;
+};
+
+type EditEntryData = {
+    label?: string;
+    input?: string;
+    array?: boolean;
+    type?: string;
 };
 
 export { BlueprintNode };

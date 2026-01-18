@@ -302,7 +302,7 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
             },
         });
 
-        if (!result) return;
+        if (!result || !node.validateCustomEntryInput(dialogInput, definedSchema, result)) return;
 
         const update: { label?: string; input?: string } = {};
 
@@ -312,6 +312,10 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
 
         if (result.input) {
             update.input = result.input;
+
+            if (definedSchema.input?.replaceLabel) {
+                update.label = result.input;
+            }
         }
 
         node.data.update({
