@@ -15,7 +15,8 @@ class SendToChatActionNode extends BaseActionNode<"out", Inputs> {
     static get defineInputs(): PF2eInputEntry[] {
         return [
             { key: "item", type: "item" },
-            { key: "targets", type: "target", isArray: true },
+            { key: "parent", type: "target", group: "optional" },
+            { key: "targets", type: "target", isArray: true, group: "optional" },
         ];
     }
 
@@ -24,13 +25,16 @@ class SendToChatActionNode extends BaseActionNode<"out", Inputs> {
     }
 
     async _execute(): Promise<boolean> {
-        const item = await this.getInputValue("item");
+        const rawItem = await this.getInputValue("item");
+        const parent = await this.getInputValue("parent");
 
-        if (!item?.parent) {
+        if (!rawItem || (!rawItem.parent && !parent)) {
             return this.executeNext("out");
         }
 
         const targets = await this.getInputValue("targets");
+        const item = parent ? new (getDocumentClass("Item"))(rawItem.toObject(), { parent: parent.actor }) : rawItem;
+
         const message = await item.toMessage(null, { create: !targets.length });
 
         if (targets.length && message) {
@@ -47,6 +51,7 @@ class SendToChatActionNode extends BaseActionNode<"out", Inputs> {
 
 type Inputs = {
     item?: ItemPF2e;
+    parent?: TargetDocuments;
     targets: TargetDocuments[];
 };
 

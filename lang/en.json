@@ -176,6 +176,9 @@
                     "title": "Value"
                 }
             },
+            "group": {
+                "optional": "Optional"
+            },
             "node": {
                 "__gate__": {
                     "__gate_entry__": {
@@ -534,6 +537,9 @@
                 "outcome": {
                     "title": "Outcome"
                 },
+                "parent": {
+                    "title": "Parent"
+                },
                 "private": {
                     "title": "Private"
                 },
@@ -587,6 +593,11 @@
                         "title": "Roll Save Check"
                     },
                     "send-chat": {
+                        "inputs": {
+                            "parent": {
+                                "tooltip": "Cannot send unowned items to chat"
+                            }
+                        },
                         "title": "Send Item to Chat"
                     }
                 },
