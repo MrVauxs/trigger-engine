@@ -17,12 +17,14 @@ import { PF2eInputEntry } from "pf2e";
 
 const dcStates = ["value", "target", "item"] as const;
 
+let DC_SCHEMAS: PF2eInputEntry[] | undefined;
+
 function dcLocalizePath(...path: string[]): string {
     return localizePath("pf2e-trigger.shared.difficulty-class", ...path);
 }
 
 function dcSchemas(): PF2eInputEntry[] {
-    return [
+    return (DC_SCHEMAS ??= [
         {
             key: "save",
             type: "text",
@@ -61,7 +63,7 @@ function dcSchemas(): PF2eInputEntry[] {
             state: "item",
             field: { default: 1, min: 1 },
         },
-    ];
+    ]);
 }
 
 function getValueDC(
