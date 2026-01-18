@@ -499,7 +499,6 @@
                 "paste": "Paste Node(s) from Clipboard",
                 "title": "Clipboard"
             },
-            "empty": "No Matching Nodes",
             "event": "Event",
             "search": {
                 "label": "Search Node",

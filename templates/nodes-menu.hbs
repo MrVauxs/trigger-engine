@@ -47,7 +47,7 @@
         {{group.label}}
         {{/if}}
     </legend>
-    <div class="nodes" data-empty="{{@root.i18n 'empty'}}">{{#each group.nodes as |node|}}<div
+    <div class="nodes">{{#each group.nodes as |node|}}<div
             class="selectable node" data-action="{{group.action}}" data-tags="{{node.tags}}"
             data-name="{{node.title}}" data-type="{{node.type}}" data-id="{{node.id}}">
             <div class="name">{{node.title}}</div>

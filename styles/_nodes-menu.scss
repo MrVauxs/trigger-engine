@@ -40,17 +40,6 @@
                     font-size: 1.2em;
                 }
 
-                .nodes {
-                    &:not(:has(.node:not(.hidden))) {
-                        text-align: center;
-
-                        &::after {
-                            content: attr(data-empty);
-                            opacity: 0.5;
-                        }
-                    }
-                }
-
                 .selectable {
                     position: relative;
                     font-size: 1.1em;
