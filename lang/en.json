@@ -301,6 +301,20 @@
                             }
                         },
                         "title": "Compare Numbers"
+                    },
+                    "format-text": {
+                        "inputs": {
+                            "str": {
+                                "title": "Text to Format",
+                                "tooltip": "Will replace @x variables"
+                            }
+                        },
+                        "outputs": {
+                            "result": {
+                                "title": "Formatted"
+                            }
+                        },
+                        "title": "Format Text"
                     }
                 },
                 "splitter": {
@@ -408,6 +422,7 @@
             "label": "Label",
             "required": "The field <strong>{name}</strong> is required.",
             "types": "Types",
+            "validation": "The field <strong>{name}</strong> must match the pattern <strong>{pattern}</strong>.",
             "yes": {
                 "add": "Add",
                 "edit": "Edit"

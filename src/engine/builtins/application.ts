@@ -20,6 +20,7 @@ import {
     ExecuteEvent,
     ExecuteHook,
     ExecuteScriptActionNode,
+    FormatTextLogicNode,
     ItemExtractorNode,
     ListContainsConditionNode,
     MoveTokenEvent,
@@ -69,7 +70,7 @@ const events = [
 
 const extractors = [ActorExtractorNode, ItemExtractorNode] as const;
 
-const logics = [BreakLoopLogicNode, CompareNumbersLogicNode] as const;
+const logics = [BreakLoopLogicNode, CompareNumbersLogicNode, FormatTextLogicNode] as const;
 
 const splitters = [BooleanSplitterNode, NumberSplitterNode, TextSplitterNode] as const;
 
