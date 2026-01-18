@@ -2,12 +2,14 @@ import { TriggerNode } from "engine";
 import { R, RollNoteSource, getExtraRollOptions, localizePath, splitListString } from "module-helpers";
 import { PF2eInputEntry } from "pf2e";
 
+let ROLL_SCHEMAS: PF2eInputEntry[] | undefined;
+
 function rollLocalizePath(...path: string[]): string {
     return localizePath("pf2e-trigger.shared.roll-data", ...path);
 }
 
 function rollDataSchemas(): PF2eInputEntry[] {
-    return [
+    return (ROLL_SCHEMAS ??= [
         { key: "options", type: "text", group: "roll", label: rollLocalizePath("options.title") },
         { key: "traits", type: "text", group: "roll", label: rollLocalizePath("traits.title") },
         {
@@ -17,7 +19,7 @@ function rollDataSchemas(): PF2eInputEntry[] {
             label: rollLocalizePath("note.title"),
             field: { type: "enriched" },
         },
-    ];
+    ]);
 }
 
 async function getRollData(
