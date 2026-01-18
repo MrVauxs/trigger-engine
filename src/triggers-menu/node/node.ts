@@ -1111,6 +1111,15 @@ class BlueprintNode extends PIXI.Container {
 
         if (!result) return;
 
+        if (input && schema.input?.validation) {
+            const regex = new RegExp(schema.input.validation);
+
+            if (!regex.test(result.input ?? "")) {
+                warning("edit-entry.validation", { name: input.label, pattern: schema.input.validation });
+                return;
+            }
+        }
+
         if ((input?.type === "text" && !result.input) || (input?.type === "number" && !R.isNumber(result.input))) {
             warning("edit-entry.required", { name: input.label });
             return;

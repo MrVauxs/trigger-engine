@@ -27,6 +27,7 @@ const zInputField = z.object({
     label: zString.optional(),
     placeholder: zString.optional(),
     replaceLabel: z.boolean().default(false),
+    validation: z.string().optional(),
 });
 
 const zBaseSchema = z.object({
