@@ -177,12 +177,14 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
             </section>
         </div>`;
 
+        const stretch = `<div class="window-stretch" data-action="toggle-stretch"></div>`;
+
         if (ui) {
-            ui.innerHTML = result + description;
+            ui.innerHTML = result + description + stretch;
         } else {
             const wrapper = createHTMLElement("div", {
                 classes: ["ui"],
-                content: result + description,
+                content: result + description + stretch,
                 dataset: { tooltipClass: "trigger-engine-field-tooltip", tooltipDirection: "UP" },
             });
 
@@ -294,6 +296,10 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
 
             case "toggle-enabled": {
                 return event.stopPropagation();
+            }
+
+            case "toggle-stretch": {
+                return this.element.classList.toggle("stretched");
             }
         }
     }
@@ -796,7 +802,8 @@ type EventAction =
     | "tab-gate"
     | "tab-variable"
     | "toggle-description"
-    | "toggle-enabled";
+    | "toggle-enabled"
+    | "toggle-stretch";
 
 type BlueprintContext = TriggersContext | TriggerContext;
 

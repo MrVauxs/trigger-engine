@@ -8,30 +8,34 @@
 }
 
 #trigger-engine-blueprint {
+    --outer-spacing: 5px;
     --width: calc(
         100% - ((var(--sidebar-width) + 16px + 48px) * var(--ui-scale))
     );
-    --height: calc(100% - 10px);
     --background: url("../../../ui/denim075.png") repeat;
     --background-color: #00000059;
     --background-color-highlight: #ffffff14;
     --border: 1px solid #111111;
     --border-separator: 1px solid #ffffff3b;
+    --border-radius: 0 5px 5px 0;
     --folder-spacer-width: 6px;
     --tags-buttons-border: 1px solid var(--color-border-light-tertiary);
 
     @include app();
 
     position: absolute;
-    height: var(--height);
-    max-height: var(--height);
     width: var(--width);
     max-width: var(--width);
     margin: 0;
     pointer-events: none;
-    top: 5px;
-    border-radius: 0 5px 5px 0;
+    top: var(--outer-spacing);
+    bottom: var(--outer-spacing);
+    border-radius: var(--border-radius);
     color: var(--color-text-light-highlight);
+
+    &.stretched {
+        --width: calc(100% - var(--outer-spacing));
+    }
 
     .ui {
         height: 100%;
@@ -293,6 +297,20 @@
         .content-link {
             color: var(--color-text-dark-1);
         }
+    }
+
+    .window-stretch {
+        z-index: 20;
+        position: absolute;
+        right: -1px;
+        top: 0;
+        bottom: 0;
+        width: 10px;
+        background: var(--background);
+        background-color: var(--background-color);
+        pointer-events: all;
+        cursor: pointer;
+        border-radius: var(--border-radius);
     }
 
     .window-collapsed {
