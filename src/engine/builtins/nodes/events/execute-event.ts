@@ -1,5 +1,5 @@
 import { IconObject } from "_zod";
-import { BaseEventNode, BuiltinsCustomOutput, ExecuteEventOptions } from "engine";
+import { BaseEventNode, BuiltinsCustomEntry, ExecuteEventOptions } from "engine";
 
 class ExecuteEvent extends BaseEventNode {
     static get type(): "execute-event" {
@@ -10,7 +10,7 @@ class ExecuteEvent extends BaseEventNode {
         return ["macro"];
     }
 
-    static get defineCustomOutputs(): BuiltinsCustomOutput[] {
+    static get defineCustomOutputs(): BuiltinsCustomEntry[] {
         return [{ array: true, slug: "output" }];
     }
 

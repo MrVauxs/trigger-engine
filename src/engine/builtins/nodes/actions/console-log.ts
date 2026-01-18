@@ -1,4 +1,4 @@
-import { BuiltinsCustomOutput } from "engine";
+import { BuiltinsCustomEntry } from "engine";
 import { MODULE } from "module-helpers";
 import { BaseActionNode } from ".";
 import { IconObject } from "_zod";
@@ -12,7 +12,7 @@ class ConsoleLogActionNode extends BaseActionNode<"out", never, never, "input"> 
         return ["debug"];
     }
 
-    static get defineCustomInputs(): BuiltinsCustomOutput[] {
+    static get defineCustomInputs(): BuiltinsCustomEntry[] {
         return [{ slug: "input", array: true }];
     }
 

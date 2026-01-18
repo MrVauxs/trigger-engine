@@ -1,4 +1,4 @@
-import { BuiltinsCustomOutput, TriggerNode } from "engine";
+import { BuiltinsCustomEntry, TriggerNode } from "engine";
 import { R } from "module-helpers";
 
 abstract class BaseExtractorNode<TInput extends any, TDocument extends foundry.abstract.Document> extends TriggerNode<
@@ -13,7 +13,7 @@ abstract class BaseExtractorNode<TInput extends any, TDocument extends foundry.a
         return "extractor";
     }
 
-    static get defineCustomOutputs(): BuiltinsCustomOutput[] | null {
+    static get defineCustomOutputs(): BuiltinsCustomEntry[] | null {
         return [{ slug: "path", array: true, input: {} }];
     }
 

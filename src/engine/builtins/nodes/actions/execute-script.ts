@@ -1,4 +1,4 @@
-import { BuiltinsCustomOutput, BuiltinsInputEntry, CustomInputSchema } from "engine";
+import { BuiltinsCustomEntry, BuiltinsInputEntry, CustomInputSchema } from "engine";
 import { R, isScriptMacro } from "module-helpers";
 import { BaseActionNode } from ".";
 import { IconObject } from "_zod";
@@ -45,7 +45,7 @@ class ExecuteScriptActionNode extends BaseActionNode<
         return [{ slug: "input", array: true }];
     }
 
-    static get defineCustomOutputs(): BuiltinsCustomOutput[] | null {
+    static get defineCustomOutputs(): BuiltinsCustomEntry[] | null {
         return [{ slug: "output", array: true }];
     }
 

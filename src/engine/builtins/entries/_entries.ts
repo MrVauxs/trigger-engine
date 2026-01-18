@@ -24,11 +24,11 @@ type BuiltinsInputEntry =
     | BaseEntrySchema<Exclude<BuiltinsEntryType, BuiltinsEntryWithField["type"]>>
     | BuiltinsEntryWithField;
 
-type BuiltinsCustomOutput = Prettify<
+type BuiltinsCustomEntry = Prettify<
     Omit<CustomOutputSchema, "types"> & {
         types?: BuiltinsEntryType[];
     }
 >;
 
 export { builtinsEntries };
-export type { BuiltinsCustomOutput, BuiltinsInputEntry, BuiltinsOutputEntry };
+export type { BuiltinsCustomEntry, BuiltinsInputEntry, BuiltinsOutputEntry };
