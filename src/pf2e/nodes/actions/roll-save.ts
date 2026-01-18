@@ -4,15 +4,14 @@ import { ActorPF2e, ItemPF2e, StatisticRollParameters, ZeroToThree } from "modul
 import {
     DifficultyClassInputs,
     DifficultyClassState,
-    PF2eInputEntry,
-    PF2eOutputEntry,
     RollDataInputs,
     dcSchemas,
     dcStates,
     getDcData,
     getRollData,
     rollDataSchemas,
-} from "pf2e";
+} from ".";
+import { PF2eInputEntry, PF2eOutputEntry } from "pf2e";
 
 class RollSaveActionNode extends BaseActionNode<"out", Inputs, Outputs, never, never, DifficultyClassState> {
     static get type(): "roll-save" {

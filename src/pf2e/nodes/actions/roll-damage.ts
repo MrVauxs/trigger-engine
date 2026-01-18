@@ -4,14 +4,14 @@ import { ItemPF2e, RollDamageOptions, getTargetsTokensUUIDs, rollDamageFromFormu
 import {
     DifficultyClassInputs,
     DifficultyClassState,
-    PF2eInputEntry,
     RollDataInputs,
     dcSchemas,
     dcStates,
     getDcData,
     getRollData,
     rollDataSchemas,
-} from "pf2e";
+} from ".";
+import { PF2eInputEntry } from "pf2e";
 
 class RollDamageActionNode extends BaseActionNode<"out", Inputs, never, never, never, DifficultyClassState> {
     static get type(): "roll-damage" {

@@ -154,9 +154,6 @@
                 "number": {
                     "title": "Number"
                 },
-                "slug": {
-                    "title": "Item Slug"
-                },
                 "target": {
                     "title": "Target"
                 },
@@ -367,7 +364,7 @@
                 }
             },
             "region": {
-                "gm": "GM Only?",
+                "gm": "GM Only",
                 "path": "Trigger Path"
             },
             "special": {
@@ -420,7 +417,7 @@
             "title": "Confirm Dialog"
         },
         "edit-entry": {
-            "array": "Is Array?",
+            "array": "Is Array",
             "input": "Input",
             "label": "Label",
             "required": "The field <strong>{name}</strong> is required.",
@@ -533,6 +530,12 @@
                 "effect": {
                     "title": "Effect"
                 },
+                "img": {
+                    "title": "Image Path"
+                },
+                "name": {
+                    "title": "Name"
+                },
                 "option": {
                     "title": "Roll Option"
                 },
@@ -555,10 +558,12 @@
                     "title": "Save Type"
                 },
                 "when": {
-                    "title": "Triggers When?"
+                    "title": "Triggers When"
                 }
             },
             "group": {
+                "duration": "Duration Data",
+                "effect": "Effect Data",
                 "roll": "Roll Data",
                 "save": "Save Data"
             },
@@ -566,6 +571,9 @@
                 "action": {
                     "create-condition": {
                         "title": "Create Condition Effect"
+                    },
+                    "create-effect": {
+                        "title": "Create Effect"
                     },
                     "create-item": {
                         "customs": {
@@ -581,7 +589,7 @@
                         },
                         "inputs": {
                             "duplicate": {
-                                "title": "Allow Duplicate?"
+                                "title": "Allow Duplicate"
                             }
                         },
                         "title": "Create Item"
@@ -614,10 +622,18 @@
                 },
                 "condition": {
                     "has-item": {
+                        "inputs": {
+                            "slug": {
+                                "title": "Item Slug"
+                            }
+                        },
                         "outputs": {
                             "target": {
                                 "title": "Parent"
                             }
+                        },
+                        "states": {
+                            "slug": "Slug"
                         },
                         "title": "Has Item"
                     },
@@ -627,7 +643,7 @@
                     "inside-aura": {
                         "inputs": {
                             "once": {
-                                "title": "Execute Once?"
+                                "title": "Execute Once"
                             }
                         },
                         "outputs": {
@@ -659,7 +675,7 @@
                                     "allies": "Allies",
                                     "enemies": "Enemies"
                                 },
-                                "title": "Affects Who?"
+                                "title": "Affects Who"
                             },
                             "slug": {
                                 "title": "Aura Slug"
@@ -682,7 +698,7 @@
                         "inputs": {
                             "requires": {
                                 "tooltip": "Must originate from an Actor",
-                                "title": "Requires Origin?"
+                                "title": "Requires Origin"
                             },
                             "when": {
                                 "options": {
@@ -752,6 +768,10 @@
                         "title": "Extra Traits"
                     }
                 }
+            },
+            "state": {
+                "fixed": "Fixed",
+                "timed": "Timed"
             },
             "tag": {
                 "attack": {
