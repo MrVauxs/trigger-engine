@@ -640,7 +640,7 @@ class BlueprintNode extends PIXI.Container {
 
         const ins = Number(!!entries.in);
         const outs = isGateEntryNode(this.#node) ? [] : entries.outs.contents;
-        // const minIndex = entries.in || outs.length ? 1 : 0;
+
         const [inputs, outputs] = R.pipe(
             ["inputs", "outputs"] as const,
             R.map((category) => {
@@ -705,7 +705,7 @@ class BlueprintNode extends PIXI.Container {
 
             icon.beginFill("#7a7a7a");
             icon.lineStyle(1, "#7a7a7a");
-            icon.drawCircle(this.connectorWidth / 2 - 1.5, 4, 4);
+            icon.drawCircle(this.connectorWidth / 2 - 1, 4, 4);
             icon.endFill();
 
             alignHorizontally(container, [icon, label], { height: this.entryHeight });
