@@ -2,16 +2,17 @@ import { IconObject } from "_zod";
 import { BridgeSchemaInput, BuiltinsInputEntry } from "engine";
 import { MODULE, R, UserPF2e, htmlQuery, localizePath } from "module-helpers";
 import { ConfirmDialogQueryOptions } from "queries";
-import { BaseActionNode, localizeKeyOrDescription } from ".";
+import {
+    BaseActionNode,
+    DescriptionInputs,
+    DescriptionState,
+    descriptionSchemas,
+    descriptionStates,
+    getDescriptionInputs,
+    localizeKeyOrDescription,
+} from ".";
 
-class AwaitConfirmActionNode extends BaseActionNode<
-    "true" | "false",
-    Inputs,
-    never,
-    never,
-    never,
-    "localization" | "description"
-> {
+class AwaitConfirmActionNode extends BaseActionNode<"true" | "false", Inputs, never, never, never, DescriptionState> {
     static TIMEOUT: number = 30;
 
     static get type(): "await-confirm" {
@@ -23,7 +24,7 @@ class AwaitConfirmActionNode extends BaseActionNode<
     }
 
     static get states(): string[] {
-        return ["description", "localization"];
+        return descriptionStates;
     }
 
     static get defineOuts(): BridgeSchemaInput[] {
@@ -33,17 +34,7 @@ class AwaitConfirmActionNode extends BaseActionNode<
     static get defineInputs(): BuiltinsInputEntry[] {
         return [
             { key: "title", type: "text" },
-            {
-                key: "content",
-                type: "text",
-                field: { type: "enriched" },
-                state: "description",
-            },
-            {
-                key: "localization",
-                type: "text",
-                state: "localization",
-            },
+            ...descriptionSchemas(),
             {
                 key: "timeout",
                 type: "number",
@@ -71,8 +62,7 @@ class AwaitConfirmActionNode extends BaseActionNode<
     }
 
     async _execute(): Promise<boolean> {
-        const content = this.state === "description" ? await this.getInputValue("content") : undefined;
-        const key = this.state === "localization" ? await this.getInputValue("localization") : undefined;
+        const { content, key } = await getDescriptionInputs.call(this);
 
         if (!content && !key) {
             return this.executeNext("false");
@@ -115,7 +105,7 @@ async function createConfirmDialog(options: ConfirmDialogQueryOptions): Promise<
     const title = game.i18n.localize(titleKey);
 
     return foundry.applications.api.DialogV2.confirm({
-        content: await localizeKeyOrDescription(options.key, options.content),
+        content: await localizeKeyOrDescription(options),
         render: (_, dialog) => {
             if (timeout > 0) {
                 setTimeout(() => {
@@ -140,9 +130,7 @@ async function createConfirmDialog(options: ConfirmDialogQueryOptions): Promise<
     });
 }
 
-type Inputs = {
-    content: string;
-    localization: string;
+type Inputs = DescriptionInputs & {
     timeout: number;
     title: string;
     user?: UserPF2e;

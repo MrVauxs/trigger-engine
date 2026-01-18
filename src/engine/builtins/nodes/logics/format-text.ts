@@ -1,4 +1,14 @@
-import { BaseLogicNode, BuiltinsCustomEntry, BuiltinsInputEntry, BuiltinsOutputEntry } from "engine";
+import {
+    BaseLogicNode,
+    BuiltinsCustomEntry,
+    BuiltinsInputEntry,
+    BuiltinsOutputEntry,
+    DescriptionInputs,
+    DescriptionState,
+    descriptionSchemas,
+    descriptionStates,
+    getDescriptionInputs,
+} from "engine";
 
 class FormatTextLogicNode extends BaseLogicNode<
     "out",
@@ -6,7 +16,7 @@ class FormatTextLogicNode extends BaseLogicNode<
     { result: string },
     "variable",
     never,
-    "description" | "localization"
+    DescriptionState
 > {
     static get type(): "format-text" {
         return "format-text";
@@ -17,23 +27,11 @@ class FormatTextLogicNode extends BaseLogicNode<
     }
 
     static get states(): string[] {
-        return ["description", "localization"];
+        return descriptionStates;
     }
 
     static get defineInputs(): BuiltinsInputEntry[] {
-        return [
-            {
-                key: "content",
-                type: "text",
-                field: { type: "enriched" },
-                state: "description",
-            },
-            {
-                key: "localization",
-                type: "text",
-                state: "localization",
-            },
-        ];
+        return descriptionSchemas();
     }
 
     static get defineOutputs(): BuiltinsOutputEntry[] {
@@ -55,12 +53,10 @@ class FormatTextLogicNode extends BaseLogicNode<
     }
 
     async _execute(): Promise<boolean> {
-        let result =
-            this.state === "description"
-                ? await this.getInputValue("content")
-                : game.i18n.localize(await this.getInputValue("localization"));
-
+        const { content, key } = await getDescriptionInputs.call(this);
         const variables = await this.getCustomInputs("variable");
+
+        let result = key ? game.i18n.localize(key) : (content ?? "");
 
         for (const { label, value } of variables) {
             const regex = new RegExp(`@${label}`, "gm");
@@ -73,9 +69,6 @@ class FormatTextLogicNode extends BaseLogicNode<
     }
 }
 
-type Inputs = {
-    content: string;
-    localization: string;
-};
+type Inputs = DescriptionInputs;
 
 export { FormatTextLogicNode };

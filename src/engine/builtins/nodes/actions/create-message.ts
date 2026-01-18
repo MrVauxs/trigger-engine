@@ -1,16 +1,17 @@
 import { BuiltinsInputEntry } from "engine";
 import { UserPF2e, primaryPlayerOwner } from "module-helpers";
-import { BaseActionNode, localizeKeyOrDescription } from ".";
+import {
+    BaseActionNode,
+    DescriptionInputs,
+    DescriptionState,
+    descriptionSchemas,
+    descriptionStates,
+    getDescriptionInputs,
+    localizeKeyOrDescription,
+} from ".";
 import { IconObject } from "_zod";
 
-class CreateMessageActionNode extends BaseActionNode<
-    "out",
-    Inputs,
-    never,
-    never,
-    never,
-    "localization" | "description"
-> {
+class CreateMessageActionNode extends BaseActionNode<"out", Inputs, never, never, never, DescriptionState> {
     static get type(): "create-message" {
         return "create-message";
     }
@@ -20,22 +21,12 @@ class CreateMessageActionNode extends BaseActionNode<
     }
 
     static get states(): string[] {
-        return ["description", "localization"];
+        return descriptionStates;
     }
 
     static get defineInputs(): BuiltinsInputEntry[] {
         return [
-            {
-                key: "content",
-                type: "text",
-                field: { type: "enriched" },
-                state: "description",
-            },
-            {
-                key: "localization",
-                type: "text",
-                state: "localization",
-            },
+            ...descriptionSchemas(),
             {
                 key: "author",
                 type: "user",
@@ -53,10 +44,8 @@ class CreateMessageActionNode extends BaseActionNode<
     }
 
     async _execute(): Promise<boolean> {
-        const content = await localizeKeyOrDescription(
-            this.state === "localization" ? await this.getInputValue("localization") : undefined,
-            this.state === "description" ? await this.getInputValue("content") : undefined,
-        );
+        const descriptionInputs = await getDescriptionInputs.call(this);
+        const content = await localizeKeyOrDescription(descriptionInputs);
 
         if (!content) {
             return this.executeNext("out");
@@ -82,10 +71,8 @@ class CreateMessageActionNode extends BaseActionNode<
     }
 }
 
-type Inputs = {
+type Inputs = DescriptionInputs & {
     author?: UserPF2e;
-    content: string;
-    localization: string;
     speaker?: TargetDocuments;
 };
 
