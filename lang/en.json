@@ -524,6 +524,15 @@
                 "basic": {
                     "title": "Basic"
                 },
+                "condition": {
+                    "title": "Condition"
+                },
+                "counter": {
+                    "title": "Counter"
+                },
+                "effect": {
+                    "title": "Effect"
+                },
                 "option": {
                     "title": "Roll Option"
                 },
@@ -555,6 +564,9 @@
             },
             "node": {
                 "action": {
+                    "create-condition": {
+                        "title": "Create Condition Effect"
+                    },
                     "create-item": {
                         "customs": {
                             "inputs": {

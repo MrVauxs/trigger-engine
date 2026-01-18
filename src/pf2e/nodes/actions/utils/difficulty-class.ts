@@ -11,6 +11,7 @@ import {
     extractModifierAdjustments,
     localizePath,
     parseInlineParams,
+    recordToSelectOptions,
     splitListString,
 } from "module-helpers";
 import { PF2eInputEntry } from "pf2e";
@@ -32,11 +33,7 @@ function dcSchemas(): PF2eInputEntry[] {
             state: ["value", "target"],
             field: {
                 type: "select",
-                options: R.pipe(
-                    CONFIG.PF2E.saves,
-                    R.entries(),
-                    R.map(([value, label]) => ({ value, label })),
-                ),
+                options: recordToSelectOptions(CONFIG.PF2E.saves),
             },
         },
         {
