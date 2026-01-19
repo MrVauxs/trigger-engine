@@ -1,6 +1,6 @@
 import { IconObject } from "_zod";
 import { BaseActionNode } from "engine";
-import { ActorPF2e, ItemPF2e, StatisticRollParameters, ZeroToThree } from "module-helpers";
+import { ActorPF2e, ItemPF2e, R, StatisticRollParameters, ZeroToThree } from "module-helpers";
 import {
     DifficultyClassInputs,
     DifficultyClassState,
@@ -45,11 +45,15 @@ class RollSaveActionNode extends BaseActionNode<"out", Inputs, Outputs, never, n
         return { unicode: "\uf6cf" };
     }
 
+    get canBreak(): boolean {
+        return true;
+    }
+
     async _execute(): Promise<boolean> {
         const target = await this.getInputValue("target");
 
         if (!target) {
-            return this.executeNext("out");
+            return true;
         }
 
         const item = await this.getInputValue("item");
@@ -57,7 +61,7 @@ class RollSaveActionNode extends BaseActionNode<"out", Inputs, Outputs, never, n
         const dcData = await getDcData.call(this, target.actor, origin, item);
 
         if (!dcData?.statistic) {
-            return this.executeNext("out");
+            return true;
         }
 
         const isPrivate = await this.getInputValue("private");
@@ -74,9 +78,12 @@ class RollSaveActionNode extends BaseActionNode<"out", Inputs, Outputs, never, n
 
         const rolled = await dcData.statistic.roll(rollArgs);
 
-        this.setOutputValue("outcome", rolled?.degreeOfSuccess);
+        if (R.isNumber(rolled?.degreeOfSuccess)) {
+            this.setOutputValue("outcome", rolled?.degreeOfSuccess);
+            return this.executeNext("out");
+        }
 
-        return this.executeNext("out");
+        return true;
     }
 }
 

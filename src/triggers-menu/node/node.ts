@@ -164,6 +164,10 @@ class BlueprintNode extends PIXI.Container {
         });
     }
 
+    get canBreak(): boolean {
+        return this.#node.canBreak;
+    }
+
     get isEmit(): boolean {
         return this.#node.isEmit;
     }
@@ -814,6 +818,7 @@ class BlueprintNode extends PIXI.Container {
             [this.isCustom, "custom", "\uf013"],
             [this.isEmit, "emit", "\uf1eb"],
             [this.isLoop, "loop", "\uf0e2"],
+            [this.canBreak, "break", "\uf256"],
         ] as const;
 
         for (const [condition, name, icon] of builtinsSpecials) {

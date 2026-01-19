@@ -170,6 +170,11 @@ class TriggerNode<
     }
 
     /** Used to display a special icon. */
+    get canBreak(): boolean {
+        return false;
+    }
+
+    /** Used to display a special icon. */
     get isEmit(): boolean {
         return false;
     }

@@ -392,6 +392,7 @@
                 "path": "Trigger Path"
             },
             "special": {
+                "break": "Can break current process",
                 "custom": "Has Custom Entries",
                 "emit": "Awaits User Input",
                 "loop": "Can Loop Over",

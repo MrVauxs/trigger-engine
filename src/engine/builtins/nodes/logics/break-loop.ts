@@ -13,6 +13,10 @@ abstract class BreakLoopLogicNode extends BaseLogicNode<never> {
         return null;
     }
 
+    get canBreak(): boolean {
+        return true;
+    }
+
     async _execute(): Promise<boolean> {
         return false;
     }
