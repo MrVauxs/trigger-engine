@@ -1,11 +1,13 @@
-import { DeleteCombatantEvent } from ".";
-import { ExecuteEvent } from ".";
-import { RegionEvent } from ".";
-import { TestEvent } from ".";
-import { MoveTokenEvent } from ".";
-import { DeleteTokenEvent } from ".";
-import { CreateTokenEvent } from ".";
-import { CreateCombatantEvent } from ".";
+import {
+    CreateCombatantEvent,
+    CreateTokenEvent,
+    DeleteCombatantEvent,
+    DeleteTokenEvent,
+    ExecuteEvent,
+    MoveTokenEvent,
+    RegionEvent,
+    TestEvent,
+} from ".";
 
 export * from "./base";
 export * from "./base-combatant";
@@ -16,8 +18,8 @@ export * from "./delete-combatant";
 export * from "./delete-token";
 export * from "./execute-event";
 export * from "./move-token";
-export * from "./start-event";
 export * from "./region-event";
+export * from "./start-event";
 export * from "./test-event";
 
 export default [

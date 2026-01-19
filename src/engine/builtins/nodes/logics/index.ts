@@ -1,6 +1,4 @@
-import { FormatTextLogicNode } from ".";
-import { CompareNumbersLogicNode } from ".";
-import { BreakLoopLogicNode } from ".";
+import { BreakLoopLogicNode, CompareNumbersLogicNode, FormatTextLogicNode } from ".";
 
 export * from "./base";
 export * from "./break-loop";

@@ -1,8 +1,5 @@
 import { TriggerHook } from "engine";
-import { TurnEndHook } from ".";
-import { TurnStartHook } from ".";
-import { CreateMessageHook } from ".";
-import { AuraHook } from ".";
+import { AuraHook, CreateMessageHook, TurnEndHook, TurnStartHook } from ".";
 
 export * from "./aura-hook";
 export * from "./create-message";

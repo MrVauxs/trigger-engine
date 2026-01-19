@@ -1,6 +1,4 @@
-import { TextSplitterNode } from ".";
-import { NumberSplitterNode } from ".";
-import { BooleanSplitterNode } from ".";
+import { BooleanSplitterNode, NumberSplitterNode, TextSplitterNode } from ".";
 
 export * from "./base";
 export * from "./split-boolean";

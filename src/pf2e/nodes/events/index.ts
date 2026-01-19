@@ -1,9 +1,4 @@
-import { AuraLeaveEvent } from ".";
-import { TurnEndEvent } from ".";
-import { TurnStartEvent } from ".";
-import { DamageTakenEvent } from ".";
-import { AuraEnterEvent } from ".";
-import { AttackRollEvent } from ".";
+import { AttackRollEvent, AuraEnterEvent, AuraLeaveEvent, DamageTakenEvent, TurnEndEvent, TurnStartEvent } from ".";
 
 export * from "./base-aura";
 export * from "./attack-roll";

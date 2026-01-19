@@ -1,11 +1,13 @@
-import { DeleteCombatantHook } from ".";
-import { ExecuteHook } from ".";
-import { RegionHook } from ".";
-import { TestHook } from ".";
-import { MoveTokenHook } from ".";
-import { DeleteTokenHook } from ".";
-import { CreateTokenHook } from ".";
-import { CreateCombatantHook } from ".";
+import {
+    CreateCombatantHook,
+    CreateTokenHook,
+    DeleteCombatantHook,
+    DeleteTokenHook,
+    ExecuteHook,
+    MoveTokenHook,
+    RegionHook,
+    TestHook,
+} from ".";
 
 export * from "./base-single-hook";
 export * from "./base-combatant";

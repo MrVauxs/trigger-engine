@@ -1,7 +1,4 @@
-import { InsideAuraConditionNode } from ".";
-import { IsDeadConditionNode } from ".";
-import { HasOptionConditionNode } from ".";
-import { HasItemConditionNode } from ".";
+import { HasItemConditionNode, HasOptionConditionNode, InsideAuraConditionNode, IsDeadConditionNode } from ".";
 
 export * from "./has-item";
 export * from "./has-options";

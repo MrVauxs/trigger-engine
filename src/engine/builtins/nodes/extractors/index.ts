@@ -1,5 +1,4 @@
-import { ItemExtractorNode } from ".";
-import { ActorExtractorNode } from ".";
+import { ActorExtractorNode, ItemExtractorNode } from ".";
 
 export * from "./base";
 export * from "./extract-actor";
