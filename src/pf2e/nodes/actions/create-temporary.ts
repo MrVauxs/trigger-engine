@@ -1,10 +1,18 @@
 import { IconObject } from "_zod";
 import { BaseActionNode } from "engine";
+import { createCustomEffect } from "module-helpers";
 import { PF2eInputEntry } from "pf2e";
-import { DurationInputs, DurationState, durationSchemas, durationStates, getDurationData } from ".";
-import { createCustomEffect, joinStr } from "module-helpers";
+import {
+    DurationState,
+    TriggerEffectInputs,
+    durationSchemas,
+    durationStates,
+    getDurationData,
+    getTriggerEffectData,
+    triggerEffectSchemas,
+} from ".";
 
-class CreateTemporaryActionNode extends BaseActionNode<"out", Inputs, never, never, never, DurationState> {
+class CreateTemporaryActionNode extends BaseActionNode<"out", TriggerEffectInputs, never, never, never, DurationState> {
     static get type(): "create-temporary" {
         return "create-temporary";
     }
@@ -18,7 +26,7 @@ class CreateTemporaryActionNode extends BaseActionNode<"out", Inputs, never, nev
     }
 
     static get defineInputs(): PF2eInputEntry[] {
-        return [{ key: "target", type: "target" }, { key: "identifier", type: "text" }, ...durationSchemas()];
+        return [...triggerEffectSchemas(), ...durationSchemas()];
     }
 
     get icon(): IconObject {
@@ -32,13 +40,13 @@ class CreateTemporaryActionNode extends BaseActionNode<"out", Inputs, never, nev
             return this.executeNext("out");
         }
 
-        const identifier = await this.getInputValue("identifier");
+        const { identifier, slug } = await getTriggerEffectData.call(this);
         const duration = await getDurationData.call(this);
 
         const source = createCustomEffect({
             duration,
             img: "icons/svg/clockwork.svg",
-            itemSlug: joinStr("-", this.triggerPath, identifier),
+            itemSlug: slug,
             name: identifier ? `${this.triggerName} (${identifier})` : this.triggerName,
             show: false,
         });
@@ -48,10 +56,5 @@ class CreateTemporaryActionNode extends BaseActionNode<"out", Inputs, never, nev
         return this.executeNext("out");
     }
 }
-
-type Inputs = DurationInputs & {
-    identifier: string;
-    target?: TargetDocuments;
-};
 
 export { CreateTemporaryActionNode };

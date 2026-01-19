@@ -634,7 +634,7 @@
                         "title": "Create Item"
                     },
                     "create-temporary": {
-                        "title": "Create Trigger Effect"
+                        "title": "Create Trigger-Effect"
                     },
                     "roll-damage": {
                         "inputs": {
@@ -681,6 +681,9 @@
                     },
                     "has-option": {
                         "title": "Has Roll Option"
+                    },
+                    "has-temporary": {
+                        "title": "Has Trigger-Effect"
                     },
                     "inside-aura": {
                         "inputs": {
