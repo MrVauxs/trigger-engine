@@ -1,9 +1,10 @@
-import { InceaseConditionActionNode } from ".";
 import {
     CreateConditionActionNode,
     CreateEffectActionNode,
     CreateItemActionNode,
     CreateTemporaryActionNode,
+    DecreaseConditionActionNode,
+    InceaseConditionActionNode,
     RollDamageActionNode,
     RollSaveActionNode,
     SendToChatActionNode,
@@ -14,7 +15,8 @@ export * from "./create-condition";
 export * from "./create-effect";
 export * from "./create-item";
 export * from "./create-temporary";
-export * from "./increase.condition";
+export * from "./decrease-condition";
+export * from "./increase-condition";
 export * from "./roll-damage";
 export * from "./roll-save";
 export * from "./send-chat";
@@ -24,6 +26,7 @@ export default [
     CreateEffectActionNode,
     CreateItemActionNode,
     CreateTemporaryActionNode,
+    DecreaseConditionActionNode,
     InceaseConditionActionNode,
     RollDamageActionNode,
     RollSaveActionNode,

@@ -642,6 +642,9 @@
                     "create-temporary": {
                         "title": "Create Trigger-Effect"
                     },
+                    "decrease-condition": {
+                        "title": "Decrease Condition"
+                    },
                     "increase-condition": {
                         "title": "Increase Condition"
                     },
