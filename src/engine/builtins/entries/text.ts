@@ -112,4 +112,4 @@ type BuiltinsTextFieldSchema = SimpleField | SelectField | JsonField | Javascrip
 type InputTextEntry = BaseInputEntrySchema<"text", BuiltinsTextFieldSchema>;
 
 export { TextEntry };
-export type { InputTextEntry, SelectField };
+export type { InputTextEntry, JsonField, SelectField };

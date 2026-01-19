@@ -3,16 +3,14 @@ import { PF2eInputEntry } from "pf2e";
 import { DurationInputs, DurationState, durationSchemas, getDurationData } from ".";
 import { CustomConditionOptions } from "module-helpers";
 
-let EFFECT_SCHEMAS: PF2eInputEntry[] | undefined;
-
-function effectSchemas(): PF2eInputEntry[] {
-    return (EFFECT_SCHEMAS ??= [
-        { key: "name", type: "text", group: "effect" },
-        { key: "img", type: "text", group: "effect" },
-        { key: "slug", type: "text", group: "effect" },
-        { key: "secret", type: "boolean", group: "effect", label: "PF2E.EffectPanel.Unidentified" },
+function effectSchemas(group?: string): PF2eInputEntry[] {
+    return [
+        { key: "name", type: "text", group },
+        { key: "img", type: "text", group },
+        { key: "slug", type: "text", group },
+        { key: "secret", type: "boolean", group, label: "PF2E.EffectPanel.Unidentified" },
         ...durationSchemas(),
-    ]);
+    ];
 }
 
 async function getEffectData(

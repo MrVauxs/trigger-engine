@@ -37,7 +37,7 @@ class CreateConditionActionNode extends BaseActionNode<"out", Inputs, never, nev
                     min: 1,
                 },
             },
-            ...effectSchemas(),
+            ...effectSchemas("effect"),
         ];
     }
 

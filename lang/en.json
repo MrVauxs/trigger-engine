@@ -514,6 +514,11 @@
             "convertor": {
                 "outcome-number": "A number between 0 and 3"
             },
+            "custom": {
+                "rule": {
+                    "label": "Rule Element"
+                }
+            },
             "entry": {
                 "action": {
                     "title": "Action"
@@ -566,16 +571,24 @@
             },
             "group": {
                 "duration": "Duration Data",
-                "effect": "Effect Data",
                 "roll": "Roll Data",
+                "rule": "Rule Elements",
                 "save": "Save Data"
             },
             "node": {
                 "action": {
                     "create-condition": {
+                        "groups": {
+                            "effect": "Effect Data"
+                        },
                         "title": "Create Condition Effect"
                     },
                     "create-effect": {
+                        "inputs": {
+                            "counter": {
+                                "tooltip": "Set to <code>0</code> to disable"
+                            }
+                        },
                         "title": "Create Effect"
                     },
                     "create-item": {

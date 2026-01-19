@@ -7,6 +7,7 @@ import {
     AuraLeaveEvent,
     CompareOutcomesLogicNode,
     CreateConditionActionNode,
+    CreateEffectActionNode,
     CreateItemActionNode,
     CreateMessageHook,
     DamageTakenEvent,
@@ -29,6 +30,7 @@ import {
 
 const actions = [
     CreateConditionActionNode,
+    CreateEffectActionNode,
     CreateItemActionNode,
     RollDamageActionNode,
     RollSaveActionNode,
