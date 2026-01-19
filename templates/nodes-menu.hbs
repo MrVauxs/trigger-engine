@@ -1,5 +1,6 @@
 <div class="content" data-tooltip-class="trigger-engine-field-tooltip" data-tooltip-direction="UP">
     <div class="left">
+        <div class="static">
         {{!-- search --}}
         <fieldset>
             <legend>{{@root.i18n 'search.label'}}</legend>
@@ -17,6 +18,8 @@
             </extended-multi-select>
         </fieldset>
         {{/if}}
+        </div>
+        <div class="lists">
         {{#if inClipboard}}
         <fieldset>
             <legend>{{@root.i18n 'clipboard.title'}}</legend>
@@ -28,6 +31,7 @@
         {{> 'section' gates}}
         {{> 'section' variables}}
         {{> 'section' events}}
+        </div>
     </div>
     <div class="right">
         {{> 'section' groups}}

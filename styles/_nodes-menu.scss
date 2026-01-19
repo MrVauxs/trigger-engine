@@ -12,18 +12,17 @@
 
     .content {
         white-space: nowrap;
-        min-width: 600px;
         min-height: 300px;
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 0.3em;
-        padding: 0.5em;
+        gap: 10px;
+        padding: 0;
 
         .left,
         .right {
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            width: 300px;
 
             .scroll {
                 flex: 1;
@@ -34,7 +33,6 @@
 
             fieldset {
                 position: relative;
-                overflow-y: auto;
 
                 .legend {
                     font-size: 1.2em;
@@ -65,6 +63,7 @@
         }
 
         .left {
+            overflow: hidden;
             gap: 0.3em;
 
             [name="search"] {
@@ -91,6 +90,25 @@
                     background: var(--tags-buttons-bg);
                 }
             }
+
+            .static {
+                padding-left: 10px;
+            }
+
+            .lists {
+                scrollbar-gutter: stable;
+                overflow-y: auto;
+                direction: rtl;
+
+                fieldset {
+                    direction: ltr;
+                }
+            }
+        }
+
+        .right {
+            scrollbar-gutter: stable;
+            overflow-y: auto;
         }
     }
 }
