@@ -120,8 +120,9 @@
                 }
             },
             "convertor": {
-                "user-target": "Retrieve the assigned actor",
-                "item-target": "Retrieve the parent actor"
+                "item-target": "The parent actor",
+                "user-target": "The assigned actor",
+                "target-user": "The primary owner "
             },
             "entry": {
                 "a": {
@@ -529,7 +530,9 @@
                 }
             },
             "convertor": {
-                "outcome-number": "A number between 0 and 3"
+                "outcome-number": "A number between 0 and 3",
+                "outcome-text": "criticalFailure, failure, success, criticalSuccess",
+                "target-text": "The signature value"
             },
             "custom": {
                 "rule": {
@@ -551,6 +554,9 @@
                 },
                 "effect": {
                     "title": "Effect"
+                },
+                "identifier": {
+                    "title": "Identifier"
                 },
                 "img": {
                     "title": "Image Path"
@@ -626,6 +632,9 @@
                             }
                         },
                         "title": "Create Item"
+                    },
+                    "create-temporary": {
+                        "title": "Create Trigger Effect"
                     },
                     "roll-damage": {
                         "inputs": {
