@@ -35,7 +35,7 @@ function getValuedConditionsSchemas(): PF2eInputEntry[] {
             type: "number",
             field: {
                 default: 1,
-                min: 1,
+                min: 0,
             },
         },
     ];

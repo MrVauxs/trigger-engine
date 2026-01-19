@@ -35,9 +35,11 @@ class InceaseConditionActionNode extends BaseActionNode<"out", Inputs> {
         }
 
         const { slug, value } = await getValuedConditionsData.call(this);
-        const max = (await this.getInputValue("max")) || undefined;
 
-        await actor.increaseCondition(slug, { max, value });
+        if (value) {
+            const max = (await this.getInputValue("max")) || undefined;
+            await actor.increaseCondition(slug, { max, value });
+        }
 
         return this.executeNext("out");
     }
