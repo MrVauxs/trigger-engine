@@ -303,10 +303,17 @@
                         "title": "Compare Numbers"
                     },
                     "format-text": {
+                        "customs": {
+                            "inputs": {
+                                "variable": {
+                                    "label": "Variable"
+                                }
+                            }
+                        },
                         "inputs": {
-                            "str": {
+                            "content": {
                                 "title": "Text to Format",
-                                "tooltip": "Will replace @x variables"
+                                "tooltip": "Prefix Variables with the <code>@</code> character"
                             }
                         },
                         "outputs": {
