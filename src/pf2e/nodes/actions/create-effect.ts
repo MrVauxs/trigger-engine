@@ -1,7 +1,8 @@
 import { IconObject } from "_zod";
 import { BaseActionNode, CustomInputSchema, JsonField } from "engine";
 import { R, RuleElementSource, createCustomEffect } from "module-helpers";
-import { DurationState, EffectInputs, PF2eInputEntry, durationStates, effectSchemas, getEffectData } from "pf2e";
+import { DurationState, EffectInputs, durationStates, effectSchemas, getEffectData } from ".";
+import { PF2eInputEntry } from "pf2e";
 
 class CreateEffectActionNode extends BaseActionNode<"out", Inputs, never, "rule", never, DurationState> {
     static get type(): "create-effect" {
@@ -72,7 +73,7 @@ class CreateEffectActionNode extends BaseActionNode<"out", Inputs, never, "rule"
         const source = createCustomEffect({
             ...effect,
             badge: counter > 0 ? { type: "counter", value: counter } : undefined,
-            name: effect.name ?? game.i18n.localize("TYPES.Item.effect"),
+            name: effect.name || game.i18n.localize("TYPES.Item.effect"),
             rules,
         });
 

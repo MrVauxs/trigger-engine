@@ -24,6 +24,7 @@ class TargetEntry extends NodeEntry<TargetDocuments | undefined> {
 
         const token = getTokenDocument(value);
         const actor = token?.actor;
+
         if (actor) {
             return { actor, token };
         }
