@@ -60,7 +60,8 @@ function filterByCustomSchemas<
     const customSchemas = R.pipe(
         rawSchemas ?? [],
         R.map((schema): TSchema | undefined => {
-            return schemaParser.safeParse(schema)?.data as TSchema | undefined;
+            const data = schemaParser.safeParse(schema)?.data as TSchema | undefined;
+            return data ? { ...data, field: (schema as CustomInputSchema).field } : undefined;
         }),
         R.filter(R.isTruthy),
         R.indexBy(R.prop("slug")),
@@ -107,9 +108,9 @@ function getEntrySchemas(
     parser: z.ZodObject,
     options: SchemasFilterOptions = {},
     custom: {
+        entries: Record<string, BaseCustomEntryData> | undefined;
         rawSchemas: BaseCustomEntrySchema[] | null;
         schemaParser: typeof zBaseEntrySchema;
-        entries: Record<string, BaseCustomEntryData> | undefined;
     },
 ) {
     const filtered = filterSchemasByState(schemas ?? [], options);
