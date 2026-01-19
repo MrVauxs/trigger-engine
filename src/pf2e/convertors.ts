@@ -1,7 +1,6 @@
 import { EntryConvertor } from "engine";
 import {
     DegreeOfSuccessString,
-    ItemPF2e,
     degreeOfSuccessNumber,
     degreeOfSuccessString,
     isDegreeOfSuccessValue,
@@ -9,17 +8,10 @@ import {
 
 const pf2eConvertors = [
     {
-        output: "outcome",
-        input: "string",
-        convertToInput: (outcome: DegreeOfSuccessString): string => {
-            return outcome;
-        },
-    },
-    {
-        output: "string",
+        output: "number",
         input: "outcome",
-        convertToInput: (value: string): DegreeOfSuccessString | undefined => {
-            return isDegreeOfSuccessValue(value) ? value : undefined;
+        convertToInput: (value: number): DegreeOfSuccessString | undefined => {
+            return degreeOfSuccessString(value);
         },
     },
     {
@@ -30,18 +22,24 @@ const pf2eConvertors = [
         },
     },
     {
-        output: "number",
-        input: "outcome",
-        convertToInput: (value: number): DegreeOfSuccessString | undefined => {
-            return degreeOfSuccessString(value);
+        output: "outcome",
+        input: "text",
+        convertToInput: (outcome: DegreeOfSuccessString): string => {
+            return outcome;
         },
     },
     {
-        output: "item",
-        input: "target",
-        convertToInput: (item: ItemPF2e): TargetDocuments | undefined => {
-            const actor = item.actor;
-            return actor ? { actor } : undefined;
+        output: "text",
+        input: "outcome",
+        convertToInput: (value: string): DegreeOfSuccessString | undefined => {
+            return isDegreeOfSuccessValue(value) ? value : undefined;
+        },
+    },
+    {
+        output: "target",
+        input: "text",
+        convertToInput: (target: TargetDocuments): string => {
+            return target.actor.signature;
         },
     },
 ] as const satisfies EntryConvertor[];

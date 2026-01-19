@@ -4,9 +4,10 @@ import { ItemPF2e, UserPF2e, primaryPlayerOwner } from "module-helpers";
 const builtinsConvertors = [
     {
         output: "item",
-        input: "text",
-        convertToInput: (value: ItemPF2e): string => {
-            return value.uuid;
+        input: "target",
+        convertToInput: (item: ItemPF2e): TargetDocuments | undefined => {
+            const actor = item.actor;
+            return actor ? { actor } : undefined;
         },
     },
     {
