@@ -1,7 +1,7 @@
 import { IconObject } from "_zod";
 import { BaseActionNode } from "engine";
 import { PF2eInputEntry } from "pf2e";
-import { ValuedConditionsInputs, durationStates, getValuedConditionsData, getValuedConditionsSchemas } from ".";
+import { ValuedConditionsInputs, getValuedConditionsData, getValuedConditionsSchemas } from ".";
 
 class InceaseConditionActionNode extends BaseActionNode<"out", Inputs> {
     static get type(): "increase-condition" {
@@ -10,10 +10,6 @@ class InceaseConditionActionNode extends BaseActionNode<"out", Inputs> {
 
     static get tags(): string[] {
         return ["condition"];
-    }
-
-    static get states(): string[] {
-        return [...durationStates];
     }
 
     static get defineInputs(): PF2eInputEntry[] {
