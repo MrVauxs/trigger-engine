@@ -21,6 +21,7 @@ import {
     ExecuteHook,
     ExecuteScriptActionNode,
     FormatTextLogicNode,
+    IfTruthyConditionNode,
     ItemExtractorNode,
     ListContainsConditionNode,
     MoveTokenEvent,
@@ -55,7 +56,7 @@ const actions = [
     ExecuteScriptActionNode,
 ] as const;
 
-const conditions = [ListContainsConditionNode] as const;
+const conditions = [IfTruthyConditionNode, ListContainsConditionNode] as const;
 
 const events = [
     CreateCombatantEvent,

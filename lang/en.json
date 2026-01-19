@@ -236,6 +236,16 @@
                     }
                 },
                 "condition": {
+                    "if-truthy": {
+                        "customs": {
+                            "inputs": {
+                                "condition": {
+                                    "label": "Condition"
+                                }
+                            }
+                        },
+                        "title": "Test If Truthy"
+                    },
                     "list-contains": {
                         "inputs": {
                             "list": {
