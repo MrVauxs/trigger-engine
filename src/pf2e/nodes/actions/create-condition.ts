@@ -1,7 +1,7 @@
 import { IconObject } from "_zod";
-import { BaseActionNode, CustomInputSchema } from "engine";
+import { BaseActionNode } from "engine";
 import { ConditionSlug, createCustomCondition } from "module-helpers";
-import { PF2eInputEntry, PF2eOutputEntry } from "pf2e";
+import { PF2eInputEntry } from "pf2e";
 import { DurationState, EffectInputs, durationStates, effectSchemas, getConditionOptions, getEffectData } from ".";
 
 class CreateConditionActionNode extends BaseActionNode<"out", Inputs, never, never, never, DurationState> {
@@ -10,7 +10,7 @@ class CreateConditionActionNode extends BaseActionNode<"out", Inputs, never, nev
     }
 
     static get tags(): string[] {
-        return ["condition", "effect", "item"];
+        return ["condition", "duration", "effect", "item"];
     }
 
     static get states(): string[] {
@@ -21,7 +21,7 @@ class CreateConditionActionNode extends BaseActionNode<"out", Inputs, never, nev
         return [
             { key: "target", type: "target" },
             {
-                key: "slug",
+                key: "condition",
                 type: "text",
                 field: {
                     type: "select",
@@ -41,14 +41,6 @@ class CreateConditionActionNode extends BaseActionNode<"out", Inputs, never, nev
         ];
     }
 
-    static get defineOutputs(): PF2eOutputEntry[] {
-        return [];
-    }
-
-    static get defineCustomInputs(): CustomInputSchema[] {
-        return [];
-    }
-
     get icon(): IconObject {
         return { unicode: "\ue54d", fontWeight: "900" };
     }
@@ -60,10 +52,10 @@ class CreateConditionActionNode extends BaseActionNode<"out", Inputs, never, nev
             return this.executeNext("out");
         }
 
-        const slug = await this.getInputValue("slug");
+        const condition = await this.getInputValue("condition");
         const counter = await this.getInputValue("counter");
         const effect = await getEffectData.call(this);
-        const source = createCustomCondition({ ...effect, counter, slug });
+        const source = createCustomCondition({ ...effect, counter, slug: condition });
 
         if (source) {
             await actor.createEmbeddedDocuments("Item", [source]);
@@ -74,8 +66,8 @@ class CreateConditionActionNode extends BaseActionNode<"out", Inputs, never, nev
 }
 
 type Inputs = EffectInputs & {
+    condition: ConditionSlug;
     counter: number;
-    slug: ConditionSlug;
     target?: TargetDocuments;
 };
 

@@ -557,6 +557,9 @@
                 "save": {
                     "title": "Save Type"
                 },
+                "slug": {
+                    "title": "Slug"
+                },
                 "when": {
                     "title": "Triggers When"
                 }
@@ -782,6 +785,9 @@
                 },
                 "damage": {
                     "title": "Damage"
+                },
+                "duration": {
+                    "title": "Duration"
                 },
                 "outcome": {
                     "title": "Degree of Success"
