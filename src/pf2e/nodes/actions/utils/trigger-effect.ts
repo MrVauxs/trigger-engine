@@ -13,9 +13,11 @@ function triggerEffectSchemas(): PF2eInputEntry[] {
 
 async function getTriggerEffectData(this: TriggerNode<any, TriggerEffectInputs>): Promise<TriggerEffectData> {
     const identifier = await this.getInputValue("identifier");
+    const triggerPath = game.pf2e.system.sluggify(this.triggerPath);
+
     return {
         identifier,
-        slug: joinStr("-", this.triggerPath, identifier),
+        slug: joinStr("-", triggerPath, identifier),
     };
 }
 
