@@ -996,6 +996,7 @@ class BlueprintNode extends PIXI.Container {
     customEntryLabel(category: EntryCategory | "outs", schema: BaseCustomSchema): string {
         return (
             this.customEntryLocalize(schema.label, category, schema, "label") ??
+            this.rootLocalize("custom", schema.slug, "label") ??
             localizeIfExist("node", schema.slug) ??
             schema.slug
         );
