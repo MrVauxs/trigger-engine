@@ -260,6 +260,8 @@ interface TriggerNode<
     set sceneContext(sceneOrToken: Maybe<ScenePF2e | TokenDocumentPF2e>);
     /** The current state of the node. */
     get state(): TState | null;
+    /** The name for the parent trigger. */
+    get triggerName(): string;
     /** The internal path for the parent trigger. */
     get triggerPath(): TriggerPath;
     /** @see {@link TriggerNode.type} */

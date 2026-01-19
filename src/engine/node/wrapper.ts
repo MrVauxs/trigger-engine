@@ -275,6 +275,7 @@ function instantiateNode(
                     [
                         ["nodePath", `${parent.path}:${this.id}`],
                         ["state", nodeState],
+                        ["triggerName", parent.name || parent.id],
                         ["triggerPath", parent.path],
                     ] as const,
                     R.fromEntries(),
