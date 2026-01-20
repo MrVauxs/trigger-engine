@@ -12,16 +12,23 @@ Hooks.once("init", async () => {
 
     CONFIG.queries[MODULE.path("user-query")] = onUserQuery;
 
-    // we allow third party modules to register their own application
-    Hooks.callAll("triggerEngine.registerApplication", TriggerApplication.register.bind(TriggerApplication));
-
     // we register the pf2e-trigger application
     if (game.system.id === "pf2e") {
         registerPF2eApplication();
+        // TODO remove
+        TriggerApplication.registerTriggers(MODULE.id, "pf2e-trigger", `modules/${MODULE.id}/pf2e-triggers.json`);
     }
+
+    // we allow third party to register their own application
+    Hooks.callAll("triggerEngine.registerApplication", TriggerApplication.register.bind(TriggerApplication));
+
+    // we allow third party to register triggers for a registered application
+    Hooks.callAll("triggerEngine.registerTriggers", TriggerApplication.registerTriggers.bind(TriggerApplication));
 });
 
-Hooks.once("ready", () => {
+Hooks.once("ready", async () => {
+    // we prepare  the module triggers
+    await TriggerApplication.prepareModulesTriggers();
     // we prepare all the applications once foundry is ready
     TriggerApplication.prepareApplications();
 });

@@ -45,7 +45,9 @@ class TriggerApplication {
     #events: Collection<typeof TriggerNode>;
     #hooks: { hook: TriggerHookWrapper; enabled: boolean }[];
     #mode: TriggerApplicationMode;
+    #modulefiles: string[] = [];
     #moduleId: string;
+    #moduleSources: TriggerDataInput[] = [];
     #nodes: Collection<typeof TriggerNode>;
     #triggerEvents: Record<string, { eventId: string; data: TriggerData }[]> = {};
 
@@ -132,6 +134,17 @@ class TriggerApplication {
         return applicationKey ? this.#instances.get(`${moduleId}:${applicationId}`) : undefined;
     }
 
+    static registerTriggers(moduleId: string, applicationId: string, triggersOrFilePath: string | TriggerDataInput[]) {
+        const application = this.getApplication(moduleId, applicationId);
+        if (!application) return;
+
+        if (R.isString(triggersOrFilePath)) {
+            application.addFile(triggersOrFilePath);
+        } else if (R.isArray(triggersOrFilePath)) {
+            application.addSources(triggersOrFilePath);
+        }
+    }
+
     static async openBlueprintMenu(
         moduleId: string,
         applicationId: string,
@@ -139,6 +152,10 @@ class TriggerApplication {
     ): Promise<BlueprintApplication | undefined> {
         const app = this.getApplication(moduleId, applicationId);
         return app?.openMenu(source);
+    }
+
+    static async prepareModulesTriggers() {
+        return Promise.all(this.#instances.map((application) => application.prepareModuleTriggers()));
     }
 
     static prepareApplications() {
@@ -201,7 +218,7 @@ class TriggerApplication {
         return `${this.applicationId}-menu`;
     }
 
-    get settingKey(): string {
+    get settingKey(): `${string}-triggers` {
         return `${this.applicationId}-triggers`;
     }
 
@@ -225,17 +242,44 @@ class TriggerApplication {
         return this.events.size > 1;
     }
 
-    prepare() {
+    get moduleSources(): TriggerDataInput[] {
+        return this.#moduleSources;
+    }
+
+    async prepareModuleTriggers() {
+        for (const path of this.#modulefiles) {
+            try {
+                const response = await fetch(path);
+                const json = await response.json();
+                const sources = R.isArray(json) ? (json as TriggerDataInput[]) : [];
+
+                this.addSources(sources);
+            } catch {}
+        }
+    }
+
+    async prepare() {
         const setting = this.getTriggersSetting();
         if (!setting) return;
 
-        const { enabled, sources } = setting;
+        const { disabled, enabled, sources } = setting;
+
+        const filterSource = (source: unknown): source is TriggerDataInput => {
+            return R.isObjectType(source) && "id" in source;
+        };
+
+        const worldSources = sources.filter((source) => filterSource(source) && !R.isIncludedIn(source.id, disabled));
+        const moduleSources = this.moduleSources.filter(
+            (source) => filterSource(source) && R.isIncludedIn(source.id, enabled),
+        );
+
         const triggers: TriggerData[] = R.pipe(
-            sources,
+            // world triggers should override module triggers
+            [...moduleSources, ...worldSources],
+            R.uniqueBy((source) => source.id),
             R.map((source) => {
-                if (!R.isObjectType(source) || !R.isIncludedIn(source.id, enabled)) return;
                 try {
-                    const trigger = this.createTrigger(source, false);
+                    const trigger = this.createTrigger(source);
                     return trigger?.test() && trigger.data;
                 } catch (error) {}
             }),
@@ -292,6 +336,14 @@ class TriggerApplication {
             }
         }
         MODULE.groupEnd();
+    }
+
+    addFile(path: string) {
+        this.#modulefiles.push(path);
+    }
+
+    addSources(sources: TriggerDataInput[]) {
+        this.#moduleSources.push(...sources);
     }
 
     convertToEmitable(type: string, value: any): EmitableUserValue | undefined {
@@ -416,12 +468,12 @@ class TriggerApplication {
         }
     }
 
-    createTrigger(source: TriggerDataInput, open: true): OpenTrigger | null;
-    createTrigger(source: TriggerDataInput, open: false): Trigger | null;
-    createTrigger(source: TriggerDataInput, open: boolean): OpenTrigger | Trigger | null {
+    createTrigger(source: TriggerDataInput, open: { locked?: boolean }): OpenTrigger | null;
+    createTrigger(source: TriggerDataInput, open?: { locked?: boolean }): Trigger | null;
+    createTrigger(source: TriggerDataInput, open?: { locked?: boolean }): OpenTrigger | Trigger | null {
         try {
             const data = new TriggerData(source);
-            return open ? new OpenTrigger(this, data) : new Trigger(this, data);
+            return open ? new OpenTrigger(this, data, open.locked) : new Trigger(this, data);
         } catch (error: any) {
             MODULE.error(`an error concurred while trying to create a Trigger.`, error);
             return null;
@@ -439,6 +491,7 @@ class TriggerApplication {
         const setting = game.settings.get<Partial<TriggersSetting>>(this.moduleId, this.settingKey);
 
         return {
+            disabled: setting.disabled?.slice() ?? [],
             enabled: setting.enabled?.slice() ?? [],
             sources: utils.deepClone(setting?.sources ?? []),
         };
@@ -468,7 +521,7 @@ class TriggerApplication {
 
     #getFreeApplication(source: unknown): typeof BlueprintApplication | null {
         const self = this;
-        const test = this.createTrigger(R.isPlainObject(source) ? source : {}, true);
+        const test = this.createTrigger(R.isPlainObject(source) ? source : {}, {});
         if (!test || test.invalid) return null;
 
         return class FreeBlueprintApplication extends BlueprintApplication {
@@ -478,7 +531,8 @@ class TriggerApplication {
 
             getTriggersSetting(): TriggersSetting {
                 return {
-                    enabled: [test.id],
+                    disabled: [],
+                    enabled: [],
                     sources: [test.toObject()],
                 };
             }
@@ -564,6 +618,7 @@ type ApplicationMenuOptions = {
 };
 
 type TriggersSetting = {
+    disabled: string[];
     enabled: string[];
     sources: TriggerDataInput[];
 };

@@ -9,7 +9,7 @@
             <a data-action="back-menu" {{{@root.i18n.tooltip 'back'}}}>
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
-            {{#unless isLocked}}
+            {{#unless trigger.locked}}
             <a data-action="edit-trigger" {{{@root.i18n.tooltip 'edit'}}}>
                 <i class="fa-solid fa-pen-to-square"></i>
             </a>
@@ -25,9 +25,13 @@
                 <i class="fa-solid fa-square-info"></i>
             </a>
             {{/if}}
+            {{#if trigger.locked}}
+            <i class="fa-solid fa-lock"></i>
+            {{else}}
             <a data-action="save-triggers" {{{@root.i18n.tooltip 'save'}}}>
                 <i class="fa-solid fa-floppy-disk"></i>
             </a>
+            {{/if}}
             <a data-action="collapse-window" {{{@root.i18n.tooltip 'collapse'}}}>
                 <i class="fa-solid fa-compress"></i>
             </a>
@@ -127,11 +131,12 @@
 {{#unless (and isFree (not trigger.name includeZero=true))}}
 <div class="trigger-title">
     {{#if trigger.locked}}
-    <i class="fa-solid fa-plug-circle-xmark"></i>
+    <i class="fa-solid fa-lock"></i>
     {{/if}}
-    <div class="label">
-        {{trigger.label}}
-    </div>
+    <div class="label">{{trigger.label}}</div>
+    {{#if trigger.locked}}
+    <i class="fa-solid fa-lock"></i>
+    {{/if}}
 </div>
 {{/unless}}
 <a class="window-collapsed" data-action="expand-window">

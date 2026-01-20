@@ -7,6 +7,7 @@ import {
     TriggerApplication,
     TriggerData,
     TriggerDataOutput,
+    TriggerFullId,
     TriggersSetting,
     TriggerVariable,
     UpdateTriggerData,
@@ -71,10 +72,6 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
 
     get blueprint(): Blueprint {
         return this.#blueprint;
-    }
-
-    get trigger(): OpenTrigger | undefined {
-        return this.blueprint.trigger;
     }
 
     get search(): string {
@@ -266,8 +263,8 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
             }
 
             case "select-trigger": {
-                const triggerId = htmlClosest(target, "[data-id]")?.dataset.id ?? null;
-                return (this.blueprint.trigger = triggerId);
+                const fullId = htmlClosest(target, "[data-full-id]")?.dataset.fullId ?? null;
+                return (this.blueprint.trigger = fullId as TriggerFullId | null);
             }
 
             case "tab-gate": {
@@ -437,10 +434,10 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
         return selected.length ? selected : undefined;
     }
 
-    async #addTriggerDescription(el: HTMLElement | null, triggerId?: string) {
+    async #addTriggerDescription(el: HTMLElement | null, fullId?: TriggerFullId) {
         if (!el || el.hasChildNodes()) return;
 
-        const trigger = triggerId ? this.blueprint.getTrigger(triggerId) : this.trigger;
+        const trigger = fullId ? this.blueprint.getTrigger(fullId) : this.blueprint.trigger;
         el.innerHTML = (await trigger?.enrichedDescription) || "<div></div>";
     }
 
@@ -499,7 +496,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
                 condition: (el) => {
                     const nodeId = el.dataset.nodeId ?? "";
                     const node = this.blueprint.nodes.get(nodeId);
-                    return !!node && (!node.isEvent || !!this.trigger?.application.hasMultipleEvents);
+                    return !!node && (!node.isEvent || !!this.blueprint.trigger?.application.hasMultipleEvents);
                 },
                 callback: async (el) => {
                     const nodeId = el.dataset.nodeId ?? "";
@@ -511,10 +508,10 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
     }
 
     #triggerContextMenu(): ContextMenuEntry[] {
-        const isLocked = this.blueprint.locked;
+        // const isLocked = this.blueprint.locked;
         const getTriggerFromElement = (el: HTMLElement): OpenTrigger | null => {
-            const triggerId = el.dataset.id;
-            return triggerId ? this.blueprint.getTrigger(triggerId) : null;
+            const fullId = el.dataset.fullId as TriggerFullId;
+            return fullId ? this.blueprint.getTrigger(fullId) : null;
         };
 
         return [
@@ -526,7 +523,10 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
             {
                 icon: `<i class="fa-solid fa-pen-to-square"></i>`,
                 name: localizePath("blueprint.trigger.edit"),
-                condition: !isLocked,
+                condition: (el) => {
+                    const trigger = getTriggerFromElement(el);
+                    return !!trigger && !trigger.locked;
+                },
                 callback: (el) => {
                     const trigger = getTriggerFromElement(el);
                     return trigger && this.#editTrigger(trigger.folder, trigger);
@@ -544,10 +544,13 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
             {
                 icon: `<i class="fa-solid fa-trash"></i>`,
                 name: localizePath("blueprint.trigger.delete.title"),
-                condition: !isLocked,
+                condition: (el) => {
+                    const trigger = getTriggerFromElement(el);
+                    return !!trigger && !trigger.locked;
+                },
                 callback: (el) => {
-                    const triggerId = el.dataset.id ?? "";
-                    return this.blueprint.deleteTrigger(triggerId);
+                    const fullId = el.dataset.fullId as TriggerFullId;
+                    return this.blueprint.deleteTrigger(fullId);
                 },
             },
         ];
@@ -594,7 +597,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
         );
 
         const variables: PreparedVariable[] = R.pipe(
-            this.trigger?.data.variables ?? {},
+            this.blueprint.trigger?.data.variables ?? {},
             R.entries(),
             R.map(([id, variable]): PreparedVariable | undefined => {
                 const entry = this.blueprint.nodes.getEntryFromId(id) as BlueprintEntry | undefined;
@@ -620,7 +623,6 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
             gates,
             hasDescription: !!trigger.description,
             isFree: this.application.isFreeApplication,
-            isLocked: this.blueprint.locked,
             trigger,
             variables,
         };
@@ -686,15 +688,15 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
 
             const cached = htmlQuery(el, ".trigger-description");
 
-            await this.#addTriggerDescription(cached, el.dataset.id);
+            await this.#addTriggerDescription(cached, el.dataset.fullId as TriggerFullId);
             container.innerHTML = cached?.innerHTML ?? "";
         });
 
         addListenerAll(html, ".trigger input", "change", (el: HTMLInputElement, event) => {
             event.stopPropagation();
 
-            const id = htmlClosest(el, "[data-id]")?.dataset.id as string;
-            const trigger = this.blueprint.getTrigger(id);
+            const fullId = htmlClosest(el, "[data-full-id]")?.dataset.fullId as TriggerFullId;
+            const trigger = this.blueprint.getTrigger(fullId);
 
             if (trigger) {
                 this.blueprint.enableTrigger(trigger, el.checked);
@@ -812,7 +814,6 @@ type TriggerContext = {
     gates: PreparedGate[];
     hasDescription: boolean;
     isFree: boolean;
-    isLocked: boolean;
     trigger: OpenTrigger;
     variables: PreparedVariable[];
 };

@@ -19,9 +19,12 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
     #computed: boolean = false;
     #computedConnections: Record<EntryId, boolean> = {};
     #linkedConnections: Set<TwoWaysEntryId> = new Set();
+    #locked: boolean;
 
-    constructor(parent: TriggerApplication, data: TriggerData) {
+    constructor(parent: TriggerApplication, data: TriggerData, locked: boolean = false) {
         super(parent, data);
+
+        this.#locked = locked;
 
         const sequences: ((nodeData: NodeData) => boolean)[] = [
             (nodeData) => isGateExitNode(nodeData),
@@ -41,6 +44,14 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
                 } catch (error) {}
             }
         }
+    }
+
+    get idPrefix(): "world" | "module" {
+        return this.locked ? "module" : "world";
+    }
+
+    get fullId(): TriggerFullId {
+        return `${this.idPrefix}:${this.id}`;
     }
 
     get linkedConnections(): Set<TwoWaysEntryId> {
@@ -69,6 +80,10 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
 
     get tags(): string[] {
         return R.filter([...this.data.tags, this.folder], R.isTruthy);
+    }
+
+    get locked(): boolean {
+        return this.#locked;
     }
 
     getNode(id: string): OpenTriggerNode | undefined {
@@ -222,4 +237,7 @@ interface OpenTrigger {
     get nodes(): Collection<OpenTriggerNode>;
 }
 
+type TriggerFullId = `${"world" | "module"}:${string}`;
+
 export { OpenTrigger };
+export type { TriggerFullId };

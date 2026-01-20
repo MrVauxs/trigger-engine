@@ -45,10 +45,13 @@
         <div class="list">
             {{#each group.triggers as |trigger|}}
             <div class="trigger" {{#if trigger.name}}
-                data-name="{{trigger.name}}" {{/if}} data-id={{trigger.id}}
-                data-path="{{trigger.path}}" data-tags="{{trigger.tags}}">
+                data-name="{{trigger.name}}" {{/if}} data-id={{trigger.id}} data-locked={{trigger.locked}}
+                data-full-id={{trigger.fullId}} data-path="{{trigger.path}}" data-tags="{{trigger.tags}}">
                 <input type="checkbox" data-action="toggle-enabled" name="enabled" {{checked (@root.isEnabled trigger)}}>
                 <a class="name" data-action="select-trigger">{{trigger.label}}</a>
+                {{#if trigger.locked}}
+                <i class="fa-solid fa-lock"></i>
+                {{/if}}
                 <div class="trigger-description"></div>
             </div>
             {{/each}}

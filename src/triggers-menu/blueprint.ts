@@ -1,4 +1,11 @@
-import { ConnectionId, OpenTrigger, TriggerApplication, TriggerDataInput, TriggersSetting } from "engine";
+import {
+    ConnectionId,
+    OpenTrigger,
+    TriggerApplication,
+    TriggerDataInput,
+    TriggerFullId,
+    TriggersSetting,
+} from "engine";
 import {
     MouseInteractionManager,
     R,
@@ -21,14 +28,15 @@ import {
 } from ".";
 
 class Blueprint extends PIXI.Application<HTMLCanvasElement> {
+    #disabledIds: Set<string> = new Set();
     #enabledIds: Set<string> = new Set();
     #gridLayer: BlueprintGridLayer;
     #hitArea: PIXI.Rectangle;
     #layers: BlueprintLayers;
     #mouseManager: MouseInteractionManager;
     #parent: BlueprintApplication;
-    #triggerId: string | null = null;
-    #triggers: Collection<OpenTrigger> = new Collection();
+    #triggerId: TriggerFullId | null = null;
+    #triggers: Collection<OpenTrigger, TriggerFullId> = new Collection();
 
     constructor(parent: BlueprintApplication) {
         super({
@@ -49,20 +57,33 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
 
         const triggersSetting = this.parent.getTriggersSetting();
 
+        for (const id of triggersSetting.disabled) {
+            this.#disabledIds.add(id);
+        }
+
         for (const id of triggersSetting.enabled) {
             this.#enabledIds.add(id);
         }
 
-        this.#triggers = new Collection(
-            R.pipe(
-                triggersSetting.sources,
-                R.map((source) => {
-                    const trigger = this.application.createTrigger(source, true);
-                    return trigger && ([trigger.id, trigger] as const);
-                }),
-                R.filter(R.isTruthy),
-            ),
+        const triggers = R.pipe(
+            [
+                [triggersSetting.sources, false],
+                [this.application.moduleSources, true],
+            ] as const,
+            R.flatMap(([sources, locked]) => {
+                return R.pipe(
+                    sources,
+                    R.filter((source) => R.isObjectType(source) && "id" in source),
+                    R.map((source) => {
+                        const trigger = this.application.createTrigger(source, { locked });
+                        return trigger && ([trigger.fullId, trigger] as const);
+                    }),
+                    R.filter(R.isTruthy),
+                );
+            }),
         );
+
+        this.#triggers = new Collection(triggers);
 
         const handlers: ConstructorParameters<typeof MouseInteractionManager>[3] = {
             unclickLeft: this._onUnclickLeft.bind(this),
@@ -120,7 +141,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         return this.#layers.nodes;
     }
 
-    get triggers(): Collection<OpenTrigger> {
+    get triggers(): Collection<OpenTrigger, TriggerFullId> {
         return this.#triggers;
     }
 
@@ -128,17 +149,18 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         return this.#triggerId ? this.triggers.get(this.#triggerId) : undefined;
     }
 
-    set trigger(value: string | OpenTrigger | null) {
-        const triggerId = value instanceof OpenTrigger ? value.id : value;
-        if (this.#triggerId === triggerId) return;
-        if (triggerId && !this.triggers.has(triggerId)) return;
+    set trigger(value: TriggerFullId | OpenTrigger | null) {
+        const fullId = value instanceof OpenTrigger ? value.fullId : value;
 
-        this.#triggerId = triggerId;
+        if (this.#triggerId === fullId) return;
+        if (fullId && !this.triggers.has(fullId)) return;
+
+        this.#triggerId = fullId;
 
         this.scale = 1;
         this.setPosition(0, 0);
 
-        if (triggerId) {
+        if (fullId) {
             this.draw();
         } else {
             this.#clear();
@@ -245,10 +267,10 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
             ];
         }
 
-        const trigger = this.application.createTrigger(source, true);
+        const trigger = this.application.createTrigger(source, {});
         if (!trigger) return;
 
-        this.triggers.set(trigger.id, trigger);
+        this.triggers.set(trigger.fullId, trigger);
 
         if (setTrigger) {
             this.trigger = trigger;
@@ -259,34 +281,48 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         }
     }
 
-    async deleteTrigger(id: string) {
+    async deleteTrigger(fullId: TriggerFullId) {
         const confirm = await confirmDialog("blueprint.trigger.delete");
         if (!confirm) return;
 
-        this.triggers.delete(id);
+        this.triggers.delete(fullId);
         this.parent.render();
     }
 
     async saveTriggers(): Promise<Required<TriggersSetting> | undefined> {
         if (!this.application.isSettingApplication) return;
 
-        const sources = this.triggers.map((trigger) => trigger.toObject());
+        const sources = R.pipe(
+            this.triggers.contents,
+            R.filter((trigger) => !trigger.locked),
+            R.map((trigger) => trigger.toObject()),
+        );
+
         const ids = sources.map((source) => source.id);
+        const disabled = [...this.#disabledIds].filter((id) => R.isIncludedIn(id, ids));
         const enabled = [...this.#enabledIds].filter((id) => R.isIncludedIn(id, ids));
-        const setting: Required<TriggersSetting> = { enabled, sources };
+        const setting: Required<TriggersSetting> = { disabled, enabled, sources };
 
         return game.settings.set(this.application.moduleId, this.application.settingKey, setting);
     }
 
-    isEnabled({ id }: { id: string }): boolean {
-        return this.#enabledIds.has(id);
+    isEnabled({ id, locked }: OpenTrigger): boolean {
+        return locked ? this.#enabledIds.has(id) : !this.#disabledIds.has(id);
     }
 
-    enableTrigger({ id }: { id: string }, enabled: boolean) {
+    enableTrigger({ id, locked }: OpenTrigger, enabled: boolean) {
         if (enabled) {
-            this.#enabledIds.add(id);
+            if (locked) {
+                this.#enabledIds.add(id);
+            } else {
+                this.#disabledIds.delete(id);
+            }
         } else {
-            this.#enabledIds.delete(id);
+            if (locked) {
+                this.#enabledIds.delete(id);
+            } else {
+                this.#disabledIds.add(id);
+            }
         }
     }
 
@@ -333,8 +369,8 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         this.nodes.delete(nodes, redraw);
     }
 
-    getTrigger(triggerId: string): OpenTrigger | null {
-        return this.triggers.get(triggerId) ?? null;
+    getTrigger(fullId: TriggerFullId): OpenTrigger | null {
+        return this.triggers.get(fullId) ?? null;
     }
 
     cancelMouse() {

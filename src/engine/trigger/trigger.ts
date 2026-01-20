@@ -76,11 +76,6 @@ class Trigger<TNode extends TriggerNode = TriggerNode> {
         }
     }
 
-    // TODO need to actually implement that when module triggers is done
-    get locked(): boolean {
-        return false;
-    }
-
     getNode(id: string): TNode | undefined {
         // we instantiate the node on the fly
         if (!this.#nodes.has(id)) {
