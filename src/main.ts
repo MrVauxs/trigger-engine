@@ -25,7 +25,7 @@ Hooks.once("init", async () => {
 });
 
 Hooks.once("ready", async () => {
-    // we prepare  the module triggers
+    // we prepare the module triggers
     await TriggerApplication.prepareModulesTriggers();
     // we prepare all the applications once foundry is ready
     TriggerApplication.prepareApplications();
