@@ -13,6 +13,7 @@ import {
     createHTMLElement,
     distanceToPoint,
     dividePointBy,
+    purgeObject,
     subtractPoint,
 } from "module-helpers";
 import {
@@ -315,7 +316,12 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         const enabled = [...this.#enabledIds].filter((id) => R.isIncludedIn(id, toSaveIds));
         const folders = R.pick(this.#modulesFolders, forFoldersIds) as Record<string, string>;
 
-        const setting: Required<TriggersSetting> = { disabled, enabled, folders, sources };
+        const setting: Required<TriggersSetting> = {
+            disabled,
+            enabled,
+            folders,
+            sources: purgeObject(sources),
+        };
 
         return game.settings.set(this.application.moduleId, this.application.settingKey, setting);
     }
