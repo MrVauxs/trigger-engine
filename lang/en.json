@@ -221,6 +221,14 @@
                             },
                             "speaker": {
                                 "title": "Speaker"
+                            },
+                            "visibility": {
+                                "options": {
+                                    "all": "All Users",
+                                    "gm": "GM Only",
+                                    "self": "Context User"
+                                },
+                                "title": "Visibility"
                             }
                         }
                     },
@@ -377,8 +385,8 @@
                             "id": {
                                 "options": {
                                     "__active-gm__": "Active GM",
-                                    "__self-user__": "Self User",
                                     "__context-user__": "Context User",
+                                    "__self-user__": "Self User",
                                     "specials": "Specials",
                                     "users": "Users"
                                 }

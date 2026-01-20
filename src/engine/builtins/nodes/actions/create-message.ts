@@ -11,6 +11,8 @@ import {
 } from ".";
 import { IconObject } from "_zod";
 
+const VISIBILITY_OPTIONS = ["all", "gm", "self"] as const;
+
 class CreateMessageActionNode extends BaseActionNode<"out", Inputs, never, never, never, DescriptionState> {
     static get type(): "create-message" {
         return "create-message";
@@ -36,6 +38,15 @@ class CreateMessageActionNode extends BaseActionNode<"out", Inputs, never, never
                 key: "speaker",
                 type: "target",
             },
+            {
+                key: "visibility",
+                type: "text",
+                field: {
+                    type: "select",
+                    default: "all",
+                    options: VISIBILITY_OPTIONS,
+                },
+            },
         ];
     }
 
@@ -53,6 +64,7 @@ class CreateMessageActionNode extends BaseActionNode<"out", Inputs, never, never
 
         const ChatMessage = getDocumentClass("ChatMessage");
         const speaker = await this.getInputValue("speaker");
+        const visibility = await this.getInputValue("visibility");
         const userContext = this.userContext;
 
         const author =
@@ -61,10 +73,18 @@ class CreateMessageActionNode extends BaseActionNode<"out", Inputs, never, never
                 ? userContext
                 : (speaker && primaryPlayerOwner(speaker.actor)) || userContext);
 
+        const whisper =
+            visibility === "all"
+                ? undefined
+                : visibility === "gm"
+                  ? ChatMessage.getWhisperRecipients("GM")
+                  : [userContext];
+
         await ChatMessage.create({
             author: author.id,
             content,
             speaker: speaker ? ChatMessage.getSpeaker(speaker) : undefined,
+            whisper,
         });
 
         return this.executeNext("out");
@@ -74,6 +94,7 @@ class CreateMessageActionNode extends BaseActionNode<"out", Inputs, never, never
 type Inputs = DescriptionInputs & {
     author?: UserPF2e;
     speaker?: TargetDocuments;
+    visibility: (typeof VISIBILITY_OPTIONS)[number];
 };
 
 export { CreateMessageActionNode };
