@@ -15,8 +15,6 @@ Hooks.once("init", async () => {
     // we register the pf2e-trigger application
     if (game.system.id === "pf2e") {
         registerPF2eApplication();
-        // TODO remove
-        TriggerApplication.registerTriggers(MODULE.id, "pf2e-trigger", `modules/${MODULE.id}/pf2e-triggers.json`);
     }
 
     // we allow third party to register their own application

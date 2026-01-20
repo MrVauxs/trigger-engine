@@ -41,7 +41,7 @@ import {
     render,
     waitDialog,
 } from "module-helpers";
-import { Blueprint, BlueprintEntry, BlueprintNode } from ".";
+import { Blueprint, BlueprintEntry, BlueprintNode, MaybeTrigger } from ".";
 import apps = foundry.applications.api;
 
 class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, BlueprintRenderOptions> {
@@ -533,6 +533,18 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
                 },
             },
             {
+                icon: `<i class="fa-solid fa-pen-to-square"></i>`,
+                name: localizePath("edit-folder.title"),
+                condition: (el) => {
+                    const trigger = getTriggerFromElement(el);
+                    return !!trigger?.locked;
+                },
+                callback: (el) => {
+                    const trigger = getTriggerFromElement(el);
+                    return trigger?.locked && this.#editFolder(trigger);
+                },
+            },
+            {
                 icon: `<i class="fa-solid fa-copy"></i>`,
                 name: localizePath("blueprint.trigger.duplicate"),
                 callback: (el) => {
@@ -628,12 +640,10 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
         };
     }
 
-    #prepareTriggersGroups<T extends { folder: string | undefined }>(
-        triggersData: T[],
-    ): { folder: string; triggers: T[] }[] {
+    #prepareTriggersGroups<T extends MaybeTrigger>(triggersData: T[]): { folder: string; triggers: T[] }[] {
         return R.pipe(
             triggersData,
-            R.groupBy((trigger) => trigger.folder ?? ""),
+            R.groupBy((trigger) => this.blueprint.getFolder(trigger)),
             R.entries(),
             R.sortBy(([folder]) => folder),
             R.map(([folder, triggers]) => {
@@ -645,11 +655,6 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
     #prepareTriggersContext(_options: BlueprintRenderOptions): TriggersContext {
         const triggers = this.blueprint.triggers.contents;
         const groups = this.#prepareTriggersGroups(triggers);
-
-        // we move the folder-less group at the end
-        if (groups.length > 1 && groups[0].folder === "") {
-            groups.push(groups.shift()!);
-        }
 
         const tags = R.pipe(
             triggers,
@@ -724,6 +729,24 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
         }
     }
 
+    async #editFolder(trigger: OpenTrigger) {
+        const current = this.blueprint.getFolder(trigger);
+
+        const result = await waitDialog<{ folder: string; reset: boolean }>({
+            content: "edit-folder",
+            data: { value: current },
+            i18n: "edit-folder",
+        });
+
+        if (!result) return;
+
+        if (result.reset) {
+            this.blueprint.resetFolder(trigger);
+        } else if (result.folder !== current) {
+            this.blueprint.setFolder(trigger, result.folder);
+        }
+    }
+
     async #editTrigger(folder?: string, trigger?: OpenTrigger) {
         const isEdit = !!trigger;
 
@@ -740,7 +763,6 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
                 tags: trigger?.data.tags,
             },
             i18n: "edit-trigger",
-            skipAnimate: true,
             minWidth: "700px",
             title: localize(isEdit ? "blueprint.trigger.edit" : "blueprint.triggers.create"),
             yes: {

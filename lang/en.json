@@ -66,6 +66,7 @@
                 "edit": "Edit Trigger",
                 "events": "Events",
                 "expand": "Restore Triggers Window",
+                "folder": "Edit Folder",
                 "gates": {
                     "tab": "Move to next Entry Gate",
                     "title": "Gates"
@@ -452,6 +453,12 @@
                 "add": "Add",
                 "edit": "Edit"
             }
+        },
+        "edit-folder": {
+            "folder": "Folder",
+            "reset": "Reset to module value?",
+            "title": "Edit Folder",
+            "yes": "Edit"
         },
         "edit-trigger": {
             "folder": "Folder",

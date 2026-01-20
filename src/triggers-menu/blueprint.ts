@@ -33,6 +33,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
     #gridLayer: BlueprintGridLayer;
     #hitArea: PIXI.Rectangle;
     #layers: BlueprintLayers;
+    #modulesFolders: Record<string, string>;
     #mouseManager: MouseInteractionManager;
     #parent: BlueprintApplication;
     #triggerId: TriggerFullId | null = null;
@@ -56,6 +57,8 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         this.stage.hitArea = this.#hitArea = new PIXI.Rectangle();
 
         const triggersSetting = this.parent.getTriggersSetting();
+
+        this.#modulesFolders = triggersSetting.folders;
 
         for (const id of triggersSetting.disabled) {
             this.#disabledIds.add(id);
@@ -292,16 +295,27 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
     async saveTriggers(): Promise<Required<TriggersSetting> | undefined> {
         if (!this.application.isSettingApplication) return;
 
+        const allTriggers = this.triggers.contents;
+
         const sources = R.pipe(
-            this.triggers.contents,
+            allTriggers,
             R.filter((trigger) => !trigger.locked),
             R.map((trigger) => trigger.toObject()),
         );
 
-        const ids = sources.map((source) => source.id);
-        const disabled = [...this.#disabledIds].filter((id) => R.isIncludedIn(id, ids));
-        const enabled = [...this.#enabledIds].filter((id) => R.isIncludedIn(id, ids));
-        const setting: Required<TriggersSetting> = { disabled, enabled, sources };
+        const toSaveIds = sources.map((source) => source.id);
+
+        const forFoldersIds = R.pipe(
+            allTriggers,
+            R.filter((trigger) => !!trigger.locked),
+            R.map((trigger) => trigger.id),
+        );
+
+        const disabled = [...this.#disabledIds].filter((id) => R.isIncludedIn(id, toSaveIds));
+        const enabled = [...this.#enabledIds].filter((id) => R.isIncludedIn(id, toSaveIds));
+        const folders = R.pick(this.#modulesFolders, forFoldersIds) as Record<string, string>;
+
+        const setting: Required<TriggersSetting> = { disabled, enabled, folders, sources };
 
         return game.settings.set(this.application.moduleId, this.application.settingKey, setting);
     }
@@ -324,6 +338,24 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
                 this.#disabledIds.add(id);
             }
         }
+    }
+
+    getFolder({ folder, id, locked }: MaybeTrigger): string {
+        return (locked ? (this.#modulesFolders[id] ?? folder) : folder) ?? "";
+    }
+
+    setFolder({ id, locked }: MaybeTrigger, folder: string) {
+        if (!locked) return;
+
+        this.#modulesFolders[id] = folder;
+        this.parent.render();
+    }
+
+    resetFolder({ id, locked }: MaybeTrigger) {
+        if (!locked) return;
+
+        delete this.#modulesFolders[id];
+        this.parent.render();
     }
 
     async editVariable(id: ConnectionId) {
@@ -571,4 +603,7 @@ type InteractionData = {
     selection: PIXI.Graphics;
 };
 
+type MaybeTrigger = { folder: string | undefined; id: string; locked?: boolean };
+
 export { Blueprint };
+export type { MaybeTrigger };

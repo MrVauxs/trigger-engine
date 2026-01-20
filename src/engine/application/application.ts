@@ -493,6 +493,7 @@ class TriggerApplication {
         return {
             disabled: setting.disabled?.slice() ?? [],
             enabled: setting.enabled?.slice() ?? [],
+            folders: utils.deepClone(setting.folders) ?? {},
             sources: utils.deepClone(setting?.sources ?? []),
         };
     }
@@ -533,6 +534,7 @@ class TriggerApplication {
                 return {
                     disabled: [],
                     enabled: [],
+                    folders: {},
                     sources: [test.toObject()],
                 };
             }
@@ -620,6 +622,7 @@ type ApplicationMenuOptions = {
 type TriggersSetting = {
     disabled: string[];
     enabled: string[];
+    folders: Record<string, string>;
     sources: TriggerDataInput[];
 };
 
