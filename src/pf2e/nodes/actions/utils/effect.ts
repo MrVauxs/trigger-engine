@@ -30,12 +30,14 @@ async function getEffectData(
 
 type EffectOptions = Omit<CustomConditionOptions, "slug" | "counter" | "alterations">;
 
-type EffectInputs = DurationInputs & {
-    img: string;
-    name: string;
-    secret: boolean;
-    slug: string;
-};
+type EffectInputs = Prettify<
+    DurationInputs & {
+        img: string;
+        name: string;
+        secret: boolean;
+        slug: string;
+    }
+>;
 
 export { effectSchemas, getEffectData };
 export type { EffectInputs };

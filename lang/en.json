@@ -655,6 +655,20 @@
                         },
                         "title": "Create Item"
                     },
+                    "create-persistent": {
+                        "inputs": {
+                            "dc": {
+                                "title": "DC"
+                            },
+                            "die": {
+                                "title": "Die"
+                            },
+                            "type": {
+                                "title": "Damage Type"
+                            }
+                        },
+                        "title": "Create Persistent Damage"
+                    },
                     "create-temporary": {
                         "title": "Create Trigger-Effect"
                     },
