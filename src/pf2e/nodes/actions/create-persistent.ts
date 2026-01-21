@@ -2,7 +2,6 @@ import { IconObject } from "_zod";
 import { BaseActionNode } from "engine";
 import { DamageType, createPersistentDamageSource, recordToSelectOptions } from "module-helpers";
 import { PF2eInputEntry } from "pf2e";
-import { effectSchemas } from ".";
 
 class CreatePersistentActionNode extends BaseActionNode<"out", Inputs> {
     static get type(): "create-persistent" {
@@ -37,7 +36,6 @@ class CreatePersistentActionNode extends BaseActionNode<"out", Inputs> {
                     min: 0,
                 },
             },
-            ...effectSchemas("effect"),
         ];
     }
 
