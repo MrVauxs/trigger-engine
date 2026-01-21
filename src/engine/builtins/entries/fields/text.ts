@@ -8,6 +8,8 @@ const NODE_INPUT_CODE_TYPES = ["javascript", "json"] as const;
 const NODE_INPUT_TEXT_TYPES = ["enriched", "select", ...NODE_INPUT_CODE_TYPES] as const;
 
 class TextField extends InputField<string, TextFieldSchema> {
+    #toDisplay?: string;
+
     static get defineSchema(): NodeFieldSchema {
         return {
             connector: {
@@ -108,20 +110,22 @@ class TextField extends InputField<string, TextFieldSchema> {
     }
 
     get toDisplay(): string {
-        if (this.isJSONInput && this.value === this.default) {
-            return "";
-        }
+        return (this.#toDisplay ??= (() => {
+            if (this.isJSONInput && this.value === this.default) {
+                return "";
+            }
 
-        if (this.isSelect) {
-            const option = this.options.find((option) => option.value === this.value);
-            return option ? this.localizeOption(option) : this.value;
-        }
+            if (this.isSelect) {
+                const option = this.options.find((option) => option.value === this.value);
+                return option ? this.localizeOption(option) : this.value;
+            }
 
-        return this.isSimpleInput
-            ? this.value
-            : this.isEnrichedInput
-              ? this.value.replace(/\<\/?p\>/g, " ").trim()
-              : this.value.replace(/\s{1,}|\\n/g, this.field.type === "json" ? "" : " ");
+            return this.isSimpleInput
+                ? this.value
+                : this.isEnrichedInput
+                  ? this.value.replace(/\<\/?p\>/g, " ").trim()
+                  : this.value.replace(/\s{1,}|\\n/g, this.field.type === "json" ? "" : " ");
+        })());
     }
 
     get valueAlpha(): number {
@@ -180,7 +184,7 @@ class TextField extends InputField<string, TextFieldSchema> {
             this.lineTo(centerPoint, lowPoint);
             this.lineTo(rightPoint, highPoint);
         } else {
-            label.alpha = this.isConnected || this.value === this.default ? 0.5 : 0;
+            label.alpha = this.isConnected || !this.toDisplay ? 0.5 : 0;
             this.addRectangleMask(label, 0, 0, this.width - padding * 2, this.height);
         }
 
