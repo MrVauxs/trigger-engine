@@ -800,6 +800,18 @@
                 "logic": {
                     "compare-outcomes": {
                         "title": "Compare Degree of Success"
+                    },
+                    "distance-between": {
+                        "inputs": {
+                            "distance": {
+                                "title": "Distance"
+                            },
+                            "strict": {
+                                "title": "Strict",
+                                "tooltip": "Do not fallback to active tokens"
+                            }
+                        },
+                        "title": "Distance Between Tokens"
                     }
                 },
                 "splitter": {
