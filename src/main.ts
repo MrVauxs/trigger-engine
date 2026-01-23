@@ -1,5 +1,5 @@
 import { NodeEntry, TriggerApplication, TriggerEngineRegionBehaviorType, TriggerHook, TriggerNode } from "engine";
-import { MODULE } from "module-helpers";
+import { MODULE, R } from "module-helpers";
 import { registerPF2eApplication } from "pf2e";
 import { onUserQuery } from "queries";
 import { id } from "../module.json";
@@ -13,7 +13,7 @@ Hooks.once("init", async () => {
     CONFIG.queries[MODULE.path("user-query")] = onUserQuery;
 
     // we register the pf2e-trigger application
-    if (game.system.id === "pf2e") {
+    if (R.isIncludedIn(game.system.id, ["pf2e", "sf2e"])) {
         registerPF2eApplication();
     }
 
