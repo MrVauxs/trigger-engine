@@ -866,6 +866,14 @@
                     "traits": {
                         "title": "Extra Traits"
                     }
+                },
+                "uuid": {
+                    "pf2e": {
+                        "title": "PF2e Source UUID"
+                    },
+                    "sf2e": {
+                        "title": "SF2e Source UUID"
+                    }
                 }
             },
             "state": {

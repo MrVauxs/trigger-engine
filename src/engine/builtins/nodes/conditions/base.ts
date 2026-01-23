@@ -20,7 +20,7 @@ class BaseConditionNode<
         return "#188600";
     }
 
-    get icon(): IconObject {
+    get icon(): IconObject | string | null {
         return { unicode: "\ue14f" };
     }
 

@@ -1,6 +1,13 @@
 import { IconObject } from "_zod";
 import { BaseActionNode, CustomInputSchema } from "engine";
 import { ActorPF2e, ChoiceSetSource, ItemPF2e, ItemType, R, getItemFromUuid, getItemSource } from "module-helpers";
+import {
+    DoubleUuidInputs,
+    doubleUuidSchemas,
+    getDoubleUuidValue,
+    getIconFromDoubleUuid,
+    getLocalItemFromSourceUuid,
+} from "..";
 import { PF2eInputEntry, PF2eOutputEntry } from "pf2e";
 
 class CreateItemActionNode extends BaseActionNode<"out", Inputs, { item?: ItemPF2e }, "choices"> {
@@ -16,7 +23,7 @@ class CreateItemActionNode extends BaseActionNode<"out", Inputs, { item?: ItemPF
 
     static get defineInputs(): PF2eInputEntry[] {
         return [
-            { key: "uuid", type: "text" },
+            ...doubleUuidSchemas(),
             { key: "target", type: "target" },
             { key: "duplicate", type: "boolean", field: { default: true } },
         ];
@@ -31,31 +38,20 @@ class CreateItemActionNode extends BaseActionNode<"out", Inputs, { item?: ItemPF
     }
 
     get title(): string | null {
-        return this.localItem?.name ?? super.title;
+        return getLocalItemFromSourceUuid.call(this)?.name ?? super.title;
     }
 
     get subtitle(): string | null {
-        return this.localItem ? super.title : super.subtitle;
+        return getLocalItemFromSourceUuid.call(this) ? super.title : super.subtitle;
     }
 
-    get icon(): IconObject | string {
-        const item = this.localItem;
-        return item === null ? { unicode: "\uf127" } : (item?.img ?? { unicode: "\uf466" });
-    }
-
-    get localItem(): CompendiumIndexData | undefined | null {
-        const uuid = this.getLocalValue("uuid");
-        if (!uuid) return;
-
-        const item = fromUuidSync<CompendiumIndexData>(uuid);
-        if (!item) return null;
-
-        return item instanceof Item || foundry.utils.parseUuid(item.uuid)?.type === "Item" ? item : null;
+    get icon(): IconObject | string | null {
+        return getIconFromDoubleUuid.call(this, { unicode: "\uf466" });
     }
 
     async _execute(): Promise<boolean> {
         const actor = (await this.getInputValue("target"))?.actor;
-        const uuid = await this.getInputValue("uuid");
+        const uuid = await getDoubleUuidValue.call(this);
         const item = await getItemFromUuid(uuid);
 
         if (!actor || !item) {
@@ -112,9 +108,8 @@ class CreateItemActionNode extends BaseActionNode<"out", Inputs, { item?: ItemPF
     }
 }
 
-type Inputs = {
+type Inputs = DoubleUuidInputs & {
     duplicate: boolean;
-    uuid: string;
     target?: TargetDocuments;
 };
 

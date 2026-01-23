@@ -1,6 +1,14 @@
-import { PF2eInputEntry, PF2eOutputEntry } from "pf2e";
 import { ItemPF2e, findItemWithSlug, findItemWithSourceId } from "module-helpers";
 import { BaseConditionNode } from "engine";
+import {
+    DoubleUuidInputs,
+    doubleUuidSchemas,
+    getDoubleUuidValue,
+    getIconFromDoubleUuid,
+    getLocalItemFromSourceUuid,
+} from "..";
+import { PF2eInputEntry, PF2eOutputEntry } from "pf2e";
+import { IconObject } from "_zod";
 
 class HasItemConditionNode extends BaseConditionNode<Inputs, Outputs, never, never, "uuid" | "slug"> {
     static get type(): "has-item" {
@@ -18,7 +26,7 @@ class HasItemConditionNode extends BaseConditionNode<Inputs, Outputs, never, nev
     static get defineInputs(): PF2eInputEntry[] {
         return [
             { key: "target", type: "target" },
-            { key: "uuid", type: "text", state: "uuid" },
+            ...doubleUuidSchemas("uuid"),
             { key: "slug", type: "text", state: "slug" },
         ];
     }
@@ -28,6 +36,18 @@ class HasItemConditionNode extends BaseConditionNode<Inputs, Outputs, never, nev
             { key: "target", type: "target" },
             { key: "item", type: "item" },
         ];
+    }
+
+    get title(): string | null {
+        return getLocalItemFromSourceUuid.call(this)?.name ?? super.title;
+    }
+
+    get subtitle(): string | null {
+        return getLocalItemFromSourceUuid.call(this) ? super.title : super.subtitle;
+    }
+
+    get icon(): IconObject | string | null {
+        return getIconFromDoubleUuid.call(this, super.icon);
     }
 
     async _execute(): Promise<boolean> {
@@ -42,7 +62,7 @@ class HasItemConditionNode extends BaseConditionNode<Inputs, Outputs, never, nev
         const item =
             this.state === "slug"
                 ? findItemWithSlug(target.actor, await this.getInputValue("slug"))
-                : findItemWithSourceId(target.actor, await this.getInputValue("uuid"));
+                : findItemWithSourceId(target.actor, await getDoubleUuidValue.call(this));
 
         if (item) {
             this.setOutputValue("item", item);
@@ -53,10 +73,9 @@ class HasItemConditionNode extends BaseConditionNode<Inputs, Outputs, never, nev
     }
 }
 
-type Inputs = {
+type Inputs = DoubleUuidInputs & {
     slug: string;
     target?: TargetDocuments;
-    uuid: string;
 };
 
 type Outputs = {
