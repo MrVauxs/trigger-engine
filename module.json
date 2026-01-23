@@ -8,9 +8,7 @@
             "discord": "idleatre"
         }
     ],
-    "esmodules": [
-        "scripts/main.js"
-    ],
+    "esmodules": ["scripts/main.js"],
     "compatibility": {
         "minimum": "13.351",
         "verified": "13.351",
@@ -25,15 +23,31 @@
     "download": "https://github.com/reonZ/trigger-engine/releases/download/0.7.0/module.zip",
     "changelog": "https://github.com/reonZ/trigger-engine/blob/master/CHANGELOG.md",
     "bugs": "https://github.com/reonZ/trigger-engine/issues",
-    "styles": [
-        "styles/trigger-engine.css"
-    ],
+    "styles": ["styles/trigger-engine.css"],
     "documentTypes": {
         "RegionBehavior": {
             "builtins.region": {}
         }
     },
     "relationships": {
+        "systems": [
+            {
+                "id": "pf2e",
+                "type": "system",
+                "manifest": "https://raw.githubusercontent.com/foundryvtt/pf2e/master/system.pf2e.json",
+                "compatibility": {
+                    "minimum": "7.9.1"
+                }
+            },
+            {
+                "id": "sf2e",
+                "type": "system",
+                "manifest": "https://raw.githubusercontent.com/foundryvtt/pf2e/master/system.sf2e.json",
+                "compatibility": {
+                    "minimum": "0.0.3"
+                }
+            }
+        ],
         "requires": [
             {
                 "id": "lib-wrapper",
