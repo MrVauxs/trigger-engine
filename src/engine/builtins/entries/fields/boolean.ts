@@ -25,8 +25,17 @@ class BooleanField extends BuiltInEntryField<boolean, BooleanFieldSchema> {
     }
 
     draw(): void {
-        if (this.isConnected || this.value) {
-            this.beginFill(this.isConnected ? this.backgroundColor : this.activeColor);
+        if (this.isConnected) {
+            this.beginFill(this.backgroundColor);
+        } else if (this.value) {
+            const check = this.createFontAwesomeIcon({ unicode: "\uf00c", fontWeight: "900", fontMult: 0.9 });
+
+            check.anchor.set(0.5);
+            check.x = this.width / 2;
+            check.y = this.height / 2;
+
+            this.addChild(check);
+            this.beginFill(this.activeColor);
         }
 
         this.lineStyle({ color: this.borderColor, width: this.borderWidth });
