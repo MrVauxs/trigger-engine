@@ -1,5 +1,5 @@
 import { TriggerNode } from "engine";
-import { ActorPF2e, ConditionKey, ConditionPF2e, ConditionSlug, R, recordToSelectOptions } from "module-helpers";
+import { ActorPF2e, ConditionKey, ConditionSlug, R, recordToSelectOptions } from "module-helpers";
 import { PF2eInputEntry } from "pf2e";
 
 let CONDITIONS: ConditionOptions | undefined;
@@ -47,14 +47,9 @@ async function getValuedConditionsData(
     const actor = (await this.getInputValue("target"))?.actor;
     if (!actor) return;
 
-    const slug = await this.getInputValue("condition");
-    const condition = actor.getCondition(slug);
-    if (!condition) return;
-
     return {
         actor,
-        condition,
-        slug,
+        slug: await this.getInputValue("condition"),
         value: await this.getInputValue("value"),
     };
 }
@@ -71,7 +66,6 @@ type ValuedConditionsInputs = {
 
 type ValuedConditionsData = {
     actor: ActorPF2e;
-    condition: ConditionPF2e<ActorPF2e>;
     slug: ConditionSlug;
     value: number;
 };
