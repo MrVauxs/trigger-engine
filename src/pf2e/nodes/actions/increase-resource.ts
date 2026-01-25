@@ -33,7 +33,7 @@ class InceaseResourceActionNode extends BaseActionNode<"out", Inputs> {
         if (data?.value) {
             const { actor, resource, value } = data;
             const max = (await this.getInputValue("max")) || resource.max;
-            const newValue = Math.min(resource.value + value, max, resource.max);
+            const newValue = Math.min(resource.value + value, max);
 
             if (newValue !== resource.value && actor.isOfType("creature")) {
                 await actor.updateResource(resource.slug, newValue);

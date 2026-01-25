@@ -1,7 +1,7 @@
 import { TriggerNode } from "engine";
-import { PF2eInputEntry } from "pf2e";
-import { DurationInputs, DurationState, durationSchemas, getDurationData } from ".";
 import { CustomConditionOptions } from "module-helpers";
+import { PF2eInputEntry } from "pf2e";
+import { DurationInputs, durationSchemas, DurationState, getDurationData } from ".";
 
 function effectSchemas(group?: string): PF2eInputEntry[] {
     return [
