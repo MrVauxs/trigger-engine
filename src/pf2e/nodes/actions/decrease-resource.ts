@@ -3,9 +3,9 @@ import { BaseActionNode } from "engine";
 import { PF2eInputEntry } from "pf2e";
 import { getResourceData, ResourceInputs, resourceSchemas } from ".";
 
-class InceaseResourceActionNode extends BaseActionNode<"out", Inputs> {
-    static get type(): "increase-resource" {
-        return "increase-resource";
+class DecreaseResourceActionNode extends BaseActionNode<"out", Inputs> {
+    static get type(): "decrease-resource" {
+        return "decrease-resource";
     }
 
     static get tags(): string[] {
@@ -16,7 +16,7 @@ class InceaseResourceActionNode extends BaseActionNode<"out", Inputs> {
         return [
             ...resourceSchemas(),
             {
-                key: "max",
+                key: "min",
                 type: "number",
                 field: { min: 0 },
             },
@@ -24,7 +24,7 @@ class InceaseResourceActionNode extends BaseActionNode<"out", Inputs> {
     }
 
     get icon(): IconObject {
-        return { unicode: "\uf240" };
+        return { unicode: "\ue0b1" };
     }
 
     async _execute(): Promise<boolean> {
@@ -32,8 +32,8 @@ class InceaseResourceActionNode extends BaseActionNode<"out", Inputs> {
 
         if (data?.value) {
             const { actor, resource, value } = data;
-            const max = (await this.getInputValue("max")) || resource.max;
-            const newValue = Math.min(resource.value + value, max, resource.max);
+            const min = await this.getInputValue("min");
+            const newValue = Math.max(resource.value - value, min, 0);
 
             if (newValue !== resource.value && actor.isOfType("creature")) {
                 await actor.updateResource(resource.slug, newValue);
@@ -45,7 +45,7 @@ class InceaseResourceActionNode extends BaseActionNode<"out", Inputs> {
 }
 
 type Inputs = ResourceInputs & {
-    max: number;
+    min: number;
 };
 
-export { InceaseResourceActionNode };
+export { DecreaseResourceActionNode };

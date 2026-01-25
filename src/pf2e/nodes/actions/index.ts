@@ -5,6 +5,7 @@ import {
     CreatePersistentActionNode,
     CreateTemporaryActionNode,
     DecreaseConditionActionNode,
+    DecreaseResourceActionNode,
     InceaseConditionActionNode,
     InceaseResourceActionNode,
     RollDamageActionNode,
@@ -19,6 +20,7 @@ export * from "./create-item";
 export * from "./create-persistent";
 export * from "./create-temporary";
 export * from "./decrease-condition";
+export * from "./decrease-resource";
 export * from "./increase-condition";
 export * from "./increase-resource";
 export * from "./roll-damage";
@@ -32,6 +34,7 @@ export default [
     CreatePersistentActionNode,
     CreateTemporaryActionNode,
     DecreaseConditionActionNode,
+    DecreaseResourceActionNode,
     InceaseConditionActionNode,
     InceaseResourceActionNode,
     RollDamageActionNode,

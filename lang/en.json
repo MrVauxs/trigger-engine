@@ -678,6 +678,9 @@
                     "decrease-condition": {
                         "title": "Decrease Condition"
                     },
+                    "decrease-resource": {
+                        "title": "Decrease Resource"
+                    },
                     "increase-condition": {
                         "title": "Increase Condition"
                     },
