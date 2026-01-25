@@ -1,7 +1,7 @@
 import { IconObject } from "_zod";
 import { BaseActionNode } from "engine";
 import { PF2eInputEntry } from "pf2e";
-import { ValuedConditionsInputs, getValuedConditionsData, getValuedConditionsSchemas } from ".";
+import { ValuedConditionsInputs, getValuedConditionsData, valuedConditionsSchemas } from ".";
 
 class InceaseConditionActionNode extends BaseActionNode<"out", Inputs> {
     static get type(): "increase-condition" {
@@ -14,7 +14,7 @@ class InceaseConditionActionNode extends BaseActionNode<"out", Inputs> {
 
     static get defineInputs(): PF2eInputEntry[] {
         return [
-            ...getValuedConditionsSchemas(),
+            ...valuedConditionsSchemas(),
             {
                 key: "max",
                 type: "number",
@@ -28,17 +28,11 @@ class InceaseConditionActionNode extends BaseActionNode<"out", Inputs> {
     }
 
     async _execute(): Promise<boolean> {
-        const actor = (await this.getInputValue("target"))?.actor;
+        const data = await getValuedConditionsData.call(this);
 
-        if (!actor) {
-            return this.executeNext("out");
-        }
-
-        const { slug, value } = await getValuedConditionsData.call(this);
-
-        if (value) {
+        if (data?.value) {
             const max = (await this.getInputValue("max")) || undefined;
-            await actor.increaseCondition(slug, { max, value });
+            await data.actor.increaseCondition(data.slug, { max, value: data.value });
         }
 
         return this.executeNext("out");

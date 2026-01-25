@@ -1,7 +1,7 @@
 import { IconObject } from "_zod";
 import { BaseActionNode } from "engine";
 import { PF2eInputEntry } from "pf2e";
-import { ValuedConditionsInputs, getValuedConditionsData, getValuedConditionsSchemas } from ".";
+import { ValuedConditionsInputs, getValuedConditionsData, valuedConditionsSchemas } from ".";
 
 class DecreaseConditionActionNode extends BaseActionNode<"out", Inputs> {
     static get type(): "decrease-condition" {
@@ -14,7 +14,7 @@ class DecreaseConditionActionNode extends BaseActionNode<"out", Inputs> {
 
     static get defineInputs(): PF2eInputEntry[] {
         return [
-            ...getValuedConditionsSchemas(),
+            ...valuedConditionsSchemas(),
             {
                 key: "min",
                 type: "number",
@@ -28,25 +28,18 @@ class DecreaseConditionActionNode extends BaseActionNode<"out", Inputs> {
     }
 
     async _execute(): Promise<boolean> {
-        const actor = (await this.getInputValue("target"))?.actor;
+        const data = await getValuedConditionsData.call(this);
 
-        if (!actor) {
-            return this.executeNext("out");
-        }
-
-        const { slug, value } = await getValuedConditionsData.call(this);
-        const condition = actor.getCondition(slug);
-
-        if (!condition) {
+        if (!data) {
             return this.executeNext("out");
         }
 
         const min = await this.getInputValue("min");
-        const currentValue = condition._source.system.value.value ?? 0;
-        const newValue = Math.max(currentValue - value, min);
+        const currentValue = data.condition._source.system.value.value ?? 0;
+        const newValue = Math.max(currentValue - data.value, min);
 
         if (newValue !== currentValue) {
-            await game.pf2e.ConditionManager.updateConditionValue(condition.id, actor, newValue);
+            await game.pf2e.ConditionManager.updateConditionValue(data.condition.id, data.actor, newValue);
         }
 
         return this.executeNext("out");

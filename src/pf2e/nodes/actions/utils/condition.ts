@@ -1,5 +1,5 @@
 import { TriggerNode } from "engine";
-import { ConditionKey, ConditionSlug, R, recordToSelectOptions } from "module-helpers";
+import { ActorPF2e, ConditionKey, ConditionPF2e, ConditionSlug, R, recordToSelectOptions } from "module-helpers";
 import { PF2eInputEntry } from "pf2e";
 
 let CONDITIONS: ConditionOptions | undefined;
@@ -18,7 +18,7 @@ function getValuedConditions(): ConditionOptions {
     }));
 }
 
-function getValuedConditionsSchemas(): PF2eInputEntry[] {
+function valuedConditionsSchemas(): PF2eInputEntry[] {
     return [
         { key: "target", type: "target" },
         {
@@ -41,9 +41,20 @@ function getValuedConditionsSchemas(): PF2eInputEntry[] {
     ];
 }
 
-async function getValuedConditionsData(this: TriggerNode<any, ValuedConditionsInputs>): Promise<ValuedConditionsData> {
+async function getValuedConditionsData(
+    this: TriggerNode<any, ValuedConditionsInputs>,
+): Promise<ValuedConditionsData | undefined> {
+    const actor = (await this.getInputValue("target"))?.actor;
+    if (!actor) return;
+
+    const slug = await this.getInputValue("condition");
+    const condition = actor.getCondition(slug);
+    if (!condition) return;
+
     return {
-        slug: await this.getInputValue("condition"),
+        actor,
+        condition,
+        slug,
         value: await this.getInputValue("value"),
     };
 }
@@ -59,9 +70,11 @@ type ValuedConditionsInputs = {
 };
 
 type ValuedConditionsData = {
+    actor: ActorPF2e;
+    condition: ConditionPF2e<ActorPF2e>;
     slug: ConditionSlug;
     value: number;
 };
 
-export { getConditionOptions, getValuedConditions, getValuedConditionsData, getValuedConditionsSchemas };
+export { getConditionOptions, getValuedConditions, getValuedConditionsData, valuedConditionsSchemas };
 export type { ValuedConditionsInputs };
