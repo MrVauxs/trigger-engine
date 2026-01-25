@@ -604,6 +604,9 @@
                 "private": {
                     "title": "Private"
                 },
+                "resource": {
+                    "title": "Resource"
+                },
                 "save": {
                     "title": "Save Type"
                 },
@@ -677,6 +680,9 @@
                     },
                     "increase-condition": {
                         "title": "Increase Condition"
+                    },
+                    "increase-resource": {
+                        "title": "Increase Resource"
                     },
                     "roll-damage": {
                         "inputs": {

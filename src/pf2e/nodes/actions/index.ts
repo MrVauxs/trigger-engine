@@ -6,6 +6,7 @@ import {
     CreateTemporaryActionNode,
     DecreaseConditionActionNode,
     InceaseConditionActionNode,
+    InceaseResourceActionNode,
     RollDamageActionNode,
     RollSaveActionNode,
     SendToChatActionNode,
@@ -19,6 +20,7 @@ export * from "./create-persistent";
 export * from "./create-temporary";
 export * from "./decrease-condition";
 export * from "./increase-condition";
+export * from "./increase-resource";
 export * from "./roll-damage";
 export * from "./roll-save";
 export * from "./send-chat";
@@ -31,6 +33,7 @@ export default [
     CreateTemporaryActionNode,
     DecreaseConditionActionNode,
     InceaseConditionActionNode,
+    InceaseResourceActionNode,
     RollDamageActionNode,
     RollSaveActionNode,
     SendToChatActionNode,
