@@ -681,6 +681,9 @@
                     "decrease-resource": {
                         "title": "Decrease Resource"
                     },
+                    "effect-badge": {
+                        "title": "Update Effect Badge"
+                    },
                     "increase-condition": {
                         "title": "Increase Condition"
                     },

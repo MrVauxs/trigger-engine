@@ -6,6 +6,7 @@ import {
     CreateTemporaryActionNode,
     DecreaseConditionActionNode,
     DecreaseResourceActionNode,
+    EffectBadgeActionNode,
     InceaseConditionActionNode,
     InceaseResourceActionNode,
     RollDamageActionNode,
@@ -21,6 +22,7 @@ export * from "./create-persistent";
 export * from "./create-temporary";
 export * from "./decrease-condition";
 export * from "./decrease-resource";
+export * from "./effect-badge";
 export * from "./increase-condition";
 export * from "./increase-resource";
 export * from "./roll-damage";
@@ -35,6 +37,7 @@ export default [
     CreateTemporaryActionNode,
     DecreaseConditionActionNode,
     DecreaseResourceActionNode,
+    EffectBadgeActionNode,
     InceaseConditionActionNode,
     InceaseResourceActionNode,
     RollDamageActionNode,
