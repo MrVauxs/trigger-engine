@@ -261,6 +261,16 @@
                             "script": "Script"
                         },
                         "title": "Execute Script"
+                    },
+                    "filter-targets": {
+                        "states": {
+                            "filter": "Filter",
+                            "find": "Find"
+                        },
+                        "title": "Filter Targets",
+                        "titles": {
+                            "find": "Find Target"
+                        }
                     }
                 },
                 "condition": {
