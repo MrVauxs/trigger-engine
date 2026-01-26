@@ -52,30 +52,37 @@ class EffectBadgeActionNode extends BaseActionNode<"out", Inputs, never, never, 
         const item = await this.getEffect();
         const value = await this.getInputValue("value");
 
-        if (!value || !item?.isOfType("effect") || item.pack || item.isExpired) {
+        if (!value || !item?.isOfType("effect") || item.pack) {
             return this.executeNext("out");
         }
 
         const badge = item.system.badge;
 
-        if (badge?.type !== "counter") {
+        // effect was expired, we don't increase it and we remove it if negative
+        if (badge?.type !== "counter" || item.isExpired) {
+            if (value < 0) {
+                await item.delete();
+            }
             return this.executeNext("out");
         }
 
-        const { max, min } = badge;
         let newValue = badge.value + value;
+        console.log(newValue);
 
         if (badge.loop) {
             // we keep looping until we reach a point between min & max
-            while (newValue > max) {
-                newValue = newValue - max + (min - 1);
+            while (newValue > badge.max) {
+                newValue = newValue - badge.max + (badge.min - 1);
             }
-            while (newValue < min) {
-                newValue = max - 1 + (value - min);
+            while (newValue < badge.min) {
+                newValue = badge.max - 1 + (value - badge.min);
             }
+        } else if (newValue < badge.min) {
+            // we delete the effect when reaching lower than min
+            await item.delete();
+            return this.executeNext("out");
         } else {
-            // or we simply clamp
-            newValue = Math.clamp(newValue, min, max);
+            newValue = Math.min(newValue, badge.max);
         }
 
         if (newValue !== badge.value) {
