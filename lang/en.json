@@ -860,6 +860,22 @@
                     }
                 },
                 "logic": {
+                    "choiceset-selection": {
+                        "inputs": {
+                            "flag": {
+                                "title": "flag"
+                            },
+                            "option": {
+                                "title": "rolloPtion"
+                            }
+                        },
+                        "outputs": {
+                            "selection": {
+                                "title": "Selection"
+                            }
+                        },
+                        "title": "Get ChoiceSet Selection"
+                    },
                     "compare-outcomes": {
                         "title": "Compare Degree of Success"
                     },
