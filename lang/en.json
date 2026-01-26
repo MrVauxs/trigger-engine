@@ -284,6 +284,9 @@
                         },
                         "title": "Test If Truthy"
                     },
+                    "is-combatant": {
+                        "title": "Is Current Combatant"
+                    },
                     "list-contains": {
                         "inputs": {
                             "list": {
