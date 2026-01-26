@@ -656,6 +656,11 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
         const triggers = this.blueprint.triggers.contents;
         const groups = this.#prepareTriggersGroups(triggers);
 
+        // we move the folder-less group at the end
+        if (groups.length > 1 && groups[0].folder === "") {
+            groups.push(groups.shift()!);
+        }
+
         const tags = R.pipe(
             triggers,
             R.flatMap((trigger) => {
