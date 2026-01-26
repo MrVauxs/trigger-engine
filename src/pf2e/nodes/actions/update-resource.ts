@@ -14,26 +14,28 @@ class UpdateResourceActionNode extends BaseActionNode<"out", Inputs> {
     static get defineInputs(): PF2eInputEntry[] {
         return [
             { key: "target", type: "target" },
-            { key: "resource", type: "text" },
-            {
-                key: "value",
-                type: "number",
-                field: { default: 1 },
-            },
+            { key: "slug", type: "text" },
+            { key: "by", type: "number" },
         ];
     }
 
+    get title(): string {
+        const value = this.getLocalValue("by");
+        return this.localize(value > 0 ? "titles.increase" : value < 0 ? "titles.decrease" : "title") as string;
+    }
+
     get icon(): IconObject {
-        return { unicode: "\uf241" };
+        const value = this.getLocalValue("by");
+        return { unicode: value > 0 ? "\uf240" : value < 0 ? "\ue0b1" : "\uf242" };
     }
 
     async _execute(): Promise<boolean> {
         const actor = (await this.getInputValue("target"))?.actor;
-        const slug = await this.getInputValue("resource");
+        const slug = await this.getInputValue("slug");
         const resource = actor?.getResource(slug);
 
         if (resource) {
-            const value = await this.getInputValue("value");
+            const value = await this.getInputValue("by");
             const newValue = Math.clamp(resource.value + value, 0, resource.max);
 
             if (newValue !== resource.value && actor?.isOfType("creature")) {
@@ -46,9 +48,9 @@ class UpdateResourceActionNode extends BaseActionNode<"out", Inputs> {
 }
 
 type Inputs = {
+    by: number;
     target?: TargetDocuments;
-    resource: string;
-    value: number;
+    slug: string;
 };
 
 export { UpdateResourceActionNode };

@@ -568,6 +568,9 @@
                 "basic": {
                     "title": "Basic"
                 },
+                "by": {
+                    "title": "By"
+                },
                 "condition": {
                     "title": "Condition"
                 },
@@ -707,7 +710,16 @@
                         "title": "Send Item to Chat"
                     },
                     "update-resource": {
-                        "title": "Update Resource"
+                        "inputs": {
+                            "slug": {
+                                "title": "Resource Slug"
+                            }
+                        },
+                        "title": "Update Resource",
+                        "titles": {
+                            "decrease": "Decrease Resource",
+                            "increase": "Increase Resource"
+                        }
                     }
                 },
                 "condition": {
