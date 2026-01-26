@@ -547,6 +547,8 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
 
         const interactionData = event.interactionData as InteractionData;
 
+        this.nodes.interactiveChildren = false;
+
         interactionData.layerOrigin = this.subtractPointFromEvent(event, this.#layers);
         interactionData.selection = this.#layers.addChild(new PIXI.Graphics());
     }
@@ -570,6 +572,8 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         if (!selection) return;
 
         this.nodes.selectIntersecting(selection);
+
+        this.nodes.interactiveChildren = true;
 
         this.#layers.removeChild(selection);
         selection.destroy();
