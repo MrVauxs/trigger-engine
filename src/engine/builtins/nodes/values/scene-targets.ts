@@ -2,12 +2,12 @@ import { BuiltinsInputEntry, BuiltinsOutputEntry } from "engine";
 import { BaseValueNode } from ".";
 
 const DEFAULT_CALLBACK = `/**
-* @param {{actor: Actor; token: TokenDocument}} target
-* @returns {boolean}
-*
-* @example
-* return target.actor.type === "npc";
-*/
+ * @param {{actor: Actor; token: TokenDocument}} target
+ * @returns {boolean}
+ *
+ * @example
+ * return target.actor.type === "npc";
+ */
 return true;`;
 
 class SceneTargetsValueNode extends BaseValueNode<Inputs> {

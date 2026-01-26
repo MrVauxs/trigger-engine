@@ -4,15 +4,15 @@ import { BaseActionNode } from ".";
 import { IconObject } from "_zod";
 
 const DEFAULT_CALLBACK = `/**
-* @param {unknown[]} inputs
-* @returns {boolean} to break out current process
-* @returns {{type: EntryType; value: unknown}[]}
-*
-* @example
-* const x = inputs[0];
-* const y = inputs[1];
-* return [{type: "number", value: x + y}];
-*/
+ * @param {unknown[]} inputs
+ * @returns {boolean} to break out current process
+ * @returns {{type: EntryType; value: unknown}[]}
+ *
+ * @example
+ * const x = inputs[0];
+ * const y = inputs[1];
+ * return [{type: "number", value: x + y}];
+ */
 return [];`;
 
 class ExecuteScriptActionNode extends BaseActionNode<
