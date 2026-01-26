@@ -79,7 +79,7 @@ class RollSaveActionNode extends BaseActionNode<"out", Inputs, Outputs, never, n
         const rolled = await dcData.statistic.roll(rollArgs);
 
         if (R.isNumber(rolled?.degreeOfSuccess)) {
-            this.setOutputValue("outcome", rolled?.degreeOfSuccess);
+            this.setOutputValue("outcome", rolled.degreeOfSuccess);
             return this.executeNext("out");
         }
 

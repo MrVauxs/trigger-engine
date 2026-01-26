@@ -728,6 +728,9 @@
                         },
                         "title": "Roll Damage"
                     },
+                    "roll-flat": {
+                        "title": "Roll Flat Check"
+                    },
                     "roll-save": {
                         "title": "Roll Save Check"
                     },

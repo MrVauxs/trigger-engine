@@ -8,6 +8,7 @@ import {
     EffectBadgeActionNode,
     InceaseConditionActionNode,
     RollDamageActionNode,
+    RollFlatActionNode,
     RollSaveActionNode,
     SendToChatActionNode,
     UpdateResourceActionNode,
@@ -23,6 +24,7 @@ export * from "./decrease-condition";
 export * from "./effect-badge";
 export * from "./increase-condition";
 export * from "./roll-damage";
+export * from "./roll-flat";
 export * from "./roll-save";
 export * from "./send-chat";
 export * from "./update-resource";
@@ -37,6 +39,7 @@ export default [
     EffectBadgeActionNode,
     InceaseConditionActionNode,
     RollDamageActionNode,
+    RollFlatActionNode,
     RollSaveActionNode,
     SendToChatActionNode,
     UpdateResourceActionNode,
