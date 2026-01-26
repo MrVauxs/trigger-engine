@@ -5,13 +5,12 @@ import {
     CreatePersistentActionNode,
     CreateTemporaryActionNode,
     DecreaseConditionActionNode,
-    DecreaseResourceActionNode,
     EffectBadgeActionNode,
     InceaseConditionActionNode,
-    InceaseResourceActionNode,
     RollDamageActionNode,
     RollSaveActionNode,
     SendToChatActionNode,
+    UpdateResourceActionNode,
 } from ".";
 
 export * from "./utils";
@@ -21,13 +20,12 @@ export * from "./create-item";
 export * from "./create-persistent";
 export * from "./create-temporary";
 export * from "./decrease-condition";
-export * from "./decrease-resource";
 export * from "./effect-badge";
 export * from "./increase-condition";
-export * from "./increase-resource";
 export * from "./roll-damage";
 export * from "./roll-save";
 export * from "./send-chat";
+export * from "./update-resource";
 
 export default [
     CreateConditionActionNode,
@@ -36,11 +34,10 @@ export default [
     CreatePersistentActionNode,
     CreateTemporaryActionNode,
     DecreaseConditionActionNode,
-    DecreaseResourceActionNode,
     EffectBadgeActionNode,
     InceaseConditionActionNode,
-    InceaseResourceActionNode,
     RollDamageActionNode,
     RollSaveActionNode,
     SendToChatActionNode,
+    UpdateResourceActionNode,
 ];

@@ -604,9 +604,6 @@
                 "private": {
                     "title": "Private"
                 },
-                "resource": {
-                    "title": "Resource"
-                },
                 "save": {
                     "title": "Save Type"
                 },
@@ -678,17 +675,11 @@
                     "decrease-condition": {
                         "title": "Decrease Condition"
                     },
-                    "decrease-resource": {
-                        "title": "Decrease Resource"
-                    },
                     "effect-badge": {
                         "title": "Update Effect Badge"
                     },
                     "increase-condition": {
                         "title": "Increase Condition"
-                    },
-                    "increase-resource": {
-                        "title": "Increase Resource"
                     },
                     "roll-damage": {
                         "inputs": {
@@ -714,6 +705,9 @@
                             }
                         },
                         "title": "Send Item to Chat"
+                    },
+                    "update-resource": {
+                        "title": "Update Resource"
                     }
                 },
                 "condition": {
