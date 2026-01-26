@@ -676,7 +676,6 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
     #prepareTriggersContext(_options: BlueprintRenderOptions): TriggersContext {
         const triggers = this.blueprint.triggers.contents;
         const groups = this.#prepareTriggersGroups(triggers);
-        console.log(groups);
 
         // we move the folder-less group at the end
         if (groups.length > 1 && groups[0].folder === "") {
