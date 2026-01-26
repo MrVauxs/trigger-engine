@@ -663,7 +663,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
             R.filter(([_folder, triggers]) => triggers.length > 0),
             R.sortBy(([folder]) => folder),
             R.map(([folder, triggers]) => {
-                return { collapsed: this.#folders.has(folder), folder, triggers };
+                return { collapsed: !this.#folders.has(folder), folder, triggers };
             }),
         );
     }
