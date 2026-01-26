@@ -125,6 +125,12 @@
                 "user-target": "The assigned actor",
                 "target-user": "The primary owner "
             },
+
+            "custom": {
+                "variable": {
+                    "label": "Variable"
+                }
+            },
             "entry": {
                 "a": {
                     "title": "Entry A"
@@ -143,6 +149,9 @@
                 },
                 "entry": {
                     "title": "Entry"
+                },
+                "formula": {
+                    "title": "Formula"
                 },
                 "input": {
                     "title": "Input"
@@ -329,13 +338,6 @@
                         "title": "Compare Numbers"
                     },
                     "format-text": {
-                        "customs": {
-                            "inputs": {
-                                "variable": {
-                                    "label": "Variable"
-                                }
-                            }
-                        },
                         "inputs": {
                             "content": {
                                 "title": "Text to Format",
@@ -348,6 +350,14 @@
                             }
                         },
                         "title": "Format Text"
+                    },
+                    "resolve-formula": {
+                        "inputs": {
+                            "formula": {
+                                "tooltip": "Prefix Variables with the <code>@</code> character"
+                            }
+                        },
+                        "title": "Resolve Formula"
                     }
                 },
                 "splitter": {
