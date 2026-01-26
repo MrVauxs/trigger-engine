@@ -679,7 +679,11 @@
                         "title": "Decrease Condition"
                     },
                     "effect-badge": {
-                        "title": "Update Effect Badge"
+                        "title": "Update Effect Badge",
+                        "titles": {
+                            "decrease": "Decrease Effect Badge",
+                            "increase": "Increase Effect Badge"
+                        }
                     },
                     "increase-condition": {
                         "title": "Increase Condition"

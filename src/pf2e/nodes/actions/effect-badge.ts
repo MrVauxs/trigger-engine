@@ -28,20 +28,21 @@ class EffectBadgeActionNode extends BaseActionNode<"out", Inputs, never, never, 
             { key: "target", type: "target", state: "uuid" },
             ...doubleUuidSchemas("uuid"),
             { key: "effect", type: "item", state: "item" },
-            {
-                key: "value",
-                type: "number",
-                field: { default: 1 },
-            },
+            { key: "by", type: "number" },
         ];
     }
 
+    get dynamicTitle(): string | null {
+        const value = this.getLocalValue("by");
+        return this.localize(value > 0 ? "titles.increase" : value < 0 ? "titles.decrease" : "title") as string;
+    }
+
     get title(): string | null {
-        return getLocalItemFromSourceUuid.call(this)?.name ?? super.title;
+        return getLocalItemFromSourceUuid.call(this)?.name ?? this.dynamicTitle;
     }
 
     get subtitle(): string | null {
-        return getLocalItemFromSourceUuid.call(this) ? super.title : super.subtitle;
+        return getLocalItemFromSourceUuid.call(this) ? this.dynamicTitle : super.subtitle;
     }
 
     get icon(): IconObject | string | null {
@@ -50,7 +51,7 @@ class EffectBadgeActionNode extends BaseActionNode<"out", Inputs, never, never, 
 
     async _execute(): Promise<boolean> {
         const item = await this.getEffect();
-        const value = await this.getInputValue("value");
+        const value = await this.getInputValue("by");
 
         if (!value || !item?.isOfType("effect") || item.pack) {
             return this.executeNext("out");
@@ -67,7 +68,6 @@ class EffectBadgeActionNode extends BaseActionNode<"out", Inputs, never, never, 
         }
 
         let newValue = badge.value + value;
-        console.log(newValue);
 
         if (badge.loop) {
             // we keep looping until we reach a point between min & max
@@ -107,9 +107,9 @@ class EffectBadgeActionNode extends BaseActionNode<"out", Inputs, never, never, 
 }
 
 type Inputs = DoubleUuidInputs & {
+    by: number;
     item?: ItemPF2e;
     target?: TargetDocuments;
-    value: number;
 };
 
 export { EffectBadgeActionNode };
