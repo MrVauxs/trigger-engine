@@ -144,6 +144,9 @@
                 "boolean": {
                     "title": "Boolean"
                 },
+                "callback": {
+                    "title": "Callback"
+                },
                 "combatant": {
                     "title": "Combatant"
                 },
@@ -390,6 +393,9 @@
                     }
                 },
                 "value": {
+                    "scene-targets": {
+                        "title": "Scene Targets"
+                    },
                     "user-value": {
                         "inputs": {
                             "id": {

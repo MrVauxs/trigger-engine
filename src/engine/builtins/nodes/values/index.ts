@@ -1,6 +1,7 @@
-import { UserValueNode } from ".";
+import { SceneTargetsValueNode, UserValueNode } from ".";
 
 export * from "./base";
+export * from "./scene-targets";
 export * from "./user-value";
 
-export default [UserValueNode] as const;
+export default [SceneTargetsValueNode, UserValueNode] as const;
