@@ -21,14 +21,14 @@ class BooleanField extends BuiltInEntryField<boolean, BooleanFieldSchema> {
     }
 
     get activeColor(): ColorSource {
-        return 0xad0303;
+        return 0x730202;
     }
 
     draw(): void {
         if (this.isConnected) {
             this.beginFill(this.backgroundColor);
         } else if (this.value) {
-            const check = this.createFontAwesomeIcon({ unicode: "\uf00c", fontWeight: "900", fontMult: 0.9 });
+            const check = this.createFontAwesomeIcon({ unicode: "\uf00c", fontWeight: "900", fontMult: 0.86 });
 
             check.anchor.set(0.5);
             check.x = this.width / 2;
