@@ -31,17 +31,20 @@
         {{#each groups as |group|}}
         {{!-- folder header --}}
         {{#if group.folder}}
-        <div class="header sub folder">
+        <div class="header sub folder" data-folder="{{group.folder}}">
             <div class="title">
-                <i class="fa-solid fa-folder-open fa-fw"></i>
+                <a data-action="toggle-folder">
+                    <i class="fa-solid fa-folder{{ifThen group.collapsed '' '-open'}} fa-fw"></i>
+                </a>
                 <div class="label"> {{localize group.folder}}</div>
             </div>
             <div class="controls">
-                {{> 'create' folder=group.folder}}
+                {{> 'create'}}
             </div>
         </div>
         {{/if}}
         {{!-- triggers --}}
+        {{#unless group.collapsed}}
         <div class="list">
             {{#each group.triggers as |trigger|}}
             <div class="trigger" {{#if trigger.name}}
@@ -56,14 +59,14 @@
             </div>
             {{/each}}
         </div>
+        {{/unless}}
         {{/each}}
     </div>
 </div>
 
 
 {{#*inline 'create'}}
-<a data-action="create-trigger" {{#if folder}} data-folder="{{folder}}" {{/if}}
-    {{{@root.i18n.tooltip 'create' }}}>
+<a data-action="create-trigger" {{{@root.i18n.tooltip 'create' }}}>
     <i class="fa-solid fa-plus-large"></i>
 </a>
 {{/inline}}

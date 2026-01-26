@@ -46,6 +46,7 @@ import apps = foundry.applications.api;
 
 class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, BlueprintRenderOptions> {
     #blueprint: Blueprint = new Blueprint(this);
+    #folders: Set<string> = new Set();
     #search: string = "";
     #tags: string[] = [];
     #tagsMode: MultiSelectTagsMode = "and";
@@ -223,7 +224,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
             }
 
             case "create-trigger": {
-                const folder = target.dataset.folder;
+                const folder = htmlClosest(target, "[data-folder]")?.dataset.folder;
                 return this.#editTrigger(folder);
             }
 
@@ -293,6 +294,18 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
 
             case "toggle-enabled": {
                 return event.stopPropagation();
+            }
+
+            case "toggle-folder": {
+                const folder = htmlClosest(target, "[data-folder]")?.dataset.folder ?? "";
+
+                if (this.#folders.has(folder)) {
+                    this.#folders.delete(folder);
+                } else {
+                    this.#folders.add(folder);
+                }
+
+                return this.render();
             }
 
             case "toggle-stretch": {
@@ -640,14 +653,17 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
         };
     }
 
-    #prepareTriggersGroups<T extends MaybeTrigger>(triggersData: T[]): { folder: string; triggers: T[] }[] {
+    #prepareTriggersGroups<T extends MaybeTrigger>(
+        triggersData: T[],
+    ): { collapsed: boolean; folder: string; triggers: T[] }[] {
         return R.pipe(
             triggersData,
             R.groupBy((trigger) => this.blueprint.getFolder(trigger)),
             R.entries(),
+            R.filter(([_folder, triggers]) => triggers.length > 0),
             R.sortBy(([folder]) => folder),
             R.map(([folder, triggers]) => {
-                return { folder, triggers };
+                return { collapsed: this.#folders.has(folder), folder, triggers };
             }),
         );
     }
@@ -832,6 +848,7 @@ type EventAction =
     | "tab-variable"
     | "toggle-description"
     | "toggle-enabled"
+    | "toggle-folder"
     | "toggle-stretch";
 
 type BlueprintContext = TriggersContext | TriggerContext;

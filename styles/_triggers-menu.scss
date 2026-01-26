@@ -9,9 +9,7 @@
 
 #trigger-engine-blueprint {
     --outer-spacing: 5px;
-    --width: calc(
-        100% - ((var(--sidebar-width) + 16px + 48px) * var(--ui-scale))
-    );
+    --width: calc(100% - ((var(--sidebar-width) + 16px + 48px) * var(--ui-scale)));
     --background: url("../../../ui/denim075.png") repeat;
     --background-color: #00000059;
     --background-color-highlight: #ffffff14;
@@ -261,10 +259,6 @@
                         width: var(--folder-spacer-width);
                     }
                 }
-            }
-
-            &:not(:has(+ .list .trigger:not(.hidden))) {
-                display: none;
             }
         }
 
