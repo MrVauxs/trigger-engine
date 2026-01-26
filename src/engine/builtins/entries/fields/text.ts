@@ -89,6 +89,10 @@ class TextField extends InputField<string, TextFieldSchema> {
         return this.field.type === "enriched";
     }
 
+    get isJavascript() {
+        return this.field.type === "javascript";
+    }
+
     get isJSONInput(): boolean {
         return this.field.type === "json";
     }
@@ -102,7 +106,7 @@ class TextField extends InputField<string, TextFieldSchema> {
     }
 
     get targetWidth(): number {
-        return 400;
+        return this.isJavascript ? 540 : 400;
     }
 
     get transitionTime(): number {
@@ -112,6 +116,10 @@ class TextField extends InputField<string, TextFieldSchema> {
     get toDisplay(): string {
         return (this.#toDisplay ??= (() => {
             if (this.isJSONInput && this.value === this.default) {
+                return "";
+            }
+
+            if (this.isJavascript && this.value === this.default) {
                 return "";
             }
 
