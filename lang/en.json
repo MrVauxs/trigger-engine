@@ -403,6 +403,9 @@
                     }
                 },
                 "value": {
+                    "current-combatant": {
+                        "title": "Current Combatant"
+                    },
                     "scene-targets": {
                         "title": "Scene Targets"
                     },
