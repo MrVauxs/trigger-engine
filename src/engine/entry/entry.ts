@@ -81,7 +81,7 @@ class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<st
     generateTooltip(label: string, isConnected: boolean): string | undefined {
         return this.slug
             ? this.localize("customs", this.category, this.slug, "tooltip")
-            : this.localize(this.category, this.key, "tooltip");
+            : (this.localize(this.category, this.key, "tooltip") ?? this.rootLocalize("entry", this.key, "tooltip"));
     }
 
     /**
@@ -122,6 +122,9 @@ interface NodeEntry<
 
     /** @see {@link TriggerNode#localize} */
     localize(...args: LocalizeArgs): string | undefined;
+
+    /** @see {@link TriggerNode#rootLocalize} */
+    rootLocalize(...args: LocalizeArgs): string | undefined;
 
     /** @see {@link NodeEntry.toJSON} */
     toJSON(value: TValue): JSONValue;

@@ -70,6 +70,10 @@ function instantiateEntry(
         return parent.localize(...args);
     }
 
+    function rootLocalize(...args: LocalizeArgs): string | undefined {
+        return parent.rootLocalize(...args);
+    }
+
     class NodeEntryWrapper extends EntryCls {
         constructor() {
             super();
@@ -148,7 +152,10 @@ function instantiateEntry(
             Object.defineProperties(
                 this,
                 R.pipe(
-                    [["localize", localize]] as const,
+                    [
+                        ["localize", localize],
+                        ["rootLocalize", rootLocalize],
+                    ] as const,
                     R.fromEntries(),
                     R.mapValues((method) => {
                         return {
