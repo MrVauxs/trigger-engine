@@ -611,6 +611,11 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
     #prepareTriggerContext(trigger: OpenTrigger): TriggerContext {
         this.#search = "";
 
+        // when we come back to triggers menu, we want the folder to be expanded
+        if (trigger.folder) {
+            this.#folders.add(trigger.folder);
+        }
+
         const gates = R.map(
             this.blueprint.nodes.filter((node) => isGateExitNode(node)),
             (node): PreparedGate => {
@@ -663,7 +668,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
             R.filter(([_folder, triggers]) => triggers.length > 0),
             R.sortBy(([folder]) => folder),
             R.map(([folder, triggers]) => {
-                return { collapsed: !this.#folders.has(folder), folder, triggers };
+                return { collapsed: !!folder && !this.#folders.has(folder), folder, triggers };
             }),
         );
     }
@@ -671,6 +676,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
     #prepareTriggersContext(_options: BlueprintRenderOptions): TriggersContext {
         const triggers = this.blueprint.triggers.contents;
         const groups = this.#prepareTriggersGroups(triggers);
+        console.log(groups);
 
         // we move the folder-less group at the end
         if (groups.length > 1 && groups[0].folder === "") {
