@@ -49,6 +49,7 @@ class CreateTemporaryActionNode extends BaseActionNode<"out", TriggerEffectInput
             itemSlug: slug,
             name: identifier ? `${this.triggerName} (${identifier})` : this.triggerName,
             show: false,
+            unidentified: true,
         });
 
         await actor.createEmbeddedDocuments("Item", [source]);
