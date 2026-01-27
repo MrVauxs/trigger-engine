@@ -787,6 +787,9 @@
                     "has-temporary": {
                         "title": "Has Trigger-Effect"
                     },
+                    "in-combat": {
+                        "title": "Is  In Combat"
+                    },
                     "inside-aura": {
                         "inputs": {
                             "once": {
