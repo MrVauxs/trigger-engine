@@ -133,8 +133,9 @@ class TriggerNode<
         return null;
     }
 
-    // TODO
     /**
+     * Define the custom outs schemas if any.
+     *
      * Localization path:
      * `<module-id>.<application-id>.node.<category>.<type>.custom.outs.<slug>.label`
      * `<module-id>.<application-id>.node.<category>.<type>.custom.outs.<slug>.placeholder`
@@ -145,12 +146,16 @@ class TriggerNode<
         return null;
     }
 
-    // TODO
+    /**
+     * Define the custom inputs schemas if any.
+     */
     static get defineCustomInputs(): CustomInputSchema[] | null {
         return null;
     }
 
-    // TODO
+    /**
+     * Define the custom outputs schemas if any.
+     */
     static get defineCustomOutputs(): CustomOutputSchema[] | null {
         return null;
     }
@@ -311,10 +316,10 @@ interface TriggerNode<
     /** Returns a list of custom outputs data (not their value). */
     getCustomOutputs(slug: TCustomOutputs): TriggerNodeCustomOutput[];
 
-    // TODO
+    /** Returns a list of custom inputs data. */
     getCustomInputs(slug: TCustomInputs): Promise<{ label: string; value: any }[]>;
 
-    // TODO
+    /** Returns a list of custom inputs values */
     getCustomInputsValues(slug: TCustomInputs): Promise<any[]>;
 
     /**
