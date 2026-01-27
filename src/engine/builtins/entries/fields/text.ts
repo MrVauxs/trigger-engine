@@ -115,11 +115,7 @@ class TextField extends InputField<string, TextFieldSchema> {
 
     get toDisplay(): string {
         return (this.#toDisplay ??= (() => {
-            if (this.isJSONInput && this.value === this.default) {
-                return "";
-            }
-
-            if (this.isJavascript && this.value === this.default) {
+            if ((this.isJSONInput || this.isJavascript) && this.value === this.default) {
                 return "";
             }
 
