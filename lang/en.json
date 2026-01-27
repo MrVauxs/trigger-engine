@@ -899,6 +899,14 @@
                             }
                         },
                         "title": "Distance Between Tokens"
+                    },
+                    "match-predicate": {
+                        "inputs": {
+                            "predicate": {
+                                "title": "Predicate"
+                            }
+                        },
+                        "title": "Matches Predicate"
                     }
                 },
                 "splitter": {
