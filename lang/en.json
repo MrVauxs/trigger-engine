@@ -793,6 +793,15 @@
                     "in-combat": {
                         "title": "Is  In Combat"
                     },
+                    "in-range": {
+                        "inputs": {
+                            "distance": {
+                                "title": "Distance",
+                                "tooltip": "In increment of 5ft."
+                            }
+                        },
+                        "title": "Is In Range"
+                    },
                     "inside-aura": {
                         "inputs": {
                             "once": {

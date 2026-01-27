@@ -5,6 +5,7 @@ import {
     HasItemConditionNode,
     HasOptionConditionNode,
     InCombatConditionNode,
+    InRangeConditionNode,
     InsideAuraConditionNode,
     IsDeadConditionNode,
 } from ".";
@@ -15,6 +16,7 @@ export * from "./has-item";
 export * from "./has-options";
 export * from "./has-temporary";
 export * from "./in-combat";
+export * from "./in-range";
 export * from "./inside-aura";
 export * from "./is-dead";
 
@@ -25,6 +27,7 @@ export default [
     HasOptionConditionNode,
     HasTemporaryConditionNode,
     InCombatConditionNode,
+    InRangeConditionNode,
     InsideAuraConditionNode,
     IsDeadConditionNode,
 ];
