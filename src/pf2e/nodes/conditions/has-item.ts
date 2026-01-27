@@ -48,16 +48,16 @@ class HasItemConditionNode extends BaseConditionNode<Inputs, Outputs, never, nev
     }
 
     async _execute(): Promise<boolean> {
-        const target = await this.getInputValue("target");
+        const actor = (await this.getInputValue("target"))?.actor;
 
-        if (!target?.actor) {
+        if (!actor) {
             return this.executeNext("false");
         }
 
         const item =
             this.state === "slug"
-                ? findItemWithSlug(target.actor, await this.getInputValue("slug"))
-                : findItemWithSourceId(target.actor, await getDoubleUuidValue.call(this));
+                ? findItemWithSlug(actor, await this.getInputValue("slug"))
+                : findItemWithSourceId(actor, await getDoubleUuidValue.call(this));
 
         if (item) {
             this.setOutputValue("item", item);
