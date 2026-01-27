@@ -24,13 +24,13 @@ class HasConditionConditionNode extends BaseConditionNode<Inputs> {
 
         const { actor, slug, value } = data;
         const conditions = actor.conditions.bySlug(slug);
-        const valid =
+        const hasCondition =
             conditions.length > 0 &&
             (value <= 1 ||
                 !conditions[0].system.value.isValued ||
                 conditions.some((condition) => (condition.value ?? 1) >= value));
 
-        return this.executeNextIf(valid);
+        return this.executeNextIf(hasCondition);
     }
 }
 

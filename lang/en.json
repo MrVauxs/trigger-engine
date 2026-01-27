@@ -765,6 +765,9 @@
                     "has-condition": {
                         "title": "Has Condition"
                     },
+                    "has-immunity": {
+                        "title": "Has Immunity"
+                    },
                     "has-item": {
                         "inputs": {
                             "slug": {
