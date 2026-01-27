@@ -18,6 +18,29 @@ function getValuedConditions(): ConditionOptions {
     }));
 }
 
+function conditionsSchemas(): PF2eInputEntry[] {
+    return [
+        { key: "target", type: "target" },
+        {
+            key: "condition",
+            type: "text",
+            field: {
+                type: "select",
+                options: getConditionOptions(),
+                tooltip: false,
+            },
+        },
+        {
+            key: "value",
+            type: "number",
+            field: {
+                default: 1,
+                min: 1,
+            },
+        },
+    ];
+}
+
 function valuedConditionsSchemas(): PF2eInputEntry[] {
     return [
         { key: "target", type: "target" },
@@ -41,9 +64,7 @@ function valuedConditionsSchemas(): PF2eInputEntry[] {
     ];
 }
 
-async function getValuedConditionsData(
-    this: TriggerNode<any, ValuedConditionsInputs>,
-): Promise<ValuedConditionsData | undefined> {
+async function getConditionsData(this: TriggerNode<any, ValuedConditionsInputs>): Promise<ConditionsData | undefined> {
     const actor = (await this.getInputValue("target"))?.actor;
     if (!actor) return;
 
@@ -54,21 +75,31 @@ async function getValuedConditionsData(
     };
 }
 
+async function getValuedConditionsData(
+    this: TriggerNode<any, ValuedConditionsInputs>,
+): Promise<ValuedConditionsData | undefined> {
+    return getConditionsData.call(this);
+}
+
 type ConditionOptions = { value: ConditionType; label: string }[];
 
 type ConditionType = Exclude<ConditionKey, `persistent-damage-${string}`>;
 
-type ValuedConditionsInputs = {
+type ConditionsInputs = {
     condition: ConditionSlug;
     target?: TargetDocuments;
     value: number;
 };
 
-type ValuedConditionsData = {
+type ConditionsData = {
     actor: ActorPF2e;
     slug: ConditionSlug;
     value: number;
 };
 
-export { getConditionOptions, getValuedConditions, getValuedConditionsData, valuedConditionsSchemas };
-export type { ValuedConditionsInputs };
+type ValuedConditionsInputs = ConditionsInputs;
+
+type ValuedConditionsData = ConditionsData;
+
+export { conditionsSchemas, getConditionsData, getValuedConditionsData, valuedConditionsSchemas };
+export type { ConditionsInputs, ValuedConditionsInputs };

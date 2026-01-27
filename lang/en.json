@@ -762,6 +762,9 @@
                     }
                 },
                 "condition": {
+                    "has-condition": {
+                        "title": "Has Condition"
+                    },
                     "has-item": {
                         "inputs": {
                             "slug": {
