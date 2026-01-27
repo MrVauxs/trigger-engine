@@ -315,7 +315,8 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
     }
 
     async #exportTriggers() {
-        const result = await this.#importExportTriggers("export", this.blueprint.triggers.contents);
+        const triggers = this.blueprint.triggers.filter((trigger) => !trigger.locked);
+        const result = await this.#importExportTriggers("export", triggers);
         if (!result) return;
 
         const purged = purgeObject(result);
