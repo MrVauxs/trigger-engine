@@ -32,10 +32,7 @@ class HasItemConditionNode extends BaseConditionNode<Inputs, Outputs, never, nev
     }
 
     static get defineOutputs(): PF2eOutputEntry[] {
-        return [
-            { key: "target", type: "target" },
-            { key: "item", type: "item" },
-        ];
+        return [{ key: "item", type: "item" }];
     }
 
     get title(): string | null {
@@ -56,8 +53,6 @@ class HasItemConditionNode extends BaseConditionNode<Inputs, Outputs, never, nev
         if (!target?.actor) {
             return this.executeNext("false");
         }
-
-        this.setOutputValue("target", target);
 
         const item =
             this.state === "slug"
@@ -80,7 +75,6 @@ type Inputs = DoubleUuidInputs & {
 
 type Outputs = {
     item?: ItemPF2e;
-    target?: TargetDocuments;
 };
 
 export { HasItemConditionNode };

@@ -20,7 +20,7 @@ class InsideAuraConditionNode extends BaseConditionNode<Inputs, Outputs> {
     }
 
     static get defineOutputs(): PF2eOutputEntry[] {
-        return [BaseAuraEvent.defineOutputs[1], { key: "target", type: "target" }];
+        return [BaseAuraEvent.defineOutputs[1]];
     }
 
     get isLoop(): boolean {
@@ -34,8 +34,6 @@ class InsideAuraConditionNode extends BaseConditionNode<Inputs, Outputs> {
         if (!target || !slug) {
             return this.executeNext("false");
         }
-
-        this.setOutputValue("target", target);
 
         const once = await this.getInputValue("once");
         const affects = await this.getInputValue("affects");
@@ -67,7 +65,6 @@ type Inputs = {
 
 type Outputs = {
     source?: TargetDocuments;
-    target?: TargetDocuments;
 };
 
 export { InsideAuraConditionNode };
