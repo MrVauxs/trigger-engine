@@ -238,7 +238,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
             }
 
             case "export-data": {
-                // if no callback was provided we export the trigger itself
+                // TODO if no callback was provided we export the trigger itself
                 return;
             }
 
@@ -463,8 +463,6 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
     #createContextMenus() {
         this._createContextMenu(this.#triggerContextMenu, ".sidebar.triggers .trigger");
 
-        if (this.blueprint.locked) return;
-
         this._createContextMenu(this.#triggerNodeContextMenu, ".sidebar.trigger .node");
         this._createContextMenu(this.#triggerVariableContextMenu, ".sidebar.trigger .variable");
     }
@@ -474,6 +472,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
             {
                 icon: `<i class="fa-solid fa-pen-to-square"></i>`,
                 name: localizePath(`blueprint.variable.edit`),
+                condition: () => !this.blueprint.locked,
                 callback: (el) => {
                     const id = el.dataset.id as ConnectionId;
                     return this.blueprint.editVariable(id);
@@ -482,6 +481,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
             {
                 icon: `<i class="fa-solid fa-trash"></i>`,
                 name: localizePath("blueprint.variable.delete.title"),
+                condition: () => !this.blueprint.locked,
                 callback: async (el) => {
                     const id = el.dataset.id as ConnectionId;
                     const confirm = await confirmDialog("blueprint.variable.delete");
@@ -496,7 +496,9 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
             {
                 icon: `<i class="fa-solid fa-pen-to-square"></i>`,
                 name: localizePath(`blueprint.node.edit`),
-                condition: (el) => el.hasAttribute("data-editable"),
+                condition: (el) => {
+                    return !this.blueprint.locked && el.hasAttribute("data-editable");
+                },
                 callback: (el) => {
                     const nodeId = el.dataset.nodeId ?? "";
                     const node = this.blueprint.nodes.get(nodeId);
@@ -507,6 +509,8 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
                 icon: `<i class="fa-solid fa-trash"></i>`,
                 name: localizePath("blueprint.node.delete.single"),
                 condition: (el) => {
+                    if (this.blueprint.locked) return false;
+
                     const nodeId = el.dataset.nodeId ?? "";
                     const node = this.blueprint.nodes.get(nodeId);
                     return !!node && (!node.isEvent || !!this.blueprint.trigger?.application.hasMultipleEvents);
@@ -521,7 +525,6 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
     }
 
     #triggerContextMenu(): ContextMenuEntry[] {
-        // const isLocked = this.blueprint.locked;
         const getTriggerFromElement = (el: HTMLElement): OpenTrigger | null => {
             const fullId = el.dataset.fullId as TriggerFullId;
             return fullId ? this.blueprint.getTrigger(fullId) : null;
