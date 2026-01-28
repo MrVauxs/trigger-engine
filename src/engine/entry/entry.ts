@@ -1,5 +1,5 @@
 import { BaseEntrySchemaOutput, ConnectionId, EntryCategory, NodeField, TriggerNode } from "engine";
-import { LocalizeArgs, MODULE } from "module-helpers";
+import { LocalizeArgs, MODULE, R } from "module-helpers";
 
 // IMPORTANT an entry can never represent an array
 class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<string, any> | undefined = undefined> {
@@ -79,9 +79,19 @@ class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<st
      * Tooltip to display when the entry is hovered over.
      */
     generateTooltip(label: string, isConnected: boolean): string | undefined {
-        return this.slug
-            ? this.localize("customs", this.category, this.slug, "tooltip")
-            : (this.localize(this.category, this.key, "tooltip") ?? this.rootLocalize("entry", this.key, "tooltip"));
+        if (this.tooltip === false) return;
+
+        if (R.isString(this.tooltip)) {
+            return game.i18n.localize(this.tooltip);
+        }
+
+        const customTooltip = this.slug && this.localize("customs", this.category, this.slug, "tooltip");
+
+        return (
+            customTooltip ??
+            this.localize(this.category, this.key, "tooltip") ??
+            this.rootLocalize("entry", this.key, "tooltip")
+        );
     }
 
     /**
@@ -97,7 +107,7 @@ class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<st
 interface NodeEntry<
     TValue extends unknown = unknown,
     TFieldSchema extends Record<string, any> | undefined = undefined,
-> extends Pick<BaseEntrySchemaOutput, "input" | "isArray" | "key" | "label" | "slug"> {
+> extends Pick<BaseEntrySchemaOutput, "input" | "isArray" | "key" | "label" | "slug" | "tooltip"> {
     /** The entry category. */
     get category(): EntryCategory;
     /** @see {@link NodeEntry.color} */

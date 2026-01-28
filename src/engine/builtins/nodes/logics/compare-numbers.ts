@@ -33,11 +33,11 @@ class CompareNumbersLogicNode extends BaseLogicNode<"true" | "false", Inputs> {
             {
                 key: "compare",
                 type: "text",
+                tooltip: false,
                 field: {
                     type: "select",
                     options: CompareNumbersLogicNode.compareOptions,
                     connector: false,
-                    tooltip: false,
                     width: 162,
                 },
             },

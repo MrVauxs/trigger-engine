@@ -14,10 +14,10 @@ function durationSchemas(): PF2eInputEntry[] {
             type: "text",
             group: "duration",
             state: "fixed",
+            tooltip: false,
             field: {
                 type: "select",
                 options: recordToSelectOptions(R.pick(CONFIG.PF2E.timeUnits, fixedUnits)),
-                tooltip: false,
             },
         },
         {
@@ -42,10 +42,10 @@ function durationSchemas(): PF2eInputEntry[] {
             type: "text",
             group: "duration",
             state: "timed",
+            tooltip: false,
             field: {
                 type: "select",
                 options: recordToSelectOptions(R.omit(CONFIG.PF2E.timeUnits, fixedUnits)),
-                tooltip: false,
             },
         },
         {

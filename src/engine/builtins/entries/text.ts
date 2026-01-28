@@ -65,6 +65,8 @@ class TextEntry extends BuiltInNodeEntry<string, TextFieldSchema> {
     }
 
     generateTooltip(label: string, isConnected: boolean): string | undefined {
+        if (this.tooltip === false) return;
+
         const tooltip = super.generateTooltip(label, isConnected);
 
         if (
@@ -72,11 +74,7 @@ class TextEntry extends BuiltInNodeEntry<string, TextFieldSchema> {
             !isConnected &&
             (this.isSelect || (R.isString(this.value) && this.value !== this.default))
         ) {
-            if (this.field.tooltip) {
-                return tooltip ? `<div class="title">${label}</div><hr>${tooltip}` : label;
-            } else {
-                return;
-            }
+            return tooltip ? `<div class="title">${label}</div><hr>${tooltip}` : label;
         }
 
         return tooltip;

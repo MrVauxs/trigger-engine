@@ -20,10 +20,10 @@ class HasImmunityConditionNode extends BaseConditionNode<Inputs> {
                 key: "type",
                 type: "text",
                 label: "PF2E.Actor.IWREditor.Type",
+                tooltip: false,
                 field: {
                     type: "select",
                     options,
-                    tooltip: false,
                 },
             },
         ];

@@ -34,10 +34,6 @@ class TextField extends InputField<string, TextFieldSchema> {
                     ],
                 },
             },
-            tooltip: {
-                default: true,
-                type: "boolean",
-            },
             trim: {
                 default: true,
                 type: "boolean",
@@ -325,7 +321,6 @@ type TextFieldSchema = {
     connector: boolean;
     default?: string;
     options?: (SelectFieldOption | string)[] | ReadonlyArray<string>;
-    tooltip: boolean;
     trim: boolean;
     type?: TextFieldSchemaType;
     width: number;

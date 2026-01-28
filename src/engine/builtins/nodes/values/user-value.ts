@@ -25,9 +25,9 @@ class UserValueNode extends BaseValueNode<Inputs> {
             {
                 key: "id",
                 type: "text",
+                tooltip: false,
                 field: {
                     options,
-                    tooltip: false,
                     type: "select",
                 },
             },

@@ -4,6 +4,7 @@ import { zBaseEntry } from ".";
 const zNodeEntrySchema = zBaseEntry.extend({
     group: zString.optional(),
     isArray: z.boolean().default(false),
+    tooltip: z.union([z.boolean(), z.string()]).default(true),
     type: zString,
 });
 

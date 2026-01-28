@@ -24,10 +24,10 @@ function conditionsSchemas(): PF2eInputEntry[] {
         {
             key: "condition",
             type: "text",
+            tooltip: false,
             field: {
                 type: "select",
                 options: getConditionOptions(),
-                tooltip: false,
             },
         },
         {
@@ -47,10 +47,10 @@ function valuedConditionsSchemas(): PF2eInputEntry[] {
         {
             key: "condition",
             type: "text",
+            tooltip: false,
             field: {
                 type: "select",
                 options: getValuedConditions(),
-                tooltip: false,
             },
         },
         {
