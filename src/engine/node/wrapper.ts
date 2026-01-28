@@ -479,12 +479,16 @@ function instantiateNode(
             }
 
             const convertor = parent.application.getConvertor(output.type, input.type);
-            if (!convertor || !output.isValidType(value)) return;
+            if (!convertor) return;
 
             const userContext = this.userContext;
             const convertToInput = (value: any) => convertor.convertToInput(value, userContext);
 
-            return R.isArray(value) ? await Promise.all(value.map(convertToInput)) : await convertToInput(value);
+            return R.isArray(value)
+                ? await Promise.all(value.filter((x) => output.isValidType(x)).map(convertToInput))
+                : output.isValidType(value)
+                  ? await convertToInput(value)
+                  : undefined;
         }
 
         #setOutputValue(key: string, value: any) {
