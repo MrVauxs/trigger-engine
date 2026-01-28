@@ -853,7 +853,11 @@ class BlueprintNode extends PIXI.Container {
             helper.addChild(icon);
 
             if (name) {
-                this.blueprint.addTooltip(helper, () => this.rootLocalize("special", name), "UP");
+                this.blueprint.addTooltip(
+                    helper,
+                    () => this.localize("specials", name) ?? this.rootLocalize("special", name),
+                    "UP",
+                );
             }
 
             return helper;

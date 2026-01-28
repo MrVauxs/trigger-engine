@@ -138,6 +138,9 @@
                 "actor": {
                     "title": "Actor"
                 },
+                "any": {
+                    "title": "Any"
+                },
                 "b": {
                     "title": "Entry B"
                 },
@@ -276,6 +279,14 @@
                         "titles": {
                             "find": "Find Target"
                         }
+                    },
+                    "update-item": {
+                        "inputs": {
+                            "path": {
+                                "title": "System Path"
+                            }
+                        },
+                        "title": "Update Item"
                     }
                 },
                 "condition": {
@@ -449,7 +460,8 @@
                 "custom": "Has Custom Entries",
                 "emit": "Awaits User Input",
                 "loop": "Can Loop Over",
-                "state": "Has Multiple States"
+                "state": "Has Multiple States",
+                "warning": "Be very careful when using this node"
             },
             "state": {
                 "description": "Description",

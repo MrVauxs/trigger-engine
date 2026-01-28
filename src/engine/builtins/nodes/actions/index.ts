@@ -5,6 +5,7 @@ import {
     DeleteItemActionNode,
     ExecuteScriptActionNode,
     FilterTargetsActionNode,
+    UpdateItemActionNode,
 } from ".";
 
 export * from "./utils";
@@ -15,6 +16,7 @@ export * from "./create-message";
 export * from "./delete-item";
 export * from "./execute-script";
 export * from "./filter-targets";
+export * from "./update-item";
 
 export default [
     AwaitConfirmActionNode,
@@ -23,4 +25,5 @@ export default [
     DeleteItemActionNode,
     ExecuteScriptActionNode,
     FilterTargetsActionNode,
+    UpdateItemActionNode,
 ] as const;
