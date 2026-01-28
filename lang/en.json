@@ -356,6 +356,9 @@
                     "format-text": {
                         "inputs": {
                             "content": {
+                                "title": "Text to Format"
+                            },
+                            "plain": {
                                 "title": "Text to Format",
                                 "tooltip": "Prefix Variables with the <code>@</code> character"
                             }
@@ -441,7 +444,8 @@
             },
             "state": {
                 "description": "Description",
-                "localization": "Localization"
+                "localization": "Localization",
+                "plain": "Plain Text"
             },
             "tag": {
                 "chat": {

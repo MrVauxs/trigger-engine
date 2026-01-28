@@ -27,11 +27,11 @@ class FormatTextLogicNode extends BaseLogicNode<
     }
 
     static get states(): string[] {
-        return descriptionStates;
+        return ["plain", ...descriptionStates];
     }
 
     static get defineInputs(): BuiltinsInputEntry[] {
-        return descriptionSchemas();
+        return descriptionSchemas(true);
     }
 
     static get defineOutputs(): BuiltinsOutputEntry[] {
@@ -53,10 +53,10 @@ class FormatTextLogicNode extends BaseLogicNode<
     }
 
     async _execute(): Promise<boolean> {
-        const { content, key } = await getDescriptionInputs.call(this);
+        const { content, key, plain } = await getDescriptionInputs.call(this);
         const variables = await this.getCustomInputs("variable");
 
-        let result = key ? game.i18n.localize(key) : (content ?? "");
+        let result = key ? game.i18n.localize(key) : (plain ?? content ?? "");
 
         for (const { label, value } of variables) {
             const regex = new RegExp(`@${label}`, "gm");

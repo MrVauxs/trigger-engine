@@ -2,10 +2,8 @@ import { BuiltinsInputEntry, TriggerNode } from "engine";
 
 const descriptionStates = ["description", "localization"];
 
-let DESCRIPTION_SCHEMAS: BuiltinsInputEntry[] | undefined;
-
-function descriptionSchemas(): BuiltinsInputEntry[] {
-    return (DESCRIPTION_SCHEMAS ??= [
+function descriptionSchemas(withPlain?: boolean): BuiltinsInputEntry[] {
+    const schemas: BuiltinsInputEntry[] = [
         {
             key: "content",
             type: "text",
@@ -17,7 +15,17 @@ function descriptionSchemas(): BuiltinsInputEntry[] {
             type: "text",
             state: "localization",
         },
-    ]);
+    ];
+
+    if (withPlain) {
+        schemas.unshift({
+            key: "plain",
+            type: "text",
+            state: "plain",
+        });
+    }
+
+    return schemas;
 }
 
 async function getDescriptionInputs(
@@ -26,6 +34,7 @@ async function getDescriptionInputs(
     return {
         content: this.state === "description" ? await this.getInputValue("content") : undefined,
         key: this.state === "localization" ? await this.getInputValue("localization") : undefined,
+        plain: this.state === "plain" ? await this.getInputValue("plain") : undefined,
     };
 }
 
@@ -33,16 +42,18 @@ async function localizeKeyOrDescription({ content, key }: DescriptionInputsData)
     return key ? game.i18n.localize(key) : foundry.applications.ux.TextEditor.implementation.enrichHTML(content ?? "");
 }
 
-type DescriptionState = "description" | "localization";
+type DescriptionState = "plain" | "description" | "localization";
 
 type DescriptionInputs = {
     content: string;
     localization: string;
+    plain: string;
 };
 
 type DescriptionInputsData = {
     content: string | undefined;
     key: string | undefined;
+    plain: string | undefined;
 };
 
 export { descriptionSchemas, descriptionStates, getDescriptionInputs, localizeKeyOrDescription };
