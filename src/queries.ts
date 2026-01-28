@@ -1,4 +1,4 @@
-import { ApplicationKey, TriggerApplication, TriggerPath, createConfirmDialog } from "engine";
+import { ApplicationKey, DescriptionInputsData, TriggerApplication, TriggerPath, createConfirmDialog } from "engine";
 
 function onUserQuery(data: UserQueryOptions) {
     if (data._type === "confirm-dialog") {
@@ -34,10 +34,8 @@ type ExecuteEventQueryOptions = {
     userId: string;
 };
 
-type ConfirmDialogQueryOptions = {
+type ConfirmDialogQueryOptions = DescriptionInputsData & {
     _type: "confirm-dialog";
-    content: string | undefined;
-    key: string | undefined;
     timeout: number;
     title: string;
 };

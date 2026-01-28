@@ -211,8 +211,10 @@
                             "content": {
                                 "title": "Prompt Content"
                             },
+                            "plain": {
+                                "title": "Prompt Text"
+                            },
                             "timeout": {
-                                "tooltip": "Set to <code>0</code> to disable",
                                 "title": "Timeout (s)"
                             },
                             "title": {
@@ -229,7 +231,10 @@
                         "title": "Create Chat Message",
                         "inputs": {
                             "content": {
-                                "title": "Message Content"
+                                "title": "Message Description"
+                            },
+                            "plain": {
+                                "title": "Message Text"
                             },
                             "speaker": {
                                 "title": "Speaker"
@@ -356,11 +361,10 @@
                     "format-text": {
                         "inputs": {
                             "content": {
-                                "title": "Text to Format"
+                                "title": "Description to Format"
                             },
                             "plain": {
-                                "title": "Text to Format",
-                                "tooltip": "Prefix Variables with the <code>@</code> character"
+                                "title": "Text to Format"
                             }
                         },
                         "outputs": {
@@ -371,11 +375,6 @@
                         "title": "Format Text"
                     },
                     "resolve-formula": {
-                        "inputs": {
-                            "formula": {
-                                "tooltip": "Prefix Variables with the <code>@</code> character"
-                            }
-                        },
                         "title": "Resolve Formula"
                     }
                 },
@@ -434,6 +433,16 @@
             "region": {
                 "gm": "GM Only",
                 "path": "Trigger Path"
+            },
+            "shared": {
+                "numbers": {
+                    "disable": {
+                        "tooltip": "Set to <code>0</code> to disable"
+                    }
+                },
+                "variables": {
+                    "tooltip": "Prefix variables with the <code>@</code> character"
+                }
             },
             "special": {
                 "break": "Can break current process",
@@ -668,11 +677,6 @@
                         "title": "Create Condition Effect"
                     },
                     "create-effect": {
-                        "inputs": {
-                            "counter": {
-                                "tooltip": "Set to <code>0</code> to disable"
-                            }
-                        },
                         "title": "Create Effect"
                     },
                     "create-item": {

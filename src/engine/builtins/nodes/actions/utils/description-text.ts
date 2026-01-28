@@ -1,34 +1,34 @@
 import { BuiltinsInputEntry, TriggerNode } from "engine";
 
-const descriptionStates = ["description", "localization"];
+const descriptionStates = ["plain", "description", "localization"];
 
-function descriptionSchemas(withPlain?: boolean): BuiltinsInputEntry[] {
+function descriptionSchemas(tooltip: boolean | string = true): BuiltinsInputEntry[] {
     const schemas: BuiltinsInputEntry[] = [
+        {
+            key: "plain",
+            type: "text",
+            state: "plain",
+            tooltip,
+        },
         {
             key: "content",
             type: "text",
             field: { type: "enriched" },
             state: "description",
+            tooltip,
         },
         {
             key: "localization",
             type: "text",
             state: "localization",
+            tooltip,
         },
     ];
-
-    if (withPlain) {
-        schemas.unshift({
-            key: "plain",
-            type: "text",
-            state: "plain",
-        });
-    }
 
     return schemas;
 }
 
-async function getDescriptionInputs(
+async function getDescriptionData(
     this: TriggerNode<any, DescriptionInputs, any, any, any, DescriptionState>,
 ): Promise<DescriptionInputsData> {
     return {
@@ -38,8 +38,10 @@ async function getDescriptionInputs(
     };
 }
 
-async function localizeKeyOrDescription({ content, key }: DescriptionInputsData): Promise<string> {
-    return key ? game.i18n.localize(key) : foundry.applications.ux.TextEditor.implementation.enrichHTML(content ?? "");
+async function localizeKeyOrDescription({ content, key, plain }: DescriptionInputsData): Promise<string> {
+    return key
+        ? game.i18n.localize(key)
+        : foundry.applications.ux.TextEditor.implementation.enrichHTML(content ?? plain ?? "");
 }
 
 type DescriptionState = "plain" | "description" | "localization";
@@ -56,5 +58,5 @@ type DescriptionInputsData = {
     plain: string | undefined;
 };
 
-export { descriptionSchemas, descriptionStates, getDescriptionInputs, localizeKeyOrDescription };
-export type { DescriptionInputs, DescriptionState };
+export { descriptionSchemas, descriptionStates, getDescriptionData, localizeKeyOrDescription };
+export type { DescriptionInputs, DescriptionInputsData, DescriptionState };

@@ -7,8 +7,9 @@ import {
     DescriptionState,
     descriptionSchemas,
     descriptionStates,
-    getDescriptionInputs,
+    getDescriptionData,
 } from "engine";
+import { localizePath } from "module-helpers";
 
 class FormatTextLogicNode extends BaseLogicNode<
     "out",
@@ -27,11 +28,11 @@ class FormatTextLogicNode extends BaseLogicNode<
     }
 
     static get states(): string[] {
-        return ["plain", ...descriptionStates];
+        return descriptionStates;
     }
 
     static get defineInputs(): BuiltinsInputEntry[] {
-        return descriptionSchemas(true);
+        return descriptionSchemas(localizePath("builtins.shared.variables.tooltip"));
     }
 
     static get defineOutputs(): BuiltinsOutputEntry[] {
@@ -53,7 +54,7 @@ class FormatTextLogicNode extends BaseLogicNode<
     }
 
     async _execute(): Promise<boolean> {
-        const { content, key, plain } = await getDescriptionInputs.call(this);
+        const { content, key, plain } = await getDescriptionData.call(this);
         const variables = await this.getCustomInputs("variable");
 
         let result = key ? game.i18n.localize(key) : (plain ?? content ?? "");

@@ -6,7 +6,7 @@ import {
     DescriptionState,
     descriptionSchemas,
     descriptionStates,
-    getDescriptionInputs,
+    getDescriptionData,
     localizeKeyOrDescription,
 } from ".";
 import { IconObject } from "_zod";
@@ -55,7 +55,7 @@ class CreateMessageActionNode extends BaseActionNode<"out", Inputs, never, never
     }
 
     async _execute(): Promise<boolean> {
-        const descriptionInputs = await getDescriptionInputs.call(this);
+        const descriptionInputs = await getDescriptionData.call(this);
         const content = await localizeKeyOrDescription(descriptionInputs);
 
         if (!content) {

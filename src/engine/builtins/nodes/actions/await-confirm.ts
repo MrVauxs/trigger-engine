@@ -8,7 +8,7 @@ import {
     DescriptionState,
     descriptionSchemas,
     descriptionStates,
-    getDescriptionInputs,
+    getDescriptionData,
     localizeKeyOrDescription,
 } from ".";
 
@@ -38,6 +38,7 @@ class AwaitConfirmActionNode extends BaseActionNode<"true" | "false", Inputs, ne
             {
                 key: "timeout",
                 type: "number",
+                tooltip: localizePath("builtins.shared.numbers.disable.tooltip"),
                 field: {
                     default: this.TIMEOUT,
                     min: 0,
@@ -62,9 +63,9 @@ class AwaitConfirmActionNode extends BaseActionNode<"true" | "false", Inputs, ne
     }
 
     async _execute(): Promise<boolean> {
-        const { content, key } = await getDescriptionInputs.call(this);
+        const { content, key, plain } = await getDescriptionData.call(this);
 
-        if (!content && !key) {
+        if (!content && !key && !plain) {
             return this.executeNext("false");
         }
 
@@ -74,6 +75,7 @@ class AwaitConfirmActionNode extends BaseActionNode<"true" | "false", Inputs, ne
             _type: "confirm-dialog",
             content,
             key,
+            plain,
             timeout: await this.getInputValue("timeout"),
             title: await this.getInputValue("title"),
         };
@@ -96,7 +98,7 @@ class AwaitConfirmActionNode extends BaseActionNode<"true" | "false", Inputs, ne
 }
 
 async function createConfirmDialog(options: ConfirmDialogQueryOptions): Promise<boolean | null> {
-    if (!R.isString(options.content) && !R.isString(options.key)) return null;
+    if (!R.isString(options.content) && !R.isString(options.key) && !R.isString(options.plain)) return null;
 
     let intervale: NodeJS.Timeout | undefined;
     let timeout = R.isNumber(options.timeout) ? options.timeout : AwaitConfirmActionNode.TIMEOUT;

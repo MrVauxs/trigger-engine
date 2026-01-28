@@ -1,6 +1,6 @@
 import { IconObject } from "_zod";
 import { BaseActionNode, CustomInputSchema, JsonField } from "engine";
-import { R, RuleElementSource, createCustomEffect } from "module-helpers";
+import { R, RuleElementSource, createCustomEffect, localizePath } from "module-helpers";
 import { DurationState, EffectInputs, durationStates, effectSchemas, getEffectData } from ".";
 import { PF2eInputEntry } from "pf2e";
 
@@ -24,6 +24,7 @@ class CreateEffectActionNode extends BaseActionNode<"out", Inputs, never, "rule"
                 {
                     key: "counter",
                     type: "number",
+                    tooltip: localizePath("builtins.shared.numbers.disable.tooltip"),
                     field: { min: 0 },
                 },
             ]),
