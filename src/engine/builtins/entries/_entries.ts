@@ -1,5 +1,7 @@
 import { CustomOutputSchema } from "engine";
+import { R } from "module-helpers";
 import {
+    AnyEntry,
     BaseEntrySchema,
     BooleanEntry,
     InputBooleanEntry,
@@ -12,7 +14,13 @@ import {
     UserEntry,
 } from ".";
 
-const builtinsEntries = [BooleanEntry, ItemEntry, NumberEntry, TargetEntry, TextEntry, UserEntry] as const;
+const builtinsEntries = [AnyEntry, BooleanEntry, ItemEntry, NumberEntry, TargetEntry, TextEntry, UserEntry] as const;
+
+const builtinsEntryTypes = R.pipe(
+    builtinsEntries,
+    R.map((entry) => entry.type),
+    R.filter((entry) => entry !== "any"),
+);
 
 type BuiltinsEntryType = (typeof builtinsEntries)[number]["type"];
 
@@ -30,5 +38,5 @@ type BuiltinsCustomEntry = Prettify<
     }
 >;
 
-export { builtinsEntries };
+export { builtinsEntries, builtinsEntryTypes };
 export type { BuiltinsCustomEntry, BuiltinsInputEntry, BuiltinsOutputEntry };

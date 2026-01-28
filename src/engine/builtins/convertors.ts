@@ -1,5 +1,5 @@
-import { EntryConvertor } from "engine";
-import { ItemPF2e, UserPF2e, primaryPlayerOwner } from "module-helpers";
+import { builtinsEntryTypes, EntryConvertor } from "engine";
+import { ItemPF2e, primaryPlayerOwner, UserPF2e } from "module-helpers";
 
 const builtinsConvertors = [
     {
@@ -41,6 +41,28 @@ const builtinsConvertors = [
                 : (primaryPlayerOwner(target.actor) ?? undefined);
         },
     },
+    ...addAnyConvertors(builtinsEntryTypes),
 ] as const satisfies EntryConvertor[];
 
-export { builtinsConvertors };
+function addAnyConvertors(types: string[]): EntryConvertor[] {
+    return types.flatMap((type): [EntryConvertor, EntryConvertor] => {
+        return [
+            {
+                output: "any",
+                input: type,
+                convertToInput: (value: any) => {
+                    return value;
+                },
+            },
+            {
+                output: type,
+                input: "any",
+                convertToInput: (value: any) => {
+                    return value;
+                },
+            },
+        ];
+    });
+}
+
+export { addAnyConvertors, builtinsConvertors };

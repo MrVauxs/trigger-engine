@@ -1,10 +1,11 @@
-import { EntryConvertor } from "engine";
+import { addAnyConvertors, EntryConvertor } from "engine";
 import {
-    DegreeOfSuccessString,
     degreeOfSuccessNumber,
+    DegreeOfSuccessString,
     degreeOfSuccessString,
     isDegreeOfSuccessValue,
 } from "module-helpers";
+import { pf2eEntryTypes } from ".";
 
 const pf2eConvertors = [
     {
@@ -42,6 +43,7 @@ const pf2eConvertors = [
             return target.actor.signature;
         },
     },
+    ...addAnyConvertors(pf2eEntryTypes),
 ] as const satisfies EntryConvertor[];
 
 export { pf2eConvertors };
