@@ -44,6 +44,7 @@ class TriggerApplication {
     #convertors: Collection<EntryConvertor>;
     #entries: Collection<typeof NodeEntry>;
     #events: Collection<typeof TriggerNode>;
+    #hasAnyEntry: boolean;
     #hooks: { hook: TriggerHookWrapper; enabled: boolean }[];
     #mode: TriggerApplicationMode;
     #modulefiles: string[] = [];
@@ -66,6 +67,12 @@ class TriggerApplication {
                 );
             });
         }
+
+        // used to create a convertor on the fly for the `any` entry
+        this.#hasAnyEntry =
+            options.builtins === true ||
+            options.builtins?.convertors === true ||
+            !!options.builtins?.convertors?.some((key) => key.startsWith("any-") || key.endsWith("-any"));
 
         this.#convertors = createCollection(options, "convertors");
         this.#entries = createCollection(options, "entries");
@@ -478,6 +485,17 @@ class TriggerApplication {
     }
 
     getConvertor(output: string, input: string): EntryConvertor | undefined {
+        // we generate an `any` convertor on the fly
+        if (this.#hasAnyEntry && (output === "any" || input === "any")) {
+            return {
+                output,
+                input,
+                convertToInput: (value: any) => {
+                    return value;
+                },
+            };
+        }
+
         const key = createConvertorKey(output, input);
         return this.#convertors.get(key);
     }
