@@ -12,7 +12,7 @@ import {
     TriggerDataOutput,
     UpdateTriggerData,
 } from "engine";
-import { enrichHTML, MODULE, R } from "module-helpers";
+import { enrichHTML, MODULE, purgeObject, R } from "module-helpers";
 import { TwoWaysEntryId } from "triggers-menu";
 
 class OpenTrigger extends Trigger<OpenTriggerNode> {
@@ -20,6 +20,7 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
     #computedConnections: Record<EntryId, boolean> = {};
     #linkedConnections: Set<TwoWaysEntryId> = new Set();
     #locked: boolean;
+    #resolved: ResolvedTriggerNode[] = [];
 
     constructor(parent: TriggerApplication, data: TriggerData, locked: boolean = false) {
         super(parent, data);
@@ -231,13 +232,50 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
             }
         }
     }
+
+    async resolve(...args: any[]): Promise<ResolvedOpenTrigger> {
+        const resolved: Record<string, ResolvedTriggerNode[]> = {};
+        const events = this.nodes.filter((node) => node.isEvent);
+
+        for (const event of events) {
+            this.#resolved = [];
+            await event._execute(...args);
+            resolved[event.type] = this.#resolved;
+        }
+
+        return {
+            resolved,
+            source: purgeObject(this.toObject()),
+        };
+    }
+
+    addResolvedNode(data: ResolvedTriggerNode) {
+        this.#resolved.push(data);
+    }
 }
 
 interface OpenTrigger {
     get nodes(): Collection<OpenTriggerNode>;
 }
 
+type ResolvedTriggerNode = {
+    inputs: ResolvedNodeEntry[];
+    outputs: ResolvedNodeEntry[];
+    type: string;
+};
+
+type ResolvedNodeEntry = {
+    key: string;
+    type: string;
+    value: unknown;
+};
+
+type ResolvedOpenTrigger = {
+    resolved: Record<string, ResolvedTriggerNode[]>;
+    source: TriggerDataOutput;
+};
+
 type TriggerFullId = `${"world" | "module"}:${string}`;
 
 export { OpenTrigger };
-export type { TriggerFullId };
+export type { ResolvedOpenTrigger, TriggerFullId, ResolvedTriggerNode, ResolvedNodeEntry };

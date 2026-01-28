@@ -2,7 +2,7 @@
     <div class="header" data-tooltip-direction="DOWN">
         <div class="controls">
             {{#if isFree}}
-            <a data-action="export-data" {{{@root.i18n.tooltip 'data'}}}>
+            <a data-action="resolve-data" {{{@root.i18n.tooltip 'data'}}}>
                 <i class="fa-solid fa-file-export"></i>
             </a>
             {{else}}
@@ -14,10 +14,10 @@
                 <i class="fa-solid fa-pen-to-square"></i>
             </a>
             {{/unless}}
-            {{/if}}
             <a data-action="copy-path" data-path={{trigger.path}} {{{@root.i18n.tooltip 'copy.label'}}}>
                 <i class="fa-solid fa-copy"></i>
             </a>
+            {{/if}}
         </div>
         <div class="controls">
             {{#if hasDescription}}
@@ -27,7 +27,7 @@
             {{/if}}
             {{#if trigger.locked}}
             <i class="fa-solid fa-lock"></i>
-            {{else}}
+            {{else if (not isFree)}}
             <a data-action="save-triggers" {{{@root.i18n.tooltip 'save'}}}>
                 <i class="fa-solid fa-floppy-disk"></i>
             </a>

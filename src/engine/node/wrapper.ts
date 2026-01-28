@@ -7,6 +7,8 @@ import {
     OpenNodeEntry,
     OpenTrigger,
     OutputEntrySchema,
+    ResolvedNodeEntry,
+    ResolvedTriggerNode,
     Trigger,
 } from "engine";
 import { LocalizeArgs, MODULE, R, ScenePF2e, TokenDocumentPF2e, UserPF2e } from "module-helpers";
@@ -94,6 +96,7 @@ function instantiateNode(
     class TriggerNodeWrapper extends NodeCls {
         #in: NodeBridge | null;
         #inputs: Collection<NodeEntry>;
+        #nextCalled: boolean = false;
         #outputs: Collection<NodeEntry>;
         #outputValues: Record<string, any> = {};
         #outs: Collection<NodeBridge>;
@@ -322,14 +325,59 @@ function instantiateNode(
                     },
                 });
             }
+
+            if (parent.application.isFreeApplication) {
+                const _execute = this._execute.bind(this);
+
+                this._execute = async (...args: any[]): Promise<boolean> => {
+                    const result = await _execute(...args);
+
+                    if (!this.#nextCalled) {
+                        await this.#resolve();
+                    }
+
+                    return result;
+                };
+            }
         }
 
         get #isExecutable(): boolean {
             return !!this.#in || this.#outs.size > 0;
         }
 
+        async #resolve() {
+            const trigger = parent as OpenTrigger;
+
+            const inputs: ResolvedNodeEntry[] = await Promise.all(
+                this.#inputs.map(async ({ key, slug, type }): Promise<ResolvedNodeEntry> => {
+                    return {
+                        key: slug ?? key,
+                        type,
+                        value: await this.getInputValue(key),
+                    };
+                }),
+            );
+
+            const outputs = await Promise.all(
+                this.#outputs.map(async ({ key, slug, type }): Promise<ResolvedNodeEntry> => {
+                    return {
+                        key: slug ?? key,
+                        type,
+                        value: await this.#outputValues[key],
+                    };
+                }),
+            );
+
+            trigger.addResolvedNode({ inputs, outputs, type: this.type } satisfies ResolvedTriggerNode);
+        }
+
         async #executeNext(out: string, ...args: any[]): Promise<boolean> {
             if (!this.#isExecutable) return true;
+
+            if (parent.application.isFreeApplication) {
+                this.#nextCalled = true;
+                await this.#resolve();
+            }
 
             try {
                 const connection = this.#outs.get(out)?.connection;

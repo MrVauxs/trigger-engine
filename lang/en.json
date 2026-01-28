@@ -56,7 +56,7 @@
                     "label": "Copy Trigger Path",
                     "notify": "The Trigger path has been copied to the clipboard."
                 },
-                "data": "Export Data",
+                "data": "Resove Data",
                 "delete": {
                     "content": "Are you sure you want to delete the selected trigger?",
                     "title": "Delete Trigger"

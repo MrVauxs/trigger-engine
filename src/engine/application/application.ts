@@ -18,6 +18,7 @@ import {
     TriggerApplicationCollections,
     TriggerData,
     TriggerDataInput,
+    TriggerDataOutput,
     TriggerGateEntry,
     TriggerGateExit,
     TriggerHookWrapper,
@@ -145,13 +146,9 @@ class TriggerApplication {
         }
     }
 
-    static async openBlueprintMenu(
-        moduleId: string,
-        applicationId: string,
-        source?: TriggerDataInput,
-    ): Promise<BlueprintApplication | undefined> {
+    static async openBlueprintMenu(moduleId: string, applicationId: string, source?: TriggerDataInput, ...args: any[]) {
         const app = this.getApplication(moduleId, applicationId);
-        return app?.openMenu(source);
+        return app?.openMenu(source, ...args);
     }
 
     static async prepareModulesTriggers() {
@@ -449,22 +446,22 @@ class TriggerApplication {
         }
     }
 
-    async openMenu(arg?: TriggerDataInput): Promise<BlueprintApplication | undefined> {
-        if (this instanceof BuiltInApplication) return;
+    async openMenu(source?: TriggerDataInput, ...args: any[]) {
+        if (this instanceof BuiltInApplication) return null;
 
         const menuId = BlueprintApplication.APPLICATION_ID;
         const exist = foundry.applications.instances.get(menuId) as Maybe<BlueprintApplication>;
 
-        if (exist?.application === this && (!arg || this.isSettingApplication)) {
+        if (exist?.application === this && (!source || this.isSettingApplication)) {
             return exist.expandWindow();
         } else {
             await exist?.close();
         }
 
-        const MenuCls = this.isFreeApplication ? this.#getFreeApplication(arg) : this.#getSettingApplication();
-
-        if (MenuCls) {
-            return new MenuCls().render(true);
+        if (this.isFreeApplication) {
+            return this.#openFreeApplication(source, ...args);
+        } else {
+            return this.#openSettingApplication();
         }
     }
 
@@ -515,30 +512,41 @@ class TriggerApplication {
         await this.#execute(userId, data, eventId, args);
     }
 
-    #getSettingApplication(): typeof BlueprintApplication | undefined {
+    async #openSettingApplication(): Promise<BlueprintApplication> {
         const menuKey = `${this.moduleId}.${this.settingMenuKey}`;
-        return game.settings.menus.get(menuKey)?.type as typeof BlueprintApplication;
+        const menu = game.settings.menus.get(menuKey)?.type as typeof BlueprintApplication;
+        return new menu().render(true);
     }
 
-    #getFreeApplication(source: unknown): typeof BlueprintApplication | null {
+    #openFreeApplication(source?: TriggerDataInput, ...args: any[]): Promise<OpenTrigger> {
         const self = this;
         const test = this.createTrigger(R.isPlainObject(source) ? source : {}, {});
-        if (!test || test.invalid) return null;
+        const triggerSource: TriggerDataOutput =
+            test && !test.invalid ? test.toObject() : new TriggerData({}).toObject();
 
-        return class FreeBlueprintApplication extends BlueprintApplication {
-            get application() {
-                return self;
+        return new Promise((resolve: FreeApplicationResolve) => {
+            class FreeBlueprintApplication extends BlueprintApplication {
+                get application(): TriggerApplication {
+                    return self;
+                }
+
+                async resolve() {
+                    const resolved = await this.blueprint.trigger?.resolve(...args);
+                    resolve(resolved);
+                }
+
+                getTriggersSetting(): TriggersSetting {
+                    return {
+                        disabled: [],
+                        enabled: [],
+                        folders: {},
+                        sources: [triggerSource],
+                    };
+                }
             }
 
-            getTriggersSetting(): TriggersSetting {
-                return {
-                    disabled: [],
-                    enabled: [],
-                    folders: {},
-                    sources: [test.toObject()],
-                };
-            }
-        };
+            new FreeBlueprintApplication().render(true);
+        });
     }
 
     async #execute(userId: string, data: TriggerData, eventId: string, args: Record<string, any>) {
@@ -599,6 +607,8 @@ class TriggerApplication {
         });
     }
 }
+
+type FreeApplicationResolve = (value: any) => void;
 
 type ApplicationParentType = "setting" | "document";
 

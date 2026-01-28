@@ -1,8 +1,8 @@
 import {
     NodeEntry as _NodeEntry,
-    openBlueprintMenu as _openBlueprintMenu,
     TriggerHook as _TriggerHook,
     TriggerNode as _TriggerNode,
+    TriggerApplication,
 } from "engine";
 
 declare global {
@@ -10,6 +10,6 @@ declare global {
         const NodeEntry: typeof _NodeEntry;
         const TriggerHook: typeof _TriggerHook;
         const TriggerNode: typeof _TriggerNode;
-        const openBlueprintMenu: typeof _openBlueprintMenu;
+        const openBlueprintMenu: typeof TriggerApplication.openBlueprintMenu;
     }
 }

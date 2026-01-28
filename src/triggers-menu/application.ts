@@ -237,17 +237,17 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
                 return trigger && this.#editTrigger(trigger.folder, trigger);
             }
 
-            case "export-data": {
-                // TODO if no callback was provided we export the trigger itself
-                return;
-            }
-
             case "export-triggers": {
                 return this.#exportTriggers();
             }
 
             case "import-triggers": {
                 return this.#importTriggers();
+            }
+
+            case "resolve-data": {
+                this.resolve?.();
+                return this.close();
             }
 
             case "save-triggers": {
@@ -814,6 +814,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
 interface BlueprintApplication {
     get application(): TriggerApplication;
     getTriggersSetting(): TriggersSetting;
+    resolve(): Promise<void>;
 }
 
 function filterElements(
@@ -847,9 +848,9 @@ type EventAction =
     | "create-trigger"
     | "edit-trigger"
     | "expand-window"
-    | "export-data"
     | "export-triggers"
     | "import-triggers"
+    | "resolve-data"
     | "save-triggers"
     | "select-node"
     | "select-trigger"
