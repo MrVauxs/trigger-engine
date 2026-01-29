@@ -4,7 +4,7 @@
 
 This module provides a node-based scripting interface to automate logic in foundry. It is comprised of 3 parts.
 
-## Designing
+## 1. Designing
 
 Third party can design and register trigger applications, they define the building blocks of the triggers later created,
 as well as the hooks that will control which triggers will be exectuted and when.
@@ -28,17 +28,17 @@ The module is bundled with a fully kitted application for those modules, it offe
 As opposed to a regular application, a free application doesn't add any setting and doesn't make use of trigger hooks.
 Instead, it will allow you to use the blueprint menu directly to generate sequential data for any other use than automation.
 
-## Building
+## 2. Building
 
 ![](./images/thermal-nimbus.webp)
 
 This is the fun part, where a GM can create triggers using any registered application, playing with boxes and lines.
-Simply add at least one even node (they are the entry point of an executed trigger) and follow with the other different nodes available to generate a trigger logic.
+Simply add at least one event node (they are the entry point of an executed trigger) and follow with the other different nodes available to generate a trigger logic.
 
 > [!NOTE]
 > Third party can directly register triggers files to be loaded in your worlds, this allow modules to act as triggers "library" that GMs can then decide to enable or not in their world.
 
-## Playing
+## 3. Playing
 
 While playing, the enabled triggers will be executed based on different actions/interactions with foundry.
 
