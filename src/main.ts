@@ -1,4 +1,11 @@
-import { NodeEntry, TriggerApplication, TriggerEngineRegionBehaviorType, TriggerHook, TriggerNode } from "engine";
+import {
+    NodeEntry,
+    NodeField,
+    TriggerApplication,
+    TriggerEngineRegionBehaviorType,
+    TriggerHook,
+    TriggerNode,
+} from "engine";
 import { MODULE, R } from "module-helpers";
 import { registerPF2eApplication } from "pf2e";
 import { onUserQuery } from "queries";
@@ -37,6 +44,7 @@ MODULE.apiExpose({
 
 globalThis.triggerEngine = {
     NodeEntry,
+    NodeField,
     TriggerHook,
     TriggerNode,
     openBlueprintMenu: TriggerApplication.openBlueprintMenu.bind(TriggerApplication),
