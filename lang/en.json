@@ -153,6 +153,9 @@
                 "combatant": {
                     "title": "Combatant"
                 },
+                "current": {
+                    "title": "Current"
+                },
                 "entry": {
                     "title": "Entry"
                 },
@@ -270,16 +273,6 @@
                         },
                         "title": "Execute Script"
                     },
-                    "filter-targets": {
-                        "states": {
-                            "filter": "Filter",
-                            "find": "Find"
-                        },
-                        "title": "Filter Targets",
-                        "titles": {
-                            "find": "Find Target"
-                        }
-                    },
                     "update-item": {
                         "inputs": {
                             "path": {
@@ -368,6 +361,13 @@
                             }
                         },
                         "title": "Compare Numbers"
+                    },
+                    "filter-targets": {
+                        "title": "Filter Targets",
+                        "titles": {
+                            "find": "Find Target",
+                            "loop": "Loop Over Targets"
+                        }
                     },
                     "format-text": {
                         "inputs": {
@@ -465,7 +465,10 @@
             },
             "state": {
                 "description": "Description",
+                "filter": "Filter",
+                "find": "Find",
                 "localization": "Localization",
+                "loop": "Loop",
                 "plain": "Plain Text"
             },
             "tag": {

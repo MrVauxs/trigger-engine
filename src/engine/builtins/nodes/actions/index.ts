@@ -4,7 +4,6 @@ import {
     CreateMessageActionNode,
     DeleteItemActionNode,
     ExecuteScriptActionNode,
-    FilterTargetsActionNode,
     UpdateItemActionNode,
 } from ".";
 
@@ -15,7 +14,6 @@ export * from "./console-log";
 export * from "./create-message";
 export * from "./delete-item";
 export * from "./execute-script";
-export * from "./filter-targets";
 export * from "./update-item";
 
 export default [
@@ -24,6 +22,5 @@ export default [
     CreateMessageActionNode,
     DeleteItemActionNode,
     ExecuteScriptActionNode,
-    FilterTargetsActionNode,
     UpdateItemActionNode,
 ] as const;

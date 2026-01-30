@@ -1,6 +1,4 @@
-import { BuiltinsCustomEntry, BuiltinsInputEntry, BuiltinsOutputEntry } from "engine";
-import { BaseActionNode } from ".";
-import { IconObject } from "_zod";
+import { BaseLogicNode, BuiltinsCustomEntry, BuiltinsInputEntry, BuiltinsOutputEntry } from "engine";
 
 const DEFAULT_CALLBACK = `/**
  * @param {{actor: Actor; token: TokenDocument}} target
@@ -13,13 +11,13 @@ const DEFAULT_CALLBACK = `/**
  */
 return true;`;
 
-class FilterTargetsActionNode extends BaseActionNode<"out", Inputs, Outputs, "input", never, "filter" | "find"> {
+class FilterTargetsActionNode extends BaseLogicNode<"out", Inputs, Outputs, "input", never, States> {
     static get type(): "filter-targets" {
         return "filter-targets";
     }
 
     static get states(): string[] {
-        return ["filter", "find"];
+        return ["filter", "find", "loop"];
     }
 
     static get defineInputs(): BuiltinsInputEntry[] {
@@ -40,6 +38,7 @@ class FilterTargetsActionNode extends BaseActionNode<"out", Inputs, Outputs, "in
         return [
             { key: "targets", type: "target", state: "filter", isArray: true },
             { key: "target", type: "target", state: "find" },
+            { key: "current", type: "target", state: "loop" },
         ];
     }
 
@@ -47,12 +46,12 @@ class FilterTargetsActionNode extends BaseActionNode<"out", Inputs, Outputs, "in
         return [{ slug: "input", array: true }];
     }
 
-    get icon(): IconObject {
-        return { unicode: this.state === "filter" ? "\ue17e" : "\uf0b0" };
+    get isLoop(): boolean {
+        return this.state === "loop";
     }
 
     get title(): string {
-        return this.localize(this.state === "find" ? "titles.find" : "title") as string;
+        return this.localize(this.state === "filter" ? "title" : `titles.${this.state}`) as string;
     }
 
     async _execute(): Promise<boolean> {
@@ -64,7 +63,19 @@ class FilterTargetsActionNode extends BaseActionNode<"out", Inputs, Outputs, "in
             const Fn = function () {}.constructor as SyncFunction;
             const callback = new Fn("target", "inputs", code);
 
-            if (this.state === "filter") {
+            if (this.state === "loop") {
+                for (const current of targets) {
+                    const validTarget = callback(current, inputs);
+                    if (!validTarget) continue;
+
+                    this.setOutputValue("current", current);
+
+                    const keepExecuting = await this.executeNext("out");
+                    if (!keepExecuting) break;
+                }
+
+                return true;
+            } else if (this.state === "filter") {
                 const newTargets = targets.filter((target) => callback(target, inputs));
                 this.setOutputValue("targets", newTargets);
             } else {
@@ -81,12 +92,15 @@ type SyncFunction = {
     new (...args: any[]): (target: TargetDocuments, inputs: unknown[]) => boolean;
 };
 
+type States = "filter" | "find" | "loop";
+
 type Inputs = {
-    callback: string;
     targets: TargetDocuments[];
+    callback: string;
 };
 
 type Outputs = {
+    current?: TargetDocuments;
     target?: TargetDocuments;
     targets: TargetDocuments[];
 };
