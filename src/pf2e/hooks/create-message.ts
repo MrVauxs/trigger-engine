@@ -6,6 +6,7 @@ import {
     CheckContextChatFlag,
     CheckType,
     DegreeOfSuccessString,
+    ItemOriginFlag,
     ItemPF2e,
     R,
     SYSTEM,
@@ -72,25 +73,30 @@ class CreateMessageHook extends TriggerHook<AttackRollOptions | DamageTakenOptio
                 types,
             } satisfies DamageTakenOptions);
         } else if (message.isCheckRoll) {
-            const checkContext = context as CheckContextChatFlag;
-            const target = { actor: message.actor, token: message.token };
-            if (!isValidTargetDocuments(target)) return;
-
-            const originActor = origin?.actor ? await fromUuid<ActorPF2e>(origin.actor) : null;
-            const originToken = checkContext.origin?.token
-                ? await fromUuid<TokenDocumentPF2e>(checkContext.origin.token)
-                : null;
-
-            this.executeEvent("check-roll-event", {
-                item: message.item,
-                options: checkContext.options ?? [],
-                origin: originActor ? { actor: originActor, token: originToken } : undefined,
-                outcome: checkContext.outcome,
-                target,
-                type: checkContext.type,
-            } satisfies CheckRollOptions);
+            const checkData = await checkRollData(message);
+            if (checkData) {
+                this.executeEvent("check-roll-event", checkData);
+            }
         }
     }
+}
+
+async function checkRollData(message: ChatMessagePF2e): Promise<CheckRollOptions | undefined> {
+    const { context, origin } = message.flags[SYSTEM.id] as { context: CheckContextChatFlag; origin?: ItemOriginFlag };
+    const target = { actor: message.actor, token: message.token };
+    if (!isValidTargetDocuments(target)) return;
+
+    const originActor = origin?.actor ? await fromUuid<ActorPF2e>(origin.actor) : null;
+    const originToken = context.origin?.token ? await fromUuid<TokenDocumentPF2e>(context.origin.token) : null;
+
+    return {
+        item: message.item,
+        options: context.options ?? [],
+        origin: originActor ? { actor: originActor, token: originToken } : undefined,
+        outcome: context.outcome,
+        target,
+        type: context.type,
+    };
 }
 
 async function getAttackItem(uuid: string | undefined): Promise<ItemPF2e | undefined> {
@@ -130,5 +136,5 @@ type CheckRollOptions = BaseOptions & {
 
 type DamageTakenType = (typeof CreateMessageHook.damageTakenTypes)[number];
 
-export { CreateMessageHook };
+export { checkRollData, CreateMessageHook };
 export type { AttackRollOptions, CheckRollOptions, DamageTakenOptions, DamageTakenType };
