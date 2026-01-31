@@ -22,7 +22,7 @@ class DamageTakenEvent extends BaseEventNode<Inputs, Outputs> {
                 },
             },
             {
-                key: "when",
+                key: "for",
                 type: "text",
                 field: {
                     type: "select",
@@ -48,16 +48,10 @@ class DamageTakenEvent extends BaseEventNode<Inputs, Outputs> {
 
     async _execute({ item, options, origin, target, types }: DamageTakenOptions): Promise<boolean> {
         const requires = await this.getInputValue("requires");
+        if (requires && !origin) return true;
 
-        if (requires && !origin) {
-            return this.executeNext("out");
-        }
-
-        const when = await this.getInputValue("when");
-
-        if (!R.isIncludedIn(when, types)) {
-            return this.executeNext("out");
-        }
+        const when = await this.getInputValue("for");
+        if (!R.isIncludedIn(when, types)) return true;
 
         this.setOutputValue("item", item);
         this.setOutputValue("options", options);
@@ -69,8 +63,8 @@ class DamageTakenEvent extends BaseEventNode<Inputs, Outputs> {
 }
 
 type Inputs = {
+    for: DamageTakenType;
     requires: boolean;
-    when: DamageTakenType;
 };
 
 type Outputs = Omit<DamageTakenOptions, "types">;
