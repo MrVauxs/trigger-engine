@@ -71,7 +71,7 @@ async function getConditionsData(this: TriggerNode<any, ValuedConditionsInputs>)
     return {
         actor,
         slug: await this.getInputValue("condition"),
-        value: await this.getInputValue("value"),
+        value: Math.max(await this.getInputValue("value"), 0),
     };
 }
 
