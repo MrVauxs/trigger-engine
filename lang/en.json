@@ -577,6 +577,7 @@
             "false": "False",
             "in": "In",
             "input": "Input",
+            "null": "Null",
             "out": "Out",
             "output": "Output",
             "true": "True",
@@ -640,6 +641,9 @@
                 "effect": {
                     "title": "Effect"
                 },
+                "for": {
+                    "title": "Triggers For"
+                },
                 "identifier": {
                     "title": "Identifier"
                 },
@@ -666,6 +670,9 @@
                 },
                 "private": {
                     "title": "Private"
+                },
+                "reroll": {
+                    "title": "Is Reroll"
                 },
                 "save": {
                     "title": "Save Type"
@@ -879,13 +886,35 @@
                             }
                         }
                     },
+                    "check-roll-event": {
+                        "inputs": {
+                            "for": {
+                                "options": {
+                                    "skill-check": "Skill Check"
+                                }
+                            }
+                        },
+                        "outputs": {
+                            "type": {
+                                "title": "Check Type"
+                            }
+                        },
+                        "states": {
+                            "all": "All Checks",
+                            "check": "Specific Check"
+                        },
+                        "title": "Check Rolled",
+                        "titles": {
+                            "specific": "{type} Rolled"
+                        }
+                    },
                     "damage-taken-event": {
                         "inputs": {
                             "requires": {
                                 "tooltip": "Must originate from an Actor",
                                 "title": "Requires Origin"
                             },
-                            "when": {
+                            "for": {
                                 "options": {
                                     "all": "All Damages",
                                     "damage": "Damage Received",
@@ -1008,6 +1037,9 @@
                 },
                 "aura": {
                     "title": "Aura"
+                },
+                "check": {
+                    "title": "Check"
                 },
                 "damage": {
                     "title": "Damage"

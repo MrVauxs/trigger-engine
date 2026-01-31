@@ -1,23 +1,26 @@
 import { TriggerHook } from "engine";
 import {
     ActorPF2e,
+    ChatMessageFlagsPF2e,
     ChatMessagePF2e,
+    CheckContextChatFlag,
+    CheckType,
     DegreeOfSuccessString,
     ItemPF2e,
     R,
+    SYSTEM,
+    TokenDocumentPF2e,
     createToggleableHook,
-    isDegreeOfSuccessValue,
     isValidTargetDocuments,
 } from "module-helpers";
 
-class CreateMessageHook extends TriggerHook<AttackRollOptions | DamageTakenOptions> {
+class CreateMessageHook extends TriggerHook<AttackRollOptions | DamageTakenOptions | CheckRollOptions> {
     static damageTakenTypes = ["all", "damage", "heal", "persistent", "negated"] as const;
-    static contextEvents = ["attack-roll", "damage-taken"] as const;
 
     #hook = createToggleableHook("createChatMessage", this.#onCreateMessage.bind(this));
 
-    get events(): ["attack-roll-event", "damage-taken-event"] {
-        return ["attack-roll-event", "damage-taken-event"];
+    get events(): ["attack-roll-event", "damage-taken-event", "check-roll-event"] {
+        return ["attack-roll-event", "damage-taken-event", "check-roll-event"];
     }
 
     _enable() {
@@ -31,23 +34,17 @@ class CreateMessageHook extends TriggerHook<AttackRollOptions | DamageTakenOptio
     async #onCreateMessage(message: ChatMessagePF2e) {
         if (!game.user.isActiveGM) return;
 
-        const { appliedDamage, origin, context } = message.flags.pf2e;
+        const { appliedDamage, origin, context } = message.flags[SYSTEM.id] as ChatMessageFlagsPF2e["pf2e"];
         if (!context) return;
 
         if (context.type === "attack-roll") {
             const target = message.target;
             const source = { actor: message.actor, token: message.token };
-
-            if (
-                !isValidTargetDocuments(target) ||
-                !isValidTargetDocuments(source) ||
-                !isDegreeOfSuccessValue(context.outcome)
-            )
-                return;
+            if (!isValidTargetDocuments(target) || !isValidTargetDocuments(source)) return;
 
             this.executeEvent("attack-roll-event", {
                 action: (context as { action?: string }).action || "",
-                item: await getItem(origin?.uuid),
+                item: message.item,
                 options: context.options ?? [],
                 origin: source,
                 outcome: context.outcome,
@@ -68,17 +65,35 @@ class CreateMessageHook extends TriggerHook<AttackRollOptions | DamageTakenOptio
                     : ["all", "damage"];
 
             this.executeEvent("damage-taken-event", {
-                item: await getItem(origin?.uuid),
+                item: await getAttackItem(origin?.uuid),
                 options: context.options ?? [],
                 origin: originActor ? { actor: originActor } : undefined,
                 target,
                 types,
             } satisfies DamageTakenOptions);
+        } else if (message.isCheckRoll) {
+            const checkContext = context as CheckContextChatFlag;
+            const target = { actor: message.actor, token: message.token };
+            if (!isValidTargetDocuments(target)) return;
+
+            const originActor = origin?.actor ? await fromUuid<ActorPF2e>(origin.actor) : null;
+            const originToken = checkContext.origin?.token
+                ? await fromUuid<TokenDocumentPF2e>(checkContext.origin.token)
+                : null;
+
+            this.executeEvent("check-roll-event", {
+                item: message.item,
+                options: checkContext.options ?? [],
+                origin: originActor ? { actor: originActor, token: originToken } : undefined,
+                outcome: checkContext.outcome,
+                target,
+                type: checkContext.type,
+            } satisfies CheckRollOptions);
         }
     }
 }
 
-async function getItem(uuid: string | undefined): Promise<ItemPF2e | undefined> {
+async function getAttackItem(uuid: string | undefined): Promise<ItemPF2e | undefined> {
     if (!uuid) return;
 
     const splits = R.split(uuid, ".");
@@ -92,24 +107,28 @@ async function getItem(uuid: string | undefined): Promise<ItemPF2e | undefined> 
         : actor.items.get(itemId);
 }
 
-type AttackRollOptions = {
-    action: string;
-    item: ItemPF2e | undefined;
-    options: string[];
-    origin: TargetDocuments;
-    outcome: DegreeOfSuccessString;
-    target: TargetDocuments;
-};
-
-type DamageTakenOptions = {
-    item: ItemPF2e | undefined;
+type BaseOptions = {
+    item: ItemPF2e | null | undefined;
     options: string[];
     origin: TargetDocuments | undefined;
     target: TargetDocuments;
+};
+
+type AttackRollOptions = WithRequired<BaseOptions, "origin"> & {
+    action: string;
+    outcome: DegreeOfSuccessString | null;
+};
+
+type DamageTakenOptions = BaseOptions & {
     types: DamageTakenType[];
+};
+
+type CheckRollOptions = BaseOptions & {
+    outcome: DegreeOfSuccessString | null;
+    type: CheckType;
 };
 
 type DamageTakenType = (typeof CreateMessageHook.damageTakenTypes)[number];
 
 export { CreateMessageHook };
-export type { AttackRollOptions, DamageTakenOptions, DamageTakenType };
+export type { AttackRollOptions, CheckRollOptions, DamageTakenOptions, DamageTakenType };

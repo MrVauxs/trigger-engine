@@ -18,7 +18,6 @@ class AttackRollEvent extends BaseEventNode<never, Outputs> {
             { key: "item", type: "item" },
             { key: "outcome", type: "outcome" },
             { key: "action", type: "text" },
-            { key: "reroll", type: "boolean" },
             { key: "options", type: "text", isArray: true },
         ];
     }
@@ -27,13 +26,12 @@ class AttackRollEvent extends BaseEventNode<never, Outputs> {
         return { unicode: "\uf71c" };
     }
 
-    async _execute({ action, item, options, origin, outcome, reroll, target }: AttackRollOptions): Promise<boolean> {
+    async _execute({ action, item, options, origin, outcome, target }: AttackRollOptions): Promise<boolean> {
         this.setOutputValue("action", action);
         this.setOutputValue("item", item);
         this.setOutputValue("options", options);
         this.setOutputValue("origin", origin);
         this.setOutputValue("outcome", outcome);
-        this.setOutputValue("reroll", reroll);
         this.setOutputValue("target", target);
 
         return this.executeNext("out");
