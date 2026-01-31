@@ -16,7 +16,23 @@ class CompareOutcomesLogicNode extends BaseLogicNode<"true" | "false", Inputs> {
     }
 
     static get defineInputs(): PF2eInputEntry[] {
-        return [{ key: "a", type: "outcome" }, CompareNumbersLogicNode.defineInputs[1], { key: "b", type: "outcome" }];
+        return [
+            {
+                key: "a",
+                type: "outcome",
+                field: {
+                    default: "success",
+                },
+            },
+            CompareNumbersLogicNode.defineInputs[1],
+            {
+                key: "b",
+                type: "outcome",
+                field: {
+                    default: "success",
+                },
+            },
+        ];
     }
 
     async _execute(): Promise<boolean> {
@@ -24,8 +40,8 @@ class CompareOutcomesLogicNode extends BaseLogicNode<"true" | "false", Inputs> {
         const entryB = await this.getInputValue("b");
         const compare = await this.getInputValue("compare");
 
-        const numberA = degreeOfSuccessNumber(entryA)!;
-        const numberB = degreeOfSuccessNumber(entryB)!;
+        const numberA = degreeOfSuccessNumber(entryA) ?? -1;
+        const numberB = degreeOfSuccessNumber(entryB) ?? -1;
 
         const result = CompareNumbersLogicNode.compareNumbers(numberA, numberB, compare);
 

@@ -8,11 +8,11 @@ import {
 } from "module-helpers";
 import { OutcomeField, OutputFieldSchema } from ".";
 
-class OutcomEntry extends NodeEntry<DegreeOfSuccessString, OutputFieldSchema> {
-    static #options: OutcomeOption[] = DEGREE_STRINGS.map((value) => {
+class OutcomEntry extends NodeEntry<OutcomeEntryType, OutputFieldSchema> {
+    static #options: OutcomeOption[] = R.map(["null", ...DEGREE_STRINGS] as const, (value) => {
         return {
             value,
-            label: `PF2E.Check.Result.Degree.Check.${value}`,
+            label: value === "null" ? "trigger-engine.node.null" : `PF2E.Check.Result.Degree.Check.${value}`,
         };
     });
 
@@ -24,8 +24,8 @@ class OutcomEntry extends NodeEntry<DegreeOfSuccessString, OutputFieldSchema> {
         return OutcomeField;
     }
 
-    static get default(): DegreeOfSuccessString {
-        return "criticalFailure";
+    static get default(): OutcomeEntryType {
+        return "null";
     }
 
     static get color(): ColorSource {
@@ -37,8 +37,8 @@ class OutcomEntry extends NodeEntry<DegreeOfSuccessString, OutputFieldSchema> {
         return R.isString(value) ? value : degreeOfSuccessString(value);
     }
 
-    static isValidType(value: unknown): value is DegreeOfSuccessString {
-        return isDegreeOfSuccessValue(value);
+    static isValidType(value: unknown): value is OutcomeEntryType {
+        return value === "null" || isDegreeOfSuccessValue(value);
     }
 
     static toJSON(value: DegreeOfSuccessString): DegreeOfSuccessString {
@@ -53,7 +53,7 @@ class OutcomEntry extends NodeEntry<DegreeOfSuccessString, OutputFieldSchema> {
         return OutcomEntry.#options;
     }
 
-    get default(): DegreeOfSuccessString {
+    get default(): OutcomeEntryType {
         return this.getSelectValue(this.field.default);
     }
 
@@ -61,23 +61,25 @@ class OutcomEntry extends NodeEntry<DegreeOfSuccessString, OutputFieldSchema> {
         return undefined;
     }
 
-    getSelectValue(value: string | undefined): DegreeOfSuccessString {
+    getSelectValue(value: string | undefined | null): OutcomeEntryType {
         return this.options.find((option) => option.value === value)
-            ? (value as DegreeOfSuccessString)
+            ? (value as OutcomeEntryType)
             : this.options[0].value;
     }
 
-    processValue(value: string): DegreeOfSuccessString {
+    processValue(value: string): OutcomeEntryType {
         return this.getSelectValue(value);
     }
 }
 
 type OutcomeOption = {
-    value: DegreeOfSuccessString;
-    label: string;
+    value: OutcomeEntryType;
+    label: string | undefined;
 };
 
-type InputOutcomeEntry = BaseInputEntrySchema<"outcome", OutputFieldSchema>;
+type InputOutcomeEntry = BaseInputEntrySchema<"outcome", Partial<OutputFieldSchema>>;
+
+type OutcomeEntryType = DegreeOfSuccessString | "null";
 
 export { OutcomEntry };
-export type { InputOutcomeEntry };
+export type { InputOutcomeEntry, OutcomeEntryType };
