@@ -42,7 +42,7 @@ class RollSaveActionNode extends BaseActionNode<"out", Inputs, Outputs, never, n
     }
 
     get icon(): IconObject {
-        return { unicode: "\uf6cf" };
+        return { unicode: "\uf6cf", fontWeight: "900" };
     }
 
     get canBreak(): boolean {

@@ -31,7 +31,7 @@ class RollFlatActionNode extends BaseActionNode<"out", Inputs, Outputs> {
     }
 
     get icon(): IconObject {
-        return { unicode: "\uf6cf" };
+        return { unicode: "\uf6cf", fontWeight: "900" };
     }
 
     async _execute(): Promise<boolean> {
