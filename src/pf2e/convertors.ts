@@ -5,6 +5,7 @@ import {
     degreeOfSuccessString,
     isDegreeOfSuccessValue,
 } from "module-helpers";
+import { OutcomeEntryType } from ".";
 
 const pf2eConvertors = [
     {
@@ -17,22 +18,22 @@ const pf2eConvertors = [
     {
         output: "outcome",
         input: "number",
-        convertToInput: (outcome: DegreeOfSuccessString): number => {
-            return degreeOfSuccessNumber(outcome) || 0;
+        convertToInput: (outcome: DegreeOfSuccessString | null): number => {
+            return degreeOfSuccessNumber(outcome) ?? -1;
         },
     },
     {
         output: "outcome",
         input: "text",
-        convertToInput: (outcome: DegreeOfSuccessString): string => {
+        convertToInput: (outcome: OutcomeEntryType): string => {
             return outcome;
         },
     },
     {
         output: "text",
         input: "outcome",
-        convertToInput: (value: string): DegreeOfSuccessString | undefined => {
-            return isDegreeOfSuccessValue(value) ? value : undefined;
+        convertToInput: (value: string): OutcomeEntryType => {
+            return isDegreeOfSuccessValue(value) ? value : "null";
         },
     },
     {

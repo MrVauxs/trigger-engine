@@ -1,8 +1,7 @@
 import { BaseSplitterNode, BridgeSchemaInput } from "engine";
-import { DEGREE_STRINGS, DegreeOfSuccessString } from "module-helpers";
-import { PF2eInputEntry } from "pf2e";
+import { OutcomeEntryType, OutcomEntry, PF2eInputEntry } from "pf2e";
 
-class OutcomeSplitterNode extends BaseSplitterNode<DegreeOfSuccessString, DegreeOfSuccessString> {
+class OutcomeSplitterNode extends BaseSplitterNode<OutcomeEntryType, OutcomeEntryType> {
     static get type(): "split-outcome" {
         return "split-outcome";
     }
@@ -12,11 +11,8 @@ class OutcomeSplitterNode extends BaseSplitterNode<DegreeOfSuccessString, Degree
     }
 
     static get defineOuts(): BridgeSchemaInput[] {
-        return DEGREE_STRINGS.map((outcome): BridgeSchemaInput => {
-            return {
-                key: outcome,
-                label: `PF2E.Check.Result.Degree.Check.${outcome}`,
-            };
+        return OutcomEntry.options.map(({ value, label }): BridgeSchemaInput => {
+            return { key: value, label };
         });
     }
 

@@ -9,7 +9,7 @@ import {
 import { OutcomeField, OutputFieldSchema } from ".";
 
 class OutcomEntry extends NodeEntry<OutcomeEntryType, OutputFieldSchema> {
-    static #options: OutcomeOption[] = R.map(["null", ...DEGREE_STRINGS] as const, (value) => {
+    static options: OutcomeOption[] = R.map(["null", ...DEGREE_STRINGS] as const, (value) => {
         return {
             value,
             label: value === "null" ? "trigger-engine.node.null" : `PF2E.Check.Result.Degree.Check.${value}`,
@@ -50,7 +50,7 @@ class OutcomEntry extends NodeEntry<OutcomeEntryType, OutputFieldSchema> {
     }
 
     get options(): OutcomeOption[] {
-        return OutcomEntry.#options;
+        return OutcomEntry.options;
     }
 
     get default(): OutcomeEntryType {

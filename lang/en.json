@@ -613,8 +613,8 @@
                 }
             },
             "convertor": {
-                "outcome-number": "A number between 0 and 3",
-                "outcome-text": "criticalFailure, failure, success, criticalSuccess",
+                "outcome-number": "A number between -1 and 3",
+                "outcome-text": "null, criticalFailure, failure, success, criticalSuccess",
                 "target-text": "The signature value"
             },
             "custom": {
