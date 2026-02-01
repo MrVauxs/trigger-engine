@@ -86,7 +86,8 @@ async function checkRollData(message: ChatMessagePF2e): Promise<CheckRollOptions
     const target = { actor: message.actor, token: message.token };
     if (!isValidTargetDocuments(target)) return;
 
-    const originActor = origin?.actor ? await fromUuid<ActorPF2e>(origin.actor) : null;
+    const originActorUuid = origin?.actor ?? context.origin?.actor;
+    const originActor = originActorUuid ? await fromUuid<ActorPF2e>(originActorUuid) : null;
     const originToken = context.origin?.token ? await fromUuid<TokenDocumentPF2e>(context.origin.token) : null;
 
     return {
