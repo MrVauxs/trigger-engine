@@ -1,10 +1,6 @@
-import { BaseLogicNode, BridgeSchemaInput } from "engine";
+import { BaseBooleanLogicNode } from ".";
 
-abstract class BaseMatchLogicNode<TType> extends BaseLogicNode<"true" | "false", { a: TType; b: TType }> {
-    static get defineOuts(): BridgeSchemaInput[] {
-        return [{ key: "true" }, { key: "false" }];
-    }
-
+abstract class BaseMatchLogicNode<TType> extends BaseBooleanLogicNode<{ a: TType; b: TType }> {
     abstract _match(entryA: TType, entryB: TType): boolean;
 
     async _execute(): Promise<boolean> {
@@ -12,7 +8,7 @@ abstract class BaseMatchLogicNode<TType> extends BaseLogicNode<"true" | "false",
         const entryB = await this.getInputValue("b");
         const result = this._match(entryA, entryB);
 
-        return this.executeNext(result ? "true" : "false");
+        return this.executeNextIf(result);
     }
 }
 

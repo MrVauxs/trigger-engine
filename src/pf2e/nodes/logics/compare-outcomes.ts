@@ -1,18 +1,14 @@
-import { BaseLogicNode, BridgeSchemaInput, CompareEntry, CompareNumbersLogicNode } from "engine";
+import { BaseBooleanLogicNode, CompareEntry, CompareNumbersLogicNode } from "engine";
 import { DegreeOfSuccessString, degreeOfSuccessNumber } from "module-helpers";
 import { PF2eInputEntry } from "pf2e";
 
-class CompareOutcomesLogicNode extends BaseLogicNode<"true" | "false", Inputs> {
+class CompareOutcomesLogicNode extends BaseBooleanLogicNode<Inputs> {
     static get type(): "compare-outcomes" {
         return "compare-outcomes";
     }
 
     static get tags(): string[] {
         return ["outcome"];
-    }
-
-    static get defineOuts(): BridgeSchemaInput[] {
-        return [{ key: "true" }, { key: "false" }];
     }
 
     static get defineInputs(): PF2eInputEntry[] {
@@ -45,7 +41,7 @@ class CompareOutcomesLogicNode extends BaseLogicNode<"true" | "false", Inputs> {
 
         const result = CompareNumbersLogicNode.compareNumbers(numberA, numberB, compare);
 
-        return this.executeNext(result ? "true" : "false");
+        return this.executeNextIf(result);
     }
 }
 

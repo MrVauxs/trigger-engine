@@ -1,9 +1,9 @@
-import { BaseLogicNode, BridgeSchemaInput, BuiltinsInputEntry } from "engine";
+import { BaseBooleanLogicNode, BuiltinsInputEntry } from "engine";
 import { localizePath } from "module-helpers";
 
 const COMPARE_ENTRIES = ["eq", "gt", "gte", "lt", "lte"] as const;
 
-class CompareNumbersLogicNode extends BaseLogicNode<"true" | "false", Inputs> {
+class CompareNumbersLogicNode extends BaseBooleanLogicNode<Inputs> {
     static #compareOptions: SelectOptions;
 
     static get type(): "compare-numbers" {
@@ -14,12 +14,8 @@ class CompareNumbersLogicNode extends BaseLogicNode<"true" | "false", Inputs> {
         return ["number"];
     }
 
-    static get defineOuts(): BridgeSchemaInput[] {
-        return [{ key: "true" }, { key: "false" }];
-    }
-
     static get compareOptions() {
-        return (this.#compareOptions ??= ["eq", "gt", "gte", "lt", "lte"].map((value) => {
+        return (this.#compareOptions ??= COMPARE_ENTRIES.map((value) => {
             return {
                 value,
                 label: localizePath("builtins.node", this.category, this.type, "inputs.compare.options", value),
@@ -68,7 +64,7 @@ class CompareNumbersLogicNode extends BaseLogicNode<"true" | "false", Inputs> {
         const compare = await this.getInputValue("compare");
         const result = CompareNumbersLogicNode.compareNumbers(entryA, entryB, compare);
 
-        return this.executeNext(result ? "true" : "false");
+        return this.executeNextIf(result);
     }
 }
 

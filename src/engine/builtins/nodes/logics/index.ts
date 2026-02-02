@@ -9,6 +9,7 @@ import {
 } from ".";
 
 export * from "./base";
+export * from "./base-boolean";
 export * from "./base-match";
 export * from "./actors-match";
 export * from "./break-loop";

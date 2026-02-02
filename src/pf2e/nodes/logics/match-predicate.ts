@@ -1,13 +1,9 @@
-import { BaseLogicNode, BridgeSchemaInput } from "engine";
+import { BaseBooleanLogicNode } from "engine";
 import { PF2eInputEntry } from "pf2e";
 
-class MathPredicateLogicNode extends BaseLogicNode<"true" | "false", Inputs> {
+class MathPredicateLogicNode extends BaseBooleanLogicNode<Inputs> {
     static get type(): "match-predicate" {
         return "match-predicate";
-    }
-
-    static get defineOuts(): BridgeSchemaInput[] {
-        return [{ key: "true" }, { key: "false" }];
     }
 
     static get defineInputs(): PF2eInputEntry[] {
@@ -31,7 +27,7 @@ class MathPredicateLogicNode extends BaseLogicNode<"true" | "false", Inputs> {
             const parsed = JSON.parse(predicate);
             const matches = new game.pf2e.Predicate(parsed).test(options);
 
-            return this.executeNext(matches ? "true" : "false");
+            return this.executeNextIf(matches);
         } catch {
             return this.executeNext("false");
         }
