@@ -387,6 +387,9 @@
                     },
                     "resolve-formula": {
                         "title": "Resolve Formula"
+                    },
+                    "texts-match": {
+                        "title": "Texts Match"
                     }
                 },
                 "splitter": {

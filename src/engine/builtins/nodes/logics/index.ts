@@ -4,6 +4,7 @@ import {
     FilterTargetsActionNode,
     FormatTextLogicNode,
     ResolveFormulaLogicNode,
+    TextsMatchLogicNode,
 } from ".";
 
 export * from "./base";
@@ -12,6 +13,7 @@ export * from "./compare-numbers";
 export * from "./filter-targets";
 export * from "./format-text";
 export * from "./resolve-formula";
+export * from "./texts-match";
 
 export default [
     BreakLoopLogicNode,
@@ -19,4 +21,5 @@ export default [
     FilterTargetsActionNode,
     FormatTextLogicNode,
     ResolveFormulaLogicNode,
+    TextsMatchLogicNode,
 ] as const;
