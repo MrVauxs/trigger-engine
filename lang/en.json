@@ -656,9 +656,6 @@
                 "identifier": {
                     "title": "Identifier"
                 },
-                "img": {
-                    "title": "Image Path"
-                },
                 "name": {
                     "title": "Name"
                 },
@@ -1033,6 +1030,14 @@
                     },
                     "index": {
                         "title": "Instance Index"
+                    }
+                },
+                "image": {
+                    "pf2e": {
+                        "title": "PF2e Image Path"
+                    },
+                    "sf2e": {
+                        "title": "SF2e Image Path"
                     }
                 },
                 "roll-data": {

@@ -1,12 +1,12 @@
 import { TriggerNode } from "engine";
 import { CustomConditionOptions } from "module-helpers";
-import { PF2eInputEntry } from "pf2e";
+import { DoubleImgInputs, doubleImgSchemas, getDoubleImgValue, PF2eInputEntry } from "pf2e";
 import { DurationInputs, durationSchemas, DurationState, getDurationData } from ".";
 
 function effectSchemas(group?: string): PF2eInputEntry[] {
     return [
         { key: "name", type: "text", group },
-        { key: "img", type: "text", group },
+        ...doubleImgSchemas(),
         { key: "slug", type: "text", group },
         { key: "secret", type: "boolean", group, label: "PF2E.EffectPanel.Unidentified" },
         ...durationSchemas(),
@@ -16,7 +16,7 @@ function effectSchemas(group?: string): PF2eInputEntry[] {
 async function getEffectData(
     this: TriggerNode<any, EffectInputs, any, any, any, DurationState>,
 ): Promise<EffectOptions> {
-    const img = await this.getInputValue("img");
+    const img = await getDoubleImgValue.call(this);
     const slug = await this.getInputValue("slug");
 
     return {
@@ -30,14 +30,12 @@ async function getEffectData(
 
 type EffectOptions = Omit<CustomConditionOptions, "slug" | "counter" | "alterations">;
 
-type EffectInputs = Prettify<
-    DurationInputs & {
-        img: string;
+type EffectInputs = DurationInputs &
+    DoubleImgInputs & {
         name: string;
         secret: boolean;
         slug: string;
-    }
->;
+    };
 
 export { effectSchemas, getEffectData };
 export type { EffectInputs };
