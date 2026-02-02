@@ -7,6 +7,7 @@ import {
     InCombatConditionNode,
     InRangeConditionNode,
     InsideAuraConditionNode,
+    IsAllianceConditionNode,
     IsDeadConditionNode,
 } from ".";
 
@@ -18,6 +19,7 @@ export * from "./has-temporary";
 export * from "./in-combat";
 export * from "./in-range";
 export * from "./inside-aura";
+export * from "./is-alliance";
 export * from "./is-dead";
 
 export default [
@@ -29,5 +31,6 @@ export default [
     InCombatConditionNode,
     InRangeConditionNode,
     InsideAuraConditionNode,
+    IsAllianceConditionNode,
     IsDeadConditionNode,
 ];

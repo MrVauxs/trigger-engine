@@ -351,19 +351,6 @@
                     "break-loop": {
                         "title": "Break Current Loop"
                     },
-                    "compare-alliances": {
-                        "inputs": {
-                            "compare": {
-                                "options": {
-                                    "allies": "Are Allies",
-                                    "different": "Are Different",
-                                    "enemies": "Are Enemies",
-                                    "neutral": "Are Neutrals"
-                                }
-                            }
-                        },
-                        "title": "Compare Allliances"
-                    },
                     "compare-numbers": {
                         "inputs": {
                             "compare": {
@@ -864,6 +851,9 @@
                         },
                         "title": "Is Inside Aura"
                     },
+                    "is-alliance": {
+                        "title": "Is of Alliance"
+                    },
                     "is-dead": {
                         "title": "Actor Is Dead"
                     }
@@ -973,6 +963,19 @@
                             }
                         },
                         "title": "Get ChoiceSet Selection"
+                    },
+                    "compare-alliances": {
+                        "inputs": {
+                            "compare": {
+                                "options": {
+                                    "allies": "Are Allies",
+                                    "different": "Are Different",
+                                    "enemies": "Are Enemies",
+                                    "neutral": "Are Neutrals"
+                                }
+                            }
+                        },
+                        "title": "Compare Allliances"
                     },
                     "compare-outcomes": {
                         "title": "Compare Degree of Success"
