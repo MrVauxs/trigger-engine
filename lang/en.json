@@ -345,6 +345,9 @@
                     }
                 },
                 "logic": {
+                    "actors-match": {
+                        "title": "Actors Match"
+                    },
                     "break-loop": {
                         "title": "Break Current Loop"
                     },
