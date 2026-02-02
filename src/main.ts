@@ -47,5 +47,4 @@ globalThis.triggerEngine = {
     NodeField,
     TriggerHook,
     TriggerNode,
-    openBlueprintMenu: TriggerApplication.openBlueprintMenu.bind(TriggerApplication),
 };

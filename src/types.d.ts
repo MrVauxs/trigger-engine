@@ -3,7 +3,6 @@ import {
     NodeField as _NodeField,
     TriggerHook as _TriggerHook,
     TriggerNode as _TriggerNode,
-    TriggerApplication,
 } from "engine";
 
 declare global {
@@ -12,6 +11,5 @@ declare global {
         const NodeField: typeof _NodeField;
         const TriggerHook: typeof _TriggerHook;
         const TriggerNode: typeof _TriggerNode;
-        const openBlueprintMenu: typeof TriggerApplication.openBlueprintMenu;
     }
 }
