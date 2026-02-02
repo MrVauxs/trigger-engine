@@ -83,8 +83,8 @@ class CreateMessageHook extends TriggerHook<AttackRollOptions | DamageTakenOptio
 
 async function checkRollData(message: ChatMessagePF2e): Promise<CheckRollOptions | undefined> {
     const { context, origin } = message.flags[SYSTEM.id] as { context: CheckContextChatFlag; origin?: ItemOriginFlag };
-    const target = { actor: message.actor, token: message.token };
-    if (!isValidTargetDocuments(target)) return;
+    const roller = { actor: message.actor, token: message.token };
+    if (!isValidTargetDocuments(roller)) return;
 
     const originActorUuid = origin?.actor ?? context.origin?.actor;
     const originActor = originActorUuid ? await fromUuid<ActorPF2e>(originActorUuid) : null;
@@ -95,7 +95,8 @@ async function checkRollData(message: ChatMessagePF2e): Promise<CheckRollOptions
         options: context.options ?? [],
         origin: originActor ? { actor: originActor, token: originToken } : undefined,
         outcome: context.outcome,
-        target,
+        roller,
+        target: message.target ?? undefined,
         type: context.type,
     };
 }
@@ -130,8 +131,9 @@ type DamageTakenOptions = BaseOptions & {
     types: DamageTakenType[];
 };
 
-type CheckRollOptions = BaseOptions & {
+type CheckRollOptions = WithPartial<BaseOptions, "target"> & {
     outcome: DegreeOfSuccessString | null;
+    roller: TargetDocuments;
     type: CheckType;
 };
 

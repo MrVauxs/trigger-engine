@@ -907,6 +907,9 @@
                             }
                         },
                         "outputs": {
+                            "roller": {
+                                "title": "Roller"
+                            },
                             "type": {
                                 "title": "Check Type"
                             }
