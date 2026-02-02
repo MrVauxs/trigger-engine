@@ -69,6 +69,7 @@ function instantiateNode(
                 key: "entry",
                 label: data.label,
                 spacing: 0,
+                tooltip: true,
                 type: data.type,
             },
         ];
