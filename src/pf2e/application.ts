@@ -1,10 +1,23 @@
 import { TriggerApplication, TriggerApplicationOptions } from "engine";
-import { MODULE } from "module-helpers";
+import { error, MODULE, SYSTEM } from "module-helpers";
 import { pf2eConvertors, pf2eEntries } from ".";
 import hooks from "./hooks";
 import nodes from "./nodes";
 
+const VERSION = {
+    pf2e: "7.9.1",
+    sf2e: "0.0.4",
+};
+
 function registerPF2eApplication() {
+    const requiredVersion = VERSION[SYSTEM.id];
+    if (foundry.utils.isNewerVersion(requiredVersion, game.system.version)) {
+        if (game.user.isGM) {
+            error("pf2e-trigger.version.error", { version: requiredVersion });
+        }
+        return;
+    }
+
     const options: TriggerApplicationOptions = {
         builtins: true,
         convertors: pf2eConvertors,

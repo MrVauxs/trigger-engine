@@ -306,6 +306,9 @@
                     }
                 },
                 "event": {
+                    "__start_event__": {
+                        "title": "Start Event"
+                    },
                     "create-combatant-event": {
                         "title": "Combatant Created"
                     },
@@ -1078,6 +1081,9 @@
                 "turn": {
                     "title": "Turn"
                 }
+            },
+            "version": {
+                "error": "The minimum supported system version for the <strong>Trigger Engine</strong> module is <strong>{version}</strong>."
             }
         },
         "save-triggers": {
