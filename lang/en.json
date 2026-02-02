@@ -351,6 +351,19 @@
                     "break-loop": {
                         "title": "Break Current Loop"
                     },
+                    "compare-alliances": {
+                        "inputs": {
+                            "compare": {
+                                "options": {
+                                    "allies": "Are Allies",
+                                    "different": "Are Different",
+                                    "enemies": "Are Enemies",
+                                    "neutral": "Are Neutrals"
+                                }
+                            }
+                        },
+                        "title": "Compare Allliances"
+                    },
                     "compare-numbers": {
                         "inputs": {
                             "compare": {
