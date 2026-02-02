@@ -43,18 +43,18 @@ class CompareAlliancesLogicNode extends BaseBooleanLogicNode<Inputs> {
     }
 
     #compareAlliances(entryA: TargetDocuments, entryB: TargetDocuments, compare: CompareEntry): boolean {
-        const actorA = entryA.actor;
-        const actorB = entryB.actor;
+        const allianceA = entryA.actor.alliance ?? "neutral";
+        const allianceB = entryB.actor.alliance ?? "neutral";
 
         switch (compare) {
             case "allies":
-                return actorA.isAllyOf(actorB);
+                return allianceA !== "neutral" && allianceB !== "neutral" && allianceA === allianceB;
             case "enemies":
-                return actorA.isEnemyOf(actorB);
+                return allianceA !== "neutral" && allianceB !== "neutral" && allianceA !== allianceB;
             case "different":
-                return actorA.alliance !== actorB.alliance;
+                return allianceA !== allianceB;
             case "neutral":
-                return actorA.alliance === null && actorB.alliance === null;
+                return allianceA === null && allianceB === null;
         }
     }
 }
