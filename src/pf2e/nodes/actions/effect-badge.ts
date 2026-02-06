@@ -53,7 +53,7 @@ class EffectBadgeActionNode extends BaseActionNode<"out", Inputs, never, never, 
         const item = await this.getEffect();
         const value = await this.getInputValue("by");
 
-        if (!value || !item?.isOfType("effect") || item.pack) {
+        if (!value || !item || item.pack) {
             return this.executeNext("out");
         }
 
@@ -94,7 +94,7 @@ class EffectBadgeActionNode extends BaseActionNode<"out", Inputs, never, never, 
 
     async getEffect(): Promise<EffectPF2e | null> {
         if (this.state === "item") {
-            const item = await this.getInputValue("item");
+            const item = await this.getInputValue("effect");
             return item?.isOfType("effect") ? item : null;
         }
 
@@ -108,7 +108,7 @@ class EffectBadgeActionNode extends BaseActionNode<"out", Inputs, never, never, 
 
 type Inputs = DoubleUuidInputs & {
     by: number;
-    item?: ItemPF2e;
+    effect?: ItemPF2e;
     target?: TargetDocuments;
 };
 
