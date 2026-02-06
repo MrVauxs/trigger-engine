@@ -71,7 +71,7 @@
                     "tab": "Move to next Entry Gate",
                     "title": "Gates"
                 },
-                "reset": "Reset Trigger",
+                "refresh": "Refresh Application",
                 "save": "Save Triggers",
                 "variables": {
                     "tab": "Move to next Variable Getter",
@@ -1105,6 +1105,12 @@
             "version": {
                 "error": "The minimum supported system version for the <strong>Trigger Engine</strong> module is <strong>{version}</strong>."
             }
+        },
+        "refresh-application": {
+            "content": "This will refresh the triggers application, would you like to save your triggers first?",
+            "no": "Refresh Only",
+            "title": "Refresh Application",
+            "yes": "Save & Refresh"
         },
         "save-triggers": {
             "content": "Are you sure you want to save the triggers?",

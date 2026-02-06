@@ -13,6 +13,7 @@ import {
     createHTMLElement,
     distanceToPoint,
     dividePointBy,
+    info,
     purgeObject,
     subtractPoint,
 } from "module-helpers";
@@ -323,7 +324,8 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
             sources: purgeObject(sources),
         };
 
-        return game.settings.set(this.application.moduleId, this.application.settingKey, setting);
+        await game.settings.set(this.application.moduleId, this.application.settingKey, setting);
+        info("save-triggers.saved");
     }
 
     isEnabled({ id, locked }: OpenTrigger): boolean {

@@ -245,6 +245,27 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
                 return this.#importTriggers();
             }
 
+            case "refresh-application": {
+                const save = await confirmDialog("refresh-application");
+                if (save === null) return;
+
+                if (save) {
+                    await this.blueprint.saveTriggers();
+                }
+
+                const triggerFullId = this.blueprint.trigger?.fullId;
+
+                await this.close();
+
+                const app = (await this.application.openMenu()) as BlueprintApplication | null;
+
+                if (app && triggerFullId) {
+                    app.blueprint.trigger = triggerFullId;
+                }
+
+                return;
+            }
+
             case "resolve-data": {
                 this.resolve?.();
                 return this.close();
@@ -252,10 +273,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
 
             case "save-triggers": {
                 const confirm = await confirmDialog("save-triggers");
-                if (!confirm) return;
-
-                const saved = await this.blueprint.saveTriggers();
-                return saved && info("save-triggers.saved");
+                return confirm && this.blueprint.saveTriggers();
             }
 
             case "select-node": {
@@ -850,6 +868,7 @@ type EventAction =
     | "expand-window"
     | "export-triggers"
     | "import-triggers"
+    | "refresh-application"
     | "resolve-data"
     | "save-triggers"
     | "select-node"

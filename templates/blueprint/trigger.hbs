@@ -28,6 +28,9 @@
             {{#if trigger.locked}}
             <i class="fa-solid fa-lock"></i>
             {{else if (not isFree)}}
+            <a data-action="refresh-application" {{{@root.i18n.tooltip 'refresh'}}}>
+                <i class="fa-solid fa-arrow-rotate-left"></i>
+            </a>
             <a data-action="save-triggers" {{{@root.i18n.tooltip 'save'}}}>
                 <i class="fa-solid fa-floppy-disk"></i>
             </a>
