@@ -1,5 +1,5 @@
 import { EntryConvertor } from "engine";
-import { ItemPF2e, primaryPlayerOwner, UserPF2e } from "module-helpers";
+import { ItemPF2e, primaryPlayerOwner, R, UserPF2e } from "module-helpers";
 
 const builtinsConvertors = [
     {
@@ -14,7 +14,8 @@ const builtinsConvertors = [
         output: "text",
         input: "number",
         convertToInput: (value: string): number => {
-            return Number(value) || 0;
+            const num = Number(value.trim() || "-1");
+            return R.isNumber(num) ? num : -1;
         },
     },
     {
