@@ -30,9 +30,16 @@ class InceaseConditionActionNode extends BaseActionNode<"out", Inputs> {
     async _execute(): Promise<boolean> {
         const data = await getValuedConditionsData.call(this);
 
-        if (data?.value) {
-            const max = (await this.getInputValue("max")) || undefined;
-            await data.actor.increaseCondition(data.slug, { max, value: data.value });
+        if (!data?.value) {
+            return this.executeNext("out");
+        }
+
+        const max = await this.getInputValue("max");
+        const current = data.actor.getCondition(data.slug)?.value ?? 0;
+        const newValue = max > 0 ? Math.min(current + data.value, max) : current + data.value;
+
+        if (!current || current < newValue) {
+            await data.actor.increaseCondition(data.slug, { value: newValue });
         }
 
         return this.executeNext("out");
