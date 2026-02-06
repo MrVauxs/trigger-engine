@@ -1,7 +1,7 @@
 import { IconObject } from "_zod";
 import { BaseActionNode } from "engine";
 import { DamageType, createPersistentDamageSource, recordToSelectOptions } from "module-helpers";
-import { PF2eInputEntry } from "pf2e";
+import { createEmbeddedItem, PF2eInputEntry } from "pf2e";
 
 class CreatePersistentActionNode extends BaseActionNode<"out", Inputs> {
     static get type(): "create-persistent" {
@@ -55,7 +55,7 @@ class CreatePersistentActionNode extends BaseActionNode<"out", Inputs> {
         const type = await this.getInputValue("type");
         const source = createPersistentDamageSource(die, type, dc);
 
-        await actor.createEmbeddedDocuments("Item", [source]);
+        await createEmbeddedItem(actor, source);
 
         return this.executeNext("out");
     }

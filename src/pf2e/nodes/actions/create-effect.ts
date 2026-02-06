@@ -1,7 +1,7 @@
 import { IconObject } from "_zod";
 import { BaseActionNode, CustomInputSchema, JsonField } from "engine";
 import { R, RuleElementSource, createCustomEffect, localizePath } from "module-helpers";
-import { DurationState, EffectInputs, durationStates, effectSchemas, getEffectData } from ".";
+import { DurationState, EffectInputs, createEmbeddedItem, durationStates, effectSchemas, getEffectData } from ".";
 import { PF2eInputEntry } from "pf2e";
 
 class CreateEffectActionNode extends BaseActionNode<"out", Inputs, never, "rule", never, DurationState> {
@@ -78,7 +78,7 @@ class CreateEffectActionNode extends BaseActionNode<"out", Inputs, never, "rule"
             rules,
         });
 
-        await actor.createEmbeddedDocuments("Item", [source]);
+        await createEmbeddedItem(actor, source);
 
         return this.executeNext("out");
     }

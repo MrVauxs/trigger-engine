@@ -7,6 +7,7 @@ import {
     DurationState,
     EffectInputs,
     conditionsSchemas,
+    createEmbeddedItem,
     durationStates,
     effectSchemas,
     getConditionsData,
@@ -43,7 +44,7 @@ class CreateConditionActionNode extends BaseActionNode<"out", Inputs, never, nev
             const source = createCustomCondition({ ...effect, counter: value, slug });
 
             if (source) {
-                await actor.createEmbeddedDocuments("Item", [source]);
+                await createEmbeddedItem(actor, source);
             }
         }
 

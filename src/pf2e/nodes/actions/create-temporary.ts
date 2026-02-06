@@ -5,6 +5,7 @@ import { PF2eInputEntry } from "pf2e";
 import {
     DurationState,
     TriggerEffectInputs,
+    createEmbeddedItem,
     durationSchemas,
     durationStates,
     getDurationData,
@@ -52,7 +53,7 @@ class CreateTemporaryActionNode extends BaseActionNode<"out", TriggerEffectInput
             unidentified: true,
         });
 
-        await actor.createEmbeddedDocuments("Item", [source]);
+        await createEmbeddedItem(actor, source);
 
         return this.executeNext("out");
     }

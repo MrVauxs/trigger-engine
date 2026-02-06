@@ -2,6 +2,7 @@ import { IconObject } from "_zod";
 import { BaseActionNode, CustomInputSchema } from "engine";
 import { ActorPF2e, ChoiceSetSource, ItemPF2e, ItemType, R, getItemFromUuid, getItemSource } from "module-helpers";
 import {
+    createEmbeddedItem,
     DoubleUuidInputs,
     doubleUuidSchemas,
     getDoubleUuidValue,
@@ -101,8 +102,10 @@ class CreateItemActionNode extends BaseActionNode<"out", Inputs, { item?: ItemPF
         }
 
         // we create the item
-        const [created] = await actor.createEmbeddedDocuments("Item", [source]);
-        this.setOutputValue("item", created);
+        const created = await createEmbeddedItem(actor, source);
+        if (created) {
+            this.setOutputValue("item", created);
+        }
 
         return this.executeNext("out");
     }
