@@ -753,6 +753,18 @@
                             "increase": "Increase Effect Badge"
                         }
                     },
+                    "effect-duration": {
+                        "outputs": {
+                            "delete": {
+                                "title": "Deleted"
+                            }
+                        },
+                        "title": "Update Effect Duration",
+                        "titles": {
+                            "decrease": "Decrease Effect Duration",
+                            "increase": "Increase Effect Duration"
+                        }
+                    },
                     "increase-condition": {
                         "title": "Increase Condition"
                     },
