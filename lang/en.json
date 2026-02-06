@@ -1014,6 +1014,14 @@
                             }
                         },
                         "title": "Matches Predicate"
+                    },
+                    "option-value": {
+                        "inputs": {
+                            "option": {
+                                "title": "Option Prefix"
+                            }
+                        },
+                        "title": "Get RollOption Value"
                     }
                 },
                 "splitter": {
