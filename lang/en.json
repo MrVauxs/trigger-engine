@@ -963,11 +963,6 @@
                     }
                 },
                 "extractor": {
-                    "item-formula": {
-                        "title": "Extract Item Formula"
-                    }
-                },
-                "logic": {
                     "choiceset-selection": {
                         "inputs": {
                             "flag": {
@@ -984,6 +979,11 @@
                         },
                         "title": "Get ChoiceSet Selection"
                     },
+                    "item-formula": {
+                        "title": "Extract Item Formula"
+                    }
+                },
+                "logic": {
                     "compare-alliances": {
                         "inputs": {
                             "compare": {
