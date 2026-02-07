@@ -981,6 +981,14 @@
                     },
                     "item-formula": {
                         "title": "Extract Item Formula"
+                    },
+                    "option-value": {
+                        "inputs": {
+                            "option": {
+                                "title": "Option Prefix"
+                            }
+                        },
+                        "title": "Get RollOption Value"
                     }
                 },
                 "logic": {
@@ -1019,14 +1027,6 @@
                             }
                         },
                         "title": "Matches Predicate"
-                    },
-                    "option-value": {
-                        "inputs": {
-                            "option": {
-                                "title": "Option Prefix"
-                            }
-                        },
-                        "title": "Get RollOption Value"
                     }
                 },
                 "splitter": {
