@@ -1,3 +1,13 @@
+# 1.2.0
+
+- move the `Filter Targets` node to the `Extrator` category
+- fix not being able to enable third-party triggers if no copy exist in your world
+- `pf2e-trigger`:
+  - add new `Extract Item Formula` node
+    - you can extract formula from a compendium/world item as well
+  - move the `Get ChoiceSet Selection` node to the `Extractor` category
+  - move the `Get RollOption Value` node to the `Extractor` category
+
 # 1.1.0
 
 - the `text -> number` now returns `-1` as default value instead of `0`
