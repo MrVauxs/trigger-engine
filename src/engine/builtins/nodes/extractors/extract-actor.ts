@@ -1,8 +1,8 @@
 import { BuiltinsInputEntry } from "engine";
 import { ActorPF2e } from "module-helpers";
-import { BaseExtractorNode } from ".";
+import { BaseDocumentExtractorNode } from ".";
 
-class ActorExtractorNode extends BaseExtractorNode<TargetDocuments, ActorPF2e> {
+class ActorExtractorNode extends BaseDocumentExtractorNode<TargetDocuments, ActorPF2e> {
     static get type(): "extract-actor" {
         return "extract-actor";
     }

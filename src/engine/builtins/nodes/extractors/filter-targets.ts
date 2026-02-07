@@ -1,4 +1,4 @@
-import { BaseLogicNode, BuiltinsCustomEntry, BuiltinsInputEntry, BuiltinsOutputEntry } from "engine";
+import { BaseExtractorNode, BuiltinsCustomEntry, BuiltinsInputEntry, BuiltinsOutputEntry } from "engine";
 
 const DEFAULT_CALLBACK = `/**
  * @param {{actor: Actor; token: TokenDocument}} target
@@ -11,7 +11,7 @@ const DEFAULT_CALLBACK = `/**
  */
 return true;`;
 
-class FilterTargetsActionNode extends BaseLogicNode<"out", Inputs, Outputs, "input", never, States> {
+class FilterTargetsExtractorNode extends BaseExtractorNode<Inputs, Outputs, "input", never, States> {
     static get type(): "filter-targets" {
         return "filter-targets";
     }
@@ -105,4 +105,4 @@ type Outputs = {
     targets: TargetDocuments[];
 };
 
-export { FilterTargetsActionNode };
+export { FilterTargetsExtractorNode };

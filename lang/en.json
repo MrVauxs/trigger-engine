@@ -345,6 +345,13 @@
                     },
                     "extract-item": {
                         "title": "Extract From Item"
+                    },
+                    "filter-targets": {
+                        "title": "Filter Targets",
+                        "titles": {
+                            "find": "Find Target",
+                            "loop": "Loop Over Targets"
+                        }
                     }
                 },
                 "logic": {
@@ -367,13 +374,6 @@
                             }
                         },
                         "title": "Compare Numbers"
-                    },
-                    "filter-targets": {
-                        "title": "Filter Targets",
-                        "titles": {
-                            "find": "Find Target",
-                            "loop": "Loop Over Targets"
-                        }
                     },
                     "format-text": {
                         "inputs": {

@@ -1,8 +1,8 @@
 import { BuiltinsInputEntry } from "engine";
 import { ItemPF2e } from "module-helpers";
-import { BaseExtractorNode } from ".";
+import { BaseDocumentExtractorNode } from ".";
 
-class ItemExtractorNode extends BaseExtractorNode<ItemPF2e, ItemPF2e> {
+class ItemExtractorNode extends BaseDocumentExtractorNode<ItemPF2e, ItemPF2e> {
     static get type(): "extract-item" {
         return "extract-item";
     }
