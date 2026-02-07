@@ -2,19 +2,18 @@ import { TriggerNode } from "engine";
 import {
     ActorPF2e,
     CheckDC,
+    extractModifierAdjustments,
     ItemPF2e,
+    localizePath,
     ModifierPF2e,
     R,
+    recordToSelectOptions,
     SAVE_TYPES,
     SaveType,
-    Statistic,
-    extractModifierAdjustments,
-    localizePath,
-    parseInlineParams,
-    recordToSelectOptions,
     splitListString,
+    Statistic,
 } from "module-helpers";
-import { PF2eInputEntry } from "pf2e";
+import { extractItemInline, extractItemInputs, ItemExtractInputs, PF2eInputEntry } from "pf2e";
 
 const dcStates = ["value", "target", "item"] as const;
 
@@ -52,14 +51,7 @@ function dcSchemas(): PF2eInputEntry[] {
             state: "target",
         },
         { key: "basic", type: "boolean", group: "save", state: ["value", "target"] },
-        {
-            key: "index",
-            type: "number",
-            group: "save",
-            label: dcLocalizePath("index.title"),
-            state: "item",
-            field: { default: 1, min: 1 },
-        },
+        ...extractItemInputs({ group: "save", state: "item" }),
     ]);
 }
 
@@ -147,20 +139,7 @@ async function getDcData(
         if (!item) return;
 
         const index = await this.getInputValue("index");
-        const description = item.description;
-        const regex = /@Check\[(?=.*\b(will|reflex|fortitude)\b)([^\]]+)\]/gm;
-
-        let count = 0;
-        let match: RegExpExecArray | null = null;
-        let rawParams: Record<string, string | undefined> | null = null;
-
-        while ((match = regex.exec(description)) !== null) {
-            if (++count >= index) {
-                rawParams = parseInlineParams(match[2], { first: "type" });
-                break;
-            }
-        }
-
+        const rawParams = extractItemInline(item, index, "type");
         if (!rawParams?.type || !R.isIncludedIn(rawParams.type, SAVE_TYPES)) return;
 
         const args: DifficultyClassData = {
@@ -237,11 +216,10 @@ type DifficultyClassData = {
     statistic?: Statistic | null;
 };
 
-type DifficultyClassInputs = {
+type DifficultyClassInputs = ItemExtractInputs & {
     adjustment: number;
     against: string;
     basic: boolean;
-    index: number;
     save: SaveType;
     value: number;
 };

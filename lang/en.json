@@ -962,6 +962,11 @@
                         }
                     }
                 },
+                "extractor": {
+                    "item-formula": {
+                        "title": "Extract Item Formula"
+                    }
+                },
                 "logic": {
                     "choiceset-selection": {
                         "inputs": {
@@ -1047,9 +1052,6 @@
                     },
                     "against": {
                         "title": "Against"
-                    },
-                    "index": {
-                        "title": "Instance Index"
                     }
                 },
                 "image": {
@@ -1058,6 +1060,11 @@
                     },
                     "sf2e": {
                         "title": "SF2e Image Path"
+                    }
+                },
+                "item-extraction": {
+                    "index": {
+                        "title": "Instance Index"
                     }
                 },
                 "roll-data": {

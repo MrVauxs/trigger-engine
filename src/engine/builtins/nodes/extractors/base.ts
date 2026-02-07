@@ -15,7 +15,7 @@ abstract class BaseExtractorNode<
         return "#86910d";
     }
 
-    get subtitle(): null {
+    get subtitle(): string | null {
         return null;
     }
 }
