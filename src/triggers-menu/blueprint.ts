@@ -297,25 +297,14 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
     async saveTriggers(): Promise<Required<TriggersSetting> | undefined> {
         if (!this.application.isSettingApplication) return;
 
-        const allTriggers = this.triggers.contents;
+        const [locked, triggers] = R.partition(this.triggers.contents, (trigger) => trigger.locked);
+        const sources = R.map(triggers, (trigger) => trigger.toObject());
+        const triggersIds = R.map(triggers, (trigger) => trigger.id);
+        const lockedIds = R.map(locked, (trigger) => trigger.id);
 
-        const sources = R.pipe(
-            allTriggers,
-            R.filter((trigger) => !trigger.locked),
-            R.map((trigger) => trigger.toObject()),
-        );
-
-        const toSaveIds = sources.map((source) => source.id);
-
-        const forFoldersIds = R.pipe(
-            allTriggers,
-            R.filter((trigger) => !!trigger.locked),
-            R.map((trigger) => trigger.id),
-        );
-
-        const disabled = [...this.#disabledIds].filter((id) => R.isIncludedIn(id, toSaveIds));
-        const enabled = [...this.#enabledIds].filter((id) => R.isIncludedIn(id, toSaveIds));
-        const folders = R.pick(this.#modulesFolders, forFoldersIds) as Record<string, string>;
+        const disabled = [...this.#disabledIds].filter((id) => R.isIncludedIn(id, triggersIds));
+        const enabled = [...this.#enabledIds].filter((id) => R.isIncludedIn(id, lockedIds));
+        const folders = R.pick(this.#modulesFolders, lockedIds) as Record<string, string>;
 
         const setting: Required<TriggersSetting> = {
             disabled,
