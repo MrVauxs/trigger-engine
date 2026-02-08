@@ -49,6 +49,7 @@ class CheckRollEvent extends BaseEventNode<Inputs, Outputs, never, "all" | "chec
             { key: "origin", type: "target" },
             { key: "target", type: "target" },
             { key: "item", type: "item" },
+            { key: "reroll", type: "boolean" },
             { key: "options", type: "text", isArray: true },
             { key: "type", type: "text", state: "all" },
         ];
@@ -70,7 +71,16 @@ class CheckRollEvent extends BaseEventNode<Inputs, Outputs, never, "all" | "chec
         return { unicode: "\uf6cf", fontWeight: "900" };
     }
 
-    async _execute({ item, options, origin, outcome, roller, target, type }: CheckRollOptions): Promise<boolean> {
+    async _execute({
+        isReroll,
+        item,
+        options,
+        origin,
+        outcome,
+        roller,
+        target,
+        type,
+    }: CheckRollOptions): Promise<boolean> {
         if (this.state === "check") {
             const when = await this.getInputValue("for");
             if (when !== type) return true;
@@ -82,6 +92,7 @@ class CheckRollEvent extends BaseEventNode<Inputs, Outputs, never, "all" | "chec
         this.setOutputValue("options", options);
         this.setOutputValue("origin", origin);
         this.setOutputValue("outcome", outcome);
+        this.setOutputValue("reroll", isReroll);
         this.setOutputValue("roller", roller);
         this.setOutputValue("target", target);
 
@@ -93,6 +104,8 @@ type Inputs = {
     for: keyof typeof specificChecks;
 };
 
-type Outputs = CheckRollOptions;
+type Outputs = Omit<CheckRollOptions, "isReroll"> & {
+    reroll: boolean;
+};
 
 export { CheckRollEvent };

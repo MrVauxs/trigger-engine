@@ -45,6 +45,7 @@ class CreateMessageHook extends TriggerHook<AttackRollOptions | DamageTakenOptio
 
             this.executeEvent("attack-roll-event", {
                 action: (context as { action?: string }).action || "",
+                isReroll: context.isReroll,
                 item: message.item,
                 options: context.options ?? [],
                 origin: source,
@@ -81,7 +82,7 @@ class CreateMessageHook extends TriggerHook<AttackRollOptions | DamageTakenOptio
     }
 }
 
-async function checkRollData(message: ChatMessagePF2e): Promise<CheckRollOptions | undefined> {
+async function checkRollData(message: ChatMessagePF2e, reroll?: boolean): Promise<CheckRollOptions | undefined> {
     const { context, origin } = message.flags[SYSTEM.id] as { context: CheckContextChatFlag; origin?: ItemOriginFlag };
     const roller = { actor: message.actor, token: message.token };
     if (!isValidTargetDocuments(roller)) return;
@@ -91,6 +92,7 @@ async function checkRollData(message: ChatMessagePF2e): Promise<CheckRollOptions
     const originToken = context.origin?.token ? await fromUuid<TokenDocumentPF2e>(context.origin.token) : null;
 
     return {
+        isReroll: reroll ?? context.isReroll,
         item: message.item,
         options: context.options ?? [],
         origin: originActor ? { actor: originActor, token: originToken } : undefined,
@@ -124,6 +126,7 @@ type BaseOptions = {
 
 type AttackRollOptions = WithRequired<BaseOptions, "origin"> & {
     action: string;
+    isReroll: boolean;
     outcome: DegreeOfSuccessString | null;
 };
 
@@ -132,6 +135,7 @@ type DamageTakenOptions = BaseOptions & {
 };
 
 type CheckRollOptions = WithPartial<BaseOptions, "target"> & {
+    isReroll: boolean;
     outcome: DegreeOfSuccessString | null;
     roller: TargetDocuments;
     type: CheckType;

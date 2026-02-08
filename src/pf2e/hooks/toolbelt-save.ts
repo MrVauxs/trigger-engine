@@ -1,9 +1,13 @@
 import { TriggerHook } from "engine";
-import { createToggleableHook } from "module-helpers";
+import { ChatMessagePF2e, createToggleableHook } from "module-helpers";
 import { checkRollData } from ".";
 
 class ToolbeltSaveHook extends TriggerHook {
-    #hook = createToggleableHook("pf2e-toolbelt.rollSave", this.#onToolbeltSave.bind(this));
+    #hook = createToggleableHook(
+        ["pf2e-toolbelt.rollSave", "pf2e-toolbelt.rerollSave"],
+        this.#onToolbeltSave.bind(this),
+    );
+    // #hook = createToggleableHook("pf2e-toolbelt.rerollSave", this.#onToolbeltSave.bind(this));
 
     get events(): ["check-roll-event"] {
         return ["check-roll-event"];
@@ -17,8 +21,16 @@ class ToolbeltSaveHook extends TriggerHook {
         this.#hook.disable();
     }
 
-    async #onToolbeltSave({ rollMessage: message }: toolbelt.targetHelper.RollSaveHook) {
-        const checkData = await checkRollData(message);
+    async #onToolbeltSave({
+        data,
+        message,
+        rollMessage,
+    }: {
+        data: toolbelt.targetHelper.MessageTargetSave;
+        message: ChatMessagePF2e;
+        rollMessage?: ChatMessagePF2e;
+    }) {
+        const checkData = await checkRollData(rollMessage ?? message, !!data.rerolled);
         if (checkData) {
             this.executeEvent("check-roll-event", checkData);
         }
