@@ -1,3 +1,14 @@
+# 1.3.0
+
+- `pf2e-trigger`:
+  - add `Is Reroll` boolean output to the `Attack Rolled` and `Check Rolled` event nodes
+  - add `Has Special Resource` condition node
+    - the resource must also have a `max` value greater than `0`
+      - this is useful for mythic characters as `hero-points` always exists in the data
+    - it returns the current value as an output (default `-1`)
+  - add `Move Time` action node to update the system world clock
+  - rename `Update Resource` into `Update Special Resource`
+
 # 1.2.0
 
 - move the `Filter Targets` node to the `Extrator` category
