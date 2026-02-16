@@ -768,6 +768,9 @@
                     "increase-condition": {
                         "title": "Increase Condition"
                     },
+                    "move-time": {
+                        "title": "Move Time"
+                    },
                     "roll-damage": {
                         "inputs": {
                             "formula": {

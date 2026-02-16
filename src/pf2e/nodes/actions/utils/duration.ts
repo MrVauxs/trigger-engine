@@ -7,6 +7,25 @@ const durationStates = ["timed", "fixed"] as const;
 
 let DURATION_SCHEMAS: PF2eInputEntry[] | undefined;
 
+function durationUnitsSchema({
+    defaultValue,
+    group,
+    state,
+}: { defaultValue?: TimeUnit; group?: string; state?: string } = {}): PF2eInputEntry {
+    return {
+        key: "unit",
+        type: "text",
+        group,
+        state,
+        tooltip: false,
+        field: {
+            type: "select",
+            default: defaultValue,
+            options: recordToSelectOptions(R.omit(CONFIG.PF2E.timeUnits, fixedUnits)),
+        },
+    };
+}
+
 function durationSchemas(): PF2eInputEntry[] {
     return (DURATION_SCHEMAS ??= [
         {
@@ -37,17 +56,7 @@ function durationSchemas(): PF2eInputEntry[] {
                 min: 0,
             },
         },
-        {
-            key: "unit",
-            type: "text",
-            group: "duration",
-            state: "timed",
-            tooltip: false,
-            field: {
-                type: "select",
-                options: recordToSelectOptions(R.omit(CONFIG.PF2E.timeUnits, fixedUnits)),
-            },
-        },
+        durationUnitsSchema({ group: "duration", state: "timed" }),
         {
             key: "expiry",
             type: "text",
@@ -96,5 +105,5 @@ type DurationInputs = {
     unit: TimeUnit;
 };
 
-export { durationSchemas, durationStates, getDurationData };
+export { durationSchemas, durationStates, durationUnitsSchema, getDurationData };
 export type { DurationInputs, DurationState };
