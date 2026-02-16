@@ -802,7 +802,7 @@
                                 "title": "Resource Slug"
                             }
                         },
-                        "title": "Update Resource",
+                        "title": "Update Special Resource",
                         "titles": {
                             "decrease": "Decrease Resource",
                             "increase": "Increase Resource"
@@ -834,6 +834,14 @@
                     },
                     "has-option": {
                         "title": "Has Roll Option"
+                    },
+                    "has-resource": {
+                        "inputs": {
+                            "slug": {
+                                "title": "Resource Slug"
+                            }
+                        },
+                        "title": "Has Special Resource"
                     },
                     "has-temporary": {
                         "title": "Has Trigger-Effect"
