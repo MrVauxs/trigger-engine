@@ -4,7 +4,7 @@ import {
     DegreeOfSuccessString,
     degreeOfSuccessString,
     isDegreeOfSuccessValue,
-} from "module-helpers";
+} from "foundry-helpers";
 import { OutcomeEntryType } from ".";
 
 const pf2eConvertors = [

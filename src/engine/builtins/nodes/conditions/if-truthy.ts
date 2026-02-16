@@ -1,5 +1,5 @@
 import { CustomInputSchema } from "engine";
-import { R } from "module-helpers";
+import { R } from "foundry-helpers";
 import { BaseConditionNode } from ".";
 
 class IfTruthyConditionNode extends BaseConditionNode<never, never, "condition"> {

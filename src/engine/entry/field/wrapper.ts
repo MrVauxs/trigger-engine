@@ -1,4 +1,4 @@
-import { drawRectangleMask, LocalizeArgs, R } from "module-helpers";
+import { drawRectangleMask, LocalizeArgs, R } from "foundry-helpers";
 import { BlueprintNode, NodeFieldOptions } from "triggers-menu";
 import { NodeField } from ".";
 import { NodeEntry } from "..";

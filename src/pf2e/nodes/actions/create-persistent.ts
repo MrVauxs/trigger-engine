@@ -1,6 +1,6 @@
 import { IconObject } from "_zod";
 import { BaseActionNode } from "engine";
-import { DamageType, createPersistentDamageSource, recordToSelectOptions } from "module-helpers";
+import { DamageType, recordToSelectOptions } from "foundry-helpers";
 import { createEmbeddedItem, PF2eInputEntry } from "pf2e";
 
 class CreatePersistentActionNode extends BaseActionNode<"out", Inputs> {
@@ -59,6 +59,13 @@ class CreatePersistentActionNode extends BaseActionNode<"out", Inputs> {
 
         return this.executeNext("out");
     }
+}
+
+function createPersistentDamageSource(formula: string, damageType: DamageType, dc = 15) {
+    const baseConditionSource = game.pf2e.ConditionManager.getCondition("persistent-damage").toObject();
+    return foundry.utils.mergeObject(baseConditionSource, {
+        system: { persistent: { formula, damageType, dc } },
+    });
 }
 
 type Inputs = {

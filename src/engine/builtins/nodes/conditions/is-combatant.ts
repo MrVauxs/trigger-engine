@@ -1,5 +1,5 @@
 import { BuiltinsInputEntry } from "engine";
-import { isCurrentCombatant } from "module-helpers";
+import { isCurrentCombatant } from "foundry-helpers";
 import { BaseConditionNode } from ".";
 
 class IsCombatantConditionNode extends BaseConditionNode<{ target?: TargetDocuments }> {

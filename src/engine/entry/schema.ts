@@ -1,17 +1,17 @@
-import { z, zString } from "module-helpers";
+import { z } from "foundry-helpers";
 import { zBaseEntry } from ".";
 
 const zNodeEntrySchema = zBaseEntry.extend({
-    group: zString.optional(),
+    group: z.string().trim().min(1).optional(),
     isArray: z.boolean().default(false),
     tooltip: z.union([z.boolean(), z.string()]).default(true),
-    type: zString,
+    type: z.string().trim().min(1),
 });
 
 const zNodeOutputSchema = zNodeEntrySchema;
 
 const zNodeInputSchema = zNodeEntrySchema.extend({
-    field: z.record(zString, z.any()).optional(),
+    field: z.record(z.string().trim().min(1), z.any()).optional(),
 });
 
 type BaseEntrySchemaInput = z.input<typeof zNodeEntrySchema>;

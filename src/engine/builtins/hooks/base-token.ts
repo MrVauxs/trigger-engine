@@ -1,4 +1,4 @@
-import { TokenDocumentPF2e } from "module-helpers";
+import { TokenDocumentPF2e } from "foundry-helpers";
 import { BaseSingleHook } from ".";
 
 abstract class BaseTokenHook extends BaseSingleHook<TargetDocuments> {

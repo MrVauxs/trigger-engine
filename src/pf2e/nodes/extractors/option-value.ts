@@ -1,6 +1,6 @@
 import { IconObject } from "_zod";
 import { BaseExtractorNode } from "engine";
-import { R } from "module-helpers";
+import { R } from "foundry-helpers";
 import { PF2eInputEntry, PF2eOutputEntry } from "pf2e";
 
 class OptionValueLogicNode extends BaseExtractorNode<Inputs, { value: string }> {

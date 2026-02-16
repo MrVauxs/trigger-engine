@@ -1,4 +1,5 @@
 export * from "./_utils";
+export * from "./custom-elements";
 export * from "./node";
 export * from "./connection";
 export * from "./nodes-menu";

@@ -1,5 +1,5 @@
 import { BaseConditionNode } from "engine";
-import { ImmunityType, objectHasKey, R, recordToSelectOptions } from "module-helpers";
+import { ImmunityType, objectHasKey, R, recordToSelectOptions } from "foundry-helpers";
 import { PF2eInputEntry } from "pf2e";
 
 let IMMUNITIES: ImmunityOptions | undefined;

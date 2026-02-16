@@ -1,10 +1,10 @@
 import { BaseBooleanLogicNode, BuiltinsInputEntry } from "engine";
-import { localizePath } from "module-helpers";
+import { localize } from "foundry-helpers";
 
 const COMPARE_ENTRIES = ["eq", "gt", "gte", "lt", "lte"] as const;
 
 class CompareNumbersLogicNode extends BaseBooleanLogicNode<Inputs> {
-    static #compareOptions: SelectOptions;
+    static #compareOptions: { value: string; label: string }[];
 
     static get type(): "compare-numbers" {
         return "compare-numbers";
@@ -18,7 +18,7 @@ class CompareNumbersLogicNode extends BaseBooleanLogicNode<Inputs> {
         return (this.#compareOptions ??= COMPARE_ENTRIES.map((value) => {
             return {
                 value,
-                label: localizePath("builtins.node", this.category, this.type, "inputs.compare.options", value),
+                label: localize.path("builtins.node", this.category, this.type, "inputs.compare.options", value),
             };
         }));
     }

@@ -1,5 +1,5 @@
 import { BaseConditionNode } from "engine";
-import { actorsRespectAlliance } from "module-helpers";
+import { actorsRespectAlliance } from "foundry-helpers";
 import { BaseAuraEvent, PF2eInputEntry, PF2eOutputEntry, getAurasInMemory } from "pf2e";
 
 class InsideAuraConditionNode extends BaseConditionNode<Inputs, Outputs> {

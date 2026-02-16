@@ -1,6 +1,6 @@
 import { IconObject } from "_zod";
 import { BaseActionNode } from "engine";
-import { ItemPF2e, RollDamageOptions, getTargetsTokensUUIDs, rollDamageFromFormula } from "module-helpers";
+import { ItemPF2e, RollDamageOptions, getTargetsTokens, rollDamageFromFormula } from "foundry-helpers";
 import {
     DifficultyClassInputs,
     DifficultyClassState,
@@ -65,7 +65,7 @@ class RollDamageActionNode extends BaseActionNode<"out", Inputs, never, never, n
             toolbelt: {
                 item: item?.uuid,
                 // private: await this.get("private"),
-                targets: getTargetsTokensUUIDs(targets),
+                targets: getTargetsTokens(targets, true),
             },
         };
 

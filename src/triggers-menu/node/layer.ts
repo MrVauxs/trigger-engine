@@ -6,13 +6,14 @@ import {
     NodeDataOutput,
     OpenTriggerNode,
     OPPOSITE_CONNECTION_CATEGORY,
+    splitEntryId,
 } from "engine";
-import { info, R } from "module-helpers";
+import { localize, R } from "foundry-helpers";
 import { BaseBlueprintEntry, BlueprintNode } from ".";
 import { Blueprint, BlueprintLayers } from "..";
 
 class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
-    #nodes: Collection<BlueprintNode> = new Collection();
+    #nodes: Collection<string, BlueprintNode> = new Collection();
 
     get blueprint(): Blueprint {
         return this.parent.blueprint;
@@ -64,13 +65,13 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
     }
 
     getNodeFromEntryId(id: EntryId): BlueprintNode | undefined {
-        const [nodeId] = R.split(id, ":");
+        const [nodeId] = splitEntryId(id);
         return this.get(nodeId);
     }
 
     getEntryFromId(id: EntryId): BaseBlueprintEntry | undefined {
-        const [nodeId, category, key] = R.split(id, ":");
-        return (this.get(nodeId)?.[category] as Collection<BaseBlueprintEntry>).get(key);
+        const [nodeId, category, key] = splitEntryId(id);
+        return (this.get(nodeId)?.[category] as Collection<string, BaseBlueprintEntry>).get(key);
     }
 
     selectNodes(ids: string[]) {
@@ -125,14 +126,14 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
             }
 
             // we add variable getters
-            const variables = variablesKeys.filter((id) => R.split(id, ":")[0] === node.id);
+            const variables = variablesKeys.filter((id) => splitEntryId(id)[0] === node.id);
             for (const id of variables) {
                 nodes.push(...this.getVariables(id));
             }
 
             // we update the variables data in bundle
             trigger.update({
-                variables: R.fromKeys(variables, (id) => undefined),
+                variables: R.fromKeys(variables, () => undefined),
             });
         }
 
@@ -158,7 +159,7 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
         const str = JSON.stringify(sources);
 
         game.clipboard.copyPlainText(str);
-        info("blueprint.node.copy.copied");
+        localize.info("blueprint.node.copy.copied");
     }
 
     duplicateSelected(nodes: BlueprintNode[]) {
@@ -186,7 +187,7 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
                 for (const entry of R.values(source[category])) {
                     if (!entry.connection) continue;
 
-                    const [nodeId, category, key] = R.split(entry.connection, ":");
+                    const [nodeId, category, key] = splitEntryId(entry.connection);
                     const newId = replacementIds[nodeId];
 
                     entry.connection = `${newId}:${category}:${key}`;
@@ -238,7 +239,7 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
                 for (const [key, entry] of R.entries(source[category])) {
                     if (!entry?.connection) continue;
 
-                    const nodeId = R.split(entry.connection, ":")[0];
+                    const [nodeId] = splitEntryId(entry.connection);
 
                     if (!R.isIncludedIn(nodeId, nodeIds)) {
                         delete source[category][key];

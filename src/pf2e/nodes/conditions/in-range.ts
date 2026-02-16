@@ -1,5 +1,5 @@
 import { BaseConditionNode } from "engine";
-import { distanceBetween, getTargetToken } from "module-helpers";
+import { distanceBetween, getTargetToken } from "foundry-helpers";
 import { PF2eInputEntry } from "pf2e";
 
 class InRangeConditionNode extends BaseConditionNode<Inputs> {

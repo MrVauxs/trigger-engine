@@ -1,6 +1,6 @@
 import { IconObject } from "_zod";
 import { BaseActionNode } from "engine";
-import { createCustomEffect } from "module-helpers";
+import { createCustomEffect } from "foundry-helpers";
 import { PF2eInputEntry } from "pf2e";
 import {
     DurationState,

@@ -1,5 +1,5 @@
 import { BuiltinsInputEntry } from "engine";
-import { ItemPF2e } from "module-helpers";
+import { ItemPF2e } from "foundry-helpers";
 import { BaseDocumentExtractorNode } from ".";
 
 class ItemExtractorNode extends BaseDocumentExtractorNode<ItemPF2e, ItemPF2e> {

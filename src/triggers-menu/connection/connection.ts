@@ -1,5 +1,5 @@
 import { EntryId } from "engine";
-import { calculateMidPoint } from "module-helpers";
+import { calculateMidPoint } from "foundry-helpers";
 import { BaseBlueprintEntry, BlueprintEntry, isBlueprintEntry } from "triggers-menu";
 import { BlueprintConnectionsLayer } from ".";
 
@@ -91,13 +91,15 @@ function drawCurvedLine(
     const halfPoint = calculateMidPoint(origin, target);
 
     const changeLineStyle = (colorIndex: 0 | -1) => {
-        graphics.lineStyle({
+        const lineOptions = {
             alignment: 0.5,
             cap: PIXI.LINE_CAP.ROUND,
             color: colors.at(colorIndex),
             smooth: true,
             width: 6,
-        });
+        } satisfies PIXI.ILineStyleOptions & { smooth: boolean };
+
+        graphics.lineStyle(lineOptions);
     };
 
     graphics.moveTo(origin.x, origin.y);

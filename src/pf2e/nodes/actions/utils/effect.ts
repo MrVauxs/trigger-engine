@@ -1,5 +1,5 @@
 import { TriggerNode } from "engine";
-import { CustomConditionOptions } from "module-helpers";
+import { CustomConditionOptions } from "foundry-helpers";
 import { DoubleImgInputs, doubleImgSchemas, getDoubleImgValue, PF2eInputEntry } from "pf2e";
 import { DurationInputs, durationSchemas, DurationState, getDurationData } from ".";
 

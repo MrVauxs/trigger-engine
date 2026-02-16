@@ -1,6 +1,6 @@
 import { IconObject } from "_zod";
 import { BaseActionNode, CustomInputSchema, JsonField } from "engine";
-import { R, RuleElementSource, createCustomEffect, localizePath } from "module-helpers";
+import { ActorPF2e, R, RuleElementSource, createCustomEffect, localize } from "foundry-helpers";
 import { DurationState, EffectInputs, createEmbeddedItem, durationStates, effectSchemas, getEffectData } from ".";
 import { PF2eInputEntry } from "pf2e";
 
@@ -24,7 +24,7 @@ class CreateEffectActionNode extends BaseActionNode<"out", Inputs, never, "rule"
                 {
                     key: "counter",
                     type: "number",
-                    tooltip: localizePath("builtins.shared.numbers.disable.tooltip"),
+                    tooltip: localize.path("builtins.shared.numbers.disable.tooltip"),
                     field: { min: 0 },
                 },
             ]),
@@ -55,7 +55,7 @@ class CreateEffectActionNode extends BaseActionNode<"out", Inputs, never, "rule"
 
         const effect = await getEffectData.call(this);
         const ItemCls = getDocumentClass("Item");
-        const parent = new ItemCls({ type: "effect", name: "fake" }, { parent: actor });
+        const parent = new ItemCls<ActorPF2e>({ type: "effect", name: "fake" }, { parent: actor });
         const counter = await this.getInputValue("counter");
 
         const rules = R.pipe(

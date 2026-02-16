@@ -1,5 +1,7 @@
+import { zCollection, zDocument } from "_zod";
 import { NodeData, NodeDataSchema, zConnectionId, zNodeDataSchema } from "engine";
-import { z, zCollection, zDocument, zID, zString } from "module-helpers";
+import { z } from "foundry-helpers";
+import { zDocumentId } from "foundry-helpers/src";
 
 class TriggerData extends zDocument<TriggerDataSchema> {
     static get defineSchema() {
@@ -20,12 +22,12 @@ interface TriggerData extends Omit<z.output<TriggerDataSchema>, "nodes"> {
 
 const zTriggerVariable = z.object({
     isArray: z.boolean(),
-    label: zString,
-    type: zString,
+    label: z.string().trim().min(1),
+    type: z.string().trim().min(1),
 });
 
 const zTriggerDataSchema = z.object({
-    id: zID,
+    id: zDocumentId(),
     description: z.string().trim().default(""),
     folder: z.string().trim().default(""),
     name: z.string().trim().default(""),

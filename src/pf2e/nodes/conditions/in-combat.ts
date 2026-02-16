@@ -1,5 +1,5 @@
 import { BaseConditionNode } from "engine";
-import { isInCombat } from "module-helpers";
+import { isInCombat } from "foundry-helpers";
 import { PF2eInputEntry } from "pf2e";
 
 class InCombatConditionNode extends BaseConditionNode<{ target?: TargetDocuments }> {

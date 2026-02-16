@@ -1,5 +1,5 @@
 import { NodeEntry } from "engine";
-import { R, UserPF2e } from "module-helpers";
+import { R, UserPF2e } from "foundry-helpers";
 
 class UserEntry extends NodeEntry<UserPF2e | undefined> {
     static get type(): "user" {

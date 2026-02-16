@@ -1,6 +1,6 @@
 import { IconObject } from "_zod";
 import { BaseValueNode, BuiltinsOutputEntry } from "engine";
-import { ItemPF2e, getItemFromUuid } from "module-helpers";
+import { getDocumentFromUUID, ItemPF2e } from "foundry-helpers";
 import { PF2eInputEntry } from "pf2e";
 import {
     DoubleUuidInputs,
@@ -40,7 +40,7 @@ class ItemValueNode extends BaseValueNode<DoubleUuidInputs> {
     async _query(): Promise<ItemPF2e | undefined> {
         if (this.#item === undefined) {
             const uuid = await getDoubleUuidValue.call(this);
-            this.#item = await getItemFromUuid(uuid);
+            this.#item = await getDocumentFromUUID("Item", uuid);
         }
         return this.#item ?? undefined;
     }

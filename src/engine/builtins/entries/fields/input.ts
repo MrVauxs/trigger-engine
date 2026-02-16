@@ -1,10 +1,10 @@
-import { assignStyle, getInputValue, R, setStyleProperties } from "module-helpers";
+import { assignStyle, getInputValue, R, setStyleProperties } from "foundry-helpers";
 import { BuiltInEntryField } from ".";
 
-abstract class InputField<
-    TValue extends unknown,
-    TSchema extends Record<string, any>,
-> extends BuiltInEntryField<TValue, TSchema> {
+abstract class InputField<TValue extends unknown, TSchema extends Record<string, any>> extends BuiltInEntryField<
+    TValue,
+    TSchema
+> {
     abstract get fontSize(): number;
     abstract get targetWidth(): number;
     abstract get toDisplay(): string;
@@ -118,10 +118,7 @@ abstract class InputField<
         });
     }
 
-    activateEventListeners(
-        input: HTMLInputElement,
-        returnValue: (value: TValue) => Promise<void>,
-    ): void {
+    activateEventListeners(input: HTMLInputElement, returnValue: (value: TValue) => Promise<void>): void {
         const onBlur = () => {
             returnValue(getInputValue(input) as TValue);
         };

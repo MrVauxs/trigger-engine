@@ -8,7 +8,7 @@ import {
     OpenNodeEntry,
     TriggerVariable,
 } from "engine";
-import { confirmDialog, localizePath } from "module-helpers";
+import { confirmDialog, ContextMenuEntry, localize } from "foundry-helpers";
 import { editLabelDialog } from "triggers-menu";
 import { BaseBlueprintEntry } from ".";
 import { BlueprintNode } from "..";
@@ -226,7 +226,7 @@ class BlueprintEntry extends BaseBlueprintEntry {
 
         options.unshift(
             {
-                name: localizePath("blueprint.entry.variable"),
+                name: localize.path("blueprint.entry.variable"),
                 icon: `<i class="fa-solid fa-square-root-variable"></i>`,
                 condition: !hasVariable,
                 callback: async () => {
@@ -251,7 +251,7 @@ class BlueprintEntry extends BaseBlueprintEntry {
                 },
             },
             {
-                name: localizePath("blueprint.variable.edit"),
+                name: localize.path("blueprint.variable.edit"),
                 icon: `<i class="fa-solid fa-pen-to-square"></i>`,
                 condition: hasVariable,
                 callback: async () => {
@@ -259,7 +259,7 @@ class BlueprintEntry extends BaseBlueprintEntry {
                 },
             },
             {
-                name: localizePath("blueprint.variable.delete.title"),
+                name: localize.path("blueprint.variable.delete.title"),
                 icon: `<i class="fa-solid fa-trash fa-fw"></i>`,
                 condition: hasVariable,
                 callback: async () => {

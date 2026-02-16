@@ -1,18 +1,18 @@
-import { z, zID, zString } from "module-helpers";
+import { z, zDocumentId } from "foundry-helpers";
 import { zCustomInputValue } from ".";
 
 // data
 
 const zBaseData = z.object({
-    id: zID,
+    id: zDocumentId(),
     input: zCustomInputValue,
-    label: zString,
-    slug: zString,
+    label: z.string().trim().min(1),
+    slug: z.string().trim().min(1),
 });
 
 const zBaseEntryData = zBaseData.extend({
     isArray: z.boolean().optional().catch(false),
-    type: zString,
+    type: z.string().trim().min(1),
 });
 
 type BaseCustomData = z.input<typeof zBaseData>;
@@ -24,23 +24,23 @@ type BaseCustomEntryData = z.output<typeof zBaseEntryData>;
 
 const zInputField = z.object({
     isNumber: z.boolean().default(false),
-    label: zString.optional(),
-    placeholder: zString.optional(),
+    label: z.string().trim().min(1).optional(),
+    placeholder: z.string().trim().min(1).optional(),
     replaceLabel: z.boolean().default(false),
     validation: z.string().optional(),
 });
 
 const zBaseSchema = z.object({
     input: zInputField.optional(),
-    label: zString.optional(),
-    slug: zString,
+    label: z.string().trim().min(1).optional(),
+    slug: z.string().trim().min(1),
 });
 
 const zBaseEntrySchema = zBaseSchema.extend({
     array: z.boolean().default(false),
-    group: zString.optional(),
+    group: z.string().trim().min(1).optional(),
     tooltip: z.string().trim().optional(),
-    types: z.array(zString).default(() => []),
+    types: z.array(z.string().trim().min(1)).default(() => []),
 });
 
 type BaseCustomSchema = z.input<typeof zBaseSchema>;

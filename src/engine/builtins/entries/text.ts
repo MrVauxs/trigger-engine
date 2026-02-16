@@ -1,4 +1,4 @@
-import { R } from "module-helpers";
+import { R } from "foundry-helpers";
 import { BaseInputEntrySchema, BuiltInNodeEntry, SelectFieldOption, TextField, TextFieldSchema } from ".";
 import validators = foundry.data.validators;
 

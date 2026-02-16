@@ -1,5 +1,5 @@
 import { BaseBooleanLogicNode, CompareEntry, CompareNumbersLogicNode } from "engine";
-import { DegreeOfSuccessString, degreeOfSuccessNumber } from "module-helpers";
+import { DegreeOfSuccessString, degreeOfSuccessNumber } from "foundry-helpers";
 import { PF2eInputEntry } from "pf2e";
 
 class CompareOutcomesLogicNode extends BaseBooleanLogicNode<Inputs> {

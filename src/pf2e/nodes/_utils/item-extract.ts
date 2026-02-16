@@ -1,4 +1,4 @@
-import { ItemPF2e, localizePath, parseInlineParams } from "module-helpers";
+import { ItemPF2e, localize, parseInlineParams } from "foundry-helpers";
 import { PF2eInputEntry } from "pf2e/entries";
 
 function extractItemInputs({ group, state }: { group?: string; state?: string } = {}): PF2eInputEntry[] {
@@ -7,7 +7,7 @@ function extractItemInputs({ group, state }: { group?: string; state?: string } 
             key: "index",
             type: "number",
             group,
-            label: localizePath("pf2e-trigger.shared.item-extraction.index.title"),
+            label: localize.path("pf2e-trigger.shared.item-extraction.index.title"),
             state,
             field: { default: 1, min: 1 },
         },

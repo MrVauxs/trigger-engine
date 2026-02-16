@@ -3,7 +3,6 @@ import {
     isGateEntryNode,
     isGateExitNode,
     OpenTrigger,
-    SearchSelectInputElement,
     TriggerApplication,
     TriggerData,
     TriggerDataOutput,
@@ -16,35 +15,35 @@ import {
     addEnterKeyListeners,
     addListener,
     addListenerAll,
-    ApplicationClosingOptions,
-    ApplicationConfiguration,
-    ApplicationRenderOptions,
     confirmDialog,
+    ContextMenuEntry,
     createHTMLElement,
-    error,
-    ExtendedMultiSelectElement,
-    ExtendedTextInputElement,
     htmlClosest,
     htmlQuery,
     htmlQueryAll,
     includesAll,
     includesAny,
-    info,
     localize,
-    localizePath,
     MODULE,
-    MultiSelectTagsMode,
     purgeObject,
     R,
     registerCustomElement,
-    registerCustomElements,
     render,
     waitDialog,
-} from "module-helpers";
-import { Blueprint, BlueprintEntry, BlueprintNode, MaybeTrigger } from ".";
+} from "foundry-helpers";
+import {
+    Blueprint,
+    BlueprintEntry,
+    BlueprintNode,
+    ExtendedMultiSelectElement,
+    ExtendedTextInputElement,
+    MaybeTrigger,
+    MultiSelectTagsMode,
+    SearchSelectInputElement,
+} from ".";
 import apps = foundry.applications.api;
 
-class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, BlueprintRenderOptions> {
+class BlueprintApplication extends apps.ApplicationV2<fa.ApplicationConfiguration, BlueprintRenderOptions> {
     #blueprint: Blueprint = new Blueprint(this);
     #folders: Set<string> = new Set();
     #search: string = "";
@@ -53,7 +52,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
 
     static APPLICATION_ID = "trigger-engine-blueprint";
 
-    static DEFAULT_OPTIONS: DeepPartial<ApplicationConfiguration> = {
+    static DEFAULT_OPTIONS: DeepPartial<fa.ApplicationConfiguration> = {
         classes: ["app", "themed", "theme-dark", "window-app"],
         id: BlueprintApplication.APPLICATION_ID,
         window: {
@@ -105,7 +104,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
         this.#filterTriggers();
     }
 
-    async close(options: ApplicationClosingOptions = {}) {
+    async close(options: fa.ApplicationClosingOptions = {}) {
         options.animate = false;
         this.#resizeObserver.disconnect();
 
@@ -127,7 +126,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
         return this;
     }
 
-    _onFirstRender() {
+    async _onFirstRender() {
         this.bringToFront();
 
         // we wait one frame before initializing the canvas
@@ -157,13 +156,14 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
     }
 
     async _preFirstRender(): Promise<void> {
-        registerCustomElements("extended-multi-select", "extended-text-input");
-        registerCustomElement("search-select-input", SearchSelectInputElement);
+        registerCustomElement(ExtendedMultiSelectElement.tagName, ExtendedMultiSelectElement);
+        registerCustomElement(ExtendedTextInputElement.tagName, ExtendedTextInputElement);
+        registerCustomElement(SearchSelectInputElement.tagName, SearchSelectInputElement);
     }
 
     protected _renderHTML(context: BlueprintContext, options: BlueprintRenderOptions): Promise<string> {
         const key = options.trigger ? "trigger" : "triggers";
-        return render(`blueprint.${key}`, context);
+        return render(`blueprint/${key}`, context);
     }
 
     protected _replaceHTML(result: string, content: HTMLElement, options: BlueprintRenderOptions): void {
@@ -359,7 +359,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
         const triggers = await this.#parseTriggersData(fileResult.file);
 
         if (!triggers?.length) {
-            return error("import-export-triggers.error");
+            return localize.error("import-export-triggers.error");
         }
 
         const result = await this.#importExportTriggers("import", triggers);
@@ -369,7 +369,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
             this.blueprint.addTrigger(source, false, false);
         }
 
-        info("import-export-triggers.imported");
+        localize.info("import-export-triggers.imported");
         this.render();
     }
 
@@ -410,7 +410,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
         triggers: T[],
     ): Promise<WithPartial<TriggerDataOutput, "id">[] | undefined> {
         const groups = R.map(this.#prepareTriggersGroups(triggers), (group) => {
-            const triggers = R.mapValues(group.triggers, (trigger) => {
+            const triggers = R.map(group.triggers, (trigger) => {
                 return {
                     id: trigger.id,
                     label: trigger.name || trigger.id,
@@ -476,7 +476,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
     #copyTriggerPath(el: HTMLElement) {
         const path = el.dataset.path as string;
         game.clipboard.copyPlainText(path);
-        return info("blueprint.trigger.copy.notify", { path });
+        return localize.info("blueprint.trigger.copy.notify", { path });
     }
 
     #createContextMenus() {
@@ -490,7 +490,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
         return [
             {
                 icon: `<i class="fa-solid fa-pen-to-square"></i>`,
-                name: localizePath(`blueprint.variable.edit`),
+                name: localize.path(`blueprint.variable.edit`),
                 condition: () => !this.blueprint.locked,
                 callback: (el) => {
                     const id = el.dataset.id as ConnectionId;
@@ -499,7 +499,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
             },
             {
                 icon: `<i class="fa-solid fa-trash"></i>`,
-                name: localizePath("blueprint.variable.delete.title"),
+                name: localize.path("blueprint.variable.delete.title"),
                 condition: () => !this.blueprint.locked,
                 callback: async (el) => {
                     const id = el.dataset.id as ConnectionId;
@@ -514,7 +514,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
         return [
             {
                 icon: `<i class="fa-solid fa-pen-to-square"></i>`,
-                name: localizePath(`blueprint.node.edit`),
+                name: localize.path(`blueprint.node.edit`),
                 condition: (el) => {
                     return !this.blueprint.locked && el.hasAttribute("data-editable");
                 },
@@ -526,7 +526,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
             },
             {
                 icon: `<i class="fa-solid fa-trash"></i>`,
-                name: localizePath("blueprint.node.delete.single"),
+                name: localize.path("blueprint.node.delete.single"),
                 condition: (el) => {
                     if (this.blueprint.locked) return false;
 
@@ -552,12 +552,12 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
         return [
             {
                 icon: `<i class="fa-solid fa-clipboard"></i>`,
-                name: localizePath("blueprint.trigger.copy.label"),
+                name: localize.path("blueprint.trigger.copy.label"),
                 callback: this.#copyTriggerPath.bind(this),
             },
             {
                 icon: `<i class="fa-solid fa-pen-to-square"></i>`,
-                name: localizePath("blueprint.trigger.edit"),
+                name: localize.path("blueprint.trigger.edit"),
                 condition: (el) => {
                     const trigger = getTriggerFromElement(el);
                     return !!trigger && !trigger.locked;
@@ -569,7 +569,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
             },
             {
                 icon: `<i class="fa-solid fa-pen-to-square"></i>`,
-                name: localizePath("edit-folder.title"),
+                name: localize.path("edit-folder.title"),
                 condition: (el) => {
                     const trigger = getTriggerFromElement(el);
                     return !!trigger?.locked;
@@ -581,7 +581,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
             },
             {
                 icon: `<i class="fa-solid fa-copy"></i>`,
-                name: localizePath("blueprint.trigger.duplicate"),
+                name: localize.path("blueprint.trigger.duplicate"),
                 callback: (el) => {
                     const trigger = getTriggerFromElement(el);
                     const source = trigger?.duplicate();
@@ -590,7 +590,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
             },
             {
                 icon: `<i class="fa-solid fa-trash"></i>`,
-                name: localizePath("blueprint.trigger.delete.title"),
+                name: localize.path("blueprint.trigger.delete.title"),
                 condition: (el) => {
                     const trigger = getTriggerFromElement(el);
                     return !!trigger && !trigger.locked;
@@ -682,7 +682,7 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
 
     #prepareTriggersGroups<T extends MaybeTrigger>(
         triggersData: T[],
-    ): { collapsed: boolean; folder: string; triggers: T[] }[] {
+    ): { collapsed: boolean; folder: string; triggers: NonEmptyArray<T> }[] {
         return R.pipe(
             triggersData,
             R.groupBy((trigger) => this.blueprint.getFolder(trigger)),
@@ -710,11 +710,8 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
                 return trigger.tags;
             }),
             R.unique(),
-            R.map((tag): Required<SelectOption> => {
-                return {
-                    label: tag,
-                    value: tag,
-                };
+            R.map((tag): { value: string; label: string } => {
+                return { label: tag, value: tag };
             }),
             R.unique(),
             R.sortBy(R.identity()),
@@ -811,7 +808,6 @@ class BlueprintApplication extends apps.ApplicationV2<ApplicationConfiguration, 
                 tags: trigger?.data.tags,
             },
             i18n: "edit-trigger",
-            minWidth: "700px",
             title: localize(isEdit ? "blueprint.trigger.edit" : "blueprint.triggers.create"),
             yes: {
                 label: localize("edit-trigger.yes", isEdit ? "edit" : "create"),
@@ -882,7 +878,7 @@ type EventAction =
 
 type BlueprintContext = TriggersContext | TriggerContext;
 
-type TriggerContext = {
+type TriggerContext = fa.ApplicationRenderContext & {
     events: BlueprintNode[];
     gates: PreparedGate[];
     hasDescription: boolean;
@@ -905,12 +901,12 @@ type PreparedVariable = TriggerVariable & {
     nodeId: string;
 };
 
-type TriggersContext = {
+type TriggersContext = fa.ApplicationRenderContext & {
     groups: TriggersGroup[];
     isEnabled: (trigger: OpenTrigger) => boolean;
     search: string;
     tags: {
-        list: RequiredSelectOptions;
+        list: { value: string; label: string }[];
         mode: MultiSelectTagsMode;
         selected: string[];
     };
@@ -921,7 +917,7 @@ type TriggersGroup = {
     triggers: OpenTrigger[];
 };
 
-type BlueprintRenderOptions = ApplicationRenderOptions & {
+type BlueprintRenderOptions = fa.ApplicationRenderOptions & {
     trigger: OpenTrigger | undefined;
 };
 

@@ -1,5 +1,5 @@
 import { BaseEntrySchemaOutput, ConnectionId, EntryCategory, NodeField, TriggerNode } from "engine";
-import { LocalizeArgs, MODULE, R } from "module-helpers";
+import { LocalizeArgs, MODULE, R } from "foundry-helpers";
 
 // IMPORTANT an entry can never represent an array
 class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<string, any> | undefined = undefined> {

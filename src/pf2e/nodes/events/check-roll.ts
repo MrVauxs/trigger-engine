@@ -1,6 +1,6 @@
 import { IconObject } from "_zod";
 import { BaseEventNode } from "engine";
-import { CheckType, recordToSelectOptions } from "module-helpers";
+import { CheckType, recordToSelectOptions } from "foundry-helpers";
 import { CheckRollOptions, PF2eInputEntry, PF2eOutputEntry } from "pf2e";
 
 const specificChecks = {
@@ -14,7 +14,7 @@ const specificChecks = {
 } as Record<CheckType, string | undefined>;
 
 class CheckRollEvent extends BaseEventNode<Inputs, Outputs, never, "all" | "check"> {
-    static #specificOptions: SelectOptions | undefined;
+    static #specificOptions: { value: string; label?: string }[] | undefined;
 
     static get type(): "check-roll-event" {
         return "check-roll-event";

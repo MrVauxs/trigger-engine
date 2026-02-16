@@ -7,35 +7,32 @@ import {
     TokenAura,
     TokenDocumentPF2e,
     activateHooksAndWrappers,
-    createToggleableWrapper,
+    createToggleWrapper,
     deleteInMemory,
     disableHooksAndWrappers,
     getInMemory,
     setInMemory,
-} from "module-helpers";
+} from "foundry-helpers";
 
 class AuraHook extends TriggerHook<AuraEventOptions> {
     #active: boolean = false;
 
     #wrappers = [
-        createToggleableWrapper(
+        createToggleWrapper(
             "WRAPPER",
             "CONFIG.Token.documentClass.prototype.prepareBaseData",
             this.#tokenPrepareBaseData,
             { context: this },
         ),
-        createToggleableWrapper(
+        createToggleWrapper(
             "WRAPPER",
             "CONFIG.Token.documentClass.prototype.simulateUpdate",
             this.#tokenSimulateUpdate,
             { context: this },
         ),
-        createToggleableWrapper(
-            "WRAPPER",
-            "CONFIG.Scene.documentClass.prototype.prepareData",
-            this.#scenePF2ePrepareData,
-            { context: this },
-        ),
+        createToggleWrapper("WRAPPER", "CONFIG.Scene.documentClass.prototype.prepareData", this.#scenePF2ePrepareData, {
+            context: this,
+        }),
     ];
 
     get events(): ["aura-enter-event", "aura-leave-event"] {

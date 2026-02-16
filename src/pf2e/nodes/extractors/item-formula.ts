@@ -1,5 +1,5 @@
 import { BaseExtractorNode, BuiltinsOutputEntry } from "engine";
-import { ItemPF2e } from "module-helpers";
+import { ItemPF2e } from "foundry-helpers";
 import { PF2eInputEntry } from "pf2e/entries";
 import { extractItemInline, extractItemInputs, ItemExtractInputs } from "..";
 

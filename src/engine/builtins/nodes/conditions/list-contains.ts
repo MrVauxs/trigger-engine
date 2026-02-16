@@ -1,5 +1,5 @@
 import { BuiltinsInputEntry } from "engine";
-import { R } from "module-helpers";
+import { R } from "foundry-helpers";
 import { BaseConditionNode } from ".";
 
 class ListContainsConditionNode extends BaseConditionNode<Inputs> {

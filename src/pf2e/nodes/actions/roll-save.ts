@@ -1,6 +1,6 @@
 import { IconObject } from "_zod";
 import { BaseActionNode } from "engine";
-import { ActorPF2e, ItemPF2e, R, StatisticRollParameters, ZeroToThree } from "module-helpers";
+import { ActorPF2e, ItemPF2e, R, StatisticRollParameters, ZeroToThree } from "foundry-helpers";
 import {
     DifficultyClassInputs,
     DifficultyClassState,

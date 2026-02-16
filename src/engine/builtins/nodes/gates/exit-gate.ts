@@ -1,6 +1,6 @@
 import { IconObject } from "_zod";
 import { BuiltinsCustomEntry, EXIT_GATE_TYPE, GATE_CATEGORY, TriggerNode } from "engine";
-import { R } from "module-helpers";
+import { R } from "foundry-helpers";
 
 class TriggerGateExit extends TriggerNode<"out", never, never, never, "entry"> {
     static get category(): string {

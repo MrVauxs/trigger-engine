@@ -1,6 +1,6 @@
 import { IconObject } from "_zod";
 import { BridgeSchemaInput, BuiltinsInputEntry } from "engine";
-import { MODULE, R, UserPF2e, htmlQuery, localizePath } from "module-helpers";
+import { MODULE, R, UserPF2e, htmlQuery, localize } from "foundry-helpers";
 import { ConfirmDialogQueryOptions } from "queries";
 import {
     BaseActionNode,
@@ -38,7 +38,7 @@ class AwaitConfirmActionNode extends BaseActionNode<"true" | "false", Inputs, ne
             {
                 key: "timeout",
                 type: "number",
-                tooltip: localizePath("builtins.shared.numbers.disable.tooltip"),
+                tooltip: localize.path("builtins.shared.numbers.disable.tooltip"),
                 field: {
                     default: this.TIMEOUT,
                     min: 0,
@@ -103,7 +103,7 @@ async function createConfirmDialog(options: ConfirmDialogQueryOptions): Promise<
     let intervale: NodeJS.Timeout | undefined;
     let timeout = R.isNumber(options.timeout) ? options.timeout : AwaitConfirmActionNode.TIMEOUT;
 
-    const titleKey = (R.isString(options.title) && options.title) || localizePath("confirm-dialog.title");
+    const titleKey = (R.isString(options.title) && options.title) || localize.path("confirm-dialog.title");
     const title = game.i18n.localize(titleKey);
 
     return foundry.applications.api.DialogV2.confirm({

@@ -8,8 +8,8 @@ import {
     OpenTrigger,
     PreciseEntryCategory,
 } from "engine";
-import { confirmDialog, localize, localizePath, R, waitDialog } from "module-helpers";
-import { Blueprint } from "triggers-menu";
+import { confirmDialog, ContextMenuEntry, localize, R, waitDialog } from "foundry-helpers";
+import { Blueprint, splitTwoWays } from "triggers-menu";
 import { alignHorizontally, BlueprintNode, CustomEntryDialogData } from "..";
 
 abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
@@ -184,7 +184,7 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
             const entryId = this.id;
 
             for (const twoWays of this.node.trigger.linkedConnections) {
-                const [originId, targetId] = R.split(twoWays, "-");
+                const [originId, targetId] = splitTwoWays(twoWays);
                 const otherId = originId === entryId ? targetId : targetId === entryId ? originId : undefined;
                 const otherEntry = otherId && this.blueprint.nodes.getEntryFromId(otherId);
                 if (!otherEntry) continue;
@@ -235,7 +235,7 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
 
         return [
             {
-                name: localizePath("blueprint.entry.disconnect"),
+                name: localize.path("blueprint.entry.disconnect"),
                 icon: `<i class="fa-solid fa-link-horizontal-slash"></i>`,
                 condition: this.isConnected,
                 callback: async () => {
@@ -243,7 +243,7 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
                 },
             },
             {
-                name: localizePath("blueprint.entry.edit.label"),
+                name: localize.path("blueprint.entry.edit.label"),
                 icon: `<i class="fa-solid fa-pen-to-square"></i>`,
                 condition: isCustom,
                 callback: () => {
@@ -251,7 +251,7 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
                 },
             },
             {
-                name: localizePath("blueprint.entry.remove.title"),
+                name: localize.path("blueprint.entry.remove.title"),
                 icon: `<i class="fa-solid fa-trash fa-fw"></i>`,
                 condition: isCustom,
                 callback: async () => {

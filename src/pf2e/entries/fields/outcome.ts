@@ -1,5 +1,5 @@
 import { NodeFieldSchema, TextField } from "engine";
-import { DegreeOfSuccessString } from "module-helpers";
+import { DegreeOfSuccessString } from "foundry-helpers";
 
 class OutcomeField extends TextField {
     static get defineSchema(): NodeFieldSchema {

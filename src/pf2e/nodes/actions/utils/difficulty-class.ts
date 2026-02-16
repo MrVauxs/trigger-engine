@@ -2,17 +2,17 @@ import { TriggerNode } from "engine";
 import {
     ActorPF2e,
     CheckDC,
-    extractModifierAdjustments,
     ItemPF2e,
-    localizePath,
-    ModifierPF2e,
+    localize,
+    Modifier,
     R,
     recordToSelectOptions,
     SAVE_TYPES,
     SaveType,
     splitListString,
     Statistic,
-} from "module-helpers";
+} from "foundry-helpers";
+import { extractModifierAdjustments } from "foundry-helpers/dist";
 import { extractItemInline, extractItemInputs, ItemExtractInputs, PF2eInputEntry } from "pf2e";
 
 const dcStates = ["value", "target", "item"] as const;
@@ -20,7 +20,7 @@ const dcStates = ["value", "target", "item"] as const;
 let DC_SCHEMAS: PF2eInputEntry[] | undefined;
 
 function dcLocalizePath(...path: string[]): string {
-    return localizePath("pf2e-trigger.shared.difficulty-class", ...path);
+    return localize.path("pf2e-trigger.shared.difficulty-class", ...path);
 }
 
 function dcSchemas(): PF2eInputEntry[] {
@@ -103,7 +103,7 @@ function getTargetDC(
     const statistic = origin?.getStatistic(against);
     if (!statistic) return;
 
-    const modifiers: ModifierPF2e[] = [];
+    const modifiers: Modifier[] = [];
 
     if (adjustment !== 0) {
         modifiers.push(

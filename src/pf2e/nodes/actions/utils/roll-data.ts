@@ -1,11 +1,11 @@
 import { TriggerNode } from "engine";
-import { R, RollNoteSource, getExtraRollOptions, localizePath, splitListString } from "module-helpers";
+import { R, RollNoteSource, getExtraRollOptions, localize, splitListString } from "foundry-helpers";
 import { PF2eInputEntry } from "pf2e";
 
 let ROLL_SCHEMAS: PF2eInputEntry[] | undefined;
 
 function rollLocalizePath(...path: string[]): string {
-    return localizePath("pf2e-trigger.shared.roll-data", ...path);
+    return localize.path("pf2e-trigger.shared.roll-data", ...path);
 }
 
 function rollDataSchemas(): PF2eInputEntry[] {

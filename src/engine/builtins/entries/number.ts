@@ -1,4 +1,4 @@
-import { R, roundToStep } from "module-helpers";
+import { R, roundToStep } from "foundry-helpers";
 import { BaseInputEntrySchema, BuiltInNodeEntry, NumberField, NumberFieldSchema } from ".";
 
 class NumberEntry extends BuiltInNodeEntry<number, NumberFieldSchema> {

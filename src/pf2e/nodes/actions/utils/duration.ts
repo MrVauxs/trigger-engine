@@ -1,5 +1,5 @@
 import { TriggerNode } from "engine";
-import { CustomEffectDuration, EffectExpiryType, R, TimeUnit, recordToSelectOptions } from "module-helpers";
+import { CustomEffectDuration, EffectExpiryType, R, TimeUnit, recordToSelectOptions } from "foundry-helpers";
 import { PF2eInputEntry } from "pf2e";
 
 const fixedUnits = ["unlimited", "encounter"] as const;

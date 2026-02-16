@@ -1,5 +1,5 @@
 import { TriggerNode } from "engine";
-import { ActorPF2e, ConditionKey, ConditionSlug, R, recordToSelectOptions } from "module-helpers";
+import { ActorPF2e, ConditionKey, ConditionSlug, R, recordToSelectOptions } from "foundry-helpers";
 import { PF2eInputEntry } from "pf2e";
 
 let CONDITIONS: ConditionOptions | undefined;

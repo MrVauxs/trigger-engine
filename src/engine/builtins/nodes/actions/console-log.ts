@@ -1,5 +1,5 @@
 import { BuiltinsCustomEntry } from "engine";
-import { MODULE } from "module-helpers";
+import { MODULE } from "foundry-helpers";
 import { BaseActionNode } from ".";
 import { IconObject } from "_zod";
 

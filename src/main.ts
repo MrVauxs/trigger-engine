@@ -6,12 +6,12 @@ import {
     TriggerHook,
     TriggerNode,
 } from "engine";
-import { MODULE, R } from "module-helpers";
+import { MODULE, R } from "foundry-helpers";
 import { registerPF2eApplication } from "pf2e";
 import { onUserQuery } from "queries";
 import { id } from "../module.json";
 
-MODULE.register(id, { game: "triggerEngine" });
+MODULE.register(id);
 
 Hooks.once("init", async () => {
     CONFIG.RegionBehavior.dataModels[MODULE.path("builtins.region")] = TriggerEngineRegionBehaviorType;
@@ -38,9 +38,7 @@ Hooks.once("ready", async () => {
     TriggerApplication.prepareApplications();
 });
 
-MODULE.apiExpose({
-    openBlueprintMenu: TriggerApplication.openBlueprintMenu.bind(TriggerApplication),
-});
+MODULE.apiExpose("openBlueprintMenu", TriggerApplication.openBlueprintMenu.bind(TriggerApplication));
 
 globalThis.triggerEngine = {
     NodeEntry,

@@ -1,4 +1,4 @@
-import { localize, waitDialog } from "module-helpers";
+import { localize, waitDialog } from "foundry-helpers";
 
 async function editLabelDialog(
     type: "gate" | "variable",

@@ -1,5 +1,5 @@
 import { BaseLogicNode, BuiltinsCustomEntry, BuiltinsInputEntry, BuiltinsOutputEntry } from "engine";
-import { localizePath } from "module-helpers";
+import { localize } from "foundry-helpers";
 
 class ResolveFormulaLogicNode extends BaseLogicNode<"out", Inputs, Outputs, "variable", never, "formula" | "value"> {
     static get type(): "resolve-formula" {
@@ -19,7 +19,7 @@ class ResolveFormulaLogicNode extends BaseLogicNode<"out", Inputs, Outputs, "var
             {
                 key: "formula",
                 type: "text",
-                tooltip: localizePath("builtins.shared.variables.tooltip"),
+                tooltip: localize.path("builtins.shared.variables.tooltip"),
             },
         ];
     }

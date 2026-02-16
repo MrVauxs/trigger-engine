@@ -1,4 +1,4 @@
-import { R, UserPF2e } from "module-helpers";
+import { R, UserPF2e } from "foundry-helpers";
 
 function mapConvertors<T extends EntryConvertor>(convertors: T[]): [ExtractConvertorsKeys<T>, EntryConvertor][] {
     return R.pipe(

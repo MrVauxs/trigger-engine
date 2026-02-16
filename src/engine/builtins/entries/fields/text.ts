@@ -1,6 +1,7 @@
 import { NodeFieldSchema } from "engine";
-import { R, foundryLocalizeIfExist, htmlQuery } from "module-helpers";
-import { InputField, SearchSelectInputElement } from ".";
+import { R, foundryLocalizeIfExist, htmlQuery } from "foundry-helpers";
+import { SearchSelectInputElement } from "triggers-menu";
+import { InputField } from ".";
 import { TextEntry } from "../text";
 import elements = foundry.applications.elements;
 
@@ -136,7 +137,7 @@ class TextField extends InputField<string, TextFieldSchema> {
         return this.localize(this.entry.category, this.entry.slug ?? this.entry.key, "options", value);
     }
 
-    localizeOption({ value, label }: SelectOption): string {
+    localizeOption({ value, label }: { value: string; label?: string }): string {
         return R.isString(label) ? game.i18n.localize(label) : (this.localizeOptionOrGroupValue(value) ?? value);
     }
 
@@ -193,7 +194,7 @@ class TextField extends InputField<string, TextFieldSchema> {
 
     createInput(): HTMLInputElement {
         if (this.isSelect && this.options.length) {
-            const options: SelectFieldOptions = R.map(this.options, (option) => {
+            const options: WithRequired<SelectFieldOption, "label">[] = R.map(this.options, (option) => {
                 const group = option.group
                     ? (this.localizeOptionOrGroupValue(option.group) ??
                       foundryLocalizeIfExist(option.group) ??
@@ -326,8 +327,7 @@ type TextFieldSchema = {
     width: number;
 };
 
-type SelectFieldOption = Prettify<SelectOption & { group?: string }>;
-type SelectFieldOptions = Prettify<WithRequired<SelectFieldOption, "label">>[];
+type SelectFieldOption = { value: string; label?: string; group?: string };
 
 export { TextField };
-export type { SelectFieldOption, SelectFieldOptions, TextFieldSchema, TextFieldSchemaType };
+export type { SelectFieldOption, TextFieldSchema, TextFieldSchemaType };

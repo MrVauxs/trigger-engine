@@ -1,5 +1,5 @@
 import { BuiltinsCustomEntry, BuiltinsInputEntry, CustomInputSchema } from "engine";
-import { R, isScriptMacro } from "module-helpers";
+import { CompendiumIndexData, R, isScriptMacro } from "foundry-helpers";
 import { BaseActionNode } from ".";
 import { IconObject } from "_zod";
 

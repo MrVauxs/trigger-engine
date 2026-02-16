@@ -1,5 +1,5 @@
 import { BaseConditionNode } from "engine";
-import { ItemPF2e, findItemWithSlug } from "module-helpers";
+import { ItemPF2e, findItemWithSlug } from "foundry-helpers";
 import { PF2eInputEntry, PF2eOutputEntry, TriggerEffectInputs, getTriggerEffectData, triggerEffectSchemas } from "pf2e";
 
 class HasTemporaryConditionNode extends BaseConditionNode<TriggerEffectInputs, Outputs> {

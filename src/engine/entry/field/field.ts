@@ -1,6 +1,6 @@
 import { IconObject } from "_zod";
 import { NodeEntry, TriggerNode } from "engine";
-import { LocalizeArgs, MODULE, z } from "module-helpers";
+import { LocalizeArgs, MODULE, z } from "foundry-helpers";
 import { PreciseTextOptions } from "triggers-menu";
 
 class NodeField<TValue extends unknown = unknown, TFieldSchema extends Record<string, any> = Record<string, any>>

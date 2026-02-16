@@ -12,7 +12,7 @@ import {
     TriggerPath,
     UserValue,
 } from "engine";
-import { LocalizeArgs, MODULE, ScenePF2e, TokenDocumentPF2e, UserPF2e } from "module-helpers";
+import { LocalizeArgs, MODULE, ScenePF2e, TokenDocumentPF2e, UserPF2e } from "foundry-helpers";
 
 class TriggerNode<
     TOuts extends string | never = string,

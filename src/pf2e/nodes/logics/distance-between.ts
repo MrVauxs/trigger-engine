@@ -1,5 +1,5 @@
 import { BaseLogicNode } from "engine";
-import { distanceBetween, getTargetToken } from "module-helpers";
+import { distanceBetween, getTargetToken } from "foundry-helpers";
 import { PF2eInputEntry, PF2eOutputEntry } from "pf2e";
 
 class DistanceBetweenLogicNode extends BaseLogicNode<"out", Inputs, { distance: number }> {

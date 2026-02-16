@@ -1,4 +1,4 @@
-import { ItemPF2e, findItemWithSlug, findItemWithSourceId } from "module-helpers";
+import { ItemPF2e, findItemWithSlug, findItemWithSourceId } from "foundry-helpers";
 import { BaseConditionNode } from "engine";
 import {
     DoubleUuidInputs,

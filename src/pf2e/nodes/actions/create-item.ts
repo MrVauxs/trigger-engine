@@ -1,6 +1,6 @@
 import { IconObject } from "_zod";
 import { BaseActionNode, CustomInputSchema } from "engine";
-import { ActorPF2e, ChoiceSetSource, ItemPF2e, ItemType, R, getItemFromUuid, getItemSource } from "module-helpers";
+import { ActorPF2e, ChoiceSetSource, ItemPF2e, ItemType, R, getDocumentFromUUID, getItemSource } from "foundry-helpers";
 import {
     createEmbeddedItem,
     DoubleUuidInputs,
@@ -53,7 +53,7 @@ class CreateItemActionNode extends BaseActionNode<"out", Inputs, { item?: ItemPF
     async _execute(): Promise<boolean> {
         const actor = (await this.getInputValue("target"))?.actor;
         const uuid = await getDoubleUuidValue.call(this);
-        const item = await getItemFromUuid(uuid);
+        const item = await getDocumentFromUUID("Item", uuid);
 
         if (!actor || !item) {
             return this.executeNext("out");

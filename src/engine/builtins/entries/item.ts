@@ -1,5 +1,5 @@
 import { NodeEntry } from "engine";
-import { ItemPF2e, R } from "module-helpers";
+import { ItemPF2e, ItemUUID, R } from "foundry-helpers";
 
 class ItemEntry extends NodeEntry<ItemPF2e | undefined> {
     static get type(): "item" {

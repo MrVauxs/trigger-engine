@@ -1,5 +1,5 @@
 import { zIconObj } from "_zod";
-import { z, zString } from "module-helpers";
+import { z } from "foundry-helpers";
 
 const zNodeHeaderBackground = z.custom<ColorSource>((value): boolean => {
     try {
@@ -16,7 +16,7 @@ const zNodeHeaderData = z.object({
     background: zNodeHeaderBackground.default("#000000").catch("#000000"),
     icon: zNodeIconData.nullish(),
     subtitle: z.string().nullish(),
-    title: zString,
+    title: z.string().trim().min(1),
 });
 
 type NodeHeaderSource = z.input<typeof zNodeHeaderData>;

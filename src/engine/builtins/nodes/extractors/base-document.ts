@@ -1,5 +1,5 @@
 import { BaseExtractorNode, BuiltinsCustomEntry } from "engine";
-import { R } from "module-helpers";
+import { R } from "foundry-helpers";
 
 abstract class BaseDocumentExtractorNode<
     TInput extends any,

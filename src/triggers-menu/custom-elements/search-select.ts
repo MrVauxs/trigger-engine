@@ -1,12 +1,17 @@
-import { R, addListenerAll, createHTMLElement, createInputElement, htmlQuery } from "module-helpers";
-import { SelectFieldOptions } from "..";
+import { addListenerAll, createHTMLElement, createInputElement, htmlQuery, R } from "foundry-helpers";
 
 class SearchSelectInputElement extends foundry.applications.elements.AbstractFormInputElement<string, string> {
     #input!: HTMLInputElement;
-    #options: SelectFieldOptions;
+    #options: { value: string; group?: string | undefined; label: string }[];
     #popup!: HTMLDivElement;
 
-    constructor({ options, value }: { options: SelectFieldOptions; value: string }) {
+    constructor({
+        options,
+        value,
+    }: {
+        options: { value: string; group?: string | undefined; label: string }[];
+        value: string;
+    }) {
         super();
 
         this._setValue(value || "");

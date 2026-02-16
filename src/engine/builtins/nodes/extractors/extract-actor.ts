@@ -1,5 +1,5 @@
 import { BuiltinsInputEntry } from "engine";
-import { ActorPF2e } from "module-helpers";
+import { ActorPF2e } from "foundry-helpers";
 import { BaseDocumentExtractorNode } from ".";
 
 class ActorExtractorNode extends BaseDocumentExtractorNode<TargetDocuments, ActorPF2e> {

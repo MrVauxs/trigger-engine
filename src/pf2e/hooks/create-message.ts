@@ -11,14 +11,14 @@ import {
     R,
     SYSTEM,
     TokenDocumentPF2e,
-    createToggleableHook,
+    createToggleHook,
     isValidTargetDocuments,
-} from "module-helpers";
+} from "foundry-helpers";
 
 class CreateMessageHook extends TriggerHook<AttackRollOptions | DamageTakenOptions | CheckRollOptions> {
     static damageTakenTypes = ["all", "damage", "heal", "persistent", "negated"] as const;
 
-    #hook = createToggleableHook("createChatMessage", this.#onCreateMessage.bind(this));
+    #hook = createToggleHook("createChatMessage", this.#onCreateMessage.bind(this));
 
     get events(): ["attack-roll-event", "damage-taken-event", "check-roll-event"] {
         return ["attack-roll-event", "damage-taken-event", "check-roll-event"];

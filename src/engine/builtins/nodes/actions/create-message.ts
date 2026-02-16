@@ -1,5 +1,5 @@
 import { BuiltinsInputEntry } from "engine";
-import { UserPF2e, primaryPlayerOwner } from "module-helpers";
+import { UserPF2e, primaryPlayerOwner } from "foundry-helpers";
 import {
     BaseActionNode,
     DescriptionInputs,
@@ -84,7 +84,7 @@ class CreateMessageActionNode extends BaseActionNode<"out", Inputs, never, never
             author: author.id,
             content,
             speaker: speaker ? ChatMessage.getSpeaker(speaker) : undefined,
-            whisper,
+            whisper: whisper?.map((user) => user.id),
         });
 
         return this.executeNext("out");

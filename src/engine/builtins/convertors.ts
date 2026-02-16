@@ -1,5 +1,5 @@
 import { EntryConvertor } from "engine";
-import { ItemPF2e, primaryPlayerOwner, R, UserPF2e } from "module-helpers";
+import { ItemPF2e, primaryPlayerOwner, R, UserPF2e } from "foundry-helpers";
 
 const builtinsConvertors = [
     {

@@ -1,4 +1,4 @@
-import { z } from "module-helpers";
+import { z } from "foundry-helpers";
 import { zBaseEntry } from "..";
 
 const zNodeBridgeSchema = zBaseEntry;

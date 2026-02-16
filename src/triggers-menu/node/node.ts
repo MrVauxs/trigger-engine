@@ -28,6 +28,7 @@ import {
     zCustomOutputSchema,
 } from "engine";
 import {
+    ContextMenuEntry,
     LocalizeArgs,
     MouseInteractionManager,
     R,
@@ -37,13 +38,9 @@ import {
     drawRectangleMask,
     htmlQuery,
     localize,
-    localizeIfExist,
-    localizePath,
-    mapToObjByKey,
     subtractPoint,
     waitDialog,
-    warning,
-} from "module-helpers";
+} from "foundry-helpers";
 import {
     BaseBlueprintEntry,
     BlueprintBridgeEntry,
@@ -69,11 +66,11 @@ class BlueprintNode extends PIXI.Container {
     #hitArea: PIXI.Rectangle = new PIXI.Rectangle();
     #in: BlueprintBridgeEntry | undefined;
     #initialized: boolean = false;
-    #inputs: Collection<BlueprintEntry> = new Collection();
+    #inputs: Collection<string, BlueprintEntry> = new Collection();
     #mouseManager?: MouseInteractionManager;
     #node: OpenTriggerNode;
-    #outputs: Collection<BlueprintEntry> = new Collection();
-    #outs: Collection<BlueprintBridgeEntry> = new Collection();
+    #outputs: Collection<string, BlueprintEntry> = new Collection();
+    #outs: Collection<string, BlueprintBridgeEntry> = new Collection();
     #selected: boolean = false;
 
     static SELECTED_COLOR: ColorSource = 0xff9829;
@@ -98,19 +95,19 @@ class BlueprintNode extends PIXI.Container {
         return this.#node.type;
     }
 
-    get ins(): Collection<BaseBlueprintEntry> {
+    get ins(): Collection<string, BaseBlueprintEntry> {
         return new Collection(this.#in ? [["in", this.#in]] : undefined);
     }
 
-    get outs(): Collection<BaseBlueprintEntry> {
+    get outs(): Collection<string, BaseBlueprintEntry> {
         return this.#outs;
     }
 
-    get inputs(): Collection<BlueprintEntry> {
+    get inputs(): Collection<string, BlueprintEntry> {
         return this.#inputs;
     }
 
-    get outputs(): Collection<BlueprintEntry> {
+    get outputs(): Collection<string, BlueprintEntry> {
         return this.#outputs;
     }
 
@@ -536,8 +533,6 @@ class BlueprintNode extends PIXI.Container {
                 origin: subtractPoint(this.blueprint.subtractPointFromEvent(event, node), offset),
             };
         });
-
-        mapToObjByKey(selected.length ? selected : [this], "id");
     }
 
     _onDragLeftMove(event: FederatedEvent) {
@@ -1006,7 +1001,7 @@ class BlueprintNode extends PIXI.Container {
         return (
             this.customEntryLocalize(schema.label, category, schema, "label") ??
             this.rootLocalize("custom", schema.slug, "label") ??
-            localizeIfExist("node", schema.slug) ??
+            localize.ifExist("node", schema.slug) ??
             schema.slug
         );
     }
@@ -1057,7 +1052,7 @@ class BlueprintNode extends PIXI.Container {
             const regex = new RegExp(schema.input.validation);
 
             if (!regex.test(result.input ?? "")) {
-                warning("edit-entry.validation", { name: input.label, pattern: schema.input.validation });
+                localize.warning("edit-entry.validation", { name: input.label, pattern: schema.input.validation });
                 return false;
             }
         }
@@ -1112,8 +1107,6 @@ class BlueprintNode extends PIXI.Container {
         const result = await waitDialog<EditEntryData>({
             content: "edit-entry",
             data: dialogData,
-            disabled: true,
-            focus: "input",
             i18n: "edit-entry",
             onRender: (_, dialog) => {
                 const html = dialog.element;
@@ -1133,12 +1126,12 @@ class BlueprintNode extends PIXI.Container {
         if (!result || !this.validateCustomEntryInput(input, schema, result)) return;
 
         if ((input?.type === "text" && !result.input) || (input?.type === "number" && !R.isNumber(result.input))) {
-            warning("edit-entry.required", { name: input.label });
+            localize.warning("edit-entry.required", { name: input.label });
             return;
         }
 
         if (!dialogData.types?.length && !result.label && !schema.input) {
-            warning("edit-entry.required", { name: localize("edit-entry.label") });
+            localize.warning("edit-entry.required", { name: localize("edit-entry.label") });
             return;
         }
 
@@ -1239,7 +1232,7 @@ class BlueprintNode extends PIXI.Container {
 
         entries.push(
             {
-                name: localizePath(`blueprint.node.copy.${multiFiltered}`),
+                name: localize.path(`blueprint.node.copy.${multiFiltered}`),
                 icon: `<i class="fa-solid fa-clipboard"></i>`,
                 condition: duplicable,
                 callback: async () => {
@@ -1247,7 +1240,7 @@ class BlueprintNode extends PIXI.Container {
                 },
             },
             {
-                name: localizePath(`blueprint.node.duplicate.${multiFiltered}`),
+                name: localize.path(`blueprint.node.duplicate.${multiFiltered}`),
                 icon: `<i class="fa-solid fa-copy"></i>`,
                 condition: duplicable && !locked,
                 callback: async () => {
@@ -1255,7 +1248,7 @@ class BlueprintNode extends PIXI.Container {
                 },
             },
             {
-                name: localizePath(`blueprint.node.edit`),
+                name: localize.path(`blueprint.node.edit`),
                 icon: `<i class="fa-solid fa-pen-to-square"></i>`,
                 condition: !locked && isGateExitNode(this),
                 callback: () => {
@@ -1263,7 +1256,7 @@ class BlueprintNode extends PIXI.Container {
                 },
             },
             {
-                name: localizePath(`blueprint.node.delete.${multiSelected}`),
+                name: localize.path(`blueprint.node.delete.${multiSelected}`),
                 icon: `<i class="fa-solid fa-trash fa-fw"></i>`,
                 condition: !locked && (!this.isEvent || this.trigger.application.hasMultipleEvents),
                 callback: async () => {
@@ -1306,7 +1299,7 @@ type CustomEntryDialogData = {
     }>;
     label: { placeholder: string | undefined; value: string } | false;
     type: string | undefined;
-    types?: RequiredSelectOptions;
+    types?: { value: string; label: string }[];
 };
 
 type EditEntryData = {

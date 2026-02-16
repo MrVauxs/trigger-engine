@@ -1,4 +1,4 @@
-import { z } from "module-helpers";
+import { z } from "foundry-helpers";
 
 const zIconObj = z.object({
     fontWeight: z.optional(z.string<TextStyleFontWeight>()),

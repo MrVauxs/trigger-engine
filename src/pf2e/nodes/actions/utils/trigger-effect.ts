@@ -1,5 +1,5 @@
 import { TriggerNode } from "engine";
-import { joinStr } from "module-helpers";
+import { R } from "foundry-helpers";
 import { PF2eInputEntry } from "pf2e";
 
 let SCHEMAS: PF2eInputEntry[] | undefined;
@@ -17,7 +17,7 @@ async function getTriggerEffectData(this: TriggerNode<any, TriggerEffectInputs>)
 
     return {
         identifier,
-        slug: joinStr("-", triggerPath, identifier),
+        slug: R.join([triggerPath, identifier], "-"),
     };
 }
 

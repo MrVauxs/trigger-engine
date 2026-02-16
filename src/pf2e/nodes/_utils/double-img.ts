@@ -1,10 +1,10 @@
 import { TriggerNode } from "engine";
-import { localizePath, R, SYSTEM } from "module-helpers";
+import { localize, R, SYSTEM } from "foundry-helpers";
 import { PF2eInputEntry } from "pf2e";
 
 function doubleImgSchemas(state?: string): PF2eInputEntry[] {
     return R.map(["pf2e", "sf2e"] as const, (id): PF2eInputEntry => {
-        return { key: `${id}Img`, type: "text", state, label: localizePath("pf2e-trigger.shared.image", id, "title") };
+        return { key: `${id}Img`, type: "text", state, label: localize.path("pf2e-trigger.shared.image", id, "title") };
     });
 }
 

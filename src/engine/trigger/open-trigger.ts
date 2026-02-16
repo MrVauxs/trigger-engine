@@ -6,13 +6,14 @@ import {
     isVariableGetterNode,
     NodeData,
     OpenTriggerNode,
+    splitEntryId,
     Trigger,
     TriggerApplication,
     TriggerData,
     TriggerDataOutput,
     UpdateTriggerData,
 } from "engine";
-import { enrichHTML, MODULE, purgeObject, R } from "module-helpers";
+import { enrichHTML, MODULE, purgeObject, R } from "foundry-helpers";
 import { TwoWaysEntryId } from "triggers-menu";
 
 class OpenTrigger extends Trigger<OpenTriggerNode> {
@@ -190,7 +191,7 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
             );
 
             for (const [category, originType, originKey, otherId] of originConnections) {
-                const [otherNodeId, otherCategory, otherEntryKey] = R.split(otherId, ":");
+                const [otherNodeId, otherCategory, otherEntryKey] = splitEntryId(otherId);
                 const otherNode = this.getNode(otherNodeId);
 
                 /**
@@ -255,7 +256,7 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
 }
 
 interface OpenTrigger {
-    get nodes(): Collection<OpenTriggerNode>;
+    get nodes(): Collection<string, OpenTriggerNode>;
 }
 
 type ResolvedTriggerNode = {

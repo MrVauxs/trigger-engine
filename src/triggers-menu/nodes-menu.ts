@@ -22,17 +22,17 @@ import {
     TriggerNode,
     VARIABLE_CATEGORY,
 } from "engine";
+import { htmlQuery, localize, R, render } from "foundry-helpers";
 import {
-    ApplicationClosingOptions,
-    ApplicationConfiguration,
+    BaseBlueprintEntry,
+    Blueprint,
+    BlueprintEntry,
+    editLabelDialog,
     ExtendedMultiSelectElement,
     ExtendedTextInputElement,
-    htmlQuery,
-    localize,
-    R,
-    render,
-} from "module-helpers";
-import { BaseBlueprintEntry, Blueprint, BlueprintEntry, editLabelDialog, filterElements, isBlueprintEntry } from ".";
+    filterElements,
+    isBlueprintEntry,
+} from ".";
 
 class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
     #abortController = new AbortController();
@@ -44,7 +44,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
     #searchInput: ExtendedTextInputElement | null = null;
     #tagsInput: ExtendedMultiSelectElement | null = null;
 
-    static DEFAULT_OPTIONS: DeepPartial<ApplicationConfiguration> = {
+    static DEFAULT_OPTIONS: DeepPartial<fa.ApplicationConfiguration> = {
         classes: ["application"],
         id: "trigger-engine-nodes-menu",
         window: {
@@ -58,7 +58,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         position: Point,
         resolve: BlueprintNodesMenuResolve,
         entry: BaseBlueprintEntry | undefined,
-        options?: DeepPartial<ApplicationConfiguration>,
+        options?: DeepPartial<fa.ApplicationConfiguration>,
     ) {
         super(options);
 
@@ -90,7 +90,7 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         });
     }
 
-    close(options: ApplicationClosingOptions = {}): Promise<this> {
+    close(options: fa.ApplicationClosingOptions = {}): Promise<this> {
         options.animate = false;
         return super.close(options);
     }
@@ -106,10 +106,10 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         const [allEvents, nodes] = R.partition(allNodes, (node) => node.isEvent);
         const variables = this.#prepareVariablesGroup();
 
-        const tags: RequiredSelectOptions = R.pipe(
+        const tags: { value: string; label: string }[] = R.pipe(
             [...allNodes, ...gateNodes],
-            R.flatMap((node): Required<SelectOption<string>>[] => {
-                return node.tags.map((tag): Required<SelectOption> => {
+            R.flatMap((node) => {
+                return node.tags.map((tag) => {
                     return {
                         label: localizeNodeTag(this.application, tag),
                         value: tag,
@@ -650,12 +650,12 @@ type TriggerNodeStringProperty = keyof {
 
 type EventAction = "create-gate" | "paste-nodes" | "select-gate" | "select-node" | "select-variable";
 
-type NodesMenuContext = {
+type NodesMenuContext = fa.ApplicationRenderContext & {
     events: NodesGroup[];
     gates: [GatesGroup];
     groups: NodesGroup[];
     inClipboard: boolean;
-    tags: RequiredSelectOptions;
+    tags: { value: string; label: string }[];
     variables: NodesGroup[];
 };
 

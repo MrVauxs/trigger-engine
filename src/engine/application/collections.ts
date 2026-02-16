@@ -1,11 +1,11 @@
 import { BuiltInApplication, EntryConvertor, mapConvertors, NodeEntry, TriggerHook, TriggerNode } from "engine";
-import { R } from "module-helpers";
+import { R } from "foundry-helpers";
 import { TriggerApplicationOptions } from ".";
 
 function createCollection<C extends Exclude<TriggerApplicationCollection, "hooks">>(
     options: TriggerApplicationOptions,
     collection: C,
-): Collection<ExtractCollectionType<C>> {
+): Collection<string, ExtractCollectionType<C>> {
     const local = getLocal(options, collection);
     const builtin = getBuiltins(options, collection);
 

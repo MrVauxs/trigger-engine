@@ -1,6 +1,6 @@
 import { IconObject } from "_zod";
 import { BaseActionNode } from "engine";
-import { ZeroToThree } from "module-helpers";
+import { ZeroToThree } from "foundry-helpers";
 import { PF2eInputEntry, PF2eOutputEntry } from "pf2e";
 
 class RollFlatActionNode extends BaseActionNode<"out", Inputs, Outputs> {

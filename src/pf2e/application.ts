@@ -1,5 +1,5 @@
 import { TriggerApplication, TriggerApplicationOptions } from "engine";
-import { error, MODULE, SYSTEM } from "module-helpers";
+import { localize, MODULE, SYSTEM } from "foundry-helpers";
 import { pf2eConvertors, pf2eEntries } from ".";
 import hooks from "./hooks";
 import nodes from "./nodes";
@@ -13,7 +13,7 @@ function registerPF2eApplication() {
     const requiredVersion = VERSION[SYSTEM.id];
     if (foundry.utils.isNewerVersion(requiredVersion, game.system.version)) {
         if (game.user.isGM) {
-            error("pf2e-trigger.version.error", { version: requiredVersion });
+            localize.error("pf2e-trigger.version.error", { version: requiredVersion });
         }
         return;
     }

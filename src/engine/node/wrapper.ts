@@ -9,9 +9,10 @@ import {
     OutputEntrySchema,
     ResolvedNodeEntry,
     ResolvedTriggerNode,
+    splitEntryId,
     Trigger,
 } from "engine";
-import { LocalizeArgs, MODULE, R, ScenePF2e, TokenDocumentPF2e, UserPF2e } from "module-helpers";
+import { LocalizeArgs, MODULE, R, ScenePF2e, TokenDocumentPF2e, UserPF2e } from "foundry-helpers";
 import {
     getInputsSchemas,
     getNodeStates,
@@ -96,11 +97,11 @@ function instantiateNode(
 
     class TriggerNodeWrapper extends NodeCls {
         #in: NodeBridge | null;
-        #inputs: Collection<NodeEntry>;
+        #inputs: Collection<string, NodeEntry>;
         #nextCalled: boolean = false;
-        #outputs: Collection<NodeEntry>;
+        #outputs: Collection<string, NodeEntry>;
         #outputValues: Record<string, any> = {};
-        #outs: Collection<NodeBridge>;
+        #outs: Collection<string, NodeBridge>;
         #sceneId?: string;
         #userId?: string;
 
@@ -308,8 +309,8 @@ function instantiateNode(
                         value: {
                             in: this.#in,
                             outs: this.#outs,
-                            inputs: inputs as Collection<OpenNodeEntry>,
-                            outputs: outputs as Collection<OpenNodeEntry>,
+                            inputs: inputs as Collection<string, OpenNodeEntry>,
+                            outputs: outputs as Collection<string, OpenNodeEntry>,
                         } satisfies NodeEntries,
                     },
                     exitGate: {
@@ -434,7 +435,7 @@ function instantiateNode(
             };
 
             if (input.connection) {
-                const [nodeId, _, otherKey] = R.split(input.connection, ":");
+                const [nodeId, _, otherKey] = splitEntryId(input.connection);
                 const otherNode = parent.getNode(nodeId) as TriggerNodeWrapper | undefined;
 
                 if (!otherNode) {
@@ -539,9 +540,9 @@ interface OpenTriggerNode extends TriggerNode {
 
 type NodeEntries = {
     in: NodeBridge | null;
-    inputs: Collection<OpenNodeEntry>;
-    outputs: Collection<OpenNodeEntry>;
-    outs: Collection<NodeBridge>;
+    inputs: Collection<string, OpenNodeEntry>;
+    outputs: Collection<string, OpenNodeEntry>;
+    outs: Collection<string, NodeBridge>;
 };
 
 export { instantiateNode };

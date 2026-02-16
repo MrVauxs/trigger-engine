@@ -1,13 +1,9 @@
 import { TriggerHook } from "engine";
-import { ChatMessagePF2e, createToggleableHook } from "module-helpers";
+import { ChatMessagePF2e, createToggleHook } from "foundry-helpers";
 import { checkRollData } from ".";
 
 class ToolbeltSaveHook extends TriggerHook {
-    #hook = createToggleableHook(
-        ["pf2e-toolbelt.rollSave", "pf2e-toolbelt.rerollSave"],
-        this.#onToolbeltSave.bind(this),
-    );
-    // #hook = createToggleableHook("pf2e-toolbelt.rerollSave", this.#onToolbeltSave.bind(this));
+    #hook = createToggleHook(["pf2e-toolbelt.rollSave", "pf2e-toolbelt.rerollSave"], this.#onToolbeltSave.bind(this));
 
     get events(): ["check-roll-event"] {
         return ["check-roll-event"];
@@ -26,7 +22,7 @@ class ToolbeltSaveHook extends TriggerHook {
         message,
         rollMessage,
     }: {
-        data: toolbelt.targetHelper.MessageTargetSave;
+        data: toolbelt.targetHelper.TargetSaveInstance;
         message: ChatMessagePF2e;
         rollMessage?: ChatMessagePF2e;
     }) {

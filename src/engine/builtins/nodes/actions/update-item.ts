@@ -1,5 +1,5 @@
 import { BuiltinsInputEntry } from "engine";
-import { ItemPF2e } from "module-helpers";
+import { ItemPF2e } from "foundry-helpers";
 import { BaseActionNode } from ".";
 import { IconObject } from "_zod";
 

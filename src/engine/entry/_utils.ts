@@ -1,14 +1,14 @@
-import { z, zString } from "module-helpers";
+import { z } from "foundry-helpers";
 
-const zCustomInputValue = z.union([zString, z.number()]).optional();
+const zCustomInputValue = z.union([z.string().trim().min(1), z.number()]).optional();
 
 const zEntrySchemaState = z.union([z.string(), z.array(z.string())]).optional();
 
 const zBaseEntry = z.object({
     input: zCustomInputValue,
-    key: zString,
-    label: zString.optional(),
-    slug: zString.optional(),
+    key: z.string().trim().min(1),
+    label: z.string().trim().min(1).optional(),
+    slug: z.string().trim().min(1).optional(),
     spacing: z.number().default(0),
     state: zEntrySchemaState,
 });

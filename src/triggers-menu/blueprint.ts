@@ -1,6 +1,7 @@
 import {
     ConnectionId,
     OpenTrigger,
+    splitEntryId,
     TriggerApplication,
     TriggerDataInput,
     TriggerFullId,
@@ -9,14 +10,15 @@ import {
 import {
     MouseInteractionManager,
     R,
+    TooltipDirection,
     confirmDialog,
     createHTMLElement,
     distanceToPoint,
     dividePointBy,
-    info,
+    localize,
     purgeObject,
     subtractPoint,
-} from "module-helpers";
+} from "foundry-helpers";
 import {
     BaseBlueprintEntry,
     BlueprintApplication,
@@ -27,6 +29,7 @@ import {
     BlueprintNodesLayer,
     BlueprintNodesMenu,
     editLabelDialog,
+    splitTwoWays,
 } from ".";
 
 class Blueprint extends PIXI.Application<HTMLCanvasElement> {
@@ -39,7 +42,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
     #mouseManager: MouseInteractionManager;
     #parent: BlueprintApplication;
     #triggerId: TriggerFullId | null = null;
-    #triggers: Collection<OpenTrigger, TriggerFullId> = new Collection();
+    #triggers: Collection<TriggerFullId, OpenTrigger> = new Collection();
 
     constructor(parent: BlueprintApplication) {
         super({
@@ -146,7 +149,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         return this.#layers.nodes;
     }
 
-    get triggers(): Collection<OpenTrigger, TriggerFullId> {
+    get triggers(): Collection<TriggerFullId, OpenTrigger> {
         return this.#triggers;
     }
 
@@ -314,7 +317,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         };
 
         await game.settings.set(this.application.moduleId, this.application.settingKey, setting);
-        info("save-triggers.saved");
+        localize.info("save-triggers.saved");
     }
 
     isEnabled({ id, locked }: OpenTrigger): boolean {
@@ -371,7 +374,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
             },
         });
 
-        const nodeId = R.split(id, ":")[0];
+        const [nodeId] = splitEntryId(id);
         if (nodeId) {
             trigger.refreshNode(nodeId);
         }
@@ -505,7 +508,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         }
 
         for (const twoWays of trigger.linkedConnections) {
-            const [originId, targetId] = R.split(twoWays, "-");
+            const [originId, targetId] = splitTwoWays(twoWays);
             const origin = this.nodes.getEntryFromId(originId);
             const target = this.nodes.getEntryFromId(targetId);
 

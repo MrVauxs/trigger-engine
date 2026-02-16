@@ -1,11 +1,11 @@
 import { EntryId } from "engine";
-import { subtractPoint } from "module-helpers";
+import { R, subtractPoint } from "foundry-helpers";
 import { BaseBlueprintEntry, Blueprint, BlueprintConnection, BlueprintLayers, drawCurvedLine } from "triggers-menu";
 
 class BlueprintConnectionsLayer extends PIXI.Container {
     #abortController?: AbortController;
     #blueprint: Blueprint;
-    #connections = new Collection<BlueprintConnection, TwoWaysEntryId>();
+    #connections = new Collection<TwoWaysEntryId, BlueprintConnection>();
     #connector?: FreeConnector;
 
     constructor(blueprint: Blueprint) {
@@ -35,7 +35,7 @@ class BlueprintConnectionsLayer extends PIXI.Container {
         }
     }
 
-    start(event: PIXI.FederatedPointerEvent, entry: BaseBlueprintEntry) {
+    start(_event: PIXI.FederatedPointerEvent, entry: BaseBlueprintEntry) {
         this.#terminateConnection();
 
         this.blueprint.nodes.interactiveChildren = false;
@@ -161,6 +161,10 @@ class BlueprintConnectionsLayer extends PIXI.Container {
     }
 }
 
+function splitTwoWays(twoWaysId: TwoWaysEntryId): [EntryId, EntryId] {
+    return R.split(twoWaysId, "-") as [EntryId, EntryId];
+}
+
 interface BlueprintConnectionsLayer {
     parent: BlueprintLayers;
 }
@@ -176,5 +180,5 @@ type FreeConnector = PIXI.Graphics & {
     };
 };
 
-export { BlueprintConnectionsLayer };
+export { BlueprintConnectionsLayer, splitTwoWays };
 export type { TwoWaysEntryId };

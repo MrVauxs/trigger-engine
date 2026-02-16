@@ -1,5 +1,5 @@
 import { TriggerApplication } from "engine";
-import { ActorPF2e, R } from "module-helpers";
+import { ActorPF2e, R } from "foundry-helpers";
 import { TriggerHook } from ".";
 
 function instantiateHook(parent: TriggerApplication, HookCls: typeof TriggerHook): TriggerHookWrapper {

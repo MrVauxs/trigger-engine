@@ -18,7 +18,7 @@ import {
     zNodeInputSchema,
     zNodeOutputSchema,
 } from "engine";
-import { R, z } from "module-helpers";
+import { R, z } from "foundry-helpers";
 
 function filterSchemasByState<T extends { state?: string | string[] }>(
     schemas: T[],
@@ -64,7 +64,7 @@ function filterByCustomSchemas<
             return data ? { ...data, field: (schema as CustomInputSchema).field } : undefined;
         }),
         R.filter(R.isTruthy),
-        R.indexBy(R.prop("slug")),
+        R.indexBy((entry) => entry.slug),
     ) as Record<string, TSchema>;
 
     return R.pipe(

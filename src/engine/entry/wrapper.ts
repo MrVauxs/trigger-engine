@@ -1,3 +1,4 @@
+import { zForceSafeParse } from "_zod";
 import {
     BaseEntrySchemaInput,
     BaseEntrySchemaOutput,
@@ -9,7 +10,7 @@ import {
     Trigger,
     TriggerNode,
 } from "engine";
-import { LocalizeArgs, R, z, zForceSafeParse } from "module-helpers";
+import { LocalizeArgs, R, z } from "foundry-helpers";
 import { EntryCategory } from "triggers-menu";
 
 function instantiateEntry(
@@ -86,7 +87,7 @@ function instantiateEntry(
                 writable: false,
             });
 
-            foundry.utils.deepFreeze(this.field);
+            foundry.utils.deepFreeze(this.field as any);
 
             Object.defineProperty(this, "category", {
                 value: category,

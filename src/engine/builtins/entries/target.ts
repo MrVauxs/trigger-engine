@@ -1,5 +1,13 @@
 import { NodeEntry } from "engine";
-import { ActorPF2e, R, TokenDocumentPF2e, getTokenDocument, isValidTargetDocuments } from "module-helpers";
+import {
+    ActorPF2e,
+    ActorUUID,
+    R,
+    TokenDocumentPF2e,
+    TokenDocumentUUID,
+    getTokenDocument,
+    isValidTargetDocuments,
+} from "foundry-helpers";
 
 class TargetEntry extends NodeEntry<TargetDocuments | undefined> {
     static get type(): "target" {

@@ -1,8 +1,8 @@
-import { R } from "module-helpers";
+import { R } from "foundry-helpers";
 
 function alignHorizontally(
     parent: PIXI.Container,
-    elements: MaybeFalsy<PIXI.Container>[],
+    elements: (PIXI.Container | undefined)[],
     {
         height,
         offset: { x = 0, y = 0 } = {},

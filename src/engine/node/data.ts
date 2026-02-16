@@ -1,5 +1,6 @@
+import { zDocument } from "_zod";
 import { zCustomInputData, zCustomOutData, zCustomOutputData, zEntryDataSchema } from "engine";
-import { z, zDocument, zID, zPosition, zString } from "module-helpers";
+import { z, zDocumentId, zPoint } from "foundry-helpers";
 
 class NodeData extends zDocument<NodeDataSchema> {
     static get defineSchema() {
@@ -13,17 +14,17 @@ interface NodeData extends z.output<NodeDataSchema> {
 
 const zNodeCustoms = z.object({
     title: z.string().optional(),
-    inputs: z.record(zString, zCustomInputData).default(() => ({})),
-    outputs: z.record(zString, zCustomOutputData).default(() => ({})),
-    outs: z.record(zString, zCustomOutData).default(() => ({})),
+    inputs: z.record(z.string().trim().min(1), zCustomInputData).default(() => ({})),
+    outputs: z.record(z.string().trim().min(1), zCustomOutputData).default(() => ({})),
+    outs: z.record(z.string().trim().min(1), zCustomOutData).default(() => ({})),
 });
 
 const zNodeDataSchema = z.object({
     custom: zNodeCustoms.default(() => ({ outs: {}, inputs: {}, outputs: {} })),
-    id: zID,
+    id: zDocumentId(),
     inputs: zEntryDataSchema,
     outs: zEntryDataSchema,
-    position: zPosition,
+    position: zPoint(),
     state: z.string().trim().optional(),
     type: z.string().trim().readonly(),
 });

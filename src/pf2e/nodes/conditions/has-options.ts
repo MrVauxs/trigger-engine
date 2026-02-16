@@ -1,5 +1,5 @@
 import { BaseConditionNode } from "engine";
-import { hasRollOption } from "module-helpers";
+import { ActorPF2e, R } from "foundry-helpers";
 import { PF2eInputEntry } from "pf2e";
 
 class HasOptionConditionNode extends BaseConditionNode<Inputs> {
@@ -25,6 +25,11 @@ class HasOptionConditionNode extends BaseConditionNode<Inputs> {
 
         return this.executeNextIf(result);
     }
+}
+
+function hasRollOption(actor: ActorPF2e, option: string) {
+    const rolloptionsDomains = R.values(actor.rollOptions) as Record<string, boolean>[];
+    return rolloptionsDomains.some((rollOptions) => rollOptions[option]);
 }
 
 type Inputs = {

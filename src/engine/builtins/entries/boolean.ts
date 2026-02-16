@@ -1,4 +1,4 @@
-import { R } from "module-helpers";
+import { R } from "foundry-helpers";
 import { BaseInputEntrySchema, BooleanField, BooleanFieldSchema, BuiltInNodeEntry } from ".";
 
 class BooleanEntry extends BuiltInNodeEntry<boolean, BooleanFieldSchema> {

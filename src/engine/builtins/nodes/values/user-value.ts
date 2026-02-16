@@ -1,4 +1,4 @@
-import { UserPF2e } from "module-helpers";
+import { UserPF2e } from "foundry-helpers";
 import { BaseValueNode } from ".";
 import { BuiltinsInputEntry, BuiltinsOutputEntry, SelectField, SelectFieldOption } from "engine";
 
@@ -55,7 +55,7 @@ class UserValueNode extends BaseValueNode<Inputs> {
 }
 
 type Inputs = {
-    id: Stringptionel<"__context-user__" | "__self-user__" | "__active-gm__">;
+    id: "__context-user__" | "__self-user__" | "__active-gm__" | (string & {});
 };
 
 export { UserValueNode };

@@ -1,5 +1,5 @@
 import { ApplicationKey, EmitableUserValue, TriggerNode, UserValue } from "engine";
-import { ActorPF2e, MODULE } from "module-helpers";
+import { ActorPF2e, MODULE } from "foundry-helpers";
 
 class TriggerHook<TArgs extends Record<string, any> = Record<string, any>> {
     /**

@@ -1,5 +1,5 @@
 import { BaseActionNode } from "engine";
-import { ActorPF2e, EffectPF2e, findItemWithSourceId, ItemPF2e } from "module-helpers";
+import { ActorPF2e, EffectPF2e, findItemWithSourceId, ItemPF2e } from "foundry-helpers";
 import {
     DoubleUuidInputs,
     doubleUuidSchemas,

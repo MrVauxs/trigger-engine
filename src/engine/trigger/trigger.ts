@@ -6,12 +6,13 @@ import {
     TriggerDataOutput,
     TriggerNode,
     instantiateNode,
+    splitEntryId,
 } from "engine";
-import { R, ScenePF2e, TokenDocumentPF2e, UserPF2e } from "module-helpers";
+import { R, ScenePF2e, TokenDocumentPF2e, UserPF2e } from "foundry-helpers";
 
 class Trigger<TNode extends TriggerNode = TriggerNode> {
     #data: TriggerData;
-    #nodes: Collection<TNode> = new Collection();
+    #nodes: Collection<string, TNode> = new Collection();
     #parent: TriggerApplication;
     #sceneId?: string;
     #userId: string;
@@ -97,7 +98,7 @@ class Trigger<TNode extends TriggerNode = TriggerNode> {
     }
 
     getNodeFromEntryId(id: EntryId): TNode | undefined {
-        const [nodeId] = R.split(id, ":");
+        const [nodeId] = splitEntryId(id);
         return this.getNode(nodeId);
     }
 

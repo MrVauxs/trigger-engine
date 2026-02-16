@@ -1,4 +1,4 @@
-import { ActorPF2e, ItemPF2e, ItemSourcePF2e } from "module-helpers";
+import { ActorPF2e, ItemPF2e, ItemSourcePF2e } from "foundry-helpers";
 
 async function createEmbeddedItem<T extends ItemPF2e>(
     actor: ActorPF2e,

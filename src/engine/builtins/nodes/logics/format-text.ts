@@ -9,7 +9,7 @@ import {
     descriptionStates,
     getDescriptionData,
 } from "engine";
-import { localizePath } from "module-helpers";
+import { localize } from "foundry-helpers";
 
 class FormatTextLogicNode extends BaseLogicNode<
     "out",
@@ -32,7 +32,7 @@ class FormatTextLogicNode extends BaseLogicNode<
     }
 
     static get defineInputs(): BuiltinsInputEntry[] {
-        return descriptionSchemas(localizePath("builtins.shared.variables.tooltip"));
+        return descriptionSchemas(localize.path("builtins.shared.variables.tooltip"));
     }
 
     static get defineOutputs(): BuiltinsOutputEntry[] {

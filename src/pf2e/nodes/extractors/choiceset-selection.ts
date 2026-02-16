@@ -1,6 +1,6 @@
 import { IconObject } from "_zod";
 import { BaseExtractorNode } from "engine";
-import { getChoiceSetSelection, ItemPF2e } from "module-helpers";
+import { getChoiceSetSelection, ItemPF2e } from "foundry-helpers";
 import { PF2eInputEntry, PF2eOutputEntry } from "pf2e";
 
 class ChoicesetSelectionLogicNode extends BaseExtractorNode<Inputs, { selection: string }> {

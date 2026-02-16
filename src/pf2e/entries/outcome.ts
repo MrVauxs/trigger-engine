@@ -1,15 +1,10 @@
 import { BaseInputEntrySchema, NodeEntry } from "engine";
-import {
-    DEGREE_STRINGS,
-    DegreeOfSuccessString,
-    R,
-    degreeOfSuccessString,
-    isDegreeOfSuccessValue,
-} from "module-helpers";
+import { DegreeOfSuccessString, R, degreeOfSuccessString, isDegreeOfSuccessValue } from "foundry-helpers";
 import { OutcomeField, OutputFieldSchema } from ".";
+import { DEGREE_OF_SUCCESS_STRINGS } from "foundry-helpers/dist";
 
 class OutcomEntry extends NodeEntry<OutcomeEntryType, OutputFieldSchema> {
-    static options: OutcomeOption[] = R.map(["null", ...DEGREE_STRINGS] as const, (value) => {
+    static options: OutcomeOption[] = R.map(["null", ...DEGREE_OF_SUCCESS_STRINGS] as const, (value) => {
         return {
             value,
             label: value === "null" ? "trigger-engine.node.null" : `PF2E.Check.Result.Degree.Check.${value}`,

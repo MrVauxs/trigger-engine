@@ -1,5 +1,5 @@
 import { mapConvertors } from "engine";
-import { MODULE, R } from "module-helpers";
+import { MODULE, R } from "foundry-helpers";
 import { builtinsConvertors, builtinsEntries } from ".";
 import hooks from "./hooks";
 import nodes from "./nodes";

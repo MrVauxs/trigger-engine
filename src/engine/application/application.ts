@@ -27,7 +27,7 @@ import {
     TriggerVariableGetter,
     VARIABLE_CATEGORY,
 } from "engine";
-import { includesAny, joinStr, LocalizeArgs, LocalizeData, MODULE, R } from "module-helpers";
+import { includesAny, LocalizeArgs, LocalizeData, MODULE, R } from "foundry-helpers";
 import { ExecuteEventQueryOptions, ExecuteTriggerQueryOptions } from "queries";
 import { BlueprintApplication } from "triggers-menu";
 import utils = foundry.utils;
@@ -37,20 +37,20 @@ const FORBIDDEN_NODE_CATEGORIES = [GATE_CATEGORY, VARIABLE_CATEGORY];
 const FORBIDDEN_NODE_TYPE = [EXIT_GATE_TYPE, ENTRY_GATE_TYPE, GETTER_VARIABLE_TYPE];
 
 class TriggerApplication {
-    static #instances: Collection<TriggerApplication> = new Collection();
+    static #instances: Collection<string, TriggerApplication> = new Collection();
 
     #applicationId: string;
     #applicationKey: ApplicationKey;
-    #convertors: Collection<EntryConvertor>;
-    #entries: Collection<typeof NodeEntry>;
-    #events: Collection<typeof TriggerNode>;
+    #convertors: Collection<string, EntryConvertor>;
+    #entries: Collection<string, typeof NodeEntry>;
+    #events: Collection<string, typeof TriggerNode>;
     #hasAnyEntry: boolean;
     #hooks: { hook: TriggerHookWrapper; enabled: boolean }[];
     #mode: TriggerApplicationMode;
     #modulefiles: string[] = [];
     #moduleId: string;
     #moduleSources: TriggerDataInput[] = [];
-    #nodes: Collection<typeof TriggerNode>;
+    #nodes: Collection<string, typeof TriggerNode>;
     #triggerEvents: Record<string, { eventId: string; data: TriggerData }[]> = {};
 
     constructor(moduleId: string, applicationId: string, options: TriggerApplicationOptions = {}) {
@@ -230,15 +230,15 @@ class TriggerApplication {
         return `${this.moduleId}.${this.applicationId}`;
     }
 
-    get entries(): Collection<typeof NodeEntry> {
+    get entries(): Collection<string, typeof NodeEntry> {
         return this.#entries;
     }
 
-    get nodes(): Collection<typeof TriggerNode> {
+    get nodes(): Collection<string, typeof TriggerNode> {
         return this.#nodes;
     }
 
-    get events(): Collection<typeof TriggerNode> {
+    get events(): Collection<string, typeof TriggerNode> {
         return this.#events;
     }
 
@@ -339,7 +339,7 @@ class TriggerApplication {
                 MODULE.debug("[DISABLED] ", hookName);
             }
         }
-        MODULE.groupEnd();
+        console.groupEnd();
     }
 
     addFile(path: string) {
@@ -447,7 +447,7 @@ class TriggerApplication {
         const data = R.isObjectType(args.at(-1)) ? (args.pop() as LocalizeData) : undefined;
 
         for (const applicationPath of [this.localizePath, BuiltInApplication.localizePath]) {
-            const path = joinStr(".", applicationPath, ...args);
+            const path = R.join([applicationPath, ...(args as string[])], ".");
             if (!game.i18n.has(path, true)) continue;
             return R.isObjectType(data) ? game.i18n.format(path, data) : game.i18n.localize(path);
         }
@@ -503,7 +503,7 @@ class TriggerApplication {
     getTriggersSetting(): TriggersSetting | undefined {
         if (!this.isSettingApplication) return;
 
-        const setting = game.settings.get<Partial<TriggersSetting>>(this.moduleId, this.settingKey);
+        const setting = game.settings.get(this.moduleId, this.settingKey) as Partial<TriggersSetting>;
 
         return {
             disabled: setting.disabled?.slice() ?? [],

@@ -1,5 +1,5 @@
 import { BaseEventNode } from "engine";
-import { R, actorsRespectAlliance, isCurrentCombatant, localizePath } from "module-helpers";
+import { R, actorsRespectAlliance, isCurrentCombatant, localize } from "foundry-helpers";
 import { AuraEventOptions, PF2eInputEntry, PF2eOutputEntry } from "pf2e";
 
 abstract class BaseAuraEvent extends BaseEventNode<Inputs, Outputs> {
@@ -65,7 +65,7 @@ abstract class BaseAuraEvent extends BaseEventNode<Inputs, Outputs> {
     }
 
     static localizePath(...path: string[]): string {
-        return localizePath("pf2e-trigger.node", this.category, "base-aura-event", ...path);
+        return localize.path("pf2e-trigger.node", this.category, "base-aura-event", ...path);
     }
 
     async _execute({ aura, target }: AuraEventOptions): Promise<boolean> {
