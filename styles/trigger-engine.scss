@@ -5,6 +5,8 @@
 @import "triggers-menu";
 
 .application.dialog.trigger-engine {
+    min-width: 400px;
+
     .window-content {
         .form-group {
             white-space: nowrap;
