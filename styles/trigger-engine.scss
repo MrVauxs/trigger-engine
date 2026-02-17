@@ -1,9 +1,3 @@
-@import "edit-trigger";
-@import "fields";
-@import "import-export-triggers";
-@import "nodes-menu";
-@import "triggers-menu";
-
 .application.dialog.trigger-engine {
     min-width: 400px;
 
@@ -22,3 +16,9 @@
         }
     }
 }
+
+@import "edit-trigger";
+@import "fields";
+@import "import-export-triggers";
+@import "nodes-menu";
+@import "triggers-menu";
