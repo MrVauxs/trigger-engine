@@ -1,3 +1,13 @@
+# 1.4.0
+
+- fix the `Create/Edit Trigger` dialog width
+- `pf2e-trigger`:
+  - `Increase Condition`:
+    - fix mishandling of increment value
+  - `Move Time`:
+    - add new `Threshold` state allowing you to move time up to a defined system threshold (dusk, down, etc.)
+    - fix node missing icon
+
 # 1.3.0
 
 - `pf2e-trigger`:
