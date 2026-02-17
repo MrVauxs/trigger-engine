@@ -38,8 +38,8 @@ class InceaseConditionActionNode extends BaseActionNode<"out", Inputs> {
         const current = data.actor.getCondition(data.slug)?.value ?? 0;
         const newValue = max > 0 ? Math.min(current + data.value, max) : current + data.value;
 
-        if (!current || current < newValue) {
-            await data.actor.increaseCondition(data.slug, { value: newValue });
+        if (current < newValue) {
+            await data.actor.increaseCondition(data.slug, { value: newValue - current });
         }
 
         return this.executeNext("out");
