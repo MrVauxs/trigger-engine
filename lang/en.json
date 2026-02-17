@@ -769,6 +769,10 @@
                         "title": "Increase Condition"
                     },
                     "move-time": {
+                        "states": {
+                            "threshold": "Thresholds",
+                            "unit": "Units"
+                        },
                         "title": "Move Time"
                     },
                     "roll-damage": {
