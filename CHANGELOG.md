@@ -1,3 +1,9 @@
+# 1.4.1
+
+- `pf2e-trigger`:
+  - `Roll Damage`:
+    - fix dc value not always being forwarded to the message flags
+
 # 1.4.0
 
 - fix the `Create/Edit Trigger` dialog width
