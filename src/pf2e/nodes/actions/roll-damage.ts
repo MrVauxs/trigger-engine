@@ -64,12 +64,11 @@ class RollDamageActionNode extends BaseActionNode<"out", Inputs, never, never, n
             target: targets[0],
             toolbelt: {
                 item: item?.uuid,
-                // private: await this.get("private"),
                 targets: getTargetsTokens(targets, true),
             },
         };
 
-        if (dcData?.dc.statistic) {
+        if (dcData?.dc) {
             foundry.utils.mergeObject(damageOptions.toolbelt, {
                 options: dcData.extraOptions,
                 private: await this.getInputValue("private"),
