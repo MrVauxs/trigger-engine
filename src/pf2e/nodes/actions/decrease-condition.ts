@@ -36,10 +36,10 @@ class DecreaseConditionActionNode extends BaseActionNode<"out", Inputs> {
         }
 
         const min = await this.getInputValue("min");
-        const currentValue = condition._source.system.value.value ?? 0;
-        const newValue = Math.max(currentValue - data.value, min);
+        const current = condition._source.system.value.value ?? 0;
+        const newValue = Math.max(current - data.value, min);
 
-        if (newValue !== currentValue) {
+        if (current > newValue) {
             await game.pf2e.ConditionManager.updateConditionValue(condition.id, data.actor, newValue);
         }
 
