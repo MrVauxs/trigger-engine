@@ -1,3 +1,11 @@
+# 1.4.2
+
+- `Extract from Actor/Item`:
+  - fix `path` field for the custom outputs not being localized
+- `pf2e-trigger`:
+  - `Decrease Condition`:
+    - fix the condition value being raised to the `min` input if the actor already had the condition at a lower value
+
 # 1.4.1
 
 - `pf2e-trigger`:
