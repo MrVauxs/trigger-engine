@@ -455,6 +455,11 @@
                 "path": "Trigger Path"
             },
             "shared": {
+                "extract": {
+                    "input": {
+                        "label": "Path"
+                    }
+                },
                 "numbers": {
                     "disable": {
                         "tooltip": "Set to <code>0</code> to disable"

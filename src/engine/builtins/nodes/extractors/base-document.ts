@@ -1,12 +1,21 @@
 import { BaseExtractorNode, BuiltinsCustomEntry } from "engine";
-import { R } from "foundry-helpers";
+import { localize, R } from "foundry-helpers";
 
 abstract class BaseDocumentExtractorNode<
     TInput extends any,
     TDocument extends foundry.abstract.Document,
 > extends BaseExtractorNode<{ input: TInput | undefined }, any, never, "path", never> {
     static get defineCustomOutputs(): BuiltinsCustomEntry[] | null {
-        return [{ slug: "path", array: true, input: {} }];
+        return [
+            {
+                slug: "path",
+                array: true,
+                label: localize.path("builtins.shared.extract.input.label"),
+                input: {
+                    label: localize.path("builtins.shared.extract.input.label"),
+                },
+            },
+        ];
     }
 
     abstract _castDocument(document: TInput): TDocument | undefined;
