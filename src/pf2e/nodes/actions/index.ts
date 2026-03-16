@@ -9,6 +9,7 @@ import {
     EffectDurationActionNode,
     InceaseConditionActionNode,
     MoveTimeActionNode,
+    RemoveConditionActionNode,
     RollDamageActionNode,
     RollFlatActionNode,
     RollSaveActionNode,
@@ -28,6 +29,7 @@ export * from "./effect-badge";
 export * from "./effect-duration";
 export * from "./increase-condition";
 export * from "./move-time";
+export * from "./remove-condition";
 export * from "./roll-damage";
 export * from "./roll-flat";
 export * from "./roll-save";
@@ -45,6 +47,7 @@ export default [
     EffectDurationActionNode,
     InceaseConditionActionNode,
     MoveTimeActionNode,
+    RemoveConditionActionNode,
     RollDamageActionNode,
     RollFlatActionNode,
     RollSaveActionNode,

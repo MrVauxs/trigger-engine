@@ -780,6 +780,9 @@
                         },
                         "title": "Move Time"
                     },
+                    "remove-condition": {
+                        "title": "Remove Condition"
+                    },
                     "roll-damage": {
                         "inputs": {
                             "formula": {
