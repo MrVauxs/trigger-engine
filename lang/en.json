@@ -894,6 +894,14 @@
                     }
                 },
                 "event": {
+                    "action-chat-event": {
+                        "title": "Action Sent to Chat",
+                        "inputs": {
+                            "slug": {
+                                "title": "Action Slug"
+                            }
+                        }
+                    },
                     "attack-roll-event": {
                         "title": "Attack Rolled"
                     },

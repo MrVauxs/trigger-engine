@@ -1,27 +1,32 @@
 import { TriggerHook } from "engine";
 import {
+    AbilityItemPF2e,
     ActorPF2e,
     ChatMessageFlagsPF2e,
     ChatMessagePF2e,
     CheckContextChatFlag,
     CheckType,
     DegreeOfSuccessString,
+    FeatPF2e,
     ItemOriginFlag,
     ItemPF2e,
     R,
     SYSTEM,
     TokenDocumentPF2e,
     createToggleHook,
+    isActionMessage,
     isValidTargetDocuments,
 } from "foundry-helpers";
 
-class CreateMessageHook extends TriggerHook<AttackRollOptions | DamageTakenOptions | CheckRollOptions> {
+class CreateMessageHook extends TriggerHook<
+    ActionChatOptions | AttackRollOptions | DamageTakenOptions | CheckRollOptions
+> {
     static damageTakenTypes = ["all", "damage", "heal", "persistent", "negated"] as const;
 
     #hook = createToggleHook("createChatMessage", this.#onCreateMessage.bind(this));
 
-    get events(): ["attack-roll-event", "damage-taken-event", "check-roll-event"] {
-        return ["attack-roll-event", "damage-taken-event", "check-roll-event"];
+    get events(): ["action-chat-event", "attack-roll-event", "damage-taken-event", "check-roll-event"] {
+        return ["action-chat-event", "attack-roll-event", "damage-taken-event", "check-roll-event"];
     }
 
     _enable() {
@@ -36,6 +41,30 @@ class CreateMessageHook extends TriggerHook<AttackRollOptions | DamageTakenOptio
         if (!game.user.isActiveGM) return;
 
         const { appliedDamage, origin, context } = message.flags[SYSTEM.id] as ChatMessageFlagsPF2e["pf2e"];
+
+        if (origin && isActionMessage(message)) {
+            const item = fromUuidSync<AbilityItemPF2e | FeatPF2e>(origin.uuid);
+            if (!item) return;
+
+            const originActor = origin?.actor ? await fromUuid<ActorPF2e>(origin.actor) : null;
+
+            const targets = R.pipe(
+                game.toolbelt?.api.targetHelper.getMessageTargets(message) ?? [],
+                R.map((token) => {
+                    const actor = token.actor;
+                    return actor ? { actor, token } : null;
+                }),
+                R.filter(R.isTruthy),
+            );
+
+            return this.executeEvent("action-chat-event", {
+                item,
+                options: origin.rollOptions ?? [],
+                origin: originActor ? { actor: originActor } : undefined,
+                targets,
+            } satisfies ActionChatOptions);
+        }
+
         if (!context) return;
 
         if (context.type === "attack-roll") {
@@ -43,7 +72,7 @@ class CreateMessageHook extends TriggerHook<AttackRollOptions | DamageTakenOptio
             const source = { actor: message.actor, token: message.token };
             if (!isValidTargetDocuments(target) || !isValidTargetDocuments(source)) return;
 
-            this.executeEvent("attack-roll-event", {
+            return this.executeEvent("attack-roll-event", {
                 action: (context as { action?: string }).action || "",
                 isReroll: context.isReroll,
                 item: message.item,
@@ -52,7 +81,9 @@ class CreateMessageHook extends TriggerHook<AttackRollOptions | DamageTakenOptio
                 outcome: context.outcome,
                 target,
             } satisfies AttackRollOptions);
-        } else if (context.type === "damage-taken") {
+        }
+
+        if (context.type === "damage-taken") {
             const target = { actor: message.actor, token: message.token };
             if (!isValidTargetDocuments(target)) return;
 
@@ -66,18 +97,18 @@ class CreateMessageHook extends TriggerHook<AttackRollOptions | DamageTakenOptio
                     ? ["all", "damage", "persistent"]
                     : ["all", "damage"];
 
-            this.executeEvent("damage-taken-event", {
+            return this.executeEvent("damage-taken-event", {
                 item: await getAttackItem(origin?.uuid),
                 options: context.options ?? [],
                 origin: originActor ? { actor: originActor } : undefined,
                 target,
                 types,
             } satisfies DamageTakenOptions);
-        } else if (message.isCheckRoll) {
+        }
+
+        if (message.isCheckRoll) {
             const checkData = await checkRollData(message);
-            if (checkData) {
-                this.executeEvent("check-roll-event", checkData);
-            }
+            return checkData && this.executeEvent("check-roll-event", checkData);
         }
     }
 }
@@ -124,6 +155,11 @@ type BaseOptions = {
     target: TargetDocuments;
 };
 
+type ActionChatOptions = Omit<BaseOptions, "item" | "target"> & {
+    item: ItemPF2e;
+    targets: TargetDocuments[];
+};
+
 type AttackRollOptions = WithRequired<BaseOptions, "origin"> & {
     action: string;
     isReroll: boolean;
@@ -144,4 +180,4 @@ type CheckRollOptions = WithPartial<BaseOptions, "target"> & {
 type DamageTakenType = (typeof CreateMessageHook.damageTakenTypes)[number];
 
 export { checkRollData, CreateMessageHook };
-export type { AttackRollOptions, CheckRollOptions, DamageTakenOptions, DamageTakenType };
+export type { ActionChatOptions, AttackRollOptions, CheckRollOptions, DamageTakenOptions, DamageTakenType };
