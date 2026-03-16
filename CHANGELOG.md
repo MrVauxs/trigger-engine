@@ -1,3 +1,13 @@
+# 1.5.0
+
+- `pf2e-trigger`:
+  - add `Action Sent to Chat` event node:
+    - it will trigger whenever an action message is created regardless of how (there is no way to identify otherwise)
+    - if the `Action Slug` remains empty, the event will trigger for any action
+    - the `Targets` output is only ever related to the `PF2e Toolbelt` module as action messages normally don't have a target
+  - add `Remove Condition` action node:
+    - it will remove every non-locked instances of the condition from the actor
+
 # 1.4.2
 
 - `Extract from Actor/Item`:
