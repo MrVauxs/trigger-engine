@@ -221,7 +221,7 @@ class TriggerNode<
      * @abstract
      * A node with `in` or `outs` is considered an `executable` node.
      *
-     * This method is called by by a previous node that have `outs`.
+     * This method is called by a previous node that has `outs`.
      *
      * @param args are passed by the hook calling the event (and optionally from the previous node if needed)
      *
