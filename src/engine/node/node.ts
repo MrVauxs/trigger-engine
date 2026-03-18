@@ -240,7 +240,7 @@ class TriggerNode<
      * @param key is the key of the output entry that was requested by the other node.
      *
      * @returns the computed value of the output type requested by the other node.
-     * If the returned value isn't compatible with the connection type, the default value will be instead be returned.
+     * If the returned value isn't compatible with the connection type, the default value is returned instead.
      */
     _query(key: string): Promise<any> {
         throw MODULE.Error("'_query' method not implemented.");
@@ -331,7 +331,7 @@ interface TriggerNode<
      * then the default value is returned instead.
      *
      * @example
-     * const number = await this.get("number");
+     * const number = await this.getInputValue("number");
      *
      * @see {@link TriggerNode#_execute}
      */
@@ -387,7 +387,7 @@ interface TriggerNode<
      * Set values for this node's custom outputs.
      *
      * @param slug of the custom outputs
-     * @param values array where each entry represents a one of the custom entry (same index order as seen in the node).
+     * @param values array where each entry represents one of the custom entries (same index order as seen in the node).
      *
      * @see {@link TriggerNode.defineCustomOutputs}
      */
