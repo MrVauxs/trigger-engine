@@ -1,4 +1,5 @@
 import { BaseExtractorNode, BuiltinsCustomEntry, BuiltinsInputEntry, BuiltinsOutputEntry } from "engine";
+import { MODULE } from "foundry-helpers";
 
 const DEFAULT_CALLBACK = `/**
  * @param {{actor: Actor; token: TokenDocument}} target
@@ -82,7 +83,12 @@ class FilterTargetsExtractorNode extends BaseExtractorNode<Inputs, Outputs, "inp
                 const target = targets.find((target) => callback(target, inputs));
                 this.setOutputValue("target", target);
             }
-        } catch {}
+        } catch (error: any) {
+            MODULE.error(
+                `an error occured in the node "${this.type}" (${this.id}) of the trigger "${this.triggerPath}"`,
+                error,
+            );
+        }
 
         return this.executeNext("out");
     }

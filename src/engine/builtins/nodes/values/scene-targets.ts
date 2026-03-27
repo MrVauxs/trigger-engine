@@ -1,5 +1,6 @@
 import { BuiltinsInputEntry, BuiltinsOutputEntry } from "engine";
 import { BaseValueNode } from ".";
+import { MODULE } from "foundry-helpers";
 
 const DEFAULT_CALLBACK = `/**
  * @param {{actor: Actor; token: TokenDocument}} target
@@ -49,7 +50,12 @@ class SceneTargetsValueNode extends BaseValueNode<Inputs> {
             const callback = new Fn("target", code);
 
             return targets?.filter((target): target is TargetDocuments => !!target && callback(target)) ?? [];
-        } catch {
+        } catch (error: any) {
+            MODULE.error(
+                `an error occured in the node "${this.type}" (${this.id}) of the trigger "${this.triggerPath}"`,
+                error,
+            );
+
             return [];
         }
     }

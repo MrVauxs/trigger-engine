@@ -1,5 +1,5 @@
 import { BuiltinsCustomEntry, BuiltinsInputEntry, CustomInputSchema } from "engine";
-import { CompendiumIndexData, R, isScriptMacro } from "foundry-helpers";
+import { CompendiumIndexData, MODULE, R, isScriptMacro } from "foundry-helpers";
 import { BaseActionNode } from ".";
 import { IconObject } from "_zod";
 
@@ -117,7 +117,12 @@ class ExecuteScriptActionNode extends BaseActionNode<
         try {
             const fn = new foundry.utils.AsyncFunction("inputs", code);
             return fn(values);
-        } catch (error: any) {}
+        } catch (error: any) {
+            MODULE.error(
+                `an error occured in the node "${this.type}" (${this.id}) of the trigger "${this.triggerPath}"`,
+                error,
+            );
+        }
     }
 }
 
