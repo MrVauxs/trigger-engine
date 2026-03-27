@@ -1,3 +1,10 @@
+# 1.5.1
+
+- the `Scene Targets`, `Filter Targets` and `Execute Script` nodes will now log any error caused by the user provided function instead of catching it silently
+  - the try/catch is for the entire node context, so any error will still break the entire node's process
+- `pf2e-trigger`:
+  - fix `Extra Note` localization typo in the `Roll Data` section of the `Roll Damage` and `Roll Save` nodes
+
 # 1.5.0
 
 - `pf2e-trigger`:
