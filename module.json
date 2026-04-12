@@ -12,17 +12,17 @@
         "scripts/main.js"
     ],
     "compatibility": {
-        "minimum": "13.351",
-        "verified": "13.351",
-        "maximum": "13"
+        "minimum": "14.360",
+        "verified": "14.360",
+        "maximum": "14"
     },
     "socket": true,
     "library": true,
-    "version": "1.5.1",
+    "version": "1.6.0",
     "url": "https://github.com/reonZ/trigger-engine",
     "readme": "https://github.com/reonZ/trigger-engine/blob/master/README.md",
     "manifest": "https://raw.githubusercontent.com/reonZ/trigger-engine/master/module.json",
-    "download": "https://github.com/reonZ/trigger-engine/releases/download/1.5.1/module.zip",
+    "download": "https://github.com/reonZ/trigger-engine/releases/download/1.6.0/module.zip",
     "changelog": "https://github.com/reonZ/trigger-engine/blob/master/CHANGELOG.md",
     "bugs": "https://github.com/reonZ/trigger-engine/issues",
     "styles": [

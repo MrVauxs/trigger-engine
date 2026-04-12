@@ -1,3 +1,8 @@
+# 1.6.0
+
+- this is a foundry version `14.360` release
+- update to be compatible with the various v14 changes
+
 # 1.5.1
 
 - the `Scene Targets`, `Filter Targets` and `Execute Script` nodes will now log any error caused by the user provided function instead of catching it silently
