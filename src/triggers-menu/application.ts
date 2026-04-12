@@ -220,7 +220,7 @@ class BlueprintApplication extends apps.ApplicationV2<fa.ApplicationConfiguratio
             }
 
             case "copy-path": {
-                return this.#copyTriggerPath(target);
+                return this.#copyTriggerPath(event, target);
             }
 
             case "create-trigger": {
@@ -473,7 +473,7 @@ class BlueprintApplication extends apps.ApplicationV2<fa.ApplicationConfiguratio
         el.innerHTML = (await trigger?.enrichedDescription) || "<div></div>";
     }
 
-    #copyTriggerPath(el: HTMLElement) {
+    #copyTriggerPath(_event: PointerEvent, el: HTMLElement) {
         const path = el.dataset.path as string;
         game.clipboard.copyPlainText(path);
         return localize.info("blueprint.trigger.copy.notify", { path });
@@ -490,18 +490,18 @@ class BlueprintApplication extends apps.ApplicationV2<fa.ApplicationConfiguratio
         return [
             {
                 icon: `<i class="fa-solid fa-pen-to-square"></i>`,
-                name: localize.path(`blueprint.variable.edit`),
-                condition: () => !this.blueprint.locked,
-                callback: (el) => {
+                label: localize.path(`blueprint.variable.edit`),
+                visible: () => !this.blueprint.locked,
+                onClick: (_event, el) => {
                     const id = el.dataset.id as ConnectionId;
                     return this.blueprint.editVariable(id);
                 },
             },
             {
                 icon: `<i class="fa-solid fa-trash"></i>`,
-                name: localize.path("blueprint.variable.delete.title"),
-                condition: () => !this.blueprint.locked,
-                callback: async (el) => {
+                label: localize.path("blueprint.variable.delete.title"),
+                visible: () => !this.blueprint.locked,
+                onClick: async (_event, el) => {
                     const id = el.dataset.id as ConnectionId;
                     const confirm = await confirmDialog("blueprint.variable.delete");
                     return confirm && this.blueprint.deleteVariable(id);
@@ -514,11 +514,11 @@ class BlueprintApplication extends apps.ApplicationV2<fa.ApplicationConfiguratio
         return [
             {
                 icon: `<i class="fa-solid fa-pen-to-square"></i>`,
-                name: localize.path(`blueprint.node.edit`),
-                condition: (el) => {
+                label: localize.path(`blueprint.node.edit`),
+                visible: (el) => {
                     return !this.blueprint.locked && el.hasAttribute("data-editable");
                 },
-                callback: (el) => {
+                onClick: (_event, el) => {
                     const nodeId = el.dataset.nodeId ?? "";
                     const node = this.blueprint.nodes.get(nodeId);
                     return node?.edit();
@@ -526,15 +526,15 @@ class BlueprintApplication extends apps.ApplicationV2<fa.ApplicationConfiguratio
             },
             {
                 icon: `<i class="fa-solid fa-trash"></i>`,
-                name: localize.path("blueprint.node.delete.single"),
-                condition: (el) => {
+                label: localize.path("blueprint.node.delete.single"),
+                visible: (el) => {
                     if (this.blueprint.locked) return false;
 
                     const nodeId = el.dataset.nodeId ?? "";
                     const node = this.blueprint.nodes.get(nodeId);
                     return !!node && (!node.isEvent || !!this.blueprint.trigger?.application.hasMultipleEvents);
                 },
-                callback: async (el) => {
+                onClick: async (_event, el) => {
                     const nodeId = el.dataset.nodeId ?? "";
                     const confirm = await confirmDialog("blueprint.node.delete.confirm");
                     return confirm && this.blueprint.nodes.deleteById([nodeId]);
@@ -552,37 +552,37 @@ class BlueprintApplication extends apps.ApplicationV2<fa.ApplicationConfiguratio
         return [
             {
                 icon: `<i class="fa-solid fa-clipboard"></i>`,
-                name: localize.path("blueprint.trigger.copy.label"),
-                callback: this.#copyTriggerPath.bind(this),
+                label: localize.path("blueprint.trigger.copy.label"),
+                onClick: this.#copyTriggerPath.bind(this),
             },
             {
                 icon: `<i class="fa-solid fa-pen-to-square"></i>`,
-                name: localize.path("blueprint.trigger.edit"),
-                condition: (el) => {
+                label: localize.path("blueprint.trigger.edit"),
+                visible: (el) => {
                     const trigger = getTriggerFromElement(el);
                     return !!trigger && !trigger.locked;
                 },
-                callback: (el) => {
+                onClick: (_event, el) => {
                     const trigger = getTriggerFromElement(el);
                     return trigger && this.#editTrigger(trigger.folder, trigger);
                 },
             },
             {
                 icon: `<i class="fa-solid fa-pen-to-square"></i>`,
-                name: localize.path("edit-folder.title"),
-                condition: (el) => {
+                label: localize.path("edit-folder.title"),
+                visible: (el) => {
                     const trigger = getTriggerFromElement(el);
                     return !!trigger?.locked;
                 },
-                callback: (el) => {
+                onClick: (_event, el) => {
                     const trigger = getTriggerFromElement(el);
                     return trigger?.locked && this.#editFolder(trigger);
                 },
             },
             {
                 icon: `<i class="fa-solid fa-copy"></i>`,
-                name: localize.path("blueprint.trigger.duplicate"),
-                callback: (el) => {
+                label: localize.path("blueprint.trigger.duplicate"),
+                onClick: (_event, el) => {
                     const trigger = getTriggerFromElement(el);
                     const source = trigger?.duplicate();
                     return source && this.blueprint.addTrigger(source, true, true);
@@ -590,12 +590,12 @@ class BlueprintApplication extends apps.ApplicationV2<fa.ApplicationConfiguratio
             },
             {
                 icon: `<i class="fa-solid fa-trash"></i>`,
-                name: localize.path("blueprint.trigger.delete.title"),
-                condition: (el) => {
+                label: localize.path("blueprint.trigger.delete.title"),
+                visible: (el) => {
                     const trigger = getTriggerFromElement(el);
                     return !!trigger && !trigger.locked;
                 },
-                callback: (el) => {
+                onClick: (_event, el) => {
                     const fullId = el.dataset.fullId as TriggerFullId;
                     return this.blueprint.deleteTrigger(fullId);
                 },

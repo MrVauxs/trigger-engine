@@ -226,10 +226,10 @@ class BlueprintEntry extends BaseBlueprintEntry {
 
         options.unshift(
             {
-                name: localize.path("blueprint.entry.variable"),
+                label: localize.path("blueprint.entry.variable"),
                 icon: `<i class="fa-solid fa-square-root-variable"></i>`,
-                condition: !hasVariable,
-                callback: async () => {
+                visible: !hasVariable,
+                onClick: async () => {
                     const placeholder = this.label;
                     const label = await editLabelDialog("variable", { placeholder });
                     if (label === null) return;
@@ -251,18 +251,18 @@ class BlueprintEntry extends BaseBlueprintEntry {
                 },
             },
             {
-                name: localize.path("blueprint.variable.edit"),
+                label: localize.path("blueprint.variable.edit"),
                 icon: `<i class="fa-solid fa-pen-to-square"></i>`,
-                condition: hasVariable,
-                callback: async () => {
+                visible: hasVariable,
+                onClick: async () => {
                     return this.blueprint.editVariable(this.id as ConnectionId);
                 },
             },
             {
-                name: localize.path("blueprint.variable.delete.title"),
+                label: localize.path("blueprint.variable.delete.title"),
                 icon: `<i class="fa-solid fa-trash fa-fw"></i>`,
-                condition: hasVariable,
-                callback: async () => {
+                visible: hasVariable,
+                onClick: async () => {
                     const confirm = await confirmDialog("blueprint.variable.delete");
                     return confirm && this.blueprint.deleteVariable(this.id as ConnectionId);
                 },

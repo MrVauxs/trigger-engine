@@ -2,7 +2,6 @@ import { TriggerHook } from "engine";
 import {
     AbilityItemPF2e,
     ActorPF2e,
-    ChatMessageFlagsPF2e,
     ChatMessagePF2e,
     CheckContextChatFlag,
     CheckType,
@@ -40,7 +39,7 @@ class CreateMessageHook extends TriggerHook<
     async #onCreateMessage(message: ChatMessagePF2e) {
         if (!game.user.isActiveGM) return;
 
-        const { appliedDamage, origin, context } = message.flags[SYSTEM.id] as ChatMessageFlagsPF2e["pf2e"];
+        const { appliedDamage, origin, context } = message.flags[SYSTEM.id];
 
         if (origin && isActionMessage(message)) {
             const item = fromUuidSync<AbilityItemPF2e | FeatPF2e>(origin.uuid);
@@ -179,5 +178,5 @@ type CheckRollOptions = WithPartial<BaseOptions, "target"> & {
 
 type DamageTakenType = (typeof CreateMessageHook.damageTakenTypes)[number];
 
-export { checkRollData, CreateMessageHook };
+export { CreateMessageHook, checkRollData };
 export type { ActionChatOptions, AttackRollOptions, CheckRollOptions, DamageTakenOptions, DamageTakenType };

@@ -235,26 +235,26 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
 
         return [
             {
-                name: localize.path("blueprint.entry.disconnect"),
+                label: localize.path("blueprint.entry.disconnect"),
                 icon: `<i class="fa-solid fa-link-horizontal-slash"></i>`,
-                condition: this.isConnected,
-                callback: async () => {
+                visible: this.isConnected,
+                onClick: async () => {
                     this.disconnect();
                 },
             },
             {
-                name: localize.path("blueprint.entry.edit.label"),
+                label: localize.path("blueprint.entry.edit.label"),
                 icon: `<i class="fa-solid fa-pen-to-square"></i>`,
-                condition: isCustom,
-                callback: () => {
+                visible: isCustom,
+                onClick: () => {
                     return this.#edit();
                 },
             },
             {
-                name: localize.path("blueprint.entry.remove.title"),
+                label: localize.path("blueprint.entry.remove.title"),
                 icon: `<i class="fa-solid fa-trash fa-fw"></i>`,
-                condition: isCustom,
-                callback: async () => {
+                visible: isCustom,
+                onClick: async () => {
                     const confirm = await confirmDialog("blueprint.entry.remove");
                     return confirm && this.remove();
                 },

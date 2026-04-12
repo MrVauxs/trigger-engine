@@ -570,7 +570,7 @@ class BlueprintNode extends PIXI.Container {
         if (!icon) return;
 
         return this.preciseText(icon.unicode, {
-            fontFamily: "Font Awesome 6 Pro",
+            fontFamily: "Font Awesome 7 Pro",
             fontWeight: icon.fontWeight || "400",
             fontMult: icon.fontMult || 1,
         });
@@ -1192,9 +1192,9 @@ class BlueprintNode extends PIXI.Container {
                             state;
 
                         return {
-                            name: localize("blueprint.node.state.title", { label }),
+                            label: localize("blueprint.node.state.title", { label }),
                             icon: `<i class="fa-sharp fa-solid fa-arrows-repeat"></i>`,
-                            callback: async () => {
+                            onClick: async () => {
                                 const confirm = await confirmDialog("blueprint.node.state", {
                                     data: { label },
                                 });
@@ -1215,9 +1215,9 @@ class BlueprintNode extends PIXI.Container {
                     const label = this.customEntryLabel(category, schema);
 
                     entries.push({
-                        name: localize("blueprint.entry.add.title", { label }),
+                        label: localize("blueprint.entry.add.title", { label }),
                         icon: `<i class="fa-solid fa-gear"></i>`,
-                        callback: async () => {
+                        onClick: async () => {
                             this.#addCustomEntry(category, schema);
                         },
                     });
@@ -1232,34 +1232,34 @@ class BlueprintNode extends PIXI.Container {
 
         entries.push(
             {
-                name: localize.path(`blueprint.node.copy.${multiFiltered}`),
+                label: localize.path(`blueprint.node.copy.${multiFiltered}`),
                 icon: `<i class="fa-solid fa-clipboard"></i>`,
-                condition: duplicable,
-                callback: async () => {
+                visible: duplicable,
+                onClick: async () => {
                     this.parent.copySelected(selected);
                 },
             },
             {
-                name: localize.path(`blueprint.node.duplicate.${multiFiltered}`),
+                label: localize.path(`blueprint.node.duplicate.${multiFiltered}`),
                 icon: `<i class="fa-solid fa-copy"></i>`,
-                condition: duplicable && !locked,
-                callback: async () => {
+                visible: duplicable && !locked,
+                onClick: async () => {
                     this.parent.duplicateSelected(selected);
                 },
             },
             {
-                name: localize.path(`blueprint.node.edit`),
+                label: localize.path(`blueprint.node.edit`),
                 icon: `<i class="fa-solid fa-pen-to-square"></i>`,
-                condition: !locked && isGateExitNode(this),
-                callback: () => {
+                visible: !locked && isGateExitNode(this),
+                onClick: () => {
                     this.edit();
                 },
             },
             {
-                name: localize.path(`blueprint.node.delete.${multiSelected}`),
+                label: localize.path(`blueprint.node.delete.${multiSelected}`),
                 icon: `<i class="fa-solid fa-trash fa-fw"></i>`,
-                condition: !locked && (!this.isEvent || this.trigger.application.hasMultipleEvents),
-                callback: async () => {
+                visible: !locked && (!this.isEvent || this.trigger.application.hasMultipleEvents),
+                onClick: async () => {
                     const confirm = await confirmDialog("blueprint.node.delete.confirm");
                     return confirm && this.parent.delete(selected);
                 },
