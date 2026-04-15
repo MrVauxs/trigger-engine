@@ -81,7 +81,7 @@ class ExecuteScriptActionNode extends BaseActionNode<
         const uuid = this.getLocalValue("macro");
         if (!uuid) return;
 
-        const macro = fromUuidSync<CompendiumIndexData>(uuid);
+        const macro = fromUuidSync<CompendiumIndexData>(uuid, { strict: false });
         if (!macro) return null;
 
         return isScriptMacro(macro) || foundry.utils.parseUuid(macro.uuid)?.type === "Macro" ? macro : null;

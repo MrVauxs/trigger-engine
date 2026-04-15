@@ -17,7 +17,7 @@ function getLocalItemFromSourceUuid(this: TriggerNode<any, DoubleUuidInputs>): C
     const uuid = this.getLocalValue(SYSTEM.id);
     if (!uuid) return;
 
-    const item = fromUuidSync<CompendiumIndexData>(uuid);
+    const item = fromUuidSync<CompendiumIndexData>(uuid, { strict: false });
     if (!item) return null;
 
     return item instanceof Item || foundry.utils.parseUuid(item.uuid)?.type === "Item" ? item : null;

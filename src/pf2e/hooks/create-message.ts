@@ -42,7 +42,7 @@ class CreateMessageHook extends TriggerHook<
         const { appliedDamage, origin, context } = message.flags[SYSTEM.id];
 
         if (origin && isActionMessage(message)) {
-            const item = fromUuidSync<AbilityItemPF2e | FeatPF2e>(origin.uuid);
+            const item = fromUuidSync<AbilityItemPF2e | FeatPF2e>(origin.uuid, { strict: false });
             if (!item) return;
 
             const originActor = origin?.actor ? await fromUuid<ActorPF2e>(origin.actor) : null;
