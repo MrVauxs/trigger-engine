@@ -1,8 +1,9 @@
 import { BaseConditionNode } from "engine";
-import { PF2eInputEntry } from "pf2e";
+import { PF2eInputEntry, PF2eOutputEntry } from "pf2e";
 import { ConditionsInputs, conditionsSchemas, getConditionsData } from "..";
+import { R } from "foundry-helpers";
 
-class HasConditionConditionNode extends BaseConditionNode<Inputs> {
+class HasConditionConditionNode extends BaseConditionNode<Inputs, { value: number }> {
     static get type(): "has-condition" {
         return "has-condition";
     }
@@ -15,6 +16,10 @@ class HasConditionConditionNode extends BaseConditionNode<Inputs> {
         return conditionsSchemas();
     }
 
+    static get defineOutputs(): PF2eOutputEntry[] {
+        return [{ key: "value", type: "number", spacing: 1 }];
+    }
+
     async _execute(): Promise<boolean> {
         const data = await getConditionsData.call(this);
 
@@ -24,11 +29,12 @@ class HasConditionConditionNode extends BaseConditionNode<Inputs> {
 
         const { actor, slug, value } = data;
         const conditions = actor.conditions.bySlug(slug);
-        const hasCondition =
-            conditions.length > 0 &&
-            (value <= 1 ||
-                !conditions[0].system.value.isValued ||
-                conditions.some((condition) => (condition.value ?? 1) >= value));
+        const existingValue = R.firstBy(conditions, [(condition) => condition.value ?? 1, "desc"])?.value ?? 1;
+        const hasCondition = conditions.length > 0 && (value <= 1 || existingValue >= value);
+
+        if (conditions.length) {
+            this.setOutputValue("value", existingValue);
+        }
 
         return this.executeNextIf(hasCondition);
     }
