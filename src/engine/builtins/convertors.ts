@@ -3,6 +3,13 @@ import { ItemPF2e, primaryPlayerOwner, R, UserPF2e } from "foundry-helpers";
 
 const builtinsConvertors = [
     {
+        output: "boolean",
+        input: "number",
+        convertToInput: (value: boolean): number => {
+            return Number(value);
+        },
+    },
+    {
         output: "item",
         input: "target",
         convertToInput: (item: ItemPF2e): TargetDocuments | undefined => {
