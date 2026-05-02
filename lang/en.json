@@ -1041,12 +1041,14 @@
                     },
                     "distance-between": {
                         "inputs": {
-                            "distance": {
-                                "title": "Distance"
-                            },
                             "strict": {
                                 "title": "Strict",
                                 "tooltip": "Do not fallback to active tokens"
+                            }
+                        },
+                        "outputs": {
+                            "distance": {
+                                "title": "Distance"
                             }
                         },
                         "title": "Distance Between Tokens"
