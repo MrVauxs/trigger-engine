@@ -2,6 +2,7 @@ import {
     HasConditionConditionNode,
     HasImmunityConditionNode,
     HasItemConditionNode,
+    HasItemSlugConditionNode,
     HasOptionConditionNode,
     HasResourceConditionNode,
     HasTemporaryConditionNode,
@@ -12,9 +13,11 @@ import {
     IsDeadConditionNode,
 } from ".";
 
+export * from "./base-item";
 export * from "./has-condition";
 export * from "./has-immunity";
 export * from "./has-item";
+export * from "./has-item-slug";
 export * from "./has-options";
 export * from "./has-resource";
 export * from "./has-temporary";
@@ -28,6 +31,7 @@ export default [
     HasConditionConditionNode,
     HasImmunityConditionNode,
     HasItemConditionNode,
+    HasItemSlugConditionNode,
     HasOptionConditionNode,
     HasResourceConditionNode,
     HasTemporaryConditionNode,
