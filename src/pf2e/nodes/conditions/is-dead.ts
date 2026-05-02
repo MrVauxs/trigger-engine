@@ -12,7 +12,7 @@ class IsDeadConditionNode extends BaseConditionNode<{ target?: TargetDocuments }
 
     async _execute(): Promise<boolean> {
         const actor = (await this.getInputValue("target"))?.actor;
-        return this.executeNextIf(actor?.isDead);
+        return this.executeIf(actor?.isDead);
     }
 }
 

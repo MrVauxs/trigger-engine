@@ -32,13 +32,13 @@ class IsAllianceConditionNode extends BaseConditionNode<Inputs> {
         const target = await this.getInputValue("target");
 
         if (!target) {
-            return this.executeNext("false");
+            return this.execute("false");
         }
 
         const alliance = await this.getInputValue("alliance");
         const result = (target.actor.alliance ?? "neutral") === alliance;
 
-        return this.executeNextIf(result);
+        return this.executeIf(result);
     }
 }
 

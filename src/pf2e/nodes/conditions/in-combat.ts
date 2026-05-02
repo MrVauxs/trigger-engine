@@ -14,7 +14,7 @@ class InCombatConditionNode extends BaseConditionNode<{ target?: TargetDocuments
     async _execute(): Promise<boolean> {
         const actor = (await this.getInputValue("target"))?.actor;
         const inCombat = actor && isInCombat(actor);
-        return this.executeNextIf(inCombat);
+        return this.executeIf(inCombat);
     }
 }
 

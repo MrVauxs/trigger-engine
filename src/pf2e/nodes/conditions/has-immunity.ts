@@ -33,7 +33,7 @@ class HasImmunityConditionNode extends BaseConditionNode<Inputs> {
         const actor = (await this.getInputValue("target"))?.actor;
 
         if (!actor) {
-            return this.executeNext("false");
+            return this.execute("false");
         }
 
         const type = await this.getInputValue("type");
@@ -49,7 +49,7 @@ class HasImmunityConditionNode extends BaseConditionNode<Inputs> {
             return immunity.type === type || immunity.test(options);
         });
 
-        return this.executeNextIf(hasImmunity);
+        return this.executeIf(hasImmunity);
     }
 }
 

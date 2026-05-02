@@ -16,11 +16,11 @@ class IfTruthyConditionNode extends BaseConditionNode<never, never, "condition">
 
         for (const condition of conditions) {
             if ((R.isArray(condition) && !condition.some(R.isTruthy)) || !R.isTruthy(condition)) {
-                return this.executeNext("false");
+                return this.execute("false");
             }
         }
 
-        return this.executeNext("true");
+        return this.execute("true");
     }
 }
 

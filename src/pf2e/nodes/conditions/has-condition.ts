@@ -3,7 +3,7 @@ import { PF2eInputEntry, PF2eOutputEntry } from "pf2e";
 import { ConditionsInputs, conditionsSchemas, getConditionsData } from "..";
 import { R } from "foundry-helpers";
 
-class HasConditionConditionNode extends BaseConditionNode<Inputs, { value: number }> {
+class HasConditionConditionNode extends BaseConditionNode<Inputs, { boolean: boolean; value: number }> {
     static get type(): "has-condition" {
         return "has-condition";
     }
@@ -17,14 +17,14 @@ class HasConditionConditionNode extends BaseConditionNode<Inputs, { value: numbe
     }
 
     static get defineOutputs(): PF2eOutputEntry[] {
-        return [{ key: "value", type: "number", spacing: 1 }];
+        return [...BaseConditionNode.defineOutputs, { key: "value", type: "number" }];
     }
 
     async _execute(): Promise<boolean> {
         const data = await getConditionsData.call(this);
 
         if (!data) {
-            return this.executeNext("false");
+            return this.execute("false");
         }
 
         const { actor, slug, value } = data;
@@ -36,7 +36,7 @@ class HasConditionConditionNode extends BaseConditionNode<Inputs, { value: numbe
             this.setOutputValue("value", existingValue);
         }
 
-        return this.executeNextIf(hasCondition);
+        return this.executeIf(hasCondition);
     }
 }
 

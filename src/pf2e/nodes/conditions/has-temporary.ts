@@ -16,14 +16,14 @@ class HasTemporaryConditionNode extends BaseConditionNode<TriggerEffectInputs, O
     }
 
     static get defineOutputs(): PF2eOutputEntry[] {
-        return [{ key: "item", type: "item" }];
+        return [...BaseConditionNode.defineOutputs, { key: "item", type: "item" }];
     }
 
     async _execute(): Promise<boolean> {
         const actor = (await this.getInputValue("target"))?.actor;
 
         if (!actor) {
-            return this.executeNext("false");
+            return this.execute("false");
         }
 
         const { slug } = await getTriggerEffectData.call(this);
@@ -31,14 +31,15 @@ class HasTemporaryConditionNode extends BaseConditionNode<TriggerEffectInputs, O
 
         if (item) {
             this.setOutputValue("item", item);
-            return this.executeNext("true");
+            return this.execute("true");
         } else {
-            return this.executeNext("false");
+            return this.execute("false");
         }
     }
 }
 
 type Outputs = {
+    boolean: boolean;
     item?: ItemPF2e;
 };
 

@@ -20,7 +20,7 @@ class InsideAuraConditionNode extends BaseConditionNode<Inputs, Outputs> {
     }
 
     static get defineOutputs(): PF2eOutputEntry[] {
-        return [BaseAuraEvent.defineOutputs[1]];
+        return [...BaseConditionNode.defineOutputs, BaseAuraEvent.defineOutputs[1]];
     }
 
     get isLoop(): boolean {
@@ -32,7 +32,7 @@ class InsideAuraConditionNode extends BaseConditionNode<Inputs, Outputs> {
         const slug = await this.getInputValue("slug");
 
         if (!target || !slug) {
-            return this.executeNext("false");
+            return this.execute("false");
         }
 
         const once = await this.getInputValue("once");
@@ -42,13 +42,13 @@ class InsideAuraConditionNode extends BaseConditionNode<Inputs, Outputs> {
         });
 
         if (!auras.length) {
-            return this.executeNext("false");
+            return this.execute("false");
         }
 
         for (const { origin } of auras) {
             this.setOutputValue("source", origin);
 
-            const keepExecuting = await this.executeNext("true");
+            const keepExecuting = await this.execute("true");
             if (once || !keepExecuting) break;
         }
 
@@ -64,6 +64,7 @@ type Inputs = {
 };
 
 type Outputs = {
+    boolean: boolean;
     source?: TargetDocuments;
 };
 

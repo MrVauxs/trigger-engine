@@ -832,20 +832,15 @@
                         "title": "Has Immunity"
                     },
                     "has-item": {
+                        "title": "Has Item with Source UUID"
+                    },
+                    "has-item-slug": {
                         "inputs": {
                             "slug": {
                                 "title": "Item Slug"
                             }
                         },
-                        "outputs": {
-                            "target": {
-                                "title": "Parent"
-                            }
-                        },
-                        "states": {
-                            "slug": "Slug"
-                        },
-                        "title": "Has Item"
+                        "title": "Has Item with Slug"
                     },
                     "has-option": {
                         "title": "Has Roll Option"
@@ -1122,6 +1117,7 @@
             },
             "state": {
                 "fixed": "Fixed",
+                "split": "Split",
                 "timed": "Timed"
             },
             "tag": {

@@ -23,7 +23,7 @@ class ListContainsConditionNode extends BaseConditionNode<Inputs> {
         const list = await this.getInputValue("list");
         const result = R.isIncludedIn(entry, list);
 
-        return this.executeNextIf(result);
+        return this.executeIf(result);
     }
 }
 

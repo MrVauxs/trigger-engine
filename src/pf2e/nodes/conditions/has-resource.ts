@@ -18,7 +18,7 @@ class HasResourceConditionNode extends BaseConditionNode<Inputs, Outputs> {
     }
 
     static get defineOutputs(): PF2eOutputEntry[] {
-        return [{ key: "value", type: "number" }];
+        return [...BaseConditionNode.defineOutputs, { key: "value", type: "number" }];
     }
 
     async _execute(): Promise<boolean> {
@@ -29,7 +29,7 @@ class HasResourceConditionNode extends BaseConditionNode<Inputs, Outputs> {
 
         this.setOutputValue("value", hasResource ? resource.value : -1);
 
-        return this.executeNextIf(hasResource);
+        return this.executeIf(hasResource);
     }
 }
 
@@ -39,6 +39,7 @@ type Inputs = {
 };
 
 type Outputs = {
+    boolean: boolean;
     value: number;
 };
 

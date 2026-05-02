@@ -31,13 +31,13 @@ class InRangeConditionNode extends BaseConditionNode<Inputs> {
         const targetToken = getTargetToken(target, { scene })?.object;
 
         if (!originToken || !targetToken) {
-            return this.executeNext("false");
+            return this.execute("false");
         }
 
         const distance = await this.getInputValue("distance");
         const inRange = distanceBetween(originToken, targetToken) <= distance;
 
-        return this.executeNextIf(!!inRange);
+        return this.executeIf(!!inRange);
     }
 }
 

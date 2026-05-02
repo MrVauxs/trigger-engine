@@ -19,7 +19,7 @@ class IsCombatantConditionNode extends BaseConditionNode<{ target?: TargetDocume
         const target = await this.getInputValue("target");
         const isCombatant = !!target?.actor && isCurrentCombatant(target.actor);
 
-        return this.executeNextIf(isCombatant);
+        return this.executeIf(isCombatant);
     }
 }
 

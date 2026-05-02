@@ -23,7 +23,7 @@ class HasOptionConditionNode extends BaseConditionNode<Inputs> {
         const target = (await this.getInputValue("target"))?.actor;
         const result = !!target && !!option && hasRollOption(target, option);
 
-        return this.executeNextIf(result);
+        return this.executeIf(result);
     }
 }
 
