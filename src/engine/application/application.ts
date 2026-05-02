@@ -137,6 +137,20 @@ class TriggerApplication {
         this.#instances.set(applicationKey, app);
     }
 
+    static registerNodes(moduleId: string, applicationId: string, nodes: (typeof TriggerNode)[]) {
+        const applicationKey = this.getApplicationKey(moduleId, applicationId);
+        const app = applicationKey ? this.#instances.get(applicationKey) : undefined;
+        if (!app) return;
+
+        for (const node of nodes) {
+            app.nodes.set(node.type, node);
+
+            if (node.isEvent) {
+                app.events.set(node.type, node);
+            }
+        }
+    }
+
     static getApplication(moduleId: string, applicationId: string): TriggerApplication | undefined {
         const applicationKey = this.getApplicationKey(moduleId, applicationId);
         return applicationKey ? this.#instances.get(`${moduleId}:${applicationId}`) : undefined;
