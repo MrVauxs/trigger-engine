@@ -811,6 +811,28 @@
                         },
                         "title": "Send Item to Chat"
                     },
+                    "update-initiative": {
+                        "inputs": {
+                            "other": {
+                                "title": "Other Combatant"
+                            }
+                        },
+                        "outputs": {
+                            "value": {
+                                "title": "Initiative"
+                            }
+                        },
+                        "states": {
+                            "after": "After Combatant",
+                            "before": "Before Combatant",
+                            "value": "Set Value"
+                        },
+                        "title": "Update Initiative",
+                        "titles": {
+                            "after": "Move After Combatant",
+                            "before": "Move Before Combatant"
+                        }
+                    },
                     "update-resource": {
                         "inputs": {
                             "slug": {
