@@ -1,3 +1,24 @@
+# 1.7.0
+
+- add a new module hook to register extra nodes for an existing application
+- add `boolean -> number` auto-convertor (true=1; false=0)
+- all condition nodes now have two states
+  - `Split` which is the same as before
+  - `Boolean` which only has a single `Out` bridge connection and an extra `Boolean` output representing the result
+- fix drag selection sticking on the canvas when using `[Right-Click]` while dragging
+  - the selection will now disappear whenever you click again on the canvas
+- `pf2e-trigger`:
+  - add new `Everything` state to `Damage Taken` event node
+    - it triggers for everything and allows you to check yourself what type of event it was later in the trigger
+  - add `Update Initiative` action node with convenient `Before/After Combatant` states
+  - add `Value` output to `Has Condition` representing the highest existing value of the found conditions
+  - **BREAKING CHANGE:** the `Has Item` condition node has been split into two distinct nodes (due to condition nodes now always having two states)
+    - `Has Item with Source UUID` which is the same as before
+    - `Has Item with Slug` which is now its own node instead of being a state for `Has Item`
+    - all `Has Item` nodes that were using `Source UUID` will work as is, no change required
+    - all `Has Item` nodes that were using `Slug` will have to be replaced sadly (your triggers will reach a blank node otherwise)
+  - fix `Distance Between Tokens` output label localization
+
 # 1.6.0
 
 - this is a foundry version `14.360` release
