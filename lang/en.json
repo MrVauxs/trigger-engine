@@ -996,7 +996,20 @@
                                 }
                             }
                         },
-                        "title": "Damage Taken"
+                        "outputs": {
+                            "types": {
+                                "tooltip": "Type slugs list",
+                                "title": "Types"
+                            }
+                        },
+                        "states": {
+                            "everything": "Everything",
+                            "select": "Select"
+                        },
+                        "title": "Damage Taken",
+                        "titles": {
+                            "everything": "Damage Taken & Heal Receives"
+                        }
                     },
                     "turn-end-event": {
                         "title": "Turn End"
