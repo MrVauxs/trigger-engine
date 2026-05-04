@@ -1014,28 +1014,27 @@ class BlueprintNode extends PIXI.Container {
     }
 
     #switchState(state: string) {
-        // we delete the variable
-        const outputs = this.outputs.filter((entry) => entry.schema.state === this.#node.state);
+        const currentState = this.#node.state;
+
+        // we delete the variables
+        const outputs = this.outputs.filter((entry) => entry.schema.state === currentState);
         for (const entry of outputs) {
             this.blueprint.deleteVariable(entry.id as ConnectionId, false);
         }
 
-        // we clear the inputs values
-        const inputs = R.pipe(
-            this.inputs.contents,
-            R.filter((entry) => entry.schema.state === this.#node.state),
-            R.map((entry) => entry.key),
-            R.fromKeys(() => {
-                return {
-                    value: undefined,
-                };
-            }),
-        );
-
-        this.data.update({
-            inputs,
-            state,
+        // we clear the inputs & outs from previous state
+        const [inputs, outs] = [this.inputs, this.outs].map((entries) => {
+            return R.pipe(
+                entries.contents,
+                R.filter((entry) => entry.schema.state === currentState),
+                R.map((entry) => entry.key),
+                R.fromKeys(() => {
+                    return { connection: undefined, value: undefined };
+                }),
+            );
         });
+
+        this.data.update({ inputs, outs, state });
 
         this.refresh({
             forceComputeConnections: true,
