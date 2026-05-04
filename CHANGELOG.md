@@ -1,3 +1,11 @@
+# 1.7.1
+
+- fix inputs and out-bridge connections not being cleared from the data when swapping a node state
+  - only the connections that belong to the previous state are cleared
+  - this shouldn't have had any impact on the way things work, but it is preferable if they are removed
+- `pf2e-trigger`:
+  - fix check messages originating from an `Action` being considered as action messages, triggering wrongly the `Action Sent to Chat` event and not triggering the `Check Rolled` event
+
 # 1.7.0
 
 - add a new module hook to register extra nodes for an existing application
