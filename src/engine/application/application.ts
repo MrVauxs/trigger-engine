@@ -353,6 +353,8 @@ class TriggerApplication {
                 MODULE.debug("[DISABLED] ", hookName);
             }
         }
+        MODULE.debug("TRIGGERS:");
+        MODULE.debug(triggers);
         console.groupEnd();
     }
 
