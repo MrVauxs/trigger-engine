@@ -452,10 +452,12 @@ function instantiateNode(
         #getCustomInputs(slug: string): Promise<{ label: string; value: any }[]> {
             const results = this.#inputs
                 .filter((input) => input.slug === slug)
-                .map(async ({ key, label }): Promise<{ label: string; value: any }> => {
+                .map(async ({ key, label, type }): Promise<{ label: string; value: any; type: string }> => {
+                    console.log(key, type);
                     return {
                         label: label ?? "",
                         value: await this.getInputValue(key),
+                        type,
                     };
                 });
 

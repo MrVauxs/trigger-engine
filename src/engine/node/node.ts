@@ -317,7 +317,7 @@ interface TriggerNode<
     getCustomOutputs(slug: TCustomOutputs): TriggerNodeCustomOutput[];
 
     /** Returns a list of custom inputs data. */
-    getCustomInputs(slug: TCustomInputs): Promise<{ label: string; value: any }[]>;
+    getCustomInputs<T extends any = any>(slug: TCustomInputs): Promise<{ label: string; value: T; type: string }[]>;
 
     /** Returns a list of custom inputs values */
     getCustomInputsValues(slug: TCustomInputs): Promise<any[]>;
