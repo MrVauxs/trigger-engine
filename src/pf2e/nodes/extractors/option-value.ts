@@ -3,7 +3,7 @@ import { BaseExtractorNode } from "engine";
 import { R } from "foundry-helpers";
 import { PF2eInputEntry, PF2eOutputEntry } from "pf2e";
 
-class OptionValueLogicNode extends BaseExtractorNode<Inputs, { value: string }> {
+class OptionValueExtractorNode extends BaseExtractorNode<Inputs, { value: string }> {
     static get type(): "option-value" {
         return "option-value";
     }
@@ -60,4 +60,4 @@ type Inputs = {
     target?: TargetDocuments;
 };
 
-export { OptionValueLogicNode };
+export { OptionValueExtractorNode };

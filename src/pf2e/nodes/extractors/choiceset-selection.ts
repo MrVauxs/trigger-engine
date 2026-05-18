@@ -3,7 +3,7 @@ import { BaseExtractorNode } from "engine";
 import { getChoiceSetSelection, ItemPF2e } from "foundry-helpers";
 import { PF2eInputEntry, PF2eOutputEntry } from "pf2e";
 
-class ChoicesetSelectionLogicNode extends BaseExtractorNode<Inputs, { selection: string }> {
+class ChoicesetSelectionExtractorNode extends BaseExtractorNode<Inputs, { selection: string }> {
     static get type(): "choiceset-selection" {
         return "choiceset-selection";
     }
@@ -51,4 +51,4 @@ type Inputs = {
     option: string;
 };
 
-export { ChoicesetSelectionLogicNode };
+export { ChoicesetSelectionExtractorNode };
