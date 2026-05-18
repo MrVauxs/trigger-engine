@@ -143,6 +143,9 @@ class TriggerApplication {
         if (!app) return;
 
         for (const node of nodes) {
+            // we don't want third party to override existing nodes
+            if (app.nodes.has(node.type)) continue;
+
             app.nodes.set(node.type, node);
 
             if (node.isEvent) {
