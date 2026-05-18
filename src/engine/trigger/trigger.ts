@@ -12,6 +12,7 @@ import { R, ScenePF2e, TokenDocumentPF2e, UserPF2e } from "foundry-helpers";
 
 class Trigger<TNode extends TriggerNode = TriggerNode> {
     #data: TriggerData;
+    #invalid?: boolean;
     #nodes: Collection<string, TNode> = new Collection();
     #parent: TriggerApplication;
     #sceneId?: string;
@@ -54,7 +55,16 @@ class Trigger<TNode extends TriggerNode = TriggerNode> {
     }
 
     get invalid(): boolean {
-        return this.data.invalid;
+        return (this.#invalid ??= (() => {
+            if (this.data.invalid) return true;
+
+            for (const nodeData of this.data.nodes) {
+                const node = instantiateNode(this, nodeData, false);
+                if (!node || node.invalid) return true;
+            }
+
+            return false;
+        })());
     }
 
     get userContext(): UserPF2e {
@@ -100,14 +110,6 @@ class Trigger<TNode extends TriggerNode = TriggerNode> {
     getNodeFromEntryId(id: EntryId): TNode | undefined {
         const [nodeId] = splitEntryId(id);
         return this.getNode(nodeId);
-    }
-
-    test(): boolean {
-        for (const nodeData of this.data.nodes) {
-            const node = instantiateNode(this, nodeData, false);
-            if (!node || node.invalid) return false;
-        }
-        return true;
     }
 
     toObject(): TriggerDataOutput {

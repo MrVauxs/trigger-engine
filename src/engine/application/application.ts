@@ -301,7 +301,7 @@ class TriggerApplication {
             R.map((source) => {
                 try {
                     const trigger = this.createTrigger(source);
-                    return trigger?.test() && trigger.data;
+                    return trigger && !trigger.invalid && trigger.data;
                 } catch (error) {}
             }),
             R.filter(R.isTruthy),
@@ -356,8 +356,7 @@ class TriggerApplication {
                 MODULE.debug("[DISABLED] ", hookName);
             }
         }
-        MODULE.debug("TRIGGERS:");
-        MODULE.debug(triggers);
+        MODULE.debug("TRIGGERS:", triggers);
         console.groupEnd();
     }
 

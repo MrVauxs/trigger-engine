@@ -37,6 +37,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
     #enabledIds: Set<string> = new Set();
     #gridLayer: BlueprintGridLayer;
     #hitArea: PIXI.Rectangle;
+    #invalids: Collection<TriggerFullId, OpenTrigger> = new Collection();
     #layers: BlueprintLayers;
     #modulesFolders: Record<string, string>;
     #mouseManager: MouseInteractionManager;
@@ -73,7 +74,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
             this.#enabledIds.add(id);
         }
 
-        const triggers = R.pipe(
+        const allTriggers = R.pipe(
             [
                 [triggersSetting.sources, false],
                 [this.application.moduleSources, true],
@@ -91,6 +92,9 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
             }),
         );
 
+        const [invalids, triggers] = R.partition(allTriggers, ([_, trigger]) => trigger.invalid);
+
+        this.#invalids = new Collection(invalids);
         this.#triggers = new Collection(triggers);
 
         const handlers: ConstructorParameters<typeof MouseInteractionManager>[3] = {
@@ -147,6 +151,10 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
 
     get nodes(): BlueprintNodesLayer {
         return this.#layers.nodes;
+    }
+
+    get invalids(): Collection<TriggerFullId, OpenTrigger> {
+        return this.#invalids;
     }
 
     get triggers(): Collection<TriggerFullId, OpenTrigger> {
@@ -301,7 +309,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         if (!this.application.isSettingApplication) return;
 
         const [locked, triggers] = R.partition(this.triggers.contents, (trigger) => trigger.locked);
-        const sources = R.map(triggers, (trigger) => trigger.toObject());
+        const sources = R.map([...triggers, ...this.invalids], (trigger) => trigger.toObject());
         const triggersIds = R.map(triggers, (trigger) => trigger.id);
         const lockedIds = R.map(locked, (trigger) => trigger.id);
 

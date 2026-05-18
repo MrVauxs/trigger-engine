@@ -4,6 +4,7 @@ import {
     CreateMessageActionNode,
     DeleteItemActionNode,
     ExecuteScriptActionNode,
+    // TestNodeActionNode,
     UpdateItemActionNode,
 } from ".";
 
@@ -14,6 +15,7 @@ export * from "./console-log";
 export * from "./create-message";
 export * from "./delete-item";
 export * from "./execute-script";
+// export * from "./test-node";
 export * from "./update-item";
 
 export default [
@@ -22,5 +24,6 @@ export default [
     CreateMessageActionNode,
     DeleteItemActionNode,
     ExecuteScriptActionNode,
+    // TestNodeActionNode,
     UpdateItemActionNode,
 ] as const;

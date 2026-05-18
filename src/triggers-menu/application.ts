@@ -582,6 +582,9 @@ class BlueprintApplication extends apps.ApplicationV2<fa.ApplicationConfiguratio
             {
                 icon: `<i class="fa-solid fa-copy"></i>`,
                 label: localize.path("blueprint.trigger.duplicate"),
+                visible: (el) => {
+                    return !!getTriggerFromElement(el);
+                },
                 onClick: (_event, el) => {
                     const trigger = getTriggerFromElement(el);
                     const source = trigger?.duplicate();
@@ -696,7 +699,7 @@ class BlueprintApplication extends apps.ApplicationV2<fa.ApplicationConfiguratio
     }
 
     #prepareTriggersContext(_options: BlueprintRenderOptions): TriggersContext {
-        const triggers = this.blueprint.triggers.contents;
+        const triggers = [...this.blueprint.triggers, ...this.blueprint.invalids];
         const groups = this.#prepareTriggersGroups(triggers);
 
         // we move the folder-less group at the end

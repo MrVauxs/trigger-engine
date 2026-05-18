@@ -47,11 +47,20 @@
         {{#unless group.collapsed}}
         <div class="list">
             {{#each group.triggers as |trigger|}}
-            <div class="trigger" {{#if trigger.name}}
-                data-name="{{trigger.name}}" {{/if}} data-id={{trigger.id}} data-locked={{trigger.locked}}
-                data-full-id={{trigger.fullId}} data-path="{{trigger.path}}" data-tags="{{trigger.tags}}">
-                <input type="checkbox" data-action="toggle-enabled" name="enabled" {{checked (@root.isEnabled trigger)}}>
+            <div class="trigger" {{#if trigger.name}}data-name="{{trigger.name}}"{{/if}}
+                data-id="{{trigger.id}}" data-locked="{{trigger.locked}}" data-invalid="{{trigger.invalid}}"
+                data-full-id="{{trigger.fullId}}" data-path="{{trigger.path}}" data-tags="{{trigger.tags}}">
+                <input
+                    type="checkbox"
+                    data-action="toggle-enabled"
+                    name="enabled"
+                    {{#if trigger.invalid}}disabled{{else if (@root.isEnabled trigger)}}checked{{/if}}
+                >
+                {{#if trigger.invalid}}
+                <span class="name" {{{@root.i18n.tooltip 'invalid'}}}>{{trigger.label}}</a>
+                {{else}}
                 <a class="name" data-action="select-trigger">{{trigger.label}}</a>
+                {{/if}}
                 {{#if trigger.locked}}
                 <i class="fa-solid fa-lock"></i>
                 {{/if}}

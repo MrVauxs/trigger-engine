@@ -262,8 +262,18 @@
                 height: 1.2em;
             }
 
+            &[data-invalid="true"] {
+                > .name,
+                > i {
+                    color: #fb0000;
+                }
+            }
+
             &[data-locked="true"] {
-                color: grey;
+                > .name,
+                > i {
+                    opacity: 0.5;
+                }
             }
         }
     }
