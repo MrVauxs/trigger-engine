@@ -1,7 +1,7 @@
 import { BaseLogicNode, BuiltinsCustomEntry, BuiltinsInputEntry, BuiltinsOutputEntry } from "engine";
-import { ItemPF2e, localize } from "foundry-helpers";
+import { ItemPF2e, localize, R } from "foundry-helpers";
 
-class ResolveFormulaLogicNode extends BaseLogicNode<"out", Inputs, Outputs, "variable", never, "formula" | "value"> {
+class ResolveFormulaLogicNode extends BaseLogicNode<"out", Inputs, Outputs, CustomInputs, never, States> {
     static get type(): "resolve-formula" {
         return "resolve-formula";
     }
@@ -21,8 +21,6 @@ class ResolveFormulaLogicNode extends BaseLogicNode<"out", Inputs, Outputs, "var
                 type: "text",
                 tooltip: localize.path("builtins.shared.variables.tooltip"),
             },
-            { key: "actor", type: "target", state: "value" },
-            { key: "item", type: "item", state: "value" },
         ];
     }
 
@@ -34,17 +32,24 @@ class ResolveFormulaLogicNode extends BaseLogicNode<"out", Inputs, Outputs, "var
     }
 
     static get defineCustomInputs(): BuiltinsCustomEntry[] {
-        return [
-            {
-                slug: "variable",
-                array: false,
-                types: ["number"],
-                input: {
-                    replaceLabel: true,
-                    validation: "^[a-z]+$",
-                },
+        return R.map(
+            [
+                ["variable", "number"],
+                ["actor", "target"],
+                ["item", "item"],
+            ] as const,
+            ([slug, type]) => {
+                return {
+                    slug,
+                    array: false,
+                    types: [type],
+                    input: {
+                        replaceLabel: true,
+                        validation: "^[a-z]+$",
+                    },
+                };
             },
-        ];
+        );
     }
 
     async _execute(): Promise<boolean> {
@@ -61,14 +66,32 @@ class ResolveFormulaLogicNode extends BaseLogicNode<"out", Inputs, Outputs, "var
             formula = formula.replace(regex, value);
         }
 
+        const actorsAndItems = [
+            ...(await this.getCustomInputs<TargetDocuments | undefined>("actor")),
+            ...(await this.getCustomInputs<ItemPF2e | undefined>("item")),
+        ];
+
+        for (const { label, value } of actorsAndItems) {
+            if (!value) continue;
+
+            const regex = new RegExp(`@${label}(?:\\.\\w+)*`, "gm");
+            const match = formula.match(regex)?.[0];
+            if (!match) continue;
+
+            const document = value instanceof Item ? value : value.actor;
+            const path = match.slice(label.length + 2);
+            const parsedValue = foundry.utils.getProperty(document, path);
+
+            if (R.isNumber(parsedValue)) {
+                formula = formula.replace(match, String(parsedValue));
+            }
+        }
+
         if (this.state === "formula") {
             this.setOutputValue("formula", formula);
         } else {
-            const actor = (await this.getInputValue("actor"))?.actor;
-            const item = await this.getInputValue("item");
-            const roll = new Roll(formula, { actor, item });
+            const roll = new Roll(formula);
             const total = (await roll.evaluate()).total;
-
             this.setOutputValue("value", total);
         }
 
@@ -77,8 +100,6 @@ class ResolveFormulaLogicNode extends BaseLogicNode<"out", Inputs, Outputs, "var
 }
 
 type Inputs = {
-    actor?: TargetDocuments;
-    item?: ItemPF2e;
     formula: string;
 };
 
@@ -86,5 +107,9 @@ type Outputs = {
     formula: string;
     value: number;
 };
+
+type CustomInputs = "variable" | "actor" | "item";
+
+type States = "formula" | "value";
 
 export { ResolveFormulaLogicNode };
