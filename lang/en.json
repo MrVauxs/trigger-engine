@@ -330,6 +330,9 @@
                     },
                     "region-event": {
                         "outputs": {
+                            "attachment": {
+                                "title": "Attachment"
+                            },
                             "event": {
                                 "title": "Event"
                             }

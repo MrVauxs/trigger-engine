@@ -12,6 +12,7 @@ class RegionEvent extends BaseEventNode<never, Outputs> {
 
     static get defineOutputs(): BuiltinsOutputEntry[] {
         return [
+            { key: "attachment", type: "target" },
             { key: "target", type: "target" },
             { key: "event", type: "text" },
         ];
@@ -21,8 +22,9 @@ class RegionEvent extends BaseEventNode<never, Outputs> {
         return { unicode: "\uf867" };
     }
 
-    _execute({ eventName, target }: RegionEventOptions): Promise<boolean> {
+    _execute({ attachment, eventName, target }: RegionEventOptions): Promise<boolean> {
         this.sceneContext = target.token;
+        this.setOutputValue("attachment", attachment);
         this.setOutputValue("event", eventName);
         this.setOutputValue("target", target);
         return this.executeNext("out");
@@ -30,6 +32,7 @@ class RegionEvent extends BaseEventNode<never, Outputs> {
 }
 
 type Outputs = {
+    attachment?: TargetDocuments;
     event: string;
     target: TargetDocuments;
 };

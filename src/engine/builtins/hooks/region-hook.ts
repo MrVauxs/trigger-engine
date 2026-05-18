@@ -1,5 +1,5 @@
 import { TriggerApplication, TriggerHook, TriggerPath } from "engine";
-import { R, RegionEventPF2e, TokenDocumentPF2e, localize } from "foundry-helpers";
+import { R, RegionEventPF2e, TokenDocumentPF2e, createTargetDocuments, localize } from "foundry-helpers";
 import fields = foundry.data.fields;
 
 class RegionHook extends TriggerHook<RegionEventOptions> {
@@ -38,13 +38,13 @@ class TriggerEngineRegionBehaviorType extends foundry.data.regionBehaviors.Regio
     async _handleRegionEvent(event: RegionEventPF2e): Promise<void> {
         if (!("token" in event.data) || !game.user.isActiveGM) return;
 
-        const token = event.data.token as TokenDocumentPF2e;
-        const actor = token.actor;
-        if (!actor) return;
+        const target = createTargetDocuments({ token: event.data.token as TokenDocumentPF2e });
+        if (!target) return;
 
         const args: RegionEventOptions = {
+            attachment: createTargetDocuments({ token: this.region?.attachment?.token }),
             eventName: event.name,
-            target: { actor, token },
+            target,
         };
 
         TriggerApplication.executeTriggerEvent(game.user.id, this.path, "region-event", args);
@@ -52,6 +52,7 @@ class TriggerEngineRegionBehaviorType extends foundry.data.regionBehaviors.Regio
 }
 
 type RegionEventOptions = {
+    attachment: TargetDocuments | undefined;
     eventName: string;
     target: TargetDocuments;
 };
