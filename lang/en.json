@@ -1067,7 +1067,7 @@
                         "title": "Get ChoiceSet Selection"
                     },
                     "find-item": {
-                        "title": "Find Item"
+                        "title": "Find Item Instances"
                     },
                     "item-formula": {
                         "title": "Extract Item Formula"
