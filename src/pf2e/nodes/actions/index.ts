@@ -14,6 +14,7 @@ import {
     RollFlatActionNode,
     RollSaveActionNode,
     SendToChatActionNode,
+    ToggleOptionActionNode,
     UpdateInitiativeActionNode,
     UpdateResourceActionNode,
 } from ".";
@@ -35,6 +36,7 @@ export * from "./roll-damage";
 export * from "./roll-flat";
 export * from "./roll-save";
 export * from "./send-chat";
+export * from "./toggle-option";
 export * from "./update-initiative";
 export * from "./update-resource";
 
@@ -54,6 +56,7 @@ export default [
     RollFlatActionNode,
     RollSaveActionNode,
     SendToChatActionNode,
+    ToggleOptionActionNode,
     UpdateInitiativeActionNode,
     UpdateResourceActionNode,
 ];

@@ -815,6 +815,20 @@
                         },
                         "title": "Send Item to Chat"
                     },
+                    "toggle-option": {
+                        "inputs": {
+                            "checked": {
+                                "title": "Enabled"
+                            },
+                            "item": {
+                                "title": "itemId"
+                            },
+                            "option": {
+                                "title": "option"
+                            }
+                        },
+                        "title": "Toggle RollOption"
+                    },
                     "update-initiative": {
                         "inputs": {
                             "other": {
