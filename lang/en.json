@@ -396,6 +396,14 @@
                         "title": "Format Text"
                     },
                     "resolve-formula": {
+                        "inputs": {
+                            "actor": {
+                                "title": "actor"
+                            },
+                            "item": {
+                                "title": "item"
+                            }
+                        },
                         "title": "Resolve Formula"
                     },
                     "texts-match": {

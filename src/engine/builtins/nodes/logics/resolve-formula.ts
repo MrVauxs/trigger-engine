@@ -1,5 +1,5 @@
 import { BaseLogicNode, BuiltinsCustomEntry, BuiltinsInputEntry, BuiltinsOutputEntry } from "engine";
-import { localize } from "foundry-helpers";
+import { ItemPF2e, localize } from "foundry-helpers";
 
 class ResolveFormulaLogicNode extends BaseLogicNode<"out", Inputs, Outputs, "variable", never, "formula" | "value"> {
     static get type(): "resolve-formula" {
@@ -21,6 +21,8 @@ class ResolveFormulaLogicNode extends BaseLogicNode<"out", Inputs, Outputs, "var
                 type: "text",
                 tooltip: localize.path("builtins.shared.variables.tooltip"),
             },
+            { key: "actor", type: "target", state: "value" },
+            { key: "item", type: "item", state: "value" },
         ];
     }
 
@@ -62,8 +64,11 @@ class ResolveFormulaLogicNode extends BaseLogicNode<"out", Inputs, Outputs, "var
         if (this.state === "formula") {
             this.setOutputValue("formula", formula);
         } else {
-            const roll = new Roll(formula);
+            const actor = (await this.getInputValue("actor"))?.actor;
+            const item = await this.getInputValue("item");
+            const roll = new Roll(formula, { actor, item });
             const total = (await roll.evaluate()).total;
+
             this.setOutputValue("value", total);
         }
 
@@ -72,6 +77,8 @@ class ResolveFormulaLogicNode extends BaseLogicNode<"out", Inputs, Outputs, "var
 }
 
 type Inputs = {
+    actor?: TargetDocuments;
+    item?: ItemPF2e;
     formula: string;
 };
 
