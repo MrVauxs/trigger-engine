@@ -1066,6 +1066,9 @@
                         },
                         "title": "Get ChoiceSet Selection"
                     },
+                    "find-item": {
+                        "title": "Find Item"
+                    },
                     "item-formula": {
                         "title": "Extract Item Formula"
                     },
