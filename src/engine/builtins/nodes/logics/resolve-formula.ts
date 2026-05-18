@@ -81,10 +81,9 @@ class ResolveFormulaLogicNode extends BaseLogicNode<"out", Inputs, Outputs, Cust
             const document = value instanceof Item ? value : value.actor;
             const path = match.slice(label.length + 2);
             const parsedValue = foundry.utils.getProperty(document, path);
+            const finalizedValue = R.isNumber(parsedValue) ? parsedValue : 0;
 
-            if (R.isNumber(parsedValue)) {
-                formula = formula.replace(match, String(parsedValue));
-            }
+            formula = formula.replace(match, String(finalizedValue));
         }
 
         if (this.state === "formula") {
