@@ -7,20 +7,26 @@ import {
     TriggerNode,
 } from "engine";
 import { MODULE, R } from "foundry-helpers";
-import { registerPF2eApplication } from "pf2e";
+import { PF2eTriggerEngineRegionBehaviorType, registerPF2eApplication } from "pf2e";
 import { onUserQuery } from "queries";
 import { id } from "../module.json";
 
 MODULE.register(id);
 
 Hooks.once("init", async () => {
-    CONFIG.RegionBehavior.dataModels[MODULE.path("builtins.region")] = TriggerEngineRegionBehaviorType;
+    const isPF2eSystem = R.isIncludedIn(game.system.id, ["pf2e", "sf2e"]);
+
+    // we have a different region behavior for pf2e system
+    CONFIG.RegionBehavior.dataModels[MODULE.path("builtins.region")] = isPF2eSystem
+        ? PF2eTriggerEngineRegionBehaviorType
+        : TriggerEngineRegionBehaviorType;
+
     CONFIG.RegionBehavior.typeIcons[MODULE.path("builtins.region")] = "fa-solid fa-land-mine-on";
 
     CONFIG.queries[MODULE.path("user-query")] = onUserQuery;
 
     // we register the pf2e-trigger application
-    if (R.isIncludedIn(game.system.id, ["pf2e", "sf2e"])) {
+    if (isPF2eSystem) {
         registerPF2eApplication();
     }
 

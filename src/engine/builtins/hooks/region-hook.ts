@@ -41,13 +41,16 @@ class TriggerEngineRegionBehaviorType extends foundry.data.regionBehaviors.Regio
         const target = createTargetDocuments({ token: event.data.token as TokenDocumentPF2e });
         if (!target) return;
 
-        const args: RegionEventOptions = {
+        const args = this._createRegionEventOptions(event, target);
+        TriggerApplication.executeTriggerEvent(game.user.id, this.path, "region-event", args);
+    }
+
+    _createRegionEventOptions(event: RegionEventPF2e, target: TargetDocuments): RegionEventOptions {
+        return {
             attachment: createTargetDocuments({ token: this.region?.attachment?.token }),
             eventName: event.name,
             target,
         };
-
-        TriggerApplication.executeTriggerEvent(game.user.id, this.path, "region-event", args);
     }
 }
 

@@ -1,7 +1,7 @@
 import { IconObject } from "_zod";
 import { BaseEventNode, BuiltinsOutputEntry, RegionEventOptions } from "engine";
 
-class RegionEvent extends BaseEventNode<never, Outputs> {
+class RegionEvent<TOutputs extends RegionEventOutputs = RegionEventOutputs> extends BaseEventNode<never, TOutputs> {
     static get type(): "region-event" {
         return "region-event";
     }
@@ -22,19 +22,24 @@ class RegionEvent extends BaseEventNode<never, Outputs> {
         return { unicode: "\uf867" };
     }
 
-    _execute({ attachment, eventName, target }: RegionEventOptions): Promise<boolean> {
-        this.sceneContext = target.token;
+    async _execute(options: RegionEventOptions): Promise<boolean> {
+        this.sceneContext = options.target.token;
+        this._setOutputs(options);
+        return this.executeNext("out");
+    }
+
+    _setOutputs({ attachment, eventName, target }: RegionEventOptions) {
         this.setOutputValue("attachment", attachment);
         this.setOutputValue("event", eventName);
         this.setOutputValue("target", target);
-        return this.executeNext("out");
     }
 }
 
-type Outputs = {
+type RegionEventOutputs = {
     attachment?: TargetDocuments;
     event: string;
     target: TargetDocuments;
 };
 
 export { RegionEvent };
+export type { RegionEventOutputs };

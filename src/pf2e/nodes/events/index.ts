@@ -5,6 +5,7 @@ import {
     AuraLeaveEvent,
     CheckRollEvent,
     DamageTakenEvent,
+    PF2eRegionEvent,
     TurnEndEvent,
     TurnStartEvent,
 } from ".";
@@ -16,6 +17,7 @@ export * from "./aura-enter";
 export * from "./aura-leave";
 export * from "./check-roll";
 export * from "./damage-taken";
+export * from "./region-event";
 export * from "./turn-end";
 export * from "./turn-start";
 
@@ -26,6 +28,7 @@ export default [
     AuraLeaveEvent,
     CheckRollEvent,
     DamageTakenEvent,
+    PF2eRegionEvent,
     TurnEndEvent,
     TurnStartEvent,
 ];
