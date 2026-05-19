@@ -18,7 +18,7 @@ export * from "./delete-combatant";
 export * from "./delete-token";
 export * from "./execute-hook";
 export * from "./move-token";
-export * from "./region-hook";
+export * from "./create-region";
 export * from "./test-hook";
 
 export default [

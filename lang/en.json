@@ -142,6 +142,9 @@
                 "any": {
                     "title": "Any"
                 },
+                "attachment": {
+                    "title": "Attachment"
+                },
                 "b": {
                     "title": "Entry B"
                 },
@@ -330,11 +333,8 @@
                     },
                     "region-event": {
                         "outputs": {
-                            "attachment": {
-                                "title": "Attachment"
-                            },
                             "event": {
-                                "title": "Event"
+                                "title": "Event Name"
                             }
                         },
                         "title": "Region Triggered"
@@ -1036,6 +1036,14 @@
                         "titles": {
                             "everything": "Damage Taken & Heal Receives"
                         }
+                    },
+                    "template-placed-event": {
+                        "outputs": {
+                            "region": {
+                                "title": "Region Document"
+                            }
+                        },
+                        "title": "Template Placed"
                     },
                     "turn-end-event": {
                         "title": "Turn End"

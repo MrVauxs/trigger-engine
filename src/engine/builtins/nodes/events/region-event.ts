@@ -19,7 +19,7 @@ class RegionEvent<TOutputs extends RegionEventOutputs = RegionEventOutputs> exte
     }
 
     get icon(): IconObject {
-        return { unicode: "\uf867" };
+        return { unicode: "\uf719" };
     }
 
     async _execute(options: RegionEventOptions): Promise<boolean> {

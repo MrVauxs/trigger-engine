@@ -5,8 +5,8 @@ import hooks from "./hooks";
 import nodes from "./nodes";
 
 const VERSION = {
-    pf2e: "7.9.1",
-    sf2e: "0.0.4",
+    pf2e: "8.1.2",
+    sf2e: "1.1.2",
 };
 
 function registerPF2eApplication() {
