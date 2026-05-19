@@ -337,7 +337,7 @@
                                 "title": "Event"
                             }
                         },
-                        "title": "Scene Region"
+                        "title": "Region Triggered"
                     },
                     "test-event": {
                         "title": "Test Event"
