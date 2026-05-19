@@ -301,7 +301,9 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         const confirm = await confirmDialog("blueprint.trigger.delete");
         if (!confirm) return;
 
+        this.invalids.delete(fullId);
         this.triggers.delete(fullId);
+
         this.parent.render();
     }
 
@@ -407,6 +409,10 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
 
         const nodes = this.nodes.getVariables(id);
         this.nodes.delete(nodes, redraw);
+    }
+
+    getInvalidTrigger(fullId: TriggerFullId): OpenTrigger | null {
+        return this.invalids.get(fullId) ?? null;
     }
 
     getTrigger(fullId: TriggerFullId): OpenTrigger | null {

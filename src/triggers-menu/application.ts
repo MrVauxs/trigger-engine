@@ -545,8 +545,8 @@ class BlueprintApplication extends apps.ApplicationV2<fa.ApplicationConfiguratio
 
     #triggerContextMenu(): ContextMenuEntry[] {
         const getTriggerFromElement = (el: HTMLElement): OpenTrigger | null => {
-            const fullId = el.dataset.fullId as TriggerFullId;
-            return fullId ? this.blueprint.getTrigger(fullId) : null;
+            const { fullId, invalid } = el.dataset as { fullId?: TriggerFullId; invalid?: "true" | "false" };
+            return !fullId ? null : this.blueprint[invalid === "true" ? "getInvalidTrigger" : "getTrigger"](fullId);
         };
 
         return [
@@ -560,7 +560,7 @@ class BlueprintApplication extends apps.ApplicationV2<fa.ApplicationConfiguratio
                 label: localize.path("blueprint.trigger.edit"),
                 visible: (el) => {
                     const trigger = getTriggerFromElement(el);
-                    return !!trigger && !trigger.locked;
+                    return !!trigger && !trigger.locked && !trigger.invalid;
                 },
                 onClick: (_event, el) => {
                     const trigger = getTriggerFromElement(el);
@@ -583,7 +583,8 @@ class BlueprintApplication extends apps.ApplicationV2<fa.ApplicationConfiguratio
                 icon: `<i class="fa-solid fa-copy"></i>`,
                 label: localize.path("blueprint.trigger.duplicate"),
                 visible: (el) => {
-                    return !!getTriggerFromElement(el);
+                    const trigger = getTriggerFromElement(el);
+                    return !!trigger && !trigger.invalid;
                 },
                 onClick: (_event, el) => {
                     const trigger = getTriggerFromElement(el);
