@@ -3,7 +3,7 @@ import { CompendiumIndexData, MODULE, R, isScriptMacro } from "foundry-helpers";
 import { BaseActionNode } from ".";
 import { IconObject } from "_zod";
 
-const DEFAULT_CALLBACK = `/**
+const DEFAULT_SCRIPT = `/**
  * @param {unknown[]} inputs
  * @returns {boolean} to break out current process
  * @returns {{type: EntryType; value: unknown}[]}
@@ -42,7 +42,7 @@ class ExecuteScriptActionNode extends BaseActionNode<
                 type: "text",
                 field: {
                     type: "javascript",
-                    default: DEFAULT_CALLBACK,
+                    default: DEFAULT_SCRIPT,
                 },
                 state: "script",
             },

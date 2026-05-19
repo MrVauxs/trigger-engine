@@ -694,6 +694,9 @@
                 "private": {
                     "title": "Private"
                 },
+                "region": {
+                    "title": "Region Document"
+                },
                 "reroll": {
                     "title": "Is Reroll"
                 },
@@ -702,6 +705,9 @@
                 },
                 "slug": {
                     "title": "Slug"
+                },
+                "type": {
+                    "title": "Type"
                 },
                 "when": {
                     "title": "Triggers When"
@@ -715,6 +721,27 @@
             },
             "node": {
                 "action": {
+                    "create-behavior": {
+                        "inputs": {
+                            "events": {
+                                "title": "Events",
+                                "tooltip": "Comma separated list of behavior events"
+                            },
+                            "path": {
+                                "title": "Trigger Path"
+                            },
+                            "source": {
+                                "title": "System Source",
+                                "tooltip": "System source of the behavior without the <i>events</i>"
+                            }
+                        },
+                        "states": {
+                            "source": "Source Code",
+                            "terrain": "Difficult Terrain",
+                            "trigger": "Trigger Event"
+                        },
+                        "title": "Create Region Behavior"
+                    },
                     "create-condition": {
                         "groups": {
                             "effect": "Effect Data"
@@ -1038,11 +1065,6 @@
                         }
                     },
                     "template-placed-event": {
-                        "outputs": {
-                            "region": {
-                                "title": "Region Document"
-                            }
-                        },
                         "title": "Template Placed"
                     },
                     "turn-end-event": {

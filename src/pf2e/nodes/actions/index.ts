@@ -1,4 +1,5 @@
 import {
+    CreateBehaviorActionNode,
     CreateConditionActionNode,
     CreateEffectActionNode,
     CreateItemActionNode,
@@ -21,6 +22,7 @@ import {
 
 export * from "./utils";
 export * from "./base-effect";
+export * from "./create-behavior";
 export * from "./create-condition";
 export * from "./create-effect";
 export * from "./create-item";
@@ -41,6 +43,7 @@ export * from "./update-initiative";
 export * from "./update-resource";
 
 export default [
+    CreateBehaviorActionNode,
     CreateConditionActionNode,
     CreateEffectActionNode,
     CreateItemActionNode,
