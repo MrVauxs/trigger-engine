@@ -10,15 +10,15 @@
 - now always display tooltips for `text` inputs
 - add new `Text List` value node
   - a simple comma separated text field converted into a list
+- the `Resolve Formula` logic node now also support `target` and `item` variables
+  - you can then directly use full path such as `@actor.level` if your `target` input is `actor`
+  - if the path doesn't lead to a number, the whole match will be replaced by `0`
 - fix third party being able to override existing nodes when using the `triggerEngine.registerNodes` hook
 - fix local data not overriding builtins when registering an application
 - `pf2e-trigger`:
   - add new `Toggle RollOption` action node
   - add new `Find Item Instances` extractor node
     - it basically works like the `Has Item` nodes but will not stop looking after finding one instance of the matching item
-  - the `Resolve Formula` logic node now also support `target` and `item` variables
-    - you can then directly use full path such as `@actor.level` if your `target` input is `actor`
-    - if the path doesn't lead to a number, the whole match will be replaced by `0`
   - implement an extended version of `Region Triggered` for pf2e
     - an extra `Origin`, `Item` and `Roll Options` outputs are added to it
     - the extra outputs are filled if the region was originally a system "template" (i.e. from a spell chat message)
