@@ -443,6 +443,15 @@
                     "current-combatant": {
                         "title": "Current Combatant"
                     },
+                    "list-value": {
+                        "inputs": {
+                            "entry": {
+                                "title": "Entries",
+                                "tooltip": "Comma separated list"
+                            }
+                        },
+                        "title": "Text List"
+                    },
                     "scene-targets": {
                         "title": "Scene Targets"
                     },
