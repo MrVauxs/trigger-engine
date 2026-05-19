@@ -41,6 +41,18 @@ class TextEntry extends BuiltInNodeEntry<string, TextFieldSchema> {
         return String(value);
     }
 
+    get isEnrichedInput(): boolean {
+        return this.field.type === "enriched";
+    }
+
+    get isJavascript() {
+        return this.field.type === "javascript";
+    }
+
+    get isJSONInput(): boolean {
+        return this.field.type === "json";
+    }
+
     get isSimpleInput(): boolean {
         return !this.field.type || (this.field.type === "select" && !this.options.length);
     }
@@ -69,11 +81,7 @@ class TextEntry extends BuiltInNodeEntry<string, TextFieldSchema> {
 
         const tooltip = super.generateTooltip(label, isConnected);
 
-        if (
-            this.category === "inputs" &&
-            !isConnected &&
-            (this.isSelect || (R.isString(this.value) && this.value !== this.default))
-        ) {
+        if (this.category === "inputs" && !isConnected) {
             return tooltip ? `<div class="title">${label}</div><hr>${tooltip}` : label;
         }
 

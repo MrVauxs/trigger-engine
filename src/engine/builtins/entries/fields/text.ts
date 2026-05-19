@@ -83,15 +83,15 @@ class TextField extends InputField<string, TextFieldSchema> {
     }
 
     get isEnrichedInput(): boolean {
-        return this.field.type === "enriched";
+        return this.entry.isEnrichedInput;
     }
 
     get isJavascript() {
-        return this.field.type === "javascript";
+        return this.entry.isJavascript;
     }
 
     get isJSONInput(): boolean {
-        return this.field.type === "json";
+        return this.entry.isJSONInput;
     }
 
     get targetFontSize(): number {
