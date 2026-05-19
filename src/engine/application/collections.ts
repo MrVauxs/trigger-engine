@@ -9,7 +9,7 @@ function createCollection<C extends Exclude<TriggerApplicationCollection, "hooks
     const local = getLocal(options, collection);
     const builtin = getBuiltins(options, collection);
 
-    return new Collection([...local, ...builtin]) as any;
+    return new Collection([...builtin, ...local]) as any;
 }
 
 function getLocal(options: TriggerApplicationOptions, collection: Exclude<TriggerApplicationCollection, "hooks">) {
