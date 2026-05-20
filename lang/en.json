@@ -226,7 +226,7 @@
                 },
                 "action": {
                     "attach-region": {
-                        "detach": "Detach Region",
+                        "detach": "Detach Scene Region",
                         "inputs": {
                             "center": {
                                 "title": "Center to Token"
@@ -239,7 +239,7 @@
                             "attach": "Attach",
                             "detach": "Detach"
                         },
-                        "title": "Attach Region"
+                        "title": "Attach Scene Region"
                     },
                     "await-confirm": {
                         "inputs": {

@@ -29,6 +29,7 @@ function moveRegionToPosition(
     return shapes;
 }
 
+// we do all that because the default TokenDocument don't have the pf2e goodies
 function getTokenCenter(region: RegionDocument, token: TokenDocument) {
     const mode = CONST.GRID_SNAPPING_MODES.CENTER;
     const { x, y } = getSnappedCoords(region, token.movement.destination, mode);
