@@ -3,7 +3,7 @@
 - split the `Create Region Behavior` between builtins and the `pf2e-trigger` application
   - the `Difficult Terrain` state being reserved to the `pf2e-trigger` application
   - remove the `Events` inputs from the `Source Code` state, you are expected to provide them directly in the `System Source` if needed
-- add `Region Document` input to the `Region Triggered` event node
+- add `Region Document` output to the `Region Triggered` event node
 - add `Attach Scene Region` action node
   - it attach the region to the provided target token and will follow it while moving
   - the `Center to Token` option will also move the first shape of the region to have its origin be the same as the attached token
