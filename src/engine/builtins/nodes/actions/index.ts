@@ -1,4 +1,5 @@
 import {
+    AttachRegionActionNode,
     AwaitConfirmActionNode,
     ConsoleLogActionNode,
     CreateBehaviorActionNode,
@@ -11,6 +12,7 @@ import {
 
 export * from "./utils";
 export * from "./base";
+export * from "./attach-region";
 export * from "./await-confirm";
 export * from "./console-log";
 export * from "./create-behavior";
@@ -21,6 +23,7 @@ export * from "./execute-script";
 export * from "./update-item";
 
 export default [
+    AttachRegionActionNode,
     AwaitConfirmActionNode,
     ConsoleLogActionNode,
     CreateBehaviorActionNode,

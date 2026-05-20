@@ -216,6 +216,23 @@
                     }
                 },
                 "action": {
+                    "attach-region": {
+                        "detach": "Detach Region",
+                        "inputs": {
+                            "center": {
+                                "title": "Center to Token"
+                            },
+                            "token": {
+                                "title": "Token",
+                                "tooltip": "If provided, will only detach if it matches the current token"
+                            }
+                        },
+                        "states": {
+                            "attach": "Attach",
+                            "detach": "Detach"
+                        },
+                        "title": "Attach Region to Token"
+                    },
                     "await-confirm": {
                         "inputs": {
                             "content": {
