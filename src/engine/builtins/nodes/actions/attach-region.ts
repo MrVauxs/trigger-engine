@@ -1,6 +1,6 @@
 import { IconObject } from "_zod";
-import { BaseActionNode, BuiltinsInputEntry } from "engine";
-import { getTargetToken, RegionBehaviorPF2e } from "foundry-helpers";
+import { BaseActionNode, BuiltinsInputEntry, moveRegionToPosition } from "engine";
+import { getTargetToken, RegionSource } from "foundry-helpers";
 
 class AttachRegionActionNode extends BaseActionNode<"out", Inputs, never, never, never, State> {
     static get type(): "attach-region" {
@@ -58,26 +58,12 @@ class AttachRegionActionNode extends BaseActionNode<"out", Inputs, never, never,
         }
 
         const center = await this.getInputValue("center");
-        const updates: DeepPartial<RegionBehaviorPF2e["_source"]> = {
+        const updates: DeepPartial<RegionSource> = {
             attachment: { token: token.id },
         };
 
-        center: if (center) {
-            const { x, y } = token;
-            const shapes = foundry.utils.deepClone(region._source.shapes);
-            const shape = shapes.at(0);
-            if (!shape) break center;
-
-            if ("base" in shape) {
-                const base = shape.base as Point;
-                base.x = x;
-                base.y = y;
-            } else if ("x" in shape) {
-                shape.x = x;
-                shape.y = y;
-            }
-
-            updates.shapes = shapes;
+        if (center) {
+            updates.shapes = moveRegionToPosition(region, token);
         }
 
         await region.update(updates);

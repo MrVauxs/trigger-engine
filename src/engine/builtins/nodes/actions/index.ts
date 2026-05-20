@@ -6,6 +6,7 @@ import {
     CreateMessageActionNode,
     DeleteItemActionNode,
     ExecuteScriptActionNode,
+    MoveRegionActionNode,
     // TestNodeActionNode,
     UpdateItemActionNode,
 } from ".";
@@ -19,6 +20,7 @@ export * from "./create-behavior";
 export * from "./create-message";
 export * from "./delete-item";
 export * from "./execute-script";
+export * from "./move-region";
 // export * from "./test-node";
 export * from "./update-item";
 
@@ -30,6 +32,7 @@ export default [
     CreateMessageActionNode,
     DeleteItemActionNode,
     ExecuteScriptActionNode,
+    MoveRegionActionNode,
     // TestNodeActionNode,
     UpdateItemActionNode,
 ] as const;

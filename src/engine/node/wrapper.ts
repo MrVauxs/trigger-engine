@@ -12,7 +12,7 @@ import {
     splitEntryId,
     Trigger,
 } from "engine";
-import { LocalizeArgs, MODULE, R, ScenePF2e, TokenDocumentPF2e, UserPF2e } from "foundry-helpers";
+import { LocalizeArgs, MODULE, R, ScenePF2e, UserPF2e } from "foundry-helpers";
 import {
     getInputsSchemas,
     getNodeStates,
@@ -115,8 +115,8 @@ function instantiateNode(
                 get(): ScenePF2e | undefined {
                     return (self.#sceneId && game.scenes.get(self.#sceneId)) || parent.sceneContext;
                 },
-                set(sceneOrToken: Maybe<ScenePF2e | TokenDocumentPF2e>) {
-                    const scene = sceneOrToken instanceof TokenDocument ? sceneOrToken.scene : sceneOrToken;
+                set(sceneOrToken: Maybe<ScenePF2e | TokenDocument>) {
+                    const scene = sceneOrToken instanceof TokenDocument ? sceneOrToken.parent : sceneOrToken;
 
                     if (scene) {
                         self.#sceneId = scene.id;

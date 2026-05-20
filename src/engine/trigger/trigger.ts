@@ -8,7 +8,7 @@ import {
     instantiateNode,
     splitEntryId,
 } from "engine";
-import { R, ScenePF2e, TokenDocumentPF2e, UserPF2e } from "foundry-helpers";
+import { R, ScenePF2e, UserPF2e } from "foundry-helpers";
 
 class Trigger<TNode extends TriggerNode = TriggerNode> {
     #data: TriggerData;
@@ -79,8 +79,8 @@ class Trigger<TNode extends TriggerNode = TriggerNode> {
         return (this.#sceneId && game.scenes.get(this.#sceneId)) || game.scenes.active;
     }
 
-    set sceneContext(sceneOrToken: Maybe<ScenePF2e | TokenDocumentPF2e>) {
-        const scene = sceneOrToken instanceof TokenDocument ? sceneOrToken.scene : sceneOrToken;
+    set sceneContext(sceneOrToken: Maybe<ScenePF2e | TokenDocument>) {
+        const scene = sceneOrToken instanceof TokenDocument ? sceneOrToken.parent : sceneOrToken;
 
         if (scene) {
             this.#sceneId = scene.id;

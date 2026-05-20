@@ -193,6 +193,9 @@
                 "text": {
                     "title": "Text"
                 },
+                "token": {
+                    "title": "Token"
+                },
                 "uuid": {
                     "title": "Source UUID"
                 },
@@ -201,6 +204,12 @@
                 },
                 "value": {
                     "title": "Value"
+                },
+                "x": {
+                    "title": "X"
+                },
+                "y": {
+                    "title": "Y"
                 }
             },
             "group": {
@@ -223,7 +232,6 @@
                                 "title": "Center to Token"
                             },
                             "token": {
-                                "title": "Token",
                                 "tooltip": "If provided, will only detach if it matches the current token"
                             }
                         },
@@ -231,7 +239,7 @@
                             "attach": "Attach",
                             "detach": "Detach"
                         },
-                        "title": "Attach Region to Token"
+                        "title": "Attach Region"
                     },
                     "await-confirm": {
                         "inputs": {
@@ -313,6 +321,12 @@
                             "script": "Script"
                         },
                         "title": "Execute Script"
+                    },
+                    "move-region": {
+                        "states": {
+                            "coord": "Coordinates"
+                        },
+                        "title": "Move Scene Region"
                     },
                     "update-item": {
                         "inputs": {
