@@ -1,5 +1,5 @@
 import {
-    CreateBehaviorActionNode,
+    PF2eCreateBehaviorActionNode,
     CreateConditionActionNode,
     CreateEffectActionNode,
     CreateItemActionNode,
@@ -43,7 +43,7 @@ export * from "./update-initiative";
 export * from "./update-resource";
 
 export default [
-    CreateBehaviorActionNode,
+    PF2eCreateBehaviorActionNode,
     CreateConditionActionNode,
     CreateEffectActionNode,
     CreateItemActionNode,

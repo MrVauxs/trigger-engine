@@ -1,6 +1,7 @@
 import {
     AwaitConfirmActionNode,
     ConsoleLogActionNode,
+    CreateBehaviorActionNode,
     CreateMessageActionNode,
     DeleteItemActionNode,
     ExecuteScriptActionNode,
@@ -12,6 +13,7 @@ export * from "./utils";
 export * from "./base";
 export * from "./await-confirm";
 export * from "./console-log";
+export * from "./create-behavior";
 export * from "./create-message";
 export * from "./delete-item";
 export * from "./execute-script";
@@ -21,6 +23,7 @@ export * from "./update-item";
 export default [
     AwaitConfirmActionNode,
     ConsoleLogActionNode,
+    CreateBehaviorActionNode,
     CreateMessageActionNode,
     DeleteItemActionNode,
     ExecuteScriptActionNode,

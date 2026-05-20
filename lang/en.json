@@ -237,6 +237,26 @@
                     "console-log": {
                         "title": "Console Log"
                     },
+                    "create-behavior": {
+                        "inputs": {
+                            "events": {
+                                "title": "Events",
+                                "tooltip": "Comma separated list of behavior events"
+                            },
+                            "path": {
+                                "title": "Trigger Path"
+                            },
+                            "source": {
+                                "title": "System Source"
+                            }
+                        },
+                        "states": {
+                            "source": "Source Code",
+                            "terrain": "Difficult Terrain",
+                            "trigger": "Trigger Event"
+                        },
+                        "title": "Create Region Behavior"
+                    },
                     "create-message": {
                         "title": "Create Chat Message",
                         "inputs": {
@@ -730,27 +750,6 @@
             },
             "node": {
                 "action": {
-                    "create-behavior": {
-                        "inputs": {
-                            "events": {
-                                "title": "Events",
-                                "tooltip": "Comma separated list of behavior events"
-                            },
-                            "path": {
-                                "title": "Trigger Path"
-                            },
-                            "source": {
-                                "title": "System Source",
-                                "tooltip": "System source of the behavior without the <i>events</i>"
-                            }
-                        },
-                        "states": {
-                            "source": "Source Code",
-                            "terrain": "Difficult Terrain",
-                            "trigger": "Trigger Event"
-                        },
-                        "title": "Create Region Behavior"
-                    },
                     "create-condition": {
                         "groups": {
                             "effect": "Effect Data"
