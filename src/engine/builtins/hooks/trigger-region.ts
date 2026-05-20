@@ -36,19 +36,25 @@ class TriggerEngineRegionBehaviorType extends foundry.data.regionBehaviors.Regio
     }
 
     async _handleRegionEvent(event: RegionEventPF2e): Promise<void> {
-        if (!("token" in event.data) || !game.user.isActiveGM) return;
+        const region = this.region;
+        if (!region || !("token" in event.data) || !game.user.isActiveGM) return;
 
         const target = createTargetDocuments({ token: event.data.token as TokenDocumentPF2e });
         if (!target) return;
 
-        const args = await this._createRegionEventOptions(event, target);
+        const args = await this._createRegionEventOptions(region, event, target);
         TriggerApplication.executeTriggerEvent(game.user.id, this.path, "region-event", args);
     }
 
-    async _createRegionEventOptions(event: RegionEventPF2e, target: TargetDocuments): Promise<RegionEventOptions> {
+    async _createRegionEventOptions(
+        region: RegionDocument,
+        event: RegionEventPF2e,
+        target: TargetDocuments,
+    ): Promise<RegionEventOptions> {
         return {
             attachment: createTargetDocuments({ token: this.region?.attachment?.token }),
             eventName: event.name,
+            region,
             target,
         };
     }
@@ -57,6 +63,7 @@ class TriggerEngineRegionBehaviorType extends foundry.data.regionBehaviors.Regio
 type RegionEventOptions = {
     attachment: TargetDocuments | undefined;
     eventName: string;
+    region: RegionDocument;
     target: TargetDocuments;
 };
 

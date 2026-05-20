@@ -12,6 +12,7 @@ class RegionEvent<TOutputs extends RegionEventOutputs = RegionEventOutputs> exte
 
     static get defineOutputs(): BuiltinsOutputEntry[] {
         return [
+            { key: "region", type: "any" },
             { key: "attachment", type: "target" },
             { key: "target", type: "target" },
             { key: "event", type: "text" },
@@ -28,9 +29,10 @@ class RegionEvent<TOutputs extends RegionEventOutputs = RegionEventOutputs> exte
         return this.executeNext("out");
     }
 
-    _setOutputs({ attachment, eventName, target }: RegionEventOptions) {
+    _setOutputs({ attachment, eventName, region, target }: RegionEventOptions) {
         this.setOutputValue("attachment", attachment);
         this.setOutputValue("event", eventName);
+        this.setOutputValue("region", region);
         this.setOutputValue("target", target);
     }
 }
@@ -38,6 +40,7 @@ class RegionEvent<TOutputs extends RegionEventOutputs = RegionEventOutputs> exte
 type RegionEventOutputs = {
     attachment?: TargetDocuments;
     event: string;
+    region: RegionDocument;
     target: TargetDocuments;
 };
 
