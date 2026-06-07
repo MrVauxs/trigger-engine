@@ -6,6 +6,16 @@ import {
     TriggerNode as _TriggerNode,
 } from "engine/index";
 
+declare module "@7h3laughingman/foundry-types/client/game.mjs" {
+    export default interface Game<TActor, TActors, TChatMessage, TCombat, TItem, TMacro, TScene, TUser> {
+        triggerEngine?: {
+            api: {
+                openBlueprintMenu: typeof TriggerEngine.TriggerApplication.openBlueprintMenu;
+            };
+        };
+    }
+}
+
 declare global {
     namespace triggerEngine {
         const NodeEntry: typeof _NodeEntry;
