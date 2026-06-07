@@ -1,10 +1,10 @@
-import * as TriggerEngine from "engine";
+import * as TriggerEngine from "engine/index";
 import {
     NodeEntry as _NodeEntry,
     NodeField as _NodeField,
     TriggerHook as _TriggerHook,
     TriggerNode as _TriggerNode,
-} from "engine";
+} from "engine/index";
 
 
 declare global {
