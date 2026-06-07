@@ -1,9 +1,11 @@
+import * as TriggerEngine from "engine";
 import {
     NodeEntry as _NodeEntry,
     NodeField as _NodeField,
     TriggerHook as _TriggerHook,
     TriggerNode as _TriggerNode,
 } from "engine";
+
 
 declare global {
     namespace triggerEngine {
@@ -13,3 +15,5 @@ declare global {
         const TriggerNode: typeof _TriggerNode;
     }
 }
+
+export type { TriggerEngine };
