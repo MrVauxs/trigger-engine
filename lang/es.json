@@ -1,0 +1,1101 @@
+{
+  "TYPES": {
+    "RegionBehavior": {
+      "trigger-engine": {
+        "builtins": {
+          "region": "Motor de activación"
+        }
+      }
+    }
+  },
+  "trigger-engine": {
+    "blueprint": {
+      "entry": {
+        "add": {
+          "title": "Agregar: {label}"
+        },
+        "disconnect": "Desconectar entrada",
+        "edit": {
+          "label": "Editar entrada",
+          "title": "Editar: {label}"
+        },
+        "remove": {
+          "content": "¿Estás seguro que deseas eliminar esta entrada?",
+          "title": "Eliminar entrada"
+        },
+        "variable": "Crear variable"
+      },
+      "node": {
+        "copy": {
+          "copied": "La selección ha sido copiada al portapapeles.",
+          "multi": "Copiar nodos seleccionados",
+          "single": "Copiar nodo"
+        },
+        "delete": {
+          "confirm": {
+            "content": "¿Está seguro de que desea eliminar los nodos seleccionados?",
+            "title": "Eliminar nodo(s)"
+          },
+          "multi": "Eliminar nodos seleccionados",
+          "single": "Eliminar nodo"
+        },
+        "duplicate": {
+          "multi": "Duplicar nodos seleccionados",
+          "single": "Duplicar nodo"
+        },
+        "edit": "Editar nodo",
+        "state": {
+          "content": "¿Estás seguro que deseas cambiar de estado?",
+          "title": "Interruptor: {label}"
+        }
+      },
+      "trigger": {
+        "back": "Volver a los activadores",
+        "collapse": "Contraer ventana",
+        "copy": {
+          "label": "Copiar ruta de disparador",
+          "notify": "La ruta del disparador se ha copiado al portapapeles."
+        },
+        "data": "Recuperar datos",
+        "delete": {
+          "content": "¿Está seguro de que desea eliminar el disparador seleccionado?",
+          "title": "Eliminar disparador"
+        },
+        "description": "Alternar descripción",
+        "duplicate": "Duplicar disparador",
+        "edit": "Editar disparador",
+        "events": "Eventos",
+        "expand": "Ventana Restaurar disparadores",
+        "folder": "Editar carpeta",
+        "gates": {
+          "tab": "Pasar a la siguiente puerta de entrada",
+          "title": "Puertas"
+        },
+        "reset": "Restablecer disparador",
+        "save": "Guardar disparadores",
+        "variables": {
+          "tab": "Mover al siguiente captador de variables",
+          "title": "Variables"
+        }
+      },
+      "triggers": {
+        "close": "Cerrar ventana",
+        "create": "Crear disparador",
+        "export": "Exportar disparadores",
+        "import": "Importar disparadores",
+        "search": {
+          "clear": "Borrar búsqueda",
+          "label": "Buscar disparador"
+        },
+        "tags": {
+          "placeholder": "Etiquetas de activación"
+        }
+      },
+      "variable": {
+        "delete": {
+          "content": "¿Está seguro de que desea eliminar la variable seleccionada?",
+          "title": "Eliminar variable"
+        },
+        "edit": "Editar variable"
+      }
+    },
+    "builtins": {
+      "category": {
+        "action": {
+          "title": "Acción"
+        },
+        "event": {
+          "title": "Evento"
+        },
+        "extractor": {
+          "title": "Extractor"
+        },
+        "logic": {
+          "title": "Lógica"
+        },
+        "splitter": {
+          "title": "Separador"
+        },
+        "value": {
+          "title": "Valor"
+        }
+      },
+      "convertor": {
+        "item-target": "Actor padre",
+        "user-target": "El actor asignado",
+        "target-user": "El propietario principal"
+      },
+      "custom": {
+        "variable": {
+          "label": "Variable"
+        }
+      },
+      "entry": {
+        "a": {
+          "title": "Entrada A"
+        },
+        "actor": {
+          "title": "Actor"
+        },
+        "any": {
+          "title": "Cualquier"
+        },
+        "b": {
+          "title": "Entrada B"
+        },
+        "boolean": {
+          "title": "Booleano"
+        },
+        "callback": {
+          "title": "Callback"
+        },
+        "combatant": {
+          "title": "Combatiente"
+        },
+        "current": {
+          "title": "Actual"
+        },
+        "entry": {
+          "title": "Entrada"
+        },
+        "formula": {
+          "title": "Fórmula"
+        },
+        "input": {
+          "title": "Aporte"
+        },
+        "item": {
+          "title": "Artículo"
+        },
+        "localization": {
+          "title": "Clave de localización"
+        },
+        "max": {
+          "title": "Máximo"
+        },
+        "min": {
+          "title": "Mínimo"
+        },
+        "number": {
+          "title": "Número"
+        },
+        "target": {
+          "title": "Objetivo"
+        },
+        "targets": {
+          "title": "Objetivos"
+        },
+        "text": {
+          "title": "Texto"
+        },
+        "uuid": {
+          "title": "UUID de origen"
+        },
+        "user": {
+          "title": "Usuario"
+        },
+        "value": {
+          "title": "Valor"
+        }
+      },
+      "group": {
+        "optional": "Opcional"
+      },
+      "node": {
+        "__gate__": {
+          "__gate_entry__": {
+            "subtitle": "Puerta de entrada"
+          },
+          "__gate_exit__": {
+            "subtitle": "Puerta de salida"
+          }
+        },
+        "action": {
+          "await-confirm": {
+            "inputs": {
+              "content": {
+                "title": "Contenido del mensaje"
+              },
+              "plain": {
+                "title": "Título del mensaje"
+              },
+              "timeout": {
+                "title": "Tiempo de espera (s)"
+              },
+              "title": {
+                "title": "Título del diálogo",
+                "tooltip": "Puede ser una clave de localización"
+              }
+            },
+            "title": "Esperar confirmación"
+          },
+          "console-log": {
+            "title": "Registro de la consola"
+          },
+          "create-message": {
+            "title": "Crear mensaje de chat",
+            "inputs": {
+              "content": {
+                "title": "Descripción del mensaje"
+              },
+              "plain": {
+                "title": "Texto del mensaje"
+              },
+              "speaker": {
+                "title": "Orador"
+              },
+              "visibility": {
+                "options": {
+                  "all": "Todos los usuarios",
+                  "gm": "Sólo MJ",
+                  "self": "Usuario contextual"
+                },
+                "title": "Visibilidad"
+              }
+            }
+          },
+          "delete-item": {
+            "title": "Eliminar elemento"
+          },
+          "execute-script": {
+            "inputs": {
+              "macro": {
+                "title": "UUID de macro"
+              },
+              "script": {
+                "title": "Código de script"
+              }
+            },
+            "states": {
+              "macro": "Macro",
+              "script": "Script"
+            },
+            "title": "Ejecutar script"
+          },
+          "update-item": {
+            "inputs": {
+              "path": {
+                "title": "Ruta del sistema"
+              }
+            },
+            "title": "Actualizar artículo"
+          }
+        },
+        "condition": {
+          "if-truthy": {
+            "customs": {
+              "inputs": {
+                "condition": {
+                  "label": "Condición"
+                }
+              }
+            },
+            "title": "Prueba si es veraz"
+          },
+          "is-combatant": {
+            "title": "Es combatiente actual"
+          },
+          "list-contains": {
+            "inputs": {
+              "list": {
+                "title": "Lista de textos"
+              }
+            },
+            "title": "La lista de texto contiene"
+          }
+        },
+        "event": {
+          "__start_event__": {
+          },
+          "create-combatant-event": {
+            "title": "Combatiente creado"
+          },
+          "create-token-event": {
+            "title": "Token creado"
+          },
+          "delete-combatant-event": {
+            "title": "Combatiente eliminado"
+          },
+          "delete-token-event": {
+            "title": "Token eliminado"
+          },
+          "execute-event": {
+            "title": "Ejecutar evento"
+          },
+          "move-token-event": {
+            "title": "Token movido"
+          },
+          "region-event": {
+            "outputs": {
+              "event": {
+                "title": "Evento"
+              }
+            },
+            "title": "Región de la escena"
+          },
+          "test-event": {
+            "title": "Evento de prueba"
+          }
+        },
+        "extractor": {
+          "extract-actor": {
+            "title": "Extraer del Actor"
+          },
+          "extract-item": {
+            "title": "Extraer del artículo"
+          }
+        },
+        "logic": {
+          "actors-match": {
+            "title": "Coincidencia de actores"
+          },
+          "break-loop": {
+            "title": "Romper el bucle actual"
+          },
+          "compare-numbers": {
+            "inputs": {
+              "compare": {
+                "options": {
+                  "eq": "Igual a",
+                  "gt": "Mayor a",
+                  "gte": "Mayor o igual que",
+                  "lt": "Menos de",
+                  "lte": "Menor o igual a"
+                }
+              }
+            },
+            "title": "Comparar números"
+          },
+          "filter-targets": {
+            "title": "Filtrar objetivos",
+            "titles": {
+              "find": "Encontrar objetivo",
+              "loop": "Bucle sobre objetivos"
+            }
+          },
+          "format-text": {
+            "inputs": {
+              "content": {
+                "title": "Descripción a formatear"
+              },
+              "plain": {
+                "title": "Texto a formatear"
+              }
+            },
+            "outputs": {
+              "result": {
+                "title": "Formateado"
+              }
+            },
+            "title": "Formatear texto"
+          },
+          "resolve-formula": {
+            "title": "Resolver fórmula"
+          },
+          "texts-match": {
+            "title": "Textos coincidentes"
+          }
+        },
+        "splitter": {
+          "split-boolean": {
+            "title": "Dividir booleano"
+          },
+          "split-number": {
+            "customs": {
+              "outs": {
+                "value": {
+                  "input": {
+                    "label": "Entrada de número"
+                  }
+                }
+              }
+            },
+            "title": "Dividir número"
+          },
+          "split-text": {
+            "customs": {
+              "outs": {
+                "value": {
+                  "input": {
+                    "label": "Entrada de texto"
+                  }
+                }
+              }
+            },
+            "title": "Dividir texto"
+          }
+        },
+        "value": {
+          "current-combatant": {
+            "title": "Combatiente actual"
+          },
+          "scene-targets": {
+            "title": "Objetivos de la escena"
+          },
+          "user-value": {
+            "inputs": {
+              "id": {
+                "options": {
+                  "__active-gm__": "MJ activo",
+                  "__context-user__": "Usuario contextual",
+                  "__self-user__": "Usuario propio",
+                  "specials": "Especiales",
+                  "users": "Usuarios"
+                }
+              }
+            },
+            "title": "Usuario del mundo"
+          }
+        }
+      },
+      "region": {
+        "gm": "Sólo MJ",
+        "path": "Ruta de disparador"
+      },
+      "shared": {
+        "numbers": {
+          "disable": {
+            "tooltip": "Establezca en <code>0</code> para deshabilitar"
+          }
+        },
+        "variables": {
+          "tooltip": "Prefijar variables con el carácter <code>@</code>"
+        }
+      },
+      "special": {
+        "break": "Puede interrumpir el proceso actual",
+        "custom": "Tiene entradas personalizadas",
+        "emit": "Espera la entrada del usuario",
+        "loop": "Puede hacer un bucle",
+        "state": "Tiene múltiples estados",
+        "warning": "Tenga mucho cuidado al utilizar este nodo"
+      },
+      "state": {
+        "description": "Descripción",
+        "filter": "Filtrar",
+        "find": "Encontrar",
+        "localization": "Localización",
+        "loop": "Bucle",
+        "plain": "Texto plano"
+      },
+      "tag": {
+        "chat": {
+          "title": "Chat"
+        },
+        "combat": {
+          "title": "Combate"
+        },
+        "combatant": {
+          "title": "Combatiente"
+        },
+        "debug": {
+          "title": "Debug"
+        },
+        "dialog": {
+          "title": "Diálogo"
+        },
+        "loop": {
+          "title": "Bucle"
+        },
+        "macro": {
+          "title": "Macro"
+        },
+        "region": {
+          "title": "Región"
+        },
+        "token": {
+          "title": "Token"
+        }
+      }
+    },
+    "close-window": {
+      "title": "Cerrar menú de disparadores",
+      "content": "¿Quieres guardar los disparadores antes de cerrar?",
+      "yes": "Guardar y cerrar",
+      "no": "Cerrar sin guardar"
+    },
+    "confirm-dialog": {
+      "title": "Confirmar diálogo"
+    },
+    "edit-entry": {
+      "array": "Es una matriz",
+      "input": "Entrada",
+      "label": "Etiqueta",
+      "required": "El campo <strong>{name}</strong> es obligatorio.",
+      "types": "Tipos",
+      "validation": "El campo <strong>{name}</strong> debe coincidir con el patrón <strong>{pattern}</strong>.",
+      "yes": {
+        "add": "Agregar",
+        "edit": "Editar"
+      }
+    },
+    "edit-folder": {
+      "folder": "Carpeta",
+      "reset": "¿Restablecer el valor del módulo?",
+      "title": "Editar carpeta",
+      "yes": "Editar"
+    },
+    "edit-trigger": {
+      "folder": "Carpeta",
+      "name": "Nombre del disparador",
+      "priority": {
+        "label": "Prioridad",
+        "tooltip": "Las descripciones emergentes con mayor prioridad se ejecutarán primero."
+      },
+      "tags": "Etiquetas de disparadores",
+      "yes": {
+        "create": "Crear",
+        "edit": "Editar"
+      }
+    },
+    "edit-label": {
+      "label": "Etiqueta",
+      "title": {
+        "gate": {
+          "create": "Crear puerta",
+          "edit": "Editar puerta"
+        },
+        "variable": {
+          "create": "Crear variable",
+          "edit": "Editar variable"
+        }
+      },
+      "yes": {
+        "create": "Crear",
+        "edit": "Editar"
+      }
+    },
+    "import-export-triggers": {
+      "error": "Se produjo un error al intentar analizar los datos de los disparadores.",
+      "imported": "Se han importado tus disparadores pero no se ha guardado nada.",
+      "keep": "Conservar IDs",
+      "title": {
+        "export": "Exportar disparadores",
+        "import": "Importar disparadores"
+      },
+      "toggle": "Alternar todo",
+      "yes": {
+        "export": "Exportar",
+        "import": "Importar"
+      }
+    },
+    "node": {
+      "entry": "Entrada",
+      "false": "Falso",
+      "in": "En",
+      "input": "Entrada",
+      "null": "Null",
+      "out": "Fuera",
+      "output": "Salida",
+      "true": "Verdadero",
+      "value": "Valor"
+    },
+    "nodes-menu": {
+      "add": {
+        "gate": "Crear nueva puerta"
+      },
+      "category": {
+        "event": "Eventos",
+        "gate": "Puertas",
+        "node": "Nodos",
+        "variable": "Variables"
+      },
+      "clipboard": {
+        "paste": "Pegar nodo(s) del portapapeles",
+        "title": "Portapapeles"
+      },
+      "event": "Evento",
+      "search": {
+        "label": "Buscar nodo",
+        "placeholder": "Nombre del nodo"
+      },
+      "tags": {
+        "label": "Filtrar etiquetas"
+      }
+    },
+    "pf2e-trigger": {
+      "category": {
+        "condition": {
+          "title": "Condición"
+        }
+      },
+      "convertor": {
+        "outcome-number": "Un número entre -1 y 3",
+        "outcome-text": "null, pifia, fallo, éxito, crítico",
+        "target-text": "El valor de la firma"
+      },
+      "custom": {
+        "rule": {
+          "label": "Elemento de regla"
+        }
+      },
+      "entry": {
+        "action": {
+          "title": "Acción"
+        },
+        "basic": {
+          "title": "Básico"
+        },
+        "by": {
+          "title": "Por"
+        },
+        "condition": {
+          "title": "Condición"
+        },
+        "counter": {
+          "title": "Contrarrestar"
+        },
+        "effect": {
+          "title": "Efecto"
+        },
+        "for": {
+          "title": "Disparadores para"
+        },
+        "identifier": {
+          "title": "Identificador"
+        },
+        "name": {
+          "title": "Nombre"
+        },
+        "option": {
+          "title": "Opción de dados"
+        },
+        "options": {
+          "title": "Opciones de dados"
+        },
+        "origin": {
+          "title": "Origen"
+        },
+        "outcome": {
+          "title": "Resultado"
+        },
+        "parent": {
+          "title": "Padre"
+        },
+        "private": {
+          "title": "Privado"
+        },
+        "reroll": {
+          "title": "Es reroll"
+        },
+        "save": {
+          "title": "Guardar tipo"
+        },
+        "slug": {
+          "title": "Slug"
+        },
+        "when": {
+          "title": "Disparadores cuando"
+        },
+        "img": {
+          "title": "Ruta de la imagen"
+        }
+      },
+      "group": {
+        "duration": "Datos de duración",
+        "roll": "Datos del tirada",
+        "rule": "Elementos de regla",
+        "save": "Guardar datos"
+      },
+      "node": {
+        "action": {
+          "create-condition": {
+            "groups": {
+              "effect": "Datos de efectos"
+            },
+            "title": "Crear efecto de condición"
+          },
+          "create-effect": {
+            "title": "Crear efecto"
+          },
+          "create-item": {
+            "customs": {
+              "inputs": {
+                "choices": {
+                  "label": "ChoiceSet",
+                  "tooltip": "<ul><li>flag:&lt;flag&gt;:&lt;index&gt;</li><li>rollOption:&lt;rollOption&gt;:&lt;index&gt;</li></ul>"
+                }
+              }
+            },
+            "groups": {
+              "choices": "Selecciones de ChoiceSet"
+            },
+            "inputs": {
+              "duplicate": {
+                "title": "Permitir duplicado"
+              }
+            },
+            "title": "Crear artículo"
+          },
+          "create-persistent": {
+            "inputs": {
+              "dc": {
+                "title": "CD"
+              },
+              "die": {
+                "title": "Morir"
+              },
+              "type": {
+                "title": "Tipo de daño"
+              }
+            },
+            "title": "Crear daño persistente"
+          },
+          "create-temporary": {
+            "title": "Crear efecto disparador"
+          },
+          "decrease-condition": {
+            "title": "Disminuir condición"
+          },
+          "effect-badge": {
+            "title": "Actualizar la insignia del efecto",
+            "titles": {
+              "decrease": "Disminuir la insignia del efecto",
+              "increase": "Aumentar la insignia del efecto"
+            }
+          },
+          "increase-condition": {
+            "title": "Aumentar condición"
+          },
+          "roll-damage": {
+            "inputs": {
+              "formula": {
+                "title": "Fórmula de daño"
+              }
+            },
+            "states": {
+              "item": "Guardar (Artículo)",
+              "none": "Sin guardar",
+              "target": "Guardar (Objetivo)",
+              "value": "Guardar (Valor)"
+            },
+            "title": "Tirar daño"
+          },
+          "roll-flat": {
+            "title": "Hacer prueba plana"
+          },
+          "roll-save": {
+            "title": "Hacer prueba de salvación"
+          },
+          "send-chat": {
+            "inputs": {
+              "parent": {
+                "tooltip": "No se pueden enviar elementos sin propietario al chat"
+              }
+            },
+            "title": "Enviar artículo al chat"
+          },
+          "update-resource": {
+            "inputs": {
+              "slug": {
+                "title": "Slug del recurso"
+              }
+            },
+            "title": "Actualizar recurso",
+            "titles": {
+              "decrease": "Disminuir recurso",
+              "increase": "Aumentar recurso"
+            }
+          }
+        },
+        "condition": {
+          "has-condition": {
+            "title": "Tiene condición"
+          },
+          "has-immunity": {
+            "title": "Tiene inmunidad"
+          },
+          "has-item": {
+            "inputs": {
+              "slug": {
+                "title": "Slug del item"
+              }
+            },
+            "outputs": {
+              "target": {
+                "title": "Padre"
+              }
+            },
+            "states": {
+              "slug": "Slug"
+            },
+            "title": "Tiene artículo"
+          },
+          "has-option": {
+            "title": "Tiene opción de tirada"
+          },
+          "has-temporary": {
+            "title": "Tiene efecto disparable"
+          },
+          "in-combat": {
+            "title": "Está en combate"
+          },
+          "in-range": {
+            "inputs": {
+              "distance": {
+                "title": "Distancia",
+                "tooltip": "En incrementos de 5 pies."
+              }
+            },
+            "title": "Está dentro del alcance"
+          },
+          "inside-aura": {
+            "inputs": {
+              "once": {
+                "title": "Ejecutar una vez"
+              }
+            },
+            "outputs": {
+              "target": {
+                "title": "Aura del objetivo"
+              }
+            },
+            "title": "Está dentro de aura"
+          },
+          "is-alliance": {
+            "title": "Es de alianza"
+          },
+          "is-dead": {
+            "title": "El actor ha muerto"
+          }
+        },
+        "event": {
+          "attack-roll-event": {
+            "title": "Ataque tirado"
+          },
+          "aura-enter-event": {
+            "title": "Se entró al aura"
+          },
+          "aura-leave-event": {
+            "title": "Abandonó el aura"
+          },
+          "base-aura-event": {
+            "inputs": {
+              "affects": {
+                "options": {
+                  "all": "Todo",
+                  "allies": "Aliados",
+                  "enemies": "Enemigos"
+                },
+                "title": "Afecta a quién"
+              },
+              "slug": {
+                "title": "Slug de aura"
+              },
+              "when": {
+                "options": {
+                  "always": "Disparar siempre",
+                  "combat": "Sólo en combate",
+                  "turn": "Solo turno actual"
+                }
+              }
+            },
+            "outputs": {
+              "source": {
+                "title": "Fuente del aura"
+              }
+            }
+          },
+          "check-roll-event": {
+            "inputs": {
+              "for": {
+                "options": {
+                  "skill-check": "Prueba de habilidad"
+                }
+              }
+            },
+            "outputs": {
+              "roller": {
+              },
+              "type": {
+                "title": "Tipo de prueba"
+              }
+            },
+            "states": {
+              "all": "Todas las pruebas",
+              "check": "Prueba específica"
+            },
+            "title": "Prueba realizada",
+            "titles": {
+              "specific": "{type} realizada"
+            }
+          },
+          "damage-taken-event": {
+            "inputs": {
+              "requires": {
+                "tooltip": "Debe provenir de un actor",
+                "title": "Requiere origen"
+              },
+              "for": {
+                "options": {
+                  "all": "Todos los daños",
+                  "damage": "Daños recibidos",
+                  "heal": "Curación recibida",
+                  "persistent": "Sólo persistente",
+                  "negated": "Sólo negado"
+                }
+              }
+            },
+            "title": "Daños sufridos"
+          },
+          "turn-end-event": {
+            "title": "Fin del turno"
+          },
+          "turn-start-event": {
+            "title": "Inicio del turno",
+            "outputs": {
+              "round": {
+                "title": "Redondo"
+              }
+            }
+          }
+        },
+        "logic": {
+          "choiceset-selection": {
+            "inputs": {
+              "flag": {
+                "title": "flag"
+              },
+              "option": {
+                "title": "rolloPtion"
+              }
+            },
+            "outputs": {
+              "selection": {
+                "title": "Selección"
+              }
+            },
+            "title": "Obtener selección de ChoiceSet"
+          },
+          "compare-alliances": {
+            "inputs": {
+              "compare": {
+                "options": {
+                  "allies": "Son aliados",
+                  "different": "Son diferentes",
+                  "enemies": "Son enemigos",
+                  "neutral": "Son neutrales"
+                }
+              }
+            },
+            "title": "Comparar alianzas"
+          },
+          "compare-outcomes": {
+            "title": "Comparar el grado de éxito"
+          },
+          "distance-between": {
+            "inputs": {
+              "distance": {
+                "title": "Distancia"
+              },
+              "strict": {
+                "title": "Estricto",
+                "tooltip": "No recurra a tokens activos"
+              }
+            },
+            "title": "Distancia entre tokens"
+          },
+          "match-predicate": {
+            "inputs": {
+              "predicate": {
+                "title": "Predicado"
+              }
+            },
+            "title": "Coincide con el predicado"
+          }
+        },
+        "splitter": {
+          "split-outcome": {
+            "title": "Dividir el grado de éxito"
+          }
+        },
+        "value": {
+          "item-value": {
+            "title": "Elemento en caché"
+          }
+        }
+      },
+      "setting": {
+        "hint": "Registre sus propios disparadores con el módulo.",
+        "label": "Registrar disparadores",
+        "name": "Menú de disparadores de PF2e"
+      },
+      "shared": {
+        "difficulty-class": {
+          "adjustment": {
+            "title": "Ajustes"
+          },
+          "against": {
+            "title": "Contra"
+          },
+          "index": {
+            "title": "Índice de instancias"
+          }
+        },
+        "image": {
+          "pf2e": {
+          },
+          "sf2e": {
+          }
+        },
+        "roll-data": {
+          "note": {
+            "title": "Nodo adicional"
+          },
+          "options": {
+            "title": "Opciones de tiradas adicionales"
+          },
+          "traits": {
+            "title": "Rasgos adicionales"
+          }
+        },
+        "uuid": {
+          "pf2e": {
+            "title": "UUID de la fuente PF2e"
+          },
+          "sf2e": {
+            "title": "UUID de la fuente SF2e"
+          }
+        }
+      },
+      "state": {
+        "fixed": "Fijado",
+        "timed": "Cronometrado"
+      },
+      "tag": {
+        "attack": {
+          "title": "Ataque"
+        },
+        "aura": {
+          "title": "Aura"
+        },
+        "check": {
+          "title": "Prueba"
+        },
+        "damage": {
+          "title": "Daño"
+        },
+        "duration": {
+          "title": "Duración"
+        },
+        "outcome": {
+          "title": "Grado de éxito"
+        },
+        "save": {
+          "title": "Guardar"
+        },
+        "turn": {
+          "title": "Turno"
+        }
+      },
+      "version": {
+      }
+    },
+    "save-triggers": {
+      "content": "¿Estás seguro que deseas guardar los disparadores?",
+      "saved": "Tus disparadores han sido guardados.",
+      "title": "Guardar disparadores",
+      "yes": "Guardar"
+    }
+  }
+}
