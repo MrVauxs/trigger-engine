@@ -21,5 +21,10 @@
     },
     "dependencies": {
         "foundry-helpers": "github:reonZ/foundry-helpers"
-    }
+    },
+    "exports": {
+		"./types": {
+			"types": "./src/types.d.ts"
+		}
+	},
 }
