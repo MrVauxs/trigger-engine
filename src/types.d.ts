@@ -1,10 +1,10 @@
-import * as TriggerEngine from "engine/index";
+import * as TriggerEngine from "./engine/index";
 import {
     NodeEntry as _NodeEntry,
     NodeField as _NodeField,
     TriggerHook as _TriggerHook,
     TriggerNode as _TriggerNode,
-} from "engine/index";
+} from "./engine/index";
 
 declare module "@7h3laughingman/foundry-types/client/game.mjs" {
     export default interface Game<TActor, TActors, TChatMessage, TCombat, TItem, TMacro, TScene, TUser> {
