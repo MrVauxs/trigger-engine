@@ -307,7 +307,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         this.parent.render();
     }
 
-    async saveTriggers(): Promise<Required<TriggersSetting> | undefined> {
+    async saveTriggers(): Promise<void> {
         if (!this.application.isSettingApplication) return;
 
         const [locked, triggers] = R.partition(this.triggers.contents, (trigger) => trigger.locked);
@@ -319,14 +319,21 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         const enabled = [...this.#enabledIds].filter((id) => R.isIncludedIn(id, lockedIds));
         const folders = R.pick(this.#modulesFolders, lockedIds) as Record<string, string>;
 
-        const setting: Required<TriggersSetting> = {
+        const setting: TriggersSetting = {
             disabled,
             enabled,
             folders,
             sources: purgeObject(sources),
         };
 
-        await game.settings.set(this.application.moduleId, this.application.settingKey, setting);
+        const customSetter = this.application.customSettingsSetter;
+
+        if (customSetter) {
+            await customSetter(setting);
+        } else {
+            await game.settings.set(this.application.moduleId, this.application.settingKey, setting);
+        }
+
         localize.info("save-triggers.saved");
     }
 

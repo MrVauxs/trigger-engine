@@ -42,6 +42,7 @@ class TriggerApplication {
     #applicationId: string;
     #applicationKey: ApplicationKey;
     #convertors: Collection<string, EntryConvertor>;
+    #customSettings?: ApplicationCustomSetting;
     #entries: Collection<string, typeof NodeEntry>;
     #events: Collection<string, typeof TriggerNode>;
     #hasAnyEntry: boolean;
@@ -114,7 +115,12 @@ class TriggerApplication {
 
         // setup settings
         if (this.isSettingApplication) {
-            this.#setupSettings(options.setting);
+            // the app use custom settings logic
+            if (optionsHaveCustomSettings(options)) {
+                this.#customSettings = options.setting;
+            } else {
+                this.#setupSettings(options.setting as ApplicationMenuOptions);
+            }
         }
     }
 
@@ -233,6 +239,10 @@ class TriggerApplication {
 
     get moduleId(): string {
         return this.#moduleId;
+    }
+
+    get customSettingsSetter(): ApplicationCustomSetting["set"] | undefined {
+        return this.#customSettings?.set;
     }
 
     get settingMenuKey(): string {
@@ -521,7 +531,9 @@ class TriggerApplication {
     getTriggersSetting(): TriggersSetting | undefined {
         if (!this.isSettingApplication) return;
 
-        const setting = game.settings.get(this.moduleId, this.settingKey) as Partial<TriggersSetting>;
+        const setting =
+            this.#customSettings?.get() ??
+            (game.settings.get(this.moduleId, this.settingKey) as Partial<TriggersSetting>);
 
         return {
             disabled: setting.disabled?.slice() ?? [],
@@ -644,6 +656,16 @@ class TriggerApplication {
     }
 }
 
+function optionsHaveCustomSettings(
+    options: TriggerApplicationOptions,
+): options is Omit<TriggerApplicationOptions, "setting"> & { setting: ApplicationCustomSetting } {
+    return (
+        R.isPlainObject(options.setting) &&
+        R.isFunction((options.setting as ApplicationCustomSetting).get) &&
+        R.isFunction((options.setting as ApplicationCustomSetting).set)
+    );
+}
+
 type FreeApplicationResolve = (value: any) => void;
 
 type ApplicationParentType = "setting" | "document";
@@ -651,11 +673,18 @@ type ApplicationParentType = "setting" | "document";
 type TriggerApplicationOptions = TriggerApplicationCollections & {
     builtins?: BuiltInOptions | true;
     mode?: TriggerApplicationMode;
-    setting?: ApplicationMenuOptions;
+    setting?: ApplicationSettingOptions;
 };
 
 type BuiltInOptions = {
     [k in TriggerApplicationCollection]?: true | (typeof BuiltInApplication)[k][number][0][];
+};
+
+type ApplicationSettingOptions = ApplicationMenuOptions | ApplicationCustomSetting;
+
+type ApplicationCustomSetting = {
+    get: () => Partial<TriggersSetting>;
+    set: (data: TriggersSetting) => Promise<void>;
 };
 
 type ApplicationMenuOptions = {
