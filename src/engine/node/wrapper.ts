@@ -120,7 +120,7 @@ function instantiateNode(
 
                     if (scene) {
                         self.#sceneId = scene.id;
-                        parent.sceneContext = scene;
+                        parent.sceneContext = scene as ScenePF2e;
                     }
                 },
                 configurable: false,

@@ -25,12 +25,30 @@ declare global {
     }
 
     namespace Hooks {
-        function on(hook: "triggerEngine.registerApplication", callback: (register: typeof TriggerEngine.TriggerApplication.register) => void): number;
-        function on(hook: "triggerEngine.registerNodes", callback: (registerNodes: typeof TriggerEngine.TriggerApplication.registerNodes) => void): number;
-        function on(hook: "triggerEngine.registerTriggers", callback: (registerTriggers: typeof TriggerEngine.TriggerApplication.registerTriggers) => void): number;
-        function once(hook: "triggerEngine.registerApplication", callback: (register: typeof TriggerEngine.TriggerApplication.register) => void): number;
-        function once(hook: "triggerEngine.registerNodes", callback: (registerNodes: typeof TriggerEngine.TriggerApplication.registerNodes) => void): number;
-        function once(hook: "triggerEngine.registerTriggers", callback: (registerTriggers: typeof TriggerEngine.TriggerApplication.registerTriggers) => void): number;
+        function on(
+            hook: "triggerEngine.registerApplication",
+            callback: (register: typeof TriggerEngine.TriggerApplication.register) => void,
+        ): number;
+        function on(
+            hook: "triggerEngine.registerNodes",
+            callback: (registerNodes: typeof TriggerEngine.TriggerApplication.registerNodes) => void,
+        ): number;
+        function on(
+            hook: "triggerEngine.registerTriggers",
+            callback: (registerTriggers: typeof TriggerEngine.TriggerApplication.registerTriggers) => void,
+        ): number;
+        function once(
+            hook: "triggerEngine.registerApplication",
+            callback: (register: typeof TriggerEngine.TriggerApplication.register) => void,
+        ): number;
+        function once(
+            hook: "triggerEngine.registerNodes",
+            callback: (registerNodes: typeof TriggerEngine.TriggerApplication.registerNodes) => void,
+        ): number;
+        function once(
+            hook: "triggerEngine.registerTriggers",
+            callback: (registerTriggers: typeof TriggerEngine.TriggerApplication.registerTriggers) => void,
+        ): number;
     }
 }
 
