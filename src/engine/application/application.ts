@@ -531,9 +531,10 @@ class TriggerApplication {
     getTriggersSetting(): TriggersSetting | undefined {
         if (!this.isSettingApplication) return;
 
-        const setting =
-            this.#customSettings?.get() ??
-            (game.settings.get(this.moduleId, this.settingKey) as Partial<TriggersSetting>);
+        const customSettingsGetter = this.#customSettings?.get;
+        const setting = customSettingsGetter
+            ? customSettingsGetter()
+            : (game.settings.get(this.moduleId, this.settingKey) as Partial<TriggersSetting>);
 
         return {
             disabled: setting.disabled?.slice() ?? [],
