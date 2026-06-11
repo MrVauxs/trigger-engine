@@ -10,13 +10,12 @@ function moveRegionToPosition(
 
     const token = pointOrToken instanceof TokenDocument ? pointOrToken : null;
 
-    if ("base" in shape) {
+    if (shape.type === "emanation") {
         const coords = token?.movement.destination ?? pointOrToken;
         const { x, y } = getSnappedCoords(region, coords, CONST.GRID_SNAPPING_MODES.TOP_LEFT_CORNER);
-        const base = shape.base as Point;
 
-        base.x = x;
-        base.y = y;
+        shape.base.x = x;
+        shape.base.y = y;
     } else if ("x" in shape) {
         const { x, y } = token
             ? getTokenCenter(region, token)

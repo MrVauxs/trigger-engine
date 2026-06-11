@@ -66,6 +66,14 @@ class AttachRegionActionNode extends BaseActionNode<"out", Inputs, never, never,
             updates.shapes = moveRegionToPosition(region, token);
         }
 
+        if (region.shapes.at(0)?.type === "emanation") {
+            const shapes = (updates.shapes ??= foundry.utils.deepClone(region._source.shapes));
+            const shape = shapes[0] as foundry.data.EmanationShapeData["_source"];
+
+            shape.base.height = token.height;
+            shape.base.width = token.width;
+        }
+
         await region.update(updates);
 
         return this.executeNext("out");
