@@ -1,6 +1,8 @@
 import { EntryConvertor } from "engine";
 import { ItemPF2e, primaryPlayerOwner, R, UserPF2e } from "foundry-helpers";
 
+const TEXT_STRING_REGEX = /(?<x>[0-9\.]+)\s*[:,|_\/-]\s*(?<y>[0-9\.]+)/;
+
 const builtinsConvertors = [
     {
         output: "boolean",
@@ -12,8 +14,8 @@ const builtinsConvertors = [
     {
         output: "item",
         input: "target",
-        convertToInput: (item: ItemPF2e): TargetDocuments | undefined => {
-            const actor = item.actor;
+        convertToInput: (value: ItemPF2e): TargetDocuments | undefined => {
+            const actor = value.actor;
             return actor ? { actor } : undefined;
         },
     },
@@ -35,18 +37,38 @@ const builtinsConvertors = [
     {
         output: "user",
         input: "target",
-        convertToInput: (user: UserPF2e): TargetDocuments | undefined => {
-            const actor = user.character;
+        convertToInput: (value: UserPF2e): TargetDocuments | undefined => {
+            const actor = value.character;
             return actor ? { actor } : undefined;
         },
     },
     {
         output: "target",
         input: "user",
-        convertToInput: (target: TargetDocuments, userContext): UserPF2e | undefined => {
-            return !userContext.isGM && target.actor.testUserPermission(userContext, "OWNER")
+        convertToInput: (value: TargetDocuments, userContext): UserPF2e | undefined => {
+            return !userContext.isGM && value.actor.testUserPermission(userContext, "OWNER")
                 ? userContext
-                : (primaryPlayerOwner(target.actor) ?? undefined);
+                : (primaryPlayerOwner(value.actor) ?? undefined);
+        },
+    },
+    {
+        output: "number",
+        input: "point",
+        convertToInput: (value: number): Point | undefined => {
+            return { x: value, y: value };
+        },
+    },
+    {
+        output: "text",
+        input: "point",
+        convertToInput: (value: string): Point | undefined => {
+            const match = TEXT_STRING_REGEX.exec(value);
+            if (!match?.groups) return;
+
+            return {
+                x: Number(match.groups.x),
+                y: Number(match.groups.y),
+            };
         },
     },
 ] as const satisfies EntryConvertor[];
