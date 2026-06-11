@@ -27,6 +27,14 @@ class CreateItemActionNode extends BaseActionNode<"out", Inputs, { item?: ItemPF
             ...doubleUuidSchemas(),
             { key: "target", type: "target" },
             { key: "duplicate", type: "boolean", field: { default: true } },
+            {
+                key: "level",
+                type: "number",
+                field: {
+                    min: 0,
+                    step: 1,
+                },
+            },
         ];
     }
 
@@ -77,8 +85,18 @@ class CreateItemActionNode extends BaseActionNode<"out", Inputs, { item?: ItemPF
             }
         }
 
-        // we set the choicesets selections for the item
         const source = getItemSource(item);
+
+        // we override the level if possible
+        if (source.system.level) {
+            const level = await this.getInputValue("level");
+
+            if (level > 0) {
+                source.system.level.value = level;
+            }
+        }
+
+        // we set the choicesets selections for the item
         const choiceSets: string[] = await this.getCustomInputsValues("choices");
 
         for (const path of choiceSets) {
@@ -113,6 +131,7 @@ class CreateItemActionNode extends BaseActionNode<"out", Inputs, { item?: ItemPF
 
 type Inputs = DoubleUuidInputs & {
     duplicate: boolean;
+    level: number;
     target?: TargetDocuments;
 };
 

@@ -741,6 +741,9 @@
                 "identifier": {
                     "title": "Identifier"
                 },
+                "level": {
+                    "title": "Level"
+                },
                 "name": {
                     "title": "Name"
                 },
@@ -796,11 +799,6 @@
                         "title": "Create Condition Effect"
                     },
                     "create-effect": {
-                        "inputs": {
-                            "level": {
-                                "title": "Level"
-                            }
-                        },
                         "title": "Create Effect"
                     },
                     "create-item": {
@@ -818,6 +816,9 @@
                         "inputs": {
                             "duplicate": {
                                 "title": "Allow Duplicate"
+                            },
+                            "level": {
+                                "tooltip": "Set to <code>0</code> to not override"
                             }
                         },
                         "title": "Create Item"
