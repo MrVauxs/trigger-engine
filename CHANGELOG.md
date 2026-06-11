@@ -1,3 +1,22 @@
+# 1.10.0
+
+- application can now implement their own settings `get` and `set` logic
+  - if used, the module will not register a foundry world setting for the application
+- add the lists of builtin keys as second parameter of the `triggerEngine.registerApplication` hook call
+  - this should make it easier for application devs to set which builtin features they want to add
+- add new `TriggerNode#getContext` and `TriggerNode#setContext` methods
+  - they get and set custom data that live across the whole trigger instance
+- add new `point` connection type representing a `{x: number; y: number}` struct
+- now autofocus the `Node Name` search field when opening the nodes menu
+- `Attach Scene Region`:
+  - now also updates the emanation center sizes to fit the token it is attaching to for `emanation` region shapes
+- `Move Scene Region`:
+  - remove the `X` and `Y` inputs and replace them with a single `point` input
+  - this means that any pre-existing node will have to be updated
+- `pf2e-trigger`:
+  - add `Level` input to the `Create Effect` node
+  - add `Level` input to the `Create Item` node to override it if possible (leave to `0` to not override)
+
 # 1.9.0
 
 - split the `Create Region Behavior` between builtins and the `pf2e-trigger` application
