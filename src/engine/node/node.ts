@@ -310,6 +310,9 @@ interface TriggerNode<
      */
     executeNext(out: TOuts, ...args: any[]): Promise<boolean>;
 
+    /** custom data accessible accross the entire trigger */
+    getContext<T>(key: string): T | undefined;
+
     /** Returns the key of a custom out entry based on its input value. */
     getCustomOutKey(slug: string, input: string | number): string | undefined;
 
@@ -373,6 +376,9 @@ interface TriggerNode<
      * @returns undefined if no key exist at that path
      */
     rootLocalize(...args: LocalizeArgs): string | undefined;
+
+    /** custom data accessible accross the entire trigger */
+    setContext<T>(key: string, value: T): T;
 
     /**
      * Set the value for one of this node's outputs.

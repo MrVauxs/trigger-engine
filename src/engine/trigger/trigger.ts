@@ -11,6 +11,7 @@ import {
 import { R, ScenePF2e, UserPF2e } from "foundry-helpers";
 
 class Trigger<TNode extends TriggerNode = TriggerNode> {
+    #context: Record<string, any> = {};
     #data: TriggerData;
     #invalid?: boolean;
     #nodes: Collection<string, TNode> = new Collection();
@@ -110,6 +111,15 @@ class Trigger<TNode extends TriggerNode = TriggerNode> {
     getNodeFromEntryId(id: EntryId): TNode | undefined {
         const [nodeId] = splitEntryId(id);
         return this.getNode(nodeId);
+    }
+
+    getContext<T>(key: string): T | undefined {
+        return this.#context[key];
+    }
+
+    setContext<T>(key: string, value: T): T {
+        this.#context[key] = value;
+        return value;
     }
 
     toObject(): TriggerDataOutput {

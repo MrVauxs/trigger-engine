@@ -196,6 +196,19 @@ function instantiateNode(
                 }),
             );
 
+            // from trigger
+            Object.defineProperties(
+                this,
+                R.fromKeys(["getContext", "setContext"] as const, (property) => {
+                    return {
+                        value: parent[property].bind(parent),
+                        configurable: false,
+                        enumerable: false,
+                        writable: false,
+                    };
+                }),
+            );
+
             // from application
             Object.defineProperties(
                 this,
