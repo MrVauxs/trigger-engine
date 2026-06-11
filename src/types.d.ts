@@ -1,5 +1,7 @@
 import * as TriggerEngine from "./engine/index";
 import {
+    BuiltInApplication,
+    TriggerApplicationCollection,
     NodeEntry as _NodeEntry,
     NodeField as _NodeField,
     TriggerHook as _TriggerHook,
@@ -28,6 +30,7 @@ declare global {
         function on(
             hook: "triggerEngine.registerApplication",
             callback: (register: typeof TriggerEngine.TriggerApplication.register) => void,
+            builtInKeys: BuiltInKeys,
         ): number;
         function on(
             hook: "triggerEngine.registerNodes",
@@ -51,5 +54,7 @@ declare global {
         ): number;
     }
 }
+
+type BuiltInKeys = { [k in TriggerApplicationCollection]: (typeof BuiltInApplication)[k][number][0][] };
 
 export type { TriggerEngine };

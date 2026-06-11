@@ -1,4 +1,5 @@
 import {
+    BuiltInApplication,
     NodeEntry,
     NodeField,
     TriggerApplication,
@@ -30,8 +31,14 @@ Hooks.once("init", async () => {
         registerPF2eApplication();
     }
 
+    const builtIns = R.pipe(
+        ["convertors", "entries", "hooks", "nodes"] as const,
+        R.map((property) => [property, R.map(BuiltInApplication[property], ([key]) => key)] as const),
+        R.fromEntries(),
+    );
+
     // we allow third party to register their own application
-    Hooks.callAll("triggerEngine.registerApplication", TriggerApplication.register.bind(TriggerApplication));
+    Hooks.callAll("triggerEngine.registerApplication", TriggerApplication.register.bind(TriggerApplication), builtIns);
 
     // we allow third party to register extra nodes for an application
     Hooks.callAll("triggerEngine.registerNodes", TriggerApplication.registerNodes.bind(TriggerApplication));
