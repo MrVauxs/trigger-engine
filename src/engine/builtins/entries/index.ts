@@ -4,6 +4,7 @@ export * from "./fields";
 export * from "./boolean";
 export * from "./item";
 export * from "./number";
+export * from "./point";
 export * from "./target";
 export * from "./text";
 export * from "./user";

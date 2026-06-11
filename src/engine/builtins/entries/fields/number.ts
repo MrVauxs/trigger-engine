@@ -20,7 +20,7 @@ class NumberField extends InputField<number, NumberFieldSchema> {
     }
 
     get targetWidth(): number {
-        return 80;
+        return this.width * 2;
     }
 
     get toDisplay(): string {

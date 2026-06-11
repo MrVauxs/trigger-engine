@@ -35,6 +35,7 @@ import {
     Blueprint,
     BlueprintEntry,
     BlueprintNode,
+    PointInputElement,
     ExtendedMultiSelectElement,
     ExtendedTextInputElement,
     MaybeTrigger,
@@ -156,6 +157,7 @@ class BlueprintApplication extends apps.ApplicationV2<fa.ApplicationConfiguratio
     }
 
     async _preFirstRender(): Promise<void> {
+        registerCustomElement(PointInputElement.tagName, PointInputElement);
         registerCustomElement(ExtendedMultiSelectElement.tagName, ExtendedMultiSelectElement);
         registerCustomElement(ExtendedTextInputElement.tagName, ExtendedTextInputElement);
         registerCustomElement(SearchSelectInputElement.tagName, SearchSelectInputElement);

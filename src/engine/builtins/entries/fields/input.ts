@@ -68,8 +68,8 @@ abstract class InputField<TValue extends unknown, TSchema extends Record<string,
     }
 
     abstract createInput(): HTMLInputElement;
-    abstract afterRender(input: HTMLInputElement): void;
-    abstract afterAnimation(input: HTMLInputElement): void;
+    abstract afterRender(input: HTMLInputElement | AbstractFormInputElement): void;
+    abstract afterAnimation(input: HTMLInputElement | AbstractFormInputElement): void;
 
     onClick(): Promise<TValue> {
         const { center, width, height } = this.getGlobalBounds();
@@ -118,7 +118,12 @@ abstract class InputField<TValue extends unknown, TSchema extends Record<string,
         });
     }
 
-    activateEventListeners(input: HTMLInputElement, returnValue: (value: TValue) => Promise<void>): void {
+    activateEventListeners(
+        input: HTMLInputElement | AbstractFormInputElement,
+        returnValue: (value: TValue) => Promise<void>,
+    ): void {
+        if (!(input instanceof HTMLInputElement)) return;
+
         const onBlur = () => {
             returnValue(getInputValue(input) as TValue);
         };
@@ -142,5 +147,7 @@ abstract class InputField<TValue extends unknown, TSchema extends Record<string,
         });
     }
 }
+
+type AbstractFormInputElement = foundry.applications.elements.AbstractFormInputElement<any>;
 
 export { InputField };

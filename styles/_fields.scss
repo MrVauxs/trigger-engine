@@ -66,6 +66,42 @@ input#trigger-engine-field {
     line-height: 0;
 }
 
+point-input#trigger-engine-field {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    .key-x,
+    .key-y {
+        grid-row: 1;
+        height: 100%;
+    }
+
+    .key-x {
+        grid-column: 1;
+    }
+
+    .key-y {
+        grid-column: 2;
+    }
+
+    label {
+        display: flex;
+        align-items: center;
+        margin-left: 0.3em;
+        pointer-events: none;
+        text-transform: capitalize;
+        letter-spacing: 0.05em;
+
+        &::after {
+            content: ":";
+        }
+    }
+
+    input {
+        padding-left: calc(0.3em + 2ch);
+    }
+}
+
 search-select-input#trigger-engine-field {
     input {
         height: 100%;

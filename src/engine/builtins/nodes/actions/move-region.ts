@@ -18,8 +18,7 @@ class MoveRegionActionNode extends BaseActionNode<"out", Inputs, never, never, n
     static get defineInputs(): BuiltinsInputEntry[] {
         return [
             { key: "region", type: "any" },
-            { key: "x", type: "number", state: "coord" },
-            { key: "y", type: "number", state: "coord" },
+            { key: "point", type: "point", state: "coord" },
             { key: "target", type: "target", state: "token" },
         ];
     }
@@ -51,18 +50,14 @@ class MoveRegionActionNode extends BaseActionNode<"out", Inputs, never, never, n
             return getTargetToken(target, { scene: region.object.scene as ScenePF2e | null });
         }
 
-        return {
-            x: await this.getInputValue("x"),
-            y: await this.getInputValue("y"),
-        };
+        return this.getInputValue("point");
     }
 }
 
 type Inputs = {
     region?: any;
     target?: TargetDocuments;
-    x: number;
-    y: number;
+    point: Point;
 };
 
 type State = "coord" | "token";

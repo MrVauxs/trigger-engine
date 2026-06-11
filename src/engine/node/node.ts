@@ -146,16 +146,12 @@ class TriggerNode<
         return null;
     }
 
-    /**
-     * Define the custom inputs schemas if any.
-     */
+    /** Define the custom inputs schemas if any. */
     static get defineCustomInputs(): CustomInputSchema[] | null {
         return null;
     }
 
-    /**
-     * Define the custom outputs schemas if any.
-     */
+    /** Define the custom outputs schemas if any. */
     static get defineCustomOutputs(): CustomOutputSchema[] | null {
         return null;
     }

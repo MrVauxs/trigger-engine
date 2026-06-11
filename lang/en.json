@@ -184,6 +184,9 @@
                 "number": {
                     "title": "Number"
                 },
+                "point": {
+                    "title": "Point"
+                },
                 "target": {
                     "title": "Target"
                 },
@@ -323,6 +326,11 @@
                         "title": "Execute Script"
                     },
                     "move-region": {
+                        "inputs": {
+                            "point": {
+                                "title": "Target Position"
+                            }
+                        },
                         "states": {
                             "coord": "Coordinates"
                         },
