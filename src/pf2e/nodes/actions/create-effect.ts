@@ -22,6 +22,15 @@ class CreateEffectActionNode extends BaseActionNode<"out", Inputs, never, "rule"
             { key: "target", type: "target" },
             ...R.splice(effectSchemas(), 3, 0, [
                 {
+                    key: "level",
+                    type: "number",
+                    field: {
+                        default: 1,
+                        min: 1,
+                        step: 1,
+                    },
+                },
+                {
                     key: "counter",
                     type: "number",
                     tooltip: localize.path("builtins.shared.numbers.disable.tooltip"),
@@ -78,6 +87,11 @@ class CreateEffectActionNode extends BaseActionNode<"out", Inputs, never, "rule"
             rules,
         });
 
+        // we update the level
+        source.system.level = {
+            value: await this.getInputValue("level"),
+        };
+
         await createEmbeddedItem(actor, source);
 
         return this.executeNext("out");
@@ -86,6 +100,7 @@ class CreateEffectActionNode extends BaseActionNode<"out", Inputs, never, "rule"
 
 type Inputs = EffectInputs & {
     counter: number;
+    level: number;
     target?: TargetDocuments;
 };
 

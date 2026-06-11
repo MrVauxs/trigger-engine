@@ -796,6 +796,11 @@
                         "title": "Create Condition Effect"
                     },
                     "create-effect": {
+                        "inputs": {
+                            "level": {
+                                "title": "Level"
+                            }
+                        },
                         "title": "Create Effect"
                     },
                     "create-item": {
