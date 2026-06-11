@@ -83,14 +83,10 @@ class CreateEffectActionNode extends BaseActionNode<"out", Inputs, never, "rule"
         const source = createCustomEffect({
             ...effect,
             badge: counter > 0 ? { type: "counter", value: counter } : undefined,
+            level: await this.getInputValue("level"),
             name: effect.name || game.i18n.localize("TYPES.Item.effect"),
             rules,
         });
-
-        // we update the level
-        source.system.level = {
-            value: await this.getInputValue("level"),
-        };
 
         await createEmbeddedItem(actor, source);
 
