@@ -1,3 +1,10 @@
+# 1.10.1
+
+- add the `If` tag to `Split Boolean` & `Test If Truthy` nodes
+- fix not being able to use the `-` character in entries `key`
+- fix closing a context menu creating infinite loop of close calls
+- fix opening a context menu next to the bottom edge force-closing it right away
+
 # 1.10.0
 
 - application can now implement their own settings `get` and `set` logic
