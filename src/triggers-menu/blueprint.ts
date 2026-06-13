@@ -8,6 +8,7 @@ import {
     TriggersSetting,
 } from "engine";
 import {
+    MODULE,
     MouseInteractionManager,
     R,
     TooltipDirection,
@@ -180,6 +181,11 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
             this.draw();
         } else {
             this.#clear();
+        }
+
+        if (fullId && MODULE.isDebug) {
+            const trigger = this.triggers.get(fullId);
+            MODULE.log("SET TRIGGER", trigger);
         }
 
         this.parent.render();

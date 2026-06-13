@@ -80,8 +80,8 @@ class BlueprintConnectionsLayer extends PIXI.Container {
 
         connection.draw();
 
-        this.#connections.set(`${origin}-${target}`, connection);
-        this.#connections.set(`${target}-${origin}`, connection);
+        this.#connections.set(mergeTwoWays(origin, target), connection);
+        this.#connections.set(mergeTwoWays(target, origin), connection);
     }
 
     #onPointerMove(event: PIXI.FederatedPointerEvent) {
@@ -162,14 +162,18 @@ class BlueprintConnectionsLayer extends PIXI.Container {
 }
 
 function splitTwoWays(twoWaysId: TwoWaysEntryId): [EntryId, EntryId] {
-    return R.split(twoWaysId, "-") as [EntryId, EntryId];
+    return R.split(twoWaysId, "|") as [EntryId, EntryId];
+}
+
+function mergeTwoWays(first: EntryId, second: EntryId): TwoWaysEntryId {
+    return `${first}|${second}`;
 }
 
 interface BlueprintConnectionsLayer {
     parent: BlueprintLayers;
 }
 
-type TwoWaysEntryId = `${EntryId}-${EntryId}`;
+type TwoWaysEntryId = `${EntryId}|${EntryId}`;
 
 type FreeConnector = PIXI.Graphics & {
     origin: {
@@ -180,5 +184,5 @@ type FreeConnector = PIXI.Graphics & {
     };
 };
 
-export { BlueprintConnectionsLayer, splitTwoWays };
+export { BlueprintConnectionsLayer, mergeTwoWays, splitTwoWays };
 export type { TwoWaysEntryId };

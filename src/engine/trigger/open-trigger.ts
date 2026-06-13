@@ -14,7 +14,7 @@ import {
     UpdateTriggerData,
 } from "engine";
 import { enrichHTML, MODULE, purgeObject, R } from "foundry-helpers";
-import { TwoWaysEntryId } from "triggers-menu";
+import { mergeTwoWays, TwoWaysEntryId } from "triggers-menu";
 
 class OpenTrigger extends Trigger<OpenTriggerNode> {
     #computed: boolean = false;
@@ -145,7 +145,7 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
     addComputedConnections(origin: EntryId, target: EntryId) {
         this.#computedConnections[origin] = true;
         this.#computedConnections[target] = true;
-        this.#linkedConnections.add(`${origin}-${target}`);
+        this.#linkedConnections.add(mergeTwoWays(origin, target));
     }
 
     entryIsConnected(id: EntryId): boolean {
