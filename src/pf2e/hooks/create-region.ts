@@ -3,7 +3,6 @@ import {
     ActorPF2e,
     createTargetDocuments,
     createToggleHook,
-    ItemOriginFlag,
     ItemPF2e,
     RegionDocumentPF2e,
     ScenePF2e,
@@ -33,10 +32,10 @@ class CreateRegionHook extends TriggerHook<TemplatePlacedEventOptions> {
         if (!canvas.scene || !region.isEffectArea || !game.user.isActiveGM) return;
 
         const scene = region.object.scene;
-        const flag = region.flags[SYSTEM.id].origin as ItemOriginFlag | undefined;
+        const flag = region.flags[SYSTEM.id].origin;
         if (!scene || !flag?.actor) return;
 
-        const actor = flag.actor ? await fromUuid<ActorPF2e>(flag.actor) : null;
+        const actor = await fromUuid<ActorPF2e>(flag.actor);
         const origin = createTargetDocuments({ actor });
         if (!origin) return;
 

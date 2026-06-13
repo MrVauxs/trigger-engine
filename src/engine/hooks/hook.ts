@@ -61,7 +61,6 @@ interface TriggerHook<TArgs extends Record<string, any> = Record<string, any>> {
     /**
      * Execute all triggers that have this event.
      *
-     * @param userId the context the trigger should have.
      * @param event the name of the event to execute.
      * @param args the arguments to pass to the {@link TriggerNode#_execute} function.
      */
