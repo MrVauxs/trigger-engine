@@ -942,7 +942,7 @@ class BlueprintNode extends PIXI.Container {
             fixed: true,
             jQuery: false,
             onClose: () => {
-                menu.close();
+                anchor.remove();
             },
         });
 
@@ -953,16 +953,9 @@ class BlueprintNode extends PIXI.Container {
             }),
         });
 
-        const close = () => {
-            anchor.remove();
+        menu.element.addEventListener("pointerleave", () => {
             menu.close();
-        };
-
-        if (menu.element.matches(":hover")) {
-            menu.element.addEventListener("pointerleave", close);
-        } else {
-            close();
-        }
+        });
     }
 
     refresh({
