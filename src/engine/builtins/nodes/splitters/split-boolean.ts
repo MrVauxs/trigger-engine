@@ -7,7 +7,7 @@ class BooleanSplitterNode extends BaseSplitterNode<"true" | "false", boolean> {
     }
 
     static get tags(): string[] {
-        return ["boolean"];
+        return ["boolean", "if"];
     }
 
     static get defineOuts(): BridgeSchemaInput[] {

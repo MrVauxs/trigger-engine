@@ -7,6 +7,10 @@ class IfTruthyConditionNode extends BaseConditionNode<never, never, "condition">
         return "if-truthy";
     }
 
+    static get tags(): string[] {
+        return ["if"];
+    }
+
     static get defineCustomInputs(): CustomInputSchema[] {
         return [{ slug: "condition", array: true }];
     }

@@ -581,6 +581,9 @@
                 "dialog": {
                     "title": "Dialog"
                 },
+                "if": {
+                    "title": "If"
+                },
                 "loop": {
                     "title": "Loop"
                 },
