@@ -368,6 +368,11 @@ class TriggerApplication {
         }
         MODULE.debug("TRIGGERS:", triggers);
         console.groupEnd();
+
+        if (this.#customSettings?.afterPrepared) {
+            const sources = triggers.map((trigger) => trigger.toObject());
+            this.#customSettings.afterPrepared(sources);
+        }
     }
 
     addFile(path: string) {
@@ -684,6 +689,7 @@ type BuiltInOptions = {
 type ApplicationSettingOptions = ApplicationMenuOptions | ApplicationCustomSetting;
 
 type ApplicationCustomSetting = {
+    afterPrepared?: (data: TriggerDataInput[]) => void;
     get: () => Partial<TriggersSetting>;
     set: (data: TriggersSetting, prepareTriggers: () => void) => Promise<void>;
 };
