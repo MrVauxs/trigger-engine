@@ -628,7 +628,7 @@ class TriggerApplication {
             config: false,
             name: settingKey,
             onChange: () => {
-                TriggerApplication.prepareApplications();
+                this.prepare();
             },
         });
 
@@ -685,7 +685,7 @@ type ApplicationSettingOptions = ApplicationMenuOptions | ApplicationCustomSetti
 
 type ApplicationCustomSetting = {
     get: () => Partial<TriggersSetting>;
-    set: (data: TriggersSetting) => Promise<void>;
+    set: (data: TriggersSetting, prepareTriggers: () => void) => Promise<void>;
 };
 
 type ApplicationMenuOptions = {

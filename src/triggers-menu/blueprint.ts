@@ -335,7 +335,9 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         const customSetter = this.application.customSettingsSetter;
 
         if (customSetter) {
-            await customSetter(setting);
+            await customSetter(setting, () => {
+                this.application.prepare();
+            });
         } else {
             await game.settings.set(this.application.moduleId, this.application.settingKey, setting);
         }
