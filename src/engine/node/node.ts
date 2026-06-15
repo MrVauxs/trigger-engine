@@ -12,7 +12,7 @@ import {
     TriggerPath,
     UserValue,
 } from "engine";
-import { LocalizeArgs, MODULE, ScenePF2e, TokenDocumentPF2e, UserPF2e } from "foundry-helpers";
+import { LocalizeArgs, MODULE, ScenePF2e, TokenDocumentPF2e, TokenDocumentUUID, UserPF2e } from "foundry-helpers";
 
 class TriggerNode<
     TOuts extends string | never = string,
@@ -376,6 +376,32 @@ interface TriggerNode<
      * Retrieve the local value of this node's input.
      */
     getLocalValue<K extends keyof TInputs>(input: K): TInputs[K];
+
+    /**
+     * If the 'target' entry doesn't have a declare 'token', then the function
+     * will try to retrieve the first active token on the scene (with options)
+     *
+     * @param {TargetDocuments} target
+     * @param {object} [options]
+     * @param {boolean} [options.linked]
+     * @param {Scene | null} [options.scene]
+     */
+    getTargetToken<T extends TokenDocument>(
+        target: Maybe<TargetDocuments>,
+        options?: { linked?: boolean; scene?: Scene | null },
+    ): T | undefined;
+
+    /** @see {@link TriggerNode#getTargetToken} */
+    getTargetsTokens(
+        targets: TargetDocuments[],
+        uuid: true,
+        options?: { linked?: boolean; scene?: Scene | null },
+    ): TokenDocumentUUID[];
+    getTargetsTokens<T extends TokenDocument>(
+        targets: TargetDocuments[],
+        uuid?: boolean,
+        options?: { linked?: boolean; scene?: Scene | null },
+    ): T[];
 
     /**
      * Localization helper with pre-defined path and optional (last argument) data object for `game.i18n.format`

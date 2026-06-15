@@ -1,6 +1,6 @@
 import { IconObject } from "_zod";
 import { BaseActionNode, BuiltinsInputEntry, moveRegionToPosition } from "engine";
-import { getTargetToken, RegionSource } from "foundry-helpers";
+import { RegionSource } from "foundry-helpers";
 
 class AttachRegionActionNode extends BaseActionNode<"out", Inputs, never, never, never, State> {
     static get type(): "attach-region" {
@@ -40,7 +40,7 @@ class AttachRegionActionNode extends BaseActionNode<"out", Inputs, never, never,
         }
 
         const target = await this.getInputValue("target");
-        const token = getTargetToken(target, { scene: region.object.scene });
+        const token = this.getTargetToken(target, { scene: region.object.scene });
 
         // we detach
         if (this.state === "detach") {

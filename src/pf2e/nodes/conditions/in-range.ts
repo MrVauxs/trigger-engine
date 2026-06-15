@@ -1,5 +1,5 @@
 import { BaseConditionNode } from "engine";
-import { distanceBetween, getTargetToken } from "foundry-helpers";
+import { distanceBetween, TokenDocumentPF2e } from "foundry-helpers";
 import { PF2eInputEntry } from "pf2e";
 
 class InRangeConditionNode extends BaseConditionNode<Inputs> {
@@ -27,8 +27,8 @@ class InRangeConditionNode extends BaseConditionNode<Inputs> {
         const scene = this.sceneContext;
         const origin = await this.getInputValue("origin");
         const target = await this.getInputValue("target");
-        const originToken = getTargetToken(origin, { scene })?.object;
-        const targetToken = getTargetToken(target, { scene })?.object;
+        const originToken = this.getTargetToken<TokenDocumentPF2e>(origin, { scene })?.object;
+        const targetToken = this.getTargetToken<TokenDocumentPF2e>(target, { scene })?.object;
 
         if (!originToken || !targetToken) {
             return this.execute("false");

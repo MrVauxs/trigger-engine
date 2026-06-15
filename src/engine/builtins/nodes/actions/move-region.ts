@@ -1,6 +1,6 @@
 import { IconObject } from "_zod";
 import { BaseActionNode, BuiltinsInputEntry, moveRegionToPosition } from "engine";
-import { getTargetToken, RegionSource, ScenePF2e } from "foundry-helpers";
+import { RegionSource } from "foundry-helpers";
 
 class MoveRegionActionNode extends BaseActionNode<"out", Inputs, never, never, never, State> {
     static get type(): "move-region" {
@@ -47,7 +47,7 @@ class MoveRegionActionNode extends BaseActionNode<"out", Inputs, never, never, n
     async #getPointOrToken(region: RegionDocument): Promise<TokenDocument | Point | undefined> {
         if (this.state === "token") {
             const target = await this.getInputValue("target");
-            return getTargetToken(target, { scene: region.object.scene as ScenePF2e | null });
+            return this.getTargetToken(target, { scene: region.object.scene });
         }
 
         return this.getInputValue("point");

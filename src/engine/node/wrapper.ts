@@ -12,7 +12,16 @@ import {
     splitEntryId,
     Trigger,
 } from "engine";
-import { LocalizeArgs, MODULE, R, ScenePF2e, UserPF2e } from "foundry-helpers";
+import {
+    FirstActiveTokenOptions,
+    getTargetsTokens,
+    getTargetToken,
+    LocalizeArgs,
+    MODULE,
+    R,
+    ScenePF2e,
+    UserPF2e,
+} from "foundry-helpers";
 import {
     getInputsSchemas,
     getNodeStates,
@@ -166,6 +175,8 @@ function instantiateNode(
                         ["getCustomOutKey", this.#getCustomOutKey],
                         ["getCustomOutputs", this.#getCustomOutputs],
                         ["getOutputValue", this.#getOutputValue],
+                        ["getTargetToken", this.#getTargetToken],
+                        ["getTargetsTokens", this.#getTargetsTokens],
                         ["localize", localize],
                         ["rootLocalize", rootLocalize],
                         ["setCustomOutputValues", this.#setCustomOutputValues],
@@ -537,6 +548,18 @@ function instantiateNode(
                 value = R.isArray(value) ? value[0] : value;
                 this.#outputValues[output.key] = output.castValue(value);
             }
+        }
+
+        #getTargetToken(target: Maybe<TargetDocuments>, options?: FirstActiveTokenOptions): TokenDocument | undefined {
+            return getTargetToken(target, options);
+        }
+
+        #getTargetsTokens(
+            targets: TargetDocuments[],
+            uuid?: boolean,
+            options?: FirstActiveTokenOptions,
+        ): TokenDocument[] {
+            return getTargetsTokens(targets, uuid, options);
         }
     }
 
