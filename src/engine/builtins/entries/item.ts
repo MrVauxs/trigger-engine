@@ -24,7 +24,7 @@ class ItemEntry extends NodeEntry<ItemPF2e | undefined> {
 
     static async fromJSON(value: unknown): Promise<ItemPF2e | undefined> {
         const item = R.isString(value) ? await fromUuid<ItemPF2e>(value) : undefined;
-        return item instanceof Item ? item : undefined;
+        return this.isValidType(item) ? item : undefined;
     }
 }
 

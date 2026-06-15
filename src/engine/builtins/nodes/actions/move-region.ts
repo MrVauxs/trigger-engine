@@ -17,7 +17,7 @@ class MoveRegionActionNode extends BaseActionNode<"out", Inputs, never, never, n
 
     static get defineInputs(): BuiltinsInputEntry[] {
         return [
-            { key: "region", type: "any" },
+            { key: "region", type: "region" },
             { key: "point", type: "point", state: "coord" },
             { key: "target", type: "target", state: "token" },
         ];
@@ -30,7 +30,7 @@ class MoveRegionActionNode extends BaseActionNode<"out", Inputs, never, never, n
     async _execute(): Promise<boolean> {
         const region = await this.getInputValue("region");
 
-        if (!(region instanceof RegionDocument)) {
+        if (!region) {
             return this.executeNext("out");
         }
 
@@ -55,7 +55,7 @@ class MoveRegionActionNode extends BaseActionNode<"out", Inputs, never, never, n
 }
 
 type Inputs = {
-    region?: any;
+    region?: RegionDocument;
     target?: TargetDocuments;
     point: Point;
 };

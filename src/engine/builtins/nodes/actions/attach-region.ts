@@ -17,7 +17,7 @@ class AttachRegionActionNode extends BaseActionNode<"out", Inputs, never, never,
 
     static get defineInputs(): BuiltinsInputEntry[] {
         return [
-            { key: "region", type: "any" },
+            { key: "region", type: "region" },
             { key: "target", type: "target", state: "attach" },
             { key: "token", type: "target", state: "detach" },
             { key: "center", type: "boolean", state: "attach" },
@@ -35,7 +35,7 @@ class AttachRegionActionNode extends BaseActionNode<"out", Inputs, never, never,
     async _execute(): Promise<boolean> {
         const region = await this.getInputValue("region");
 
-        if (!(region instanceof RegionDocument)) {
+        if (!region) {
             return this.executeNext("out");
         }
 
@@ -82,7 +82,7 @@ class AttachRegionActionNode extends BaseActionNode<"out", Inputs, never, never,
 
 type Inputs = {
     center: boolean;
-    region?: any;
+    region?: RegionDocument;
     target?: TargetDocuments;
 };
 

@@ -20,7 +20,7 @@ class InsideRegionConditionNode extends BaseConditionNode<InsideRegionInputs, In
     }
 
     static get defineOutputs(): PF2eOutputEntry[] {
-        return [...BaseConditionNode.defineOutputs, { key: "region", type: "any" }];
+        return [...BaseConditionNode.defineOutputs, { key: "region", type: "region" }];
     }
 
     get isLoop(): boolean {

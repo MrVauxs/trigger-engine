@@ -19,7 +19,7 @@ class CreateBehaviorActionNode<
 
     static get defineInputs(): BuiltinsInputEntry[] {
         return [
-            { key: "region", type: "any" },
+            { key: "region", type: "region" },
             { key: "name", type: "text" },
             { key: "type", type: "text", state: "source" },
             {
@@ -54,7 +54,7 @@ class CreateBehaviorActionNode<
         const region = await this.getInputValue("region");
         const type = await this._getType();
 
-        if (!(type in CONFIG.RegionBehavior.dataModels) || !(region instanceof RegionDocument)) {
+        if (!region || !(type in CONFIG.RegionBehavior.dataModels)) {
             return this.executeNext("out");
         }
 
@@ -107,7 +107,7 @@ type CreateBehaviorInputs = Record<string, any> & {
     events: string;
     name: string;
     path: string;
-    region?: any;
+    region?: RegionDocument;
     source: string;
     type: string;
 };

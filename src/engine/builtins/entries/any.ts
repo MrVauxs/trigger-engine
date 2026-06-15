@@ -10,7 +10,7 @@ class AnyEntry extends NodeEntry<any | undefined> {
     }
 
     static get color(): ColorSource {
-        return 0x787878;
+        return 0x878787;
     }
 
     static isValidType(value: unknown): value is any {

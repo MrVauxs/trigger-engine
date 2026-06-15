@@ -12,7 +12,7 @@ class RegionEvent<TOutputs extends RegionEventOutputs = RegionEventOutputs> exte
 
     static get defineOutputs(): BuiltinsOutputEntry[] {
         return [
-            { key: "region", type: "any" },
+            { key: "region", type: "region" },
             { key: "attachment", type: "target" },
             { key: "target", type: "target" },
             { key: "event", type: "text" },

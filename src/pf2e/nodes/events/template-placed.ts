@@ -14,7 +14,7 @@ class TemplatePlacedEvent extends BaseEventNode<never, Outputs> {
 
     static get defineOutputs(): PF2eOutputEntry[] {
         return [
-            { key: "region", type: "any" },
+            { key: "region", type: "region" },
             { key: "origin", type: "target" },
             { key: "attachment", type: "target" },
             { key: "item", type: "item" },
