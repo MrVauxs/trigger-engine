@@ -383,41 +383,6 @@ class TriggerApplication {
         this.#moduleSources.push(...sources);
     }
 
-    convertToEmitable(type: string, value: any): EmitableUserValue | undefined {
-        const entry = this.entries.get(type);
-        if (!entry) return;
-
-        const convert = (value: unknown) => (entry.isValidType(value) ? entry.toJSON(value) : undefined);
-        const converted = R.isArray(value) ? value.map(convert) : convert(value);
-        return { type, value: converted };
-    }
-
-    convertValuesToEmitable(values: (UserValue | undefined)[]): (EmitableUserValue | undefined)[] {
-        return values.map((x) => {
-            return x ? this.convertToEmitable(x.type, x.value) : undefined;
-        });
-    }
-
-    async convertFromEmitable(value: EmitableUserValue | undefined, withType?: boolean): Promise<any> {
-        if (!value) return;
-
-        const entry = this.entries.get(value.type);
-        if (!entry) return;
-
-        const convertedValue = R.isArray(value.value)
-            ? await Promise.all(value.value.map(entry.fromJSON.bind(entry)))
-            : await entry.fromJSON(value.value);
-
-        return withType ? { type: value.type, value: convertedValue } : convertedValue;
-    }
-
-    async convertValuesFomEmitable(
-        values: (EmitableUserValue | undefined)[],
-        withType?: boolean,
-    ): Promise<(UserValue | undefined)[]> {
-        return Promise.all(values.map((value) => this.convertFromEmitable(value, withType)));
-    }
-
     parseUserValue(userValue: UserValue): UserValue | undefined {
         if (!R.isObjectType(userValue) || !R.isString(userValue.type)) return;
 
@@ -438,6 +403,103 @@ class TriggerApplication {
 
     parseUserValues(userValues: UserValue[]): (UserValue | undefined)[] {
         return R.isArray(userValues) ? userValues.map((value) => this.parseUserValue(value)) : [];
+    }
+
+    convertToEmitable(type: string, value: any): EmitableValue | undefined {
+        const entry = this.entries.get(type);
+        if (!entry) return;
+
+        const convert = (value: unknown) => (entry.isValidType(value) ? entry.toJSON(value) : undefined);
+        const converted = R.isArray(value) ? value.map((x) => convert(x)) : convert(value);
+        return { type, value: converted };
+    }
+
+    convertValueToEmitable(entry: unknown, parse?: boolean): EmitableValue | undefined {
+        if (!isUserValue(entry)) return;
+
+        const parsed = parse ? this.parseUserValue(entry) : entry;
+        return parsed && this.convertToEmitable(parsed.type, parsed.value);
+    }
+
+    convertValuesToEmitable(
+        values: unknown[] | ReadonlyArray<unknown>,
+        parse?: boolean,
+    ): (EmitableValue | undefined)[] {
+        return values.map((entry) => this.convertValueToEmitable(entry, parse));
+    }
+
+    convertObjectToEmitable<T extends string>(
+        obj: Record<T, unknown>,
+        conversionTypes: PartialRecord<T, string>,
+        userValueEntries: Partial<T>[],
+        parseUserValues?: boolean,
+    ): Record<T, unknown> {
+        const returnedObj = {} as Record<T, unknown>;
+
+        for (const [key, entry] of R.entries(obj)) {
+            const type = conversionTypes[key];
+
+            if (type) {
+                returnedObj[key] = this.convertToEmitable(type, entry);
+            } else if (userValueEntries.includes(key)) {
+                returnedObj[key] = R.isArray(entry)
+                    ? this.convertValuesToEmitable(entry, parseUserValues)
+                    : this.convertValueToEmitable(entry, parseUserValues);
+            } else {
+                returnedObj[key] = entry;
+            }
+        }
+
+        return returnedObj;
+    }
+
+    async convertFromEmitable(type: string, value: unknown, withType?: boolean): Promise<any> {
+        if (!value) return;
+
+        const entry = this.entries.get(type);
+        if (!entry) return;
+
+        const convertedValue = R.isArray(value)
+            ? await Promise.all(value.map((x) => entry.fromJSON(x as JSONValue)))
+            : await entry.fromJSON(value);
+
+        return withType ? { type, value: convertedValue } : convertedValue;
+    }
+
+    convertValueFromEmitable(entry: unknown, withType?: boolean): Promise<any> | undefined {
+        return isUserValue(entry) ? this.convertFromEmitable(entry.type, entry.value, withType) : undefined;
+    }
+
+    async convertValuesFomEmitable(
+        values: unknown[] | ReadonlyArray<unknown>,
+        withType?: boolean,
+    ): Promise<(UserValue | undefined)[]> {
+        return Promise.all(values.map((value) => this.convertValueFromEmitable(value, withType)));
+    }
+
+    async convertObjectFromEmitable<T extends string>(
+        obj: Record<T, unknown>,
+        conversionTypes: PartialRecord<T, string>,
+        userValueEntries: Partial<T>[],
+        withType?: boolean,
+    ): Promise<Record<T, unknown>> {
+        const returnedObj = {} as Record<T, unknown>;
+
+        for (const [key, entry] of R.entries(obj)) {
+            const type = conversionTypes[key];
+
+            if (type) {
+                returnedObj[key] = await this.convertFromEmitable(type, entry, withType);
+            } else if (userValueEntries.includes(key)) {
+                returnedObj[key] = R.isArray(entry)
+                    ? await this.convertValuesFomEmitable(entry, withType)
+                    : await this.convertValueFromEmitable(entry, withType);
+            } else {
+                returnedObj[key] = entry;
+            }
+        }
+
+        return returnedObj;
     }
 
     async executeEvent(eventName: string, args: Record<string, any>) {
@@ -672,6 +734,10 @@ function optionsHaveCustomSettings(
     );
 }
 
+function isUserValue(entry: unknown): entry is UserValue {
+    return R.isPlainObject(entry) && R.isString(entry.type);
+}
+
 type FreeApplicationResolve = (value: any) => void;
 
 type ApplicationParentType = "setting" | "document";
@@ -717,7 +783,7 @@ type UserValue = {
     value: any;
 };
 
-type EmitableUserValue = {
+type EmitableValue = {
     type: string;
     value: JSONValue | JSONValue[];
 };
@@ -726,7 +792,7 @@ export { TriggerApplication };
 export type {
     ApplicationKey,
     ApplicationParentType,
-    EmitableUserValue,
+    EmitableValue,
     TriggerApplicationOptions,
     TriggersSetting,
     UserValue,

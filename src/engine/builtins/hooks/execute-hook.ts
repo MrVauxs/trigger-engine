@@ -27,16 +27,14 @@ class ExecuteHook extends TriggerHook<ExecuteEventOptions> {
         const { applicationKey, triggerId } = getTriggerPathData(triggerPath);
         if (this.applicationKey !== applicationKey) return;
 
-        const parsed = this.parseUserValues(values);
-
         if (game.user.isActiveGM) {
             this.executeTriggerEvent(triggerId, "execute-event", {
-                values: parsed.map((x) => x?.value),
+                values: this.parseUserValues(values).map((x) => x?.value),
             } satisfies ExecuteEventOptions);
         } else {
             this.executeTriggerEventAsGM(triggerId, "execute-event", {
                 converted: true,
-                values: this.convertValuesToEmitable(parsed),
+                values: this.convertValuesToEmitable(values, true),
             } satisfies ExecuteEventOptions);
         }
     }

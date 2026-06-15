@@ -1,4 +1,4 @@
-import { ApplicationKey, EmitableUserValue, TriggerNode, UserValue } from "engine";
+import { ApplicationKey, EmitableValue, TriggerNode, UserValue } from "engine";
 import { ActorPF2e, MODULE } from "foundry-helpers";
 
 class TriggerHook<TArgs extends Record<string, any> = Record<string, any>> {
@@ -52,11 +52,32 @@ interface TriggerHook<TArgs extends Record<string, any> = Record<string, any>> {
     /** The internal key for the parent application. */
     get applicationKey(): ApplicationKey;
 
-    /** Convert the user value into one that is sent via websocket. */
+    /**
+     * Convert a data object composed of raw data and/or user values into one that is sent via websocket
+     *
+     * @see {@link TriggerHook#convertToEmitable}
+     * @see {@link TriggerHook#convertValueToEmitable}
+     * @see {@link TriggerHook#convertValuesToEmitable}
+     */
+    convertObjectToEmitable<T extends string>(
+        obj: Record<T, unknown>,
+        conversionTypes: PartialRecord<T, string>,
+        userValueEntries: Partial<T>[],
+        parseUserValues?: boolean,
+    ): Record<T, unknown>;
+
+    /** Convert a value into one that is sent via websocket. */
     convertToEmitable(type: string, value: any): UserValue | undefined;
 
-    /** @see {@link TriggerHook#convertToEmitable} */
-    convertValuesToEmitable(values: (UserValue | undefined)[]): (EmitableUserValue | undefined)[];
+    /**
+     * Convert a user value into one that is sent via websocket.
+     *
+     * @see {@link TriggerHook#parseUserValue}
+     */
+    convertValueToEmitable(value: UserValue, parse?: boolean): EmitableValue | undefined;
+
+    /** @see {@link TriggerHook#convertValueToEmitable} */
+    convertValuesToEmitable(values: (UserValue | undefined)[], parse?: boolean): (EmitableValue | undefined)[];
 
     /**
      * Execute all triggers that have this event.

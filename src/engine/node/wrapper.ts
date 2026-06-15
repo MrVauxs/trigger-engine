@@ -215,9 +215,13 @@ function instantiateNode(
                 R.fromKeys(
                     [
                         "convertFromEmitable",
+                        "convertObjectFromEmitable",
+                        "convertObjectToEmitable",
                         "convertToEmitable",
+                        "convertValueFromEmitable",
                         "convertValuesFomEmitable",
                         "convertValuesToEmitable",
+                        "convertValueToEmitable",
                         "parseUserValue",
                         "parseUserValues",
                     ] as const,

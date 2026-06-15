@@ -4,7 +4,7 @@ import {
     CustomInputSchema,
     CustomOutputSchema,
     CustomOutSchema,
-    EmitableUserValue,
+    EmitableValue,
     InputEntrySchemaSource,
     NodeEntry,
     NodeField,
@@ -276,20 +276,56 @@ interface TriggerNode<
     get userContext(): UserPF2e;
     set userContext(user: UserPF2e);
 
-    /** Convert values back from their websocket version. */
-    convertFromEmitable(userValue: EmitableUserValue, withType?: boolean): Promise<any | undefined>;
+    /** Convert a value back from its websocket version. */
+    convertFromEmitable(userValue: EmitableValue, withType?: boolean): Promise<any | undefined>;
 
-    /** Convert the user value into one that is sent via websocket. */
+    /**
+     * Convert a data object back from its websocket version.
+     *
+     * @see {@link TriggerNode#convertFromEmitable}
+     * @see {@link TriggerNode#convertValueFromEmitable}
+     * @see {@link TriggerNode#convertValuesFromEmitable}
+     */
+    convertObjectFromEmitable<T extends string>(
+        obj: Record<T, unknown>,
+        conversionTypes: PartialRecord<T, string>,
+        userValueEntries: Partial<T>[],
+        withType?: boolean,
+    ): Promise<Record<T, any>>;
+
+    /**
+     * Convert a data object composed of raw data and/or user values into one that is sent via websocket.
+     *
+     * @see {@link TriggerNode#convertToEmitable}
+     * @see {@link TriggerNode#convertValueToEmitable}
+     * @see {@link TriggerNode#convertValuesToEmitable}
+     */
+    convertObjectToEmitable<T extends string>(
+        obj: Record<T, unknown>,
+        conversionTypes: PartialRecord<T, string>,
+        userValueEntries: Partial<T>[],
+        parseUserValues?: boolean,
+    ): Record<T, any>;
+
+    /** Convert a value into one that is sent via websocket. */
     convertToEmitable(type: string, value: any): UserValue | undefined;
 
     /** @see {@link TriggerNode#convertFromEmitable} */
-    convertValuesFomEmitable(
-        values: (EmitableUserValue | undefined)[],
-        withType?: boolean,
-    ): Promise<(any | undefined)[]>;
+    convertValueFromEmitable(entry: UserValue, withType?: boolean): Promise<any> | undefined;
 
-    /** @see {@link TriggerNode#convertToEmitable} */
-    convertValuesToEmitable(values: UserValue[]): (EmitableUserValue | undefined)[];
+    /** @see {@link TriggerNode#convertValueFromEmitable} */
+    convertValuesFomEmitable(values: (EmitableValue | undefined)[], withType?: boolean): Promise<(any | undefined)[]>;
+
+    /** @see {@link TriggerNode#convertValueToEmitable} */
+    convertValuesToEmitable(values: UserValue[], parse?: boolean): (EmitableValue | undefined)[];
+
+    /**
+     * Convert a user value into one that is sent via websocket.
+     *
+     * @see {@link TriggerNode#convertToEmitable}
+     * @see {@link TriggerNode#parseUserValue}
+     */
+    convertValueToEmitable(value: UserValue, parse?: boolean): EmitableValue | undefined;
 
     /**
      * Calls the next `executable` node in the chain.
