@@ -184,6 +184,9 @@
                 "number": {
                     "title": "Number"
                 },
+                "once": {
+                    "title": "Execute Once"
+                },
                 "point": {
                     "title": "Point"
                 },
@@ -378,6 +381,9 @@
                             }
                         },
                         "title": "Test If Truthy"
+                    },
+                    "inside-region": {
+                        "title": "Is Inside Region"
                     },
                     "is-combatant": {
                         "title": "Is Current Combatant"
@@ -795,7 +801,7 @@
                     "title": "Private"
                 },
                 "region": {
-                    "title": "Region Document"
+                    "title": "Region"
                 },
                 "reroll": {
                     "title": "Is Reroll"
@@ -1026,17 +1032,20 @@
                         "title": "Is In Range"
                     },
                     "inside-aura": {
-                        "inputs": {
-                            "once": {
-                                "title": "Execute Once"
-                            }
-                        },
                         "outputs": {
                             "target": {
                                 "title": "Aura Target"
                             }
                         },
                         "title": "Is Inside Aura"
+                    },
+                    "inside-template": {
+                        "inputs": {
+                            "name": {
+                                "title": "Origin Slug"
+                            }
+                        },
+                        "title": "Is Inside Template"
                     },
                     "is-alliance": {
                         "title": "Is of Alliance"
