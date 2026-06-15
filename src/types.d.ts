@@ -18,6 +18,16 @@ declare module "@7h3laughingman/foundry-types/client/game.mjs" {
     }
 }
 
+declare module "@7h3laughingman/pf2e-types" {
+    interface GamePF2e {
+        triggerEngine?: {
+            api: {
+                openBlueprintMenu: typeof TriggerEngine.TriggerApplication.openBlueprintMenu;
+            };
+        };
+    }
+}
+
 declare global {
     namespace triggerEngine {
         const NodeEntry: typeof _NodeEntry;
