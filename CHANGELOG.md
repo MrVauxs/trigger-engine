@@ -1,3 +1,16 @@
+# 1.11.0
+
+- add a second `prepareTriggers` parameter to the `setting.set` callback of application registration
+  - this callback MUST be called everytime the `setting.set` callback is called by the module
+  - you should call it after you have fully saved the provided data
+- add extra `afterPrepared` callback in the `setting` object of application registration
+  - it is called after your application triggers have been fully prepared
+  - it has a single `data` argument that is a copy of the processed sources of all the validated/cached triggers
+- add a bunch of new methods to the `TriggerNode` and `TriggerHook` classes
+- add new `Execute Animation` action node
+  - this node is used to execute an animation trigger from the coming `Trigger Animations` module (it won't do anything for now)
+  - if the `Trigger Animations` module is active in your world when the node is reached, the animation will be executed
+
 # 1.10.1
 
 - add the `If` tag to `Split Boolean` & `Test If Truthy` nodes
