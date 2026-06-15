@@ -5,6 +5,7 @@ import {
     CreateBehaviorActionNode,
     CreateMessageActionNode,
     DeleteItemActionNode,
+    ExecuteAnimationActionNode,
     ExecuteScriptActionNode,
     MoveRegionActionNode,
     // TestNodeActionNode,
@@ -19,6 +20,7 @@ export * from "./console-log";
 export * from "./create-behavior";
 export * from "./create-message";
 export * from "./delete-item";
+export * from "./execute-animation";
 export * from "./execute-script";
 export * from "./move-region";
 // export * from "./test-node";
@@ -31,6 +33,7 @@ export default [
     CreateBehaviorActionNode,
     CreateMessageActionNode,
     DeleteItemActionNode,
+    ExecuteAnimationActionNode,
     ExecuteScriptActionNode,
     MoveRegionActionNode,
     // TestNodeActionNode,

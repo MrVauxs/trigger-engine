@@ -310,6 +310,29 @@
                     "delete-item": {
                         "title": "Delete Item"
                     },
+                    "execute-animation": {
+                        "groups": {
+                            "custom": "Custom Inputs"
+                        },
+                        "inputs": {
+                            "await": {
+                                "title": "Await Execution?",
+                                "tooltip": "Should the node wait for the animation to finish before executing the next one?"
+                            },
+                            "name": {
+                                "title": "Name",
+                                "tooltip": "The name of the animation, filtering which animations are triggered."
+                            },
+                            "options": {
+                                "title": "Options",
+                                "tooltip": "A list of string options that can be used to modify the effect (e.g. pf2e roll options)."
+                            },
+                            "sources": {
+                                "title": "Sources"
+                            }
+                        },
+                        "title": "Execute Animation"
+                    },
                     "execute-script": {
                         "inputs": {
                             "macro": {
@@ -566,6 +589,9 @@
                 "plain": "Plain Text"
             },
             "tag": {
+                "animation": {
+                    "title": "Animation"
+                },
                 "chat": {
                     "title": "Chat"
                 },
