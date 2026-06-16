@@ -166,6 +166,9 @@
                 "formula": {
                     "title": "Formula"
                 },
+                "index": {
+                    "title": "Index"
+                },
                 "input": {
                     "title": "Input"
                 },
@@ -264,6 +267,26 @@
                             }
                         },
                         "title": "Await Confirmation"
+                    },
+                    "await-delay": {
+                        "inputs": {
+                            "delay": {
+                                "title": "Delay (ms)",
+                                "tooltip": "Time in milliseconds before execution."
+                            },
+                            "repeat": {
+                                "title": "Repeat",
+                                "tooltip": "Number of execution with the specified delay (1~10)."
+                            },
+                            "start": {
+                                "title": "Starts at 1",
+                                "tooltip": "Should the <code>index</code> start at <code>1</code> instead of <code>0</code>?"
+                            }
+                        },
+                        "title": "Await Delay",
+                        "titles": {
+                            "repeat": "Repeat With Delay"
+                        }
                     },
                     "console-log": {
                         "title": "Console Log"
@@ -624,6 +647,9 @@
                 },
                 "region": {
                     "title": "Region"
+                },
+                "time": {
+                    "title": "Time"
                 },
                 "token": {
                     "title": "Token"
