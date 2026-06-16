@@ -5,6 +5,7 @@ import {
     DeleteCombatantEvent,
     DeleteTokenEvent,
     ExecuteEvent,
+    HookCalledEvent,
     MoveTokenEvent,
     RegionEvent,
     TestEvent,
@@ -20,6 +21,7 @@ export * from "./create-token";
 export * from "./delete-combatant";
 export * from "./delete-token";
 export * from "./execute-event";
+export * from "./hook-called";
 export * from "./move-token";
 export * from "./region-event";
 export * from "./start-event";
@@ -32,6 +34,7 @@ export default [
     DeleteCombatantEvent,
     DeleteTokenEvent,
     ExecuteEvent,
+    HookCalledEvent,
     MoveTokenEvent,
     RegionEvent,
     TestEvent,

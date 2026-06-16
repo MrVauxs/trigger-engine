@@ -1,4 +1,4 @@
-import { ApplicationKey, EmitableValue, TriggerNode, UserValue } from "engine";
+import { ApplicationKey, EmitableValue, TriggerDataInput, TriggerNode, UserValue } from "engine";
 import { ActorPF2e, MODULE } from "foundry-helpers";
 
 class TriggerHook<TArgs extends Record<string, any> = Record<string, any>> {
@@ -28,7 +28,7 @@ class TriggerHook<TArgs extends Record<string, any> = Record<string, any>> {
      * @abstract
      * This method is called if at least one trigger can be executed by this hook.
      */
-    _enable() {
+    _enable(sources: TriggerDataInput[]) {
         throw MODULE.Error("'_enable' method not implemented.");
     }
 
@@ -45,7 +45,7 @@ class TriggerHook<TArgs extends Record<string, any> = Record<string, any>> {
      *
      * This is useful if you need to have some background process running for exceptional nodes.
      */
-    _listen() {}
+    _listen(sources: TriggerDataInput[]) {}
 }
 
 interface TriggerHook<TArgs extends Record<string, any> = Record<string, any>> {

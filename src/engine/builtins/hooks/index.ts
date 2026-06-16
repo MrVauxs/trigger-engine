@@ -5,6 +5,7 @@ import {
     DeleteCombatantHook,
     DeleteTokenHook,
     ExecuteHook,
+    HookCalledHook,
     MoveTokenHook,
     RegionHook,
     TestHook,
@@ -20,6 +21,7 @@ export * from "./create-token";
 export * from "./delete-combatant";
 export * from "./delete-token";
 export * from "./execute-hook";
+export * from "./hook-called";
 export * from "./move-token";
 export * from "./trigger-region";
 export * from "./test-hook";
@@ -31,6 +33,7 @@ export default [
     DeleteCombatantHook,
     DeleteTokenHook,
     ExecuteHook,
+    HookCalledHook,
     MoveTokenHook,
     RegionHook,
     TestHook,

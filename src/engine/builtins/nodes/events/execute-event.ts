@@ -1,7 +1,7 @@
 import { IconObject } from "_zod";
 import { BaseEventNode, BuiltinsCustomEntry, ExecuteEventOptions } from "engine";
 
-class ExecuteEvent extends BaseEventNode {
+class ExecuteEvent extends BaseEventNode<never, never, "output"> {
     static get type(): "execute-event" {
         return "execute-event";
     }

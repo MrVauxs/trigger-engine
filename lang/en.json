@@ -428,7 +428,7 @@
                         "title": "Combatant Created"
                     },
                     "create-item-event": {
-                        "title": "Item Created"
+                        "title": "Item Added to Actor"
                     },
                     "create-token-event": {
                         "title": "Token Created"
@@ -441,6 +441,18 @@
                     },
                     "execute-event": {
                         "title": "Execute Event"
+                    },
+                    "hook-called-event": {
+                        "inputs": {
+                            "gm": {
+                                "title": "GM Only",
+                                "tooltip": "A single GM user will execute this trigger."
+                            },
+                            "name": {
+                                "title": "Hook Name"
+                            }
+                        },
+                        "title": "Foundry Hook Called"
                     },
                     "move-token-event": {
                         "title": "Token Moved"

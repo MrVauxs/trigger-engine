@@ -338,6 +338,8 @@ class TriggerApplication {
             }
         }
 
+        const preparedSources = triggers.map((trigger) => trigger.toObject());
+
         MODULE.group(this.applicationKey);
         MODULE.debug("PREPARE HOOKS:");
         for (const hookData of this.#hooks) {
@@ -355,13 +357,13 @@ class TriggerApplication {
             const canEnable = !hook.gmOnly || game.user.isGM;
 
             if (canEnable && R.isArray(wantedEvents) && includesAny(events, wantedEvents)) {
-                hook._enable();
-                hookData.enabled = true;
                 MODULE.debug("[ENABLED]  ", hookName);
-            } else if (canEnable && R.isArray(wantedOtherNodes) && includesAny(otherNodes, wantedOtherNodes)) {
-                hook._listen();
+                hook._enable(preparedSources);
                 hookData.enabled = true;
+            } else if (canEnable && R.isArray(wantedOtherNodes) && includesAny(otherNodes, wantedOtherNodes)) {
                 MODULE.debug("[LISTENING]", hookName);
+                hook._listen(preparedSources);
+                hookData.enabled = true;
             } else {
                 MODULE.debug("[DISABLED] ", hookName);
             }
@@ -370,8 +372,7 @@ class TriggerApplication {
         console.groupEnd();
 
         if (this.#customSettings?.afterPrepared) {
-            const sources = triggers.map((trigger) => trigger.toObject());
-            this.#customSettings.afterPrepared(sources);
+            this.#customSettings.afterPrepared(preparedSources);
         }
     }
 
