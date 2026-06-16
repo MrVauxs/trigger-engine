@@ -427,6 +427,9 @@
                     "create-combatant-event": {
                         "title": "Combatant Created"
                     },
+                    "create-item-event": {
+                        "title": "Item Created"
+                    },
                     "create-token-event": {
                         "title": "Token Created"
                     },
@@ -590,6 +593,12 @@
                 "extract": {
                     "input": {
                         "label": "Path"
+                    }
+                },
+                "item-event": {
+                    "type": {
+                        "label": "Item Type",
+                        "tooltip": "Comma separated list of ite types."
                     }
                 },
                 "numbers": {

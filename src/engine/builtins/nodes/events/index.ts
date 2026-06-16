@@ -1,5 +1,6 @@
 import {
     CreateCombatantEvent,
+    CreateItemEvent,
     CreateTokenEvent,
     DeleteCombatantEvent,
     DeleteTokenEvent,
@@ -11,8 +12,10 @@ import {
 
 export * from "./base";
 export * from "./base-combatant";
+export * from "./base-item";
 export * from "./base-token";
 export * from "./create-combatant";
+export * from "./create-item";
 export * from "./create-token";
 export * from "./delete-combatant";
 export * from "./delete-token";
@@ -24,6 +27,7 @@ export * from "./test-event";
 
 export default [
     CreateCombatantEvent,
+    CreateItemEvent,
     CreateTokenEvent,
     DeleteCombatantEvent,
     DeleteTokenEvent,

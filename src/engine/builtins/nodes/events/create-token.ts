@@ -1,5 +1,5 @@
 import { IconObject } from "_zod";
-import { BaseTokenEvent } from "engine";
+import { BaseTokenEvent } from ".";
 
 class CreateTokenEvent extends BaseTokenEvent {
     static get type(): "create-token-event" {
