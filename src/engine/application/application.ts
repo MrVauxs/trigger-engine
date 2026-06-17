@@ -27,7 +27,7 @@ import {
     TriggerVariableGetter,
     VARIABLE_CATEGORY,
 } from "engine";
-import { includesAny, LocalizeArgs, LocalizeData, MODULE, R } from "foundry-helpers";
+import { includesAny, localize, LocalizeArgs, LocalizeData, MODULE, R } from "foundry-helpers";
 import { ExecuteEventQueryOptions, ExecuteTriggerQueryOptions } from "queries";
 import { BlueprintApplication } from "triggers-menu";
 import utils = foundry.utils;
@@ -38,6 +38,7 @@ const FORBIDDEN_NODE_TYPE = [EXIT_GATE_TYPE, ENTRY_GATE_TYPE, GETTER_VARIABLE_TY
 
 class TriggerApplication {
     static #instances: Collection<string, TriggerApplication> = new Collection();
+    static #moduleTriggersPrepared = false;
 
     #applicationId: string;
     #applicationKey: ApplicationKey;
@@ -181,12 +182,18 @@ class TriggerApplication {
     }
 
     static async openBlueprintMenu(moduleId: string, applicationId: string, source?: TriggerDataInput, ...args: any[]) {
+        if (!this.#moduleTriggersPrepared) {
+            localize.warning("application.await-modules");
+            return;
+        }
+
         const app = this.getApplication(moduleId, applicationId);
         return app?.openMenu(source, ...args);
     }
 
     static async prepareModulesTriggers() {
-        return Promise.all(this.#instances.map((application) => application.prepareModuleTriggers()));
+        await Promise.all(this.#instances.map((application) => application.prepareModuleTriggers()));
+        TriggerApplication.#moduleTriggersPrepared = true;
     }
 
     static prepareApplications() {
