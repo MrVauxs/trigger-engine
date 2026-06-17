@@ -452,7 +452,7 @@
                                 "title": "Hook Name"
                             }
                         },
-                        "title": "Foundry Hook Called"
+                        "title": "On Hook Called"
                     },
                     "move-token-event": {
                         "title": "Token Moved"

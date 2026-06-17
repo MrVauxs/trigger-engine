@@ -124,6 +124,10 @@ class TriggerApplication {
         }
     }
 
+    static get instances(): Collection<string, TriggerApplication> {
+        return this.#instances;
+    }
+
     static getApplicationKey(moduleId: string, applicationId: string): string | undefined {
         if (
             !R.isString(moduleId) || //
@@ -162,7 +166,7 @@ class TriggerApplication {
 
     static getApplication(moduleId: string, applicationId: string): TriggerApplication | undefined {
         const applicationKey = this.getApplicationKey(moduleId, applicationId);
-        return applicationKey ? this.#instances.get(`${moduleId}:${applicationId}`) : undefined;
+        return applicationKey ? this.#instances.get(applicationKey) : undefined;
     }
 
     static registerTriggers(moduleId: string, applicationId: string, triggersOrFilePath: string | TriggerDataInput[]) {
