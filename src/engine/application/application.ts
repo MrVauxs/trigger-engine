@@ -285,7 +285,9 @@ class TriggerApplication {
                 const sources = R.isArray(json) ? (json as TriggerDataInput[]) : [];
 
                 this.addSources(sources);
-            } catch {}
+            } catch (error: any) {
+                MODULE.error(`An error occured while retrieving the triggers file: ${path}`, error);
+            }
         }
     }
 
