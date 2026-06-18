@@ -29,7 +29,7 @@ class ExecuteAnimationActionNode extends BaseActionNode<"out", Inputs, never, "i
             {
                 group: "custom",
                 slug: "input",
-                types: ["any", "boolean", "item", "number", "point", "target", "text", "user"],
+                types: ["any", "boolean", "item", "number", "point", "region", "target", "text", "user"],
                 array: true,
             },
         ];
