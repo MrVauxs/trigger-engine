@@ -603,10 +603,24 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
 
         this.#searchInput = htmlQuery<ExtendedTextInputElement>(html, `[name="search"]`);
         this.#searchInput?.addEventListener("input", () => this.#filterNodes());
+        this.#searchInput?.addEventListener("keydown", this.#searchKeyDown.bind(this));
 
         this.#tagsInput = htmlQuery<ExtendedMultiSelectElement>(html, `[name="tags"]`);
         this.#tagsInput?.addEventListener("change", () => this.#filterNodes());
         this.#tagsInput?.addEventListener("mode", () => this.#filterNodes());
+    }
+
+    #searchKeyDown(event: KeyboardEvent) {
+        if (event.key !== "Enter") return;
+
+        const selectable = this.element.querySelectorAll(".selectable.node:not(.hidden)");
+        if (selectable.length !== 1) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        const element = selectable.item(0) as HTMLElement;
+        element.click();
     }
 
     #filterNodes() {
