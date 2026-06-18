@@ -1,3 +1,27 @@
+# 1.12.0
+
+- add warning when trying to open the blueprint menu before module triggers have finished to be parsed
+- add new `region` connection type which represents a `RegionDocument`:
+  - had too many region related nodes to continue avoiding it
+  - every previously `any` entries that were representing a region have been converted to `region`
+  - all existing connections will remain, only the type changes
+  - for obvious reason, custom entry could not be converted and should be done manually (though everything should still work as `any` can be converted to and from every other type)
+- add new `Await Delay` action node:
+  - it also has a `Repeat With Delay` state
+- add new `Is Inside Region` condition node:
+  - it tests if the provided token is inside a region that has the same name
+  - if more than one such region is found, it will loop over each of them (unless the `Execute Once` is checked)
+- add new `Item Added to Actor` event node:
+  - you can (optional) provide a comma separated list of item types to check against
+- add new `On Hook Called` event node:
+  - this will automatically register a foundry hook of the same name
+  - it is on the user to set the custom outputs matching the hook arguments in the same order
+- `Execute Animation`:
+  - convert both `Sources` and `Targets` inputs into `any` type
+- now automatically creates a node when pressing `Enter` in the search field of the nodes menu if only one node remains in the list
+- `pf2e-trigger`:
+  - add new `Is Inside Template` condition node which works exactly like the `Is Inside Region` node but instead uses the origin item slug to identify the regions
+
 # 1.11.0
 
 - add a second `prepareTriggers` parameter to the `setting.set` callback of application registration
