@@ -25,14 +25,7 @@ class ExecuteAnimationActionNode extends BaseActionNode<"out", Inputs, never, "i
     }
 
     static override get defineCustomInputs(): BuiltinsCustomEntry[] {
-        return [
-            {
-                group: "custom",
-                slug: "input",
-                types: ["any", "boolean", "item", "number", "point", "region", "target", "text", "user"],
-                array: true,
-            },
-        ];
+        return [{ group: "custom", slug: "input", array: true }];
     }
 
     get headerColor(): ColorSource {
