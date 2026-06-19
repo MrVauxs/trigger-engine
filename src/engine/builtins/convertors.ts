@@ -1,5 +1,5 @@
 import { EntryConvertor } from "engine";
-import { ItemPF2e, primaryPlayerOwner, R, UserPF2e } from "foundry-helpers";
+import { ItemPF2e, primaryPlayerOwner, R, RegionDocumentPF2e, UserPF2e } from "foundry-helpers";
 
 const TEXT_STRING_REGEX = /(?<x>[0-9\.]+)\s*[:,|_\/-]\s*(?<y>[0-9\.]+)/;
 
@@ -69,6 +69,20 @@ const builtinsConvertors = [
                 x: Number(match.groups.x),
                 y: Number(match.groups.y),
             };
+        },
+    },
+    {
+        output: "region",
+        input: "target",
+        convertToInput: (value: RegionDocumentPF2e | undefined): TargetDocuments[] => {
+            return R.pipe(
+                value ? [...value.tokens] : [],
+                R.map((token) => {
+                    const actor = token.actor;
+                    return actor ? { actor, token } : undefined;
+                }),
+                R.filter(R.isTruthy),
+            );
         },
     },
 ] as const satisfies EntryConvertor[];
