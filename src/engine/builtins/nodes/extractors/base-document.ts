@@ -29,7 +29,8 @@ abstract class BaseDocumentExtractorNode<
 
             for (const { key, input } of entries) {
                 const value = R.isString(input) ? foundry.utils.getProperty(document, input) : undefined;
-                this.setOutputValue(key, value);
+                // we convert Set into Array
+                this.setOutputValue(key, value instanceof Set ? [...value] : value);
             }
         }
 
