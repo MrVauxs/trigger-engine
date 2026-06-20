@@ -1,3 +1,10 @@
+# 1.13.0
+
+- add new `region -> target` convertor which returns the `tokens` currently inside the region
+- add new `Extract From Region` extractor node
+- `Execute Animation`:
+  - fix missing `region` type in custom inputs selection
+
 # 1.12.0
 
 - add warning when trying to open the blueprint menu before module triggers have finished to be parsed
