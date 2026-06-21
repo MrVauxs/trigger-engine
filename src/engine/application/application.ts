@@ -134,6 +134,10 @@ class TriggerApplication {
             // the app use custom settings logic
             if (optionsHaveCustomSettings(options)) {
                 this.#customSettings = options.setting;
+
+                if (options.setting.menu) {
+                    this.#setupSettingsMenu(R.isPlainObject(options.setting.menu) ? options.setting.menu : {});
+                }
             } else {
                 this.#setupSettings(options.setting as ApplicationMenuOptions);
             }
@@ -709,12 +713,10 @@ class TriggerApplication {
         }
     }
 
-    #setupSettings({ hint, icon, label, name }: ApplicationMenuOptions = {}) {
-        const moduleId = this.moduleId;
-        const applicationId = this.applicationId;
+    #setupSettings(options: ApplicationMenuOptions = {}) {
         const settingKey = this.settingKey;
 
-        game.settings.register(moduleId, settingKey, {
+        game.settings.register(this.moduleId, settingKey, {
             type: Object,
             default: {},
             scope: "world",
@@ -724,6 +726,13 @@ class TriggerApplication {
                 this.prepare();
             },
         });
+
+        this.#setupSettingsMenu(options);
+    }
+
+    #setupSettingsMenu({ hint, icon, label, name }: ApplicationMenuOptions) {
+        const moduleId = this.moduleId;
+        const applicationId = this.applicationId;
 
         const settingPath = (...path: string[]): string => {
             return `${moduleId}.${applicationId}.setting.${path.join(".")}`;
@@ -772,6 +781,7 @@ type ApplicationSettingOptions = ApplicationMenuOptions | ApplicationCustomSetti
 
 type ApplicationCustomSetting = {
     afterPrepared?: (data: TriggerDataInput[]) => void;
+    menu?: boolean | ApplicationMenuOptions;
     get: () => Partial<TriggersSetting>;
     set: (data: TriggersSetting, prepareTriggers: () => void) => Promise<void>;
 };
