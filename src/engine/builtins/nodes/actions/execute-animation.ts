@@ -71,9 +71,11 @@ type Inputs = {
 
 declare global {
     namespace triggerAnimations {
-        namespace api {
-            function runFromTrigger(data: StartNodeOptions): Promise<void>;
+        interface API {
+            runFromTrigger(data: StartNodeOptions): Promise<void>;
         }
+
+        const api: API;
 
         type StartNodeOptions = {
             name: string;
@@ -86,5 +88,6 @@ declare global {
         };
     }
 }
+
 
 export { ExecuteAnimationActionNode };
