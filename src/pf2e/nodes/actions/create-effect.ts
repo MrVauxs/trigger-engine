@@ -1,10 +1,10 @@
 import { IconObject } from "_zod";
 import { BaseActionNode, CustomInputSchema, JsonField } from "engine";
-import { ActorPF2e, R, RuleElementSource, createCustomEffect, localize } from "foundry-helpers";
+import { ActorPF2e, EffectPF2e, R, RuleElementSource, createCustomEffect, localize } from "foundry-helpers";
 import { DurationState, EffectInputs, createEmbeddedItem, durationStates, effectSchemas, getEffectData } from ".";
-import { PF2eInputEntry } from "pf2e";
+import { PF2eInputEntry, PF2eOutputEntry } from "pf2e";
 
-class CreateEffectActionNode extends BaseActionNode<"out", Inputs, never, "rule", never, DurationState> {
+class CreateEffectActionNode extends BaseActionNode<"out", Inputs, Outputs, "rule", never, DurationState> {
     static get type(): "create-effect" {
         return "create-effect";
     }
@@ -38,6 +38,10 @@ class CreateEffectActionNode extends BaseActionNode<"out", Inputs, never, "rule"
                 },
             ]),
         ];
+    }
+
+    static get defineOutputs(): PF2eOutputEntry[] {
+        return [{ key: "effect", type: "item" }];
     }
 
     static get defineCustomInputs(): CustomInputSchema[] {
@@ -88,7 +92,11 @@ class CreateEffectActionNode extends BaseActionNode<"out", Inputs, never, "rule"
             rules,
         });
 
-        await createEmbeddedItem(actor, source);
+        const created = await createEmbeddedItem<EffectPF2e>(actor, source);
+
+        if (created) {
+            this.setOutputValue("effect", created);
+        }
 
         return this.executeNext("out");
     }
@@ -98,6 +106,10 @@ type Inputs = EffectInputs & {
     counter: number;
     level: number;
     target?: TargetDocuments;
+};
+
+type Outputs = {
+    effect: EffectPF2e;
 };
 
 export { CreateEffectActionNode };
