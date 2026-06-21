@@ -276,11 +276,11 @@
                         "inputs": {
                             "delay": {
                                 "title": "Delay (ms)",
-                                "tooltip": "Time in milliseconds before execution."
+                                "tooltip": "Time in milliseconds before execution"
                             },
                             "repeat": {
                                 "title": "Repeat",
-                                "tooltip": "Number of execution with the specified delay (1~10)."
+                                "tooltip": "Number of execution with the specified delay (1~10)"
                             },
                             "start": {
                                 "title": "Starts at 1",
@@ -351,11 +351,11 @@
                             },
                             "name": {
                                 "title": "Name",
-                                "tooltip": "The name of the animation, filtering which animations are triggered."
+                                "tooltip": "The name of the animation, filtering which animations are triggered"
                             },
                             "options": {
                                 "title": "Options",
-                                "tooltip": "A list of string options that can be used to modify the effect (e.g. pf2e roll options)."
+                                "tooltip": "A list of string options that can be used to modify the effect (e.g. pf2e roll options)"
                             },
                             "sources": {
                                 "title": "Sources"
@@ -450,7 +450,7 @@
                         "inputs": {
                             "gm": {
                                 "title": "GM Only",
-                                "tooltip": "A single GM user will execute this trigger."
+                                "tooltip": "A single GM user will execute this trigger"
                             },
                             "name": {
                                 "title": "Hook Name"
@@ -617,12 +617,15 @@
                 "item-event": {
                     "type": {
                         "label": "Item Type",
-                        "tooltip": "Comma separated list of ite types."
+                        "tooltip": "Comma separated list of ite types"
                     }
                 },
                 "numbers": {
                     "disable": {
                         "tooltip": "Set to <code>0</code> to disable"
+                    },
+                    "override": {
+                        "tooltip": "Set to <code>0</code> to not override"
                     }
                 },
                 "variables": {
@@ -716,7 +719,7 @@
             "name": "Trigger Name",
             "priority": {
                 "label": "Priority",
-                "tooltip": "Tooltips with higher priority will be executed first."
+                "tooltip": "Tooltips with higher priority will be executed first"
             },
             "tags": "Trigger Tags",
             "yes": {
@@ -890,6 +893,12 @@
                     "create-effect": {
                         "title": "Create Effect"
                     },
+                    "create-effect-source": {
+                        "groups": {
+                            "origin": "system.context"
+                        },
+                        "title": "Create Effect From Source"
+                    },
                     "create-item": {
                         "customs": {
                             "inputs": {
@@ -905,9 +914,6 @@
                         "inputs": {
                             "duplicate": {
                                 "title": "Allow Duplicate"
-                            },
-                            "level": {
-                                "tooltip": "Set to <code>0</code> to not override"
                             }
                         },
                         "title": "Create Item"

@@ -1,6 +1,16 @@
 import { IconObject } from "_zod";
 import { BaseActionNode, CustomInputSchema } from "engine";
-import { ActorPF2e, ChoiceSetSource, ItemPF2e, ItemType, R, getDocumentFromUUID, getItemSource } from "foundry-helpers";
+import {
+    ActorPF2e,
+    ChoiceSetSource,
+    getDocumentFromUUID,
+    getItemSource,
+    ItemPF2e,
+    ItemType,
+    localize,
+    R,
+} from "foundry-helpers";
+import { PF2eInputEntry, PF2eOutputEntry } from "pf2e";
 import {
     createEmbeddedItem,
     DoubleUuidInputs,
@@ -9,9 +19,8 @@ import {
     getIconFromDoubleUuid,
     getLocalItemFromSourceUuid,
 } from "..";
-import { PF2eInputEntry, PF2eOutputEntry } from "pf2e";
 
-class CreateItemActionNode extends BaseActionNode<"out", Inputs, { item?: ItemPF2e }, "choices"> {
+class CreateItemActionNode extends BaseActionNode<"out", CreateItemInputs, { item?: ItemPF2e }, "choices"> {
     static modes = ["flag", "rollOption"] as const;
 
     static get type(): "create-item" {
@@ -24,12 +33,13 @@ class CreateItemActionNode extends BaseActionNode<"out", Inputs, { item?: ItemPF
 
     static get defineInputs(): PF2eInputEntry[] {
         return [
-            ...doubleUuidSchemas(),
             { key: "target", type: "target" },
+            ...doubleUuidSchemas(),
             { key: "duplicate", type: "boolean", field: { default: true } },
             {
                 key: "level",
                 type: "number",
+                tooltip: localize.path("builtins.shared.numbers.override.tooltip"),
                 field: {
                     min: 0,
                     step: 1,
@@ -129,10 +139,11 @@ class CreateItemActionNode extends BaseActionNode<"out", Inputs, { item?: ItemPF
     }
 }
 
-type Inputs = DoubleUuidInputs & {
+type CreateItemInputs = DoubleUuidInputs & {
     duplicate: boolean;
     level: number;
     target?: TargetDocuments;
 };
 
 export { CreateItemActionNode };
+export type { CreateItemInputs };

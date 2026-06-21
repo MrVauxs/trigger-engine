@@ -2,6 +2,7 @@ import {
     PF2eCreateBehaviorActionNode,
     CreateConditionActionNode,
     CreateEffectActionNode,
+    CreateEffectSourceActionNode,
     CreateItemActionNode,
     CreatePersistentActionNode,
     CreateTemporaryActionNode,
@@ -25,6 +26,7 @@ export * from "./base-effect";
 export * from "./create-behavior";
 export * from "./create-condition";
 export * from "./create-effect";
+export * from "./create-effect-source";
 export * from "./create-item";
 export * from "./create-persistent";
 export * from "./create-temporary";
@@ -46,6 +48,7 @@ export default [
     PF2eCreateBehaviorActionNode,
     CreateConditionActionNode,
     CreateEffectActionNode,
+    CreateEffectSourceActionNode,
     CreateItemActionNode,
     CreatePersistentActionNode,
     CreateTemporaryActionNode,

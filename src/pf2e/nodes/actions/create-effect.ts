@@ -4,7 +4,7 @@ import { ActorPF2e, EffectPF2e, R, RuleElementSource, createCustomEffect, locali
 import { DurationState, EffectInputs, createEmbeddedItem, durationStates, effectSchemas, getEffectData } from ".";
 import { PF2eInputEntry, PF2eOutputEntry } from "pf2e";
 
-class CreateEffectActionNode extends BaseActionNode<"out", Inputs, Outputs, "rule", never, DurationState> {
+class CreateEffectActionNode extends BaseActionNode<"out", Inputs, CreateEffectOutputs, "rule", never, DurationState> {
     static get type(): "create-effect" {
         return "create-effect";
     }
@@ -108,8 +108,9 @@ type Inputs = EffectInputs & {
     target?: TargetDocuments;
 };
 
-type Outputs = {
+type CreateEffectOutputs = {
     effect: EffectPF2e;
 };
 
 export { CreateEffectActionNode };
+export type { CreateEffectOutputs };
