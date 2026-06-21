@@ -53,6 +53,7 @@ class TriggerApplication {
     #moduleId: string;
     #moduleSources: TriggerDataInput[] = [];
     #nodes: Collection<string, typeof TriggerNode>;
+    #settingsBlueprintApplication!: typeof BlueprintApplication;
     #triggerEvents: Record<string, { eventId: string; data: TriggerData }[]> = {};
 
     constructor(moduleId: string, applicationId: string, options: TriggerApplicationOptions = {}) {
@@ -116,6 +117,20 @@ class TriggerApplication {
 
         // setup settings
         if (this.isSettingApplication) {
+            const self = this;
+
+            class SettingBlueprintApplication extends BlueprintApplication {
+                get application(): TriggerApplication {
+                    return self;
+                }
+
+                getTriggersSetting(): TriggersSetting {
+                    return self.getTriggersSetting()!;
+                }
+            }
+
+            this.#settingsBlueprintApplication = SettingBlueprintApplication;
+
             // the app use custom settings logic
             if (optionsHaveCustomSettings(options)) {
                 this.#customSettings = options.setting;
@@ -643,9 +658,7 @@ class TriggerApplication {
     }
 
     async #openSettingApplication(): Promise<BlueprintApplication> {
-        const menuKey = `${this.moduleId}.${this.settingMenuKey}`;
-        const menu = game.settings.menus.get(menuKey)?.type as typeof BlueprintApplication;
-        return new menu().render(true);
+        return new this.#settingsBlueprintApplication().render(true);
     }
 
     #openFreeApplication(source?: TriggerDataInput, ...args: any[]): Promise<OpenTrigger> {
@@ -697,7 +710,6 @@ class TriggerApplication {
     }
 
     #setupSettings({ hint, icon, label, name }: ApplicationMenuOptions = {}) {
-        const self = this;
         const moduleId = this.moduleId;
         const applicationId = this.applicationId;
         const settingKey = this.settingKey;
@@ -713,16 +725,6 @@ class TriggerApplication {
             },
         });
 
-        class SettingBlueprintApplication extends BlueprintApplication {
-            get application(): TriggerApplication {
-                return self;
-            }
-
-            getTriggersSetting(): TriggersSetting {
-                return self.getTriggersSetting()!;
-            }
-        }
-
         const settingPath = (...path: string[]): string => {
             return `${moduleId}.${applicationId}.setting.${path.join(".")}`;
         };
@@ -733,7 +735,7 @@ class TriggerApplication {
             hint: hint ?? settingPath("hint"),
             icon: icon ?? "fas fa-cogs",
             restricted: true,
-            type: SettingBlueprintApplication,
+            type: this.#settingsBlueprintApplication,
         });
     }
 }
