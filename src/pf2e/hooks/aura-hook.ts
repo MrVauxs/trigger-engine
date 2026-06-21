@@ -81,7 +81,6 @@ class AuraHook extends TriggerHook<AuraEventOptions> {
             const origin = { actor: auraActor, token: aura.token };
 
             for (const actor of affectedActors) {
-                if (actor === auraActor) continue;
                 setAuraInMemory(actor, auraData, origin);
             }
         }
@@ -123,8 +122,6 @@ class AuraHook extends TriggerHook<AuraEventOptions> {
             const actorTokens = actor.getActiveTokens(true, true);
 
             for (const aura of actorAuras) {
-                if (aura.origin.actor === actor) continue;
-
                 const tokenAura = tokensAuras.find(
                     ({ slug, token }) => slug === aura.data.slug && token === aura.origin.token,
                 );
@@ -167,18 +164,16 @@ class AuraHook extends TriggerHook<AuraEventOptions> {
             affectedActors.add(actor);
             await actor.applyAreaEffects(auraData, source);
 
-            if (auraActor !== actor) {
-                const auras = getAurasInMemory(actor);
-                const already = auras.find(auraSearch(auraData, source));
+            const auras = getAurasInMemory(actor);
+            const already = auras.find(auraSearch(auraData, source));
 
-                setAuraInMemory(actor, auraData, source);
+            setAuraInMemory(actor, auraData, source);
 
-                // we only execute triggers if the hook is actually active and the token wasn't already in the aura
-                if (!already && this.#active && game.user.isActiveGM && this.isValidActor(actor)) {
-                    const aura = { data: auraData, origin: source };
-                    const target = { actor, token };
-                    this.executeEvent("aura-enter-event", { aura, target });
-                }
+            // we only execute triggers if the hook is actually active and the token wasn't already in the aura
+            if (!already && this.#active && game.user.isActiveGM && this.isValidActor(actor)) {
+                const aura = { data: auraData, origin: source };
+                const target = { actor, token };
+                this.executeEvent("aura-enter-event", { aura, target });
             }
         }
     }

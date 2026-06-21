@@ -1319,6 +1319,11 @@
                 "name": "PF2e Triggers Menu"
             },
             "shared": {
+                "aura": {
+                    "origin": {
+                        "title": "Include Origin"
+                    }
+                },
                 "difficulty-class": {
                     "adjustment": {
                         "title": "Adjustment"

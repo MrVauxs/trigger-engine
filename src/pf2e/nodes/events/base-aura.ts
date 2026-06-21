@@ -47,6 +47,11 @@ abstract class BaseAuraEvent extends BaseEventNode<Inputs, Outputs> {
                     }),
                 },
             },
+            {
+                key: "self",
+                type: "boolean",
+                label: localize.path("pf2e-trigger.shared.aura.origin.title"),
+            },
         ];
     }
 
@@ -69,17 +74,21 @@ abstract class BaseAuraEvent extends BaseEventNode<Inputs, Outputs> {
     }
 
     async _execute({ aura, target }: AuraEventOptions): Promise<boolean> {
-        const actor = target.actor;
+        const slug = await this.getInputValue("slug");
+        if (aura.data.slug !== slug) return false;
 
-        if (aura.origin.actor.uuid === actor.uuid || aura.data.slug !== (await this.getInputValue("slug"))) {
-            return false;
-        }
+        const actor = target.actor;
+        const self = await this.getInputValue("self");
+        const isOrigin = aura.origin.actor.uuid === actor.uuid;
+        if (!self && isOrigin) return false;
 
         const when = await this.getInputValue("when");
         if ((when === "combat" && !actor.combatant) || (when === "turn" && !isCurrentCombatant(actor))) return false;
 
-        const affects = await this.getInputValue("affects");
-        if (!actorsRespectAlliance(aura.origin.actor, actor, affects)) return false;
+        if (!isOrigin) {
+            const affects = await this.getInputValue("affects");
+            if (!actorsRespectAlliance(aura.origin.actor, actor, affects)) return false;
+        }
 
         this.sceneContext = target.token;
         this.setOutputValue("source", aura.origin);
@@ -91,6 +100,7 @@ abstract class BaseAuraEvent extends BaseEventNode<Inputs, Outputs> {
 
 type Inputs = {
     affects: "all" | "allies" | "enemies";
+    self: boolean;
     slug: string;
     when: "always" | "combat" | "turn";
 };

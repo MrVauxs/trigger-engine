@@ -1,5 +1,5 @@
 import { BaseConditionNode } from "engine";
-import { actorsRespectAlliance } from "foundry-helpers";
+import { actorsRespectAlliance, localize } from "foundry-helpers";
 import { BaseAuraEvent, PF2eInputEntry, PF2eOutputEntry, getAurasInMemory } from "pf2e";
 
 class InsideAuraConditionNode extends BaseConditionNode<Inputs, Outputs> {
@@ -16,6 +16,11 @@ class InsideAuraConditionNode extends BaseConditionNode<Inputs, Outputs> {
             { key: "target", type: "target" },
             ...BaseAuraEvent.defineInputs.slice(0, 2),
             { key: "once", type: "boolean" },
+            {
+                key: "self",
+                type: "boolean",
+                label: localize.path("pf2e-trigger.shared.aura.origin.title"),
+            },
         ];
     }
 
@@ -37,8 +42,13 @@ class InsideAuraConditionNode extends BaseConditionNode<Inputs, Outputs> {
 
         const once = await this.getInputValue("once");
         const affects = await this.getInputValue("affects");
+        const self = await this.getInputValue("self");
+        const targetUUID = target.actor.uuid;
+
         const auras = getAurasInMemory(target.actor).filter(({ data, origin }) => {
-            return data.slug === slug && actorsRespectAlliance(origin.actor, target.actor, affects);
+            if (data.slug !== slug) return false;
+            if (origin.actor.uuid === targetUUID) return self;
+            return actorsRespectAlliance(origin.actor, target.actor, affects);
         });
 
         if (!auras.length) {
@@ -59,6 +69,7 @@ class InsideAuraConditionNode extends BaseConditionNode<Inputs, Outputs> {
 type Inputs = {
     affects: "all" | "allies" | "enemies";
     once: boolean;
+    self: boolean;
     slug: string;
     target?: TargetDocuments;
 };
