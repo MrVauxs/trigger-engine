@@ -727,7 +727,7 @@ class TriggerApplication {
             },
         });
 
-        this.#setupSettingsMenu(options);
+        this.#setupSettingsMenu({ ...options, restricted: true });
     }
 
     #setupSettingsMenu({
