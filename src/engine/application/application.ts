@@ -730,7 +730,13 @@ class TriggerApplication {
         this.#setupSettingsMenu(options);
     }
 
-    #setupSettingsMenu({ hint, icon, label, name }: ApplicationMenuOptions) {
+    #setupSettingsMenu({
+        hint,
+        icon,
+        label,
+        name,
+        restricted = true,
+    }: ApplicationMenuOptions & { restricted?: boolean }) {
         const moduleId = this.moduleId;
         const applicationId = this.applicationId;
 
@@ -743,7 +749,7 @@ class TriggerApplication {
             label: label ?? settingPath("label"),
             hint: hint ?? settingPath("hint"),
             icon: icon ?? "fas fa-cogs",
-            restricted: true,
+            restricted,
             type: this.#settingsBlueprintApplication,
         });
     }
@@ -781,7 +787,7 @@ type ApplicationSettingOptions = ApplicationMenuOptions | ApplicationCustomSetti
 
 type ApplicationCustomSetting = {
     afterPrepared?: (data: TriggerDataInput[]) => void;
-    menu?: boolean | ApplicationMenuOptions;
+    menu?: boolean | (ApplicationMenuOptions & { restricted?: boolean });
     get: () => Partial<TriggersSetting>;
     set: (data: TriggersSetting, prepareTriggers: () => void) => Promise<void>;
 };
