@@ -1,3 +1,14 @@
+# 1.14.0
+
+- fix `setting` applications using custom logic not being able to open the blueprint menu
+- `pf2e-trigger`:
+  - add `Include Origin` input to `Aura Entered`, `Aura Left` and `Is Inside Aura` nodes
+    - if checked, the node will also trigger on the aura's origin actor/token
+    - it is unchecked by default so everything already existing will behave as before the change
+  - add `Effect` output to the `Create Effect` action node (also changed the target input position)
+  - add new `Create Effect From Source` action node
+    - it allows you to use a compendium/world effect source and tweak a few of its data before adding it to the `target`
+
 # 1.13.0
 
 - add new `region -> target` convertor which returns the `tokens` currently inside the region
