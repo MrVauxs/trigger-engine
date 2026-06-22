@@ -159,12 +159,22 @@ class TriggerApplication {
         return `${moduleId}:${applicationId}`;
     }
 
-    static register(moduleId: string, applicationId: string, options?: TriggerApplicationOptions) {
+    static register(
+        moduleId: string,
+        applicationId: string,
+        options?: TriggerApplicationOptions,
+    ): RegisteredApplication | undefined {
         const applicationKey = this.getApplicationKey(moduleId, applicationId);
         if (!applicationKey || this.#instances.has(applicationKey)) return;
 
         const app = new TriggerApplication(moduleId, applicationId, options);
         this.#instances.set(applicationKey, app);
+
+        return {
+            prepareTriggers: () => {
+                app.prepare();
+            },
+        };
     }
 
     static registerNodes(moduleId: string, applicationId: string, nodes: (typeof TriggerNode)[]) {
@@ -790,6 +800,10 @@ type ApplicationCustomSetting = {
     menu?: boolean | (ApplicationMenuOptions & { restricted?: boolean });
     get: () => Partial<TriggersSetting>;
     set: (data: TriggersSetting, prepareTriggers: () => void) => Promise<void>;
+};
+
+type RegisteredApplication = {
+    prepareTriggers: () => void;
 };
 
 type ApplicationMenuOptions = {
