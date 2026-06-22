@@ -414,8 +414,11 @@ class TriggerApplication {
         console.groupEnd();
 
         if (this.#customSettings?.afterPrepared) {
-            this.#customSettings.afterPrepared(preparedSources);
+            await this.#customSettings.afterPrepared(preparedSources);
         }
+
+        const menu = this.getMenuApplication();
+        menu?.render({ resetTriggers: true });
     }
 
     addFile(path: string) {
@@ -591,11 +594,15 @@ class TriggerApplication {
         }
     }
 
+    getMenuApplication(): Maybe<BlueprintApplication> {
+        const menuId = BlueprintApplication.APPLICATION_ID;
+        return foundry.applications.instances.get(menuId) as Maybe<BlueprintApplication>;
+    }
+
     async openMenu(source?: TriggerDataInput, ...args: any[]) {
         if (this instanceof BuiltInApplication) return null;
 
-        const menuId = BlueprintApplication.APPLICATION_ID;
-        const exist = foundry.applications.instances.get(menuId) as Maybe<BlueprintApplication>;
+        const exist = this.getMenuApplication();
 
         if (exist?.application === this && (!source || this.isSettingApplication)) {
             return exist.expandWindow();
@@ -732,7 +739,7 @@ class TriggerApplication {
             scope: "world",
             config: false,
             name: settingKey,
-            onChange: () => {
+            onChange: async () => {
                 this.prepare();
             },
         });
@@ -796,7 +803,7 @@ type BuiltInOptions = {
 type ApplicationSettingOptions = ApplicationMenuOptions | ApplicationCustomSetting;
 
 type ApplicationCustomSetting = {
-    afterPrepared?: (data: TriggerDataInput[]) => void;
+    afterPrepared?: (data: TriggerDataInput[]) => Promise<void>;
     menu?: boolean | (ApplicationMenuOptions & { restricted?: boolean });
     get: () => Partial<TriggersSetting>;
     set: (data: TriggersSetting, prepareTriggers: () => void) => Promise<void>;

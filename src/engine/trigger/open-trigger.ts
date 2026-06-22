@@ -22,6 +22,7 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
     #linkedConnections: Set<TwoWaysEntryId> = new Set();
     #locked: boolean;
     #resolved: ResolvedTriggerNode[] = [];
+    #updated: boolean = false;
 
     constructor(parent: TriggerApplication, data: TriggerData, locked: boolean = false) {
         super(parent, data);
@@ -88,11 +89,20 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
         return this.#locked;
     }
 
+    get updated(): boolean {
+        return this.#updated;
+    }
+
+    set updated(value) {
+        this.#updated = value;
+    }
+
     getNode(id: string): OpenTriggerNode | undefined {
         return this.nodes.get(id);
     }
 
     update(data: DeepPartial<UpdateTriggerData> & { [k: string]: any }): TriggerData {
+        this.updated = true;
         return this.data.update(data);
     }
 

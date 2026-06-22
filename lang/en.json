@@ -85,15 +85,17 @@
                 "close": "Close Window",
                 "create": "Create Trigger",
                 "export": "Export Triggers",
-                "invalid": "This trigger is invalid.<br>It most likely contains missing nodes.",
+                "invalid": "This trigger is invalid<br>It most likely contains missing nodes",
                 "import": "Import Triggers",
+                "locked": "This trigger can't be modified",
                 "search": {
                     "clear": "Clear Search",
                     "label": "Search Trigger"
                 },
                 "tags": {
                     "placeholder": "Trigger Tags"
-                }
+                },
+                "updated": "This trigger has been modified since last save"
             },
             "variable": {
                 "delete": {

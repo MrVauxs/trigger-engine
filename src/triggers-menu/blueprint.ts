@@ -34,17 +34,17 @@ import {
 } from ".";
 
 class Blueprint extends PIXI.Application<HTMLCanvasElement> {
-    #disabledIds: Set<string> = new Set();
-    #enabledIds: Set<string> = new Set();
+    #disabledIds = new Set<string>();
+    #enabledIds = new Set<string>();
     #gridLayer: BlueprintGridLayer;
     #hitArea: PIXI.Rectangle;
-    #invalids: Collection<TriggerFullId, OpenTrigger> = new Collection();
+    #invalids = new Collection<TriggerFullId, OpenTrigger>();
     #layers: BlueprintLayers;
-    #modulesFolders: Record<string, string>;
+    #modulesFolders: Record<string, string> = {};
     #mouseManager: MouseInteractionManager;
     #parent: BlueprintApplication;
     #triggerId: TriggerFullId | null = null;
-    #triggers: Collection<TriggerFullId, OpenTrigger> = new Collection();
+    #triggers = new Collection<TriggerFullId, OpenTrigger>();
 
     constructor(parent: BlueprintApplication) {
         super({
@@ -63,40 +63,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
 
         this.stage.hitArea = this.#hitArea = new PIXI.Rectangle();
 
-        const triggersSetting = this.parent.getTriggersSetting();
-
-        this.#modulesFolders = triggersSetting.folders;
-
-        for (const id of triggersSetting.disabled) {
-            this.#disabledIds.add(id);
-        }
-
-        for (const id of triggersSetting.enabled) {
-            this.#enabledIds.add(id);
-        }
-
-        const allTriggers = R.pipe(
-            [
-                [triggersSetting.sources, false],
-                [this.application.moduleSources, true],
-            ] as const,
-            R.flatMap(([sources, locked]) => {
-                return R.pipe(
-                    sources,
-                    R.filter((source) => R.isObjectType(source) && "id" in source),
-                    R.map((source) => {
-                        const trigger = this.application.createTrigger(source, { locked });
-                        return trigger && ([trigger.fullId, trigger] as const);
-                    }),
-                    R.filter(R.isTruthy),
-                );
-            }),
-        );
-
-        const [invalids, triggers] = R.partition(allTriggers, ([_, trigger]) => trigger.invalid);
-
-        this.#invalids = new Collection(invalids);
-        this.#triggers = new Collection(triggers);
+        this.resetTriggers();
 
         const handlers: ConstructorParameters<typeof MouseInteractionManager>[3] = {
             unclickLeft: this._onUnclickLeft.bind(this),
@@ -205,6 +172,67 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
 
         this.stage.scale.set(actualValue);
         this.resizeAll();
+    }
+
+    resetTriggers() {
+        // we cache every updated trigger
+        const updated = new Map(
+            this.triggers.filter((trigger) => trigger.updated).map((trigger) => [trigger.id, trigger] as const),
+        );
+
+        this.#invalids.clear();
+        this.#triggers.clear();
+        this.#disabledIds.clear();
+        this.#enabledIds.clear();
+
+        const triggersSetting = this.parent.getTriggersSetting();
+
+        this.#modulesFolders = triggersSetting.folders;
+
+        for (const id of triggersSetting.disabled) {
+            this.#disabledIds.add(id);
+        }
+
+        for (const id of triggersSetting.enabled) {
+            this.#enabledIds.add(id);
+        }
+
+        for (const source of triggersSetting.sources) {
+            if (!R.isObjectType(source) || !R.isString(source.id)) continue;
+
+            const exist = updated.get(source.id);
+            // that trigger is currently updated, so we want to keep the non-saved data
+            if (exist) {
+                this.#triggers.set(exist.fullId, exist);
+                updated.delete(source.id);
+                continue;
+            }
+
+            const trigger = this.application.createTrigger(source, { locked: false });
+
+            if (trigger?.invalid) {
+                this.#invalids.set(trigger.fullId, trigger);
+            } else if (trigger) {
+                this.#triggers.set(trigger.fullId, trigger);
+            }
+        }
+
+        // we add back triggers that were deleted but currently being updated
+        for (const [_, trigger] of updated) {
+            this.#triggers.set(trigger.fullId, trigger);
+        }
+
+        for (const source of this.application.moduleSources) {
+            if (!R.isObjectType(source) || !R.isString(source.id)) continue;
+
+            const trigger = this.application.createTrigger(source, { locked: true });
+
+            if (trigger?.invalid) {
+                this.#invalids.set(trigger.fullId, trigger);
+            } else if (trigger) {
+                this.#triggers.set(trigger.fullId, trigger);
+            }
+        }
     }
 
     toggleLocked(locked: boolean) {
@@ -324,6 +352,10 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         const disabled = [...this.#disabledIds].filter((id) => R.isIncludedIn(id, triggersIds));
         const enabled = [...this.#enabledIds].filter((id) => R.isIncludedIn(id, lockedIds));
         const folders = R.pick(this.#modulesFolders, lockedIds) as Record<string, string>;
+
+        for (const trigger of triggers) {
+            trigger.updated = false;
+        }
 
         const setting: TriggersSetting = {
             disabled,
@@ -470,6 +502,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         this.toggleLocked(false);
 
         if (result) {
+            this.trigger!.updated = true;
             this.parent.render();
         }
 

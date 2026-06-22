@@ -201,6 +201,8 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
             }
         }
 
+        trigger.updated = true;
+
         this.blueprint.draw({
             forceComputeConnections: true,
             renderApplication: true,
@@ -230,7 +232,7 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
         for (const node of nodes) {
             if (!node.isDuplicable) continue;
 
-            const source = node.data.toObject();
+            const source = node.toObject();
 
             source.position.x += 100;
             source.position.y += 50;

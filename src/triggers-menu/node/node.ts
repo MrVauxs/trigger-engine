@@ -9,6 +9,8 @@ import {
     EntryId,
     GATE_CATEGORY,
     NodeData,
+    NodeDataInput,
+    NodeDataOutput,
     OpenNodeEntry,
     OpenTrigger,
     OpenTriggerNode,
@@ -133,10 +135,6 @@ class BlueprintNode extends PIXI.Container {
 
     get variableId(): ConnectionId | undefined {
         return isVariableGetterNode(this) ? this.#node.data.inputs.entry?.connection : undefined;
-    }
-
-    get data(): NodeData {
-        return this.#node.data;
     }
 
     get icon(): string | undefined {
@@ -411,7 +409,7 @@ class BlueprintNode extends PIXI.Container {
         }
 
         // set position
-        const { x, y } = this.data.position;
+        const { x, y } = this.#node.data.position;
         this.position.set(x, y);
 
         // set hit area
@@ -437,9 +435,14 @@ class BlueprintNode extends PIXI.Container {
         this.#mouseManager?.cancel();
     }
 
+    update(changes: DeepPartial<NodeDataInput> & { [k: string]: any }): NodeData {
+        this.trigger.updated = true;
+        return this.#node.data.update(changes);
+    }
+
     setPosition(x: number, y: number) {
         this.position.set(x, y);
-        this.data.update({ position: { x, y } });
+        this.update({ position: { x, y } });
 
         for (const entry of this.entries) {
             this.blueprint.connections.refreshConnection(entry);
@@ -449,7 +452,7 @@ class BlueprintNode extends PIXI.Container {
     addConnection(category: PreciseEntryCategory, key: string, targetId: EntryId) {
         if (!isOppositeConnection(category) || !isConnectionId(targetId)) return;
 
-        this.data.update({
+        this.update({
             [category]: {
                 [key]: {
                     connection: targetId,
@@ -462,7 +465,7 @@ class BlueprintNode extends PIXI.Container {
     removeConnection(category: PreciseEntryCategory, key: string, targetId: EntryId) {
         if (!isOppositeConnection(category) || !isConnectionId(targetId)) return;
 
-        this.data.update({
+        this.update({
             [category]: {
                 [key]: undefined,
             },
@@ -470,10 +473,10 @@ class BlueprintNode extends PIXI.Container {
     }
 
     async edit() {
-        const label = await editLabelDialog("gate", { value: this.data.custom.title });
+        const label = await editLabelDialog("gate", { value: this.#node.data.custom.title });
         if (!label) return;
 
-        this.data.update({
+        this.update({
             custom: {
                 title: label,
             },
@@ -1006,6 +1009,10 @@ class BlueprintNode extends PIXI.Container {
         );
     }
 
+    toObject(): NodeDataOutput {
+        return this.#node.data.toObject();
+    }
+
     #switchState(state: string) {
         const currentState = this.#node.state;
 
@@ -1027,7 +1034,7 @@ class BlueprintNode extends PIXI.Container {
             );
         });
 
-        this.data.update({ inputs, outs, state });
+        this.update({ inputs, outs, state });
 
         this.refresh({
             forceComputeConnections: true,
@@ -1154,7 +1161,7 @@ class BlueprintNode extends PIXI.Container {
         const entry = parser.safeParse(entrySchema)?.data;
         if (!entry) return;
 
-        this.data.update({
+        this.update({
             custom: {
                 [category]: {
                     [entry.id]: entry,

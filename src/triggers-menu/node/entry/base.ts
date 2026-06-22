@@ -212,7 +212,7 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
         }
 
         for (const [category, node] of nodes) {
-            node.data.update({
+            node.update({
                 custom: {
                     [category]: {
                         [this.key]: undefined,
@@ -318,7 +318,7 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
             }
         }
 
-        node.data.update({
+        node.update({
             custom: {
                 [category]: {
                     [this.key]: update,

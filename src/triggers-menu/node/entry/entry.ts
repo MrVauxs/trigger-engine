@@ -193,13 +193,13 @@ class BlueprintEntry extends BaseBlueprintEntry {
             if (newValue === rawValue) return;
 
             if (newValue === defaultValue) {
-                this.node.data.update({
+                this.node.update({
                     inputs: {
                         [this.key]: undefined,
                     },
                 });
             } else {
-                this.node.data.update({
+                this.node.update({
                     inputs: {
                         [this.key]: {
                             connection: undefined,
