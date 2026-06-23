@@ -417,8 +417,13 @@ class TriggerApplication {
             await this.#customSettings.afterPrepared(preparedSources);
         }
 
-        const menu = this.getMenuApplication();
-        menu?.render({ resetTriggers: true });
+        // we refresh the app on this client if it is opened
+        const blueprint = this.getMenuApplication()?.blueprint;
+        console.log(blueprint);
+        if (blueprint) {
+            blueprint.resetTriggers();
+            blueprint.draw({ forceComputeConnections: true, renderApplication: true });
+        }
     }
 
     addFile(path: string) {
@@ -739,7 +744,7 @@ class TriggerApplication {
             scope: "world",
             config: false,
             name: settingKey,
-            onChange: async () => {
+            onChange: () => {
                 this.prepare();
             },
         });

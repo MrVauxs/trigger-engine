@@ -200,8 +200,8 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         for (const source of triggersSetting.sources) {
             if (!R.isObjectType(source) || !R.isString(source.id)) continue;
 
+            // if that trigger is currently updated, we want to keep the non-saved data
             const exist = updated.get(source.id);
-            // that trigger is currently updated, so we want to keep the non-saved data
             if (exist) {
                 this.#triggers.set(exist.fullId, exist);
                 updated.delete(source.id);
@@ -561,7 +561,13 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         this.#clear();
 
         const trigger = this.trigger;
-        if (!trigger) return;
+
+        if (!trigger) {
+            if (renderApplication) {
+                this.parent.render();
+            }
+            return;
+        }
 
         trigger.computeConnections(forceComputeConnections);
 

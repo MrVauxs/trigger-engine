@@ -127,14 +127,6 @@ class BlueprintApplication extends apps.ApplicationV2<fa.ApplicationConfiguratio
         return this;
     }
 
-    render(options?: boolean | DeepPartial<BlueprintRenderOptions>): Promise<this> {
-        if (R.isObjectType(options) && options.resetTriggers) {
-            this.blueprint.resetTriggers();
-        }
-
-        return super.render(options);
-    }
-
     async _onFirstRender() {
         this.bringToFront();
 
@@ -932,7 +924,6 @@ type TriggersGroup = {
 };
 
 type BlueprintRenderOptions = fa.ApplicationRenderOptions & {
-    resetTriggers?: boolean;
     trigger: OpenTrigger | undefined;
 };
 
