@@ -36,10 +36,10 @@
         {{#if group.folder}}
         <div class="header sub folder" data-folder="{{group.folder}}">
             <div class="title">
-                <a data-action="toggle-folder">
+                <a class="label" data-action="toggle-folder">
                     <i class="fa-solid fa-folder{{ifThen group.expanded '-open' ''}} fa-fw"></i>
+                    {{localize group.folder}}
                 </a>
-                <div class="label"> {{localize group.folder}}</div>
             </div>
             <div class="controls">
                 {{> 'create'}}
