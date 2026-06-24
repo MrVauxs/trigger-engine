@@ -93,8 +93,12 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
         return this.#updated;
     }
 
-    set updated(value) {
-        this.#updated = value;
+    setUpdated() {
+        this.#updated = true;
+    }
+
+    resetUpdated() {
+        this.#updated = false;
     }
 
     getNode(id: string): OpenTriggerNode | undefined {
@@ -102,7 +106,7 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
     }
 
     update(data: DeepPartial<UpdateTriggerData> & { [k: string]: any }): TriggerData {
-        this.updated = true;
+        this.setUpdated();
         return this.data.update(data);
     }
 

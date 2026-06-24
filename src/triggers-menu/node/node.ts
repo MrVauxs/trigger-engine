@@ -436,7 +436,7 @@ class BlueprintNode extends PIXI.Container {
     }
 
     update(changes: DeepPartial<NodeDataInput> & { [k: string]: any }): NodeData {
-        this.trigger.updated = true;
+        this.trigger.setUpdated();
         return this.#node.data.update(changes);
     }
 

@@ -201,7 +201,7 @@ class BlueprintNodesLayer extends PIXI.Container<BlueprintNode> {
             }
         }
 
-        trigger.updated = true;
+        trigger.setUpdated();
 
         this.blueprint.draw({
             forceComputeConnections: true,
