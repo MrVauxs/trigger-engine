@@ -37,6 +37,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
     #disabledIds = new Set<string>();
     #enabledIds = new Set<string>();
     #gridLayer: BlueprintGridLayer;
+    #hasDeletedTriggers = false;
     #hitArea: PIXI.Rectangle;
     #invalids = new Collection<TriggerFullId, OpenTrigger>();
     #layers: BlueprintLayers;
@@ -172,6 +173,10 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
 
         this.stage.scale.set(actualValue);
         this.resizeAll();
+    }
+
+    get hasUpdatedTriggers() {
+        return this.#hasDeletedTriggers || this.triggers.some((trigger) => trigger.updated);
     }
 
     resetTriggers() {
@@ -338,6 +343,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         this.invalids.delete(fullId);
         this.triggers.delete(fullId);
 
+        this.#hasDeletedTriggers = true;
         this.parent.render();
     }
 
@@ -353,6 +359,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         const enabled = [...this.#enabledIds].filter((id) => R.isIncludedIn(id, lockedIds));
         const folders = R.pick(this.#modulesFolders, lockedIds) as Record<string, string>;
 
+        this.#hasDeletedTriggers = false;
         for (const trigger of triggers) {
             trigger.setUpdated(false);
         }

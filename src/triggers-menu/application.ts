@@ -735,7 +735,7 @@ class BlueprintApplication extends apps.ApplicationV2<fa.ApplicationConfiguratio
                 mode: this.tagsMode,
                 selected: this.tags,
             },
-            updated: this.blueprint.triggers.some((trigger) => trigger.updated),
+            updated: this.blueprint.hasUpdatedTriggers,
         };
     }
 
