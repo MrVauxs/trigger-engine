@@ -381,20 +381,22 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         return locked ? this.#enabledIds.has(id) : !this.#disabledIds.has(id);
     }
 
-    enableTrigger({ id, locked }: OpenTrigger, enabled: boolean) {
+    enableTrigger(trigger: OpenTrigger, enabled: boolean) {
         if (enabled) {
-            if (locked) {
-                this.#enabledIds.add(id);
+            if (trigger.locked) {
+                this.#enabledIds.add(trigger.id);
             } else {
-                this.#disabledIds.delete(id);
+                this.#disabledIds.delete(trigger.id);
             }
         } else {
-            if (locked) {
-                this.#enabledIds.delete(id);
+            if (trigger.locked) {
+                this.#enabledIds.delete(trigger.id);
             } else {
-                this.#disabledIds.add(id);
+                this.#disabledIds.add(trigger.id);
             }
         }
+
+        trigger.setUpdated();
     }
 
     getFolder({ folder, id, locked }: MaybeTrigger): string {

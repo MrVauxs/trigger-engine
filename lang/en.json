@@ -88,6 +88,7 @@
                 "invalid": "This trigger is invalid<br>It most likely contains missing nodes",
                 "import": "Import Triggers",
                 "locked": "This trigger can't be modified",
+                "save": "Save Triggers",
                 "search": {
                     "clear": "Clear Search",
                     "label": "Search Trigger"

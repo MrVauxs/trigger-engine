@@ -95,6 +95,10 @@
                 a {
                     text-align: center;
                     width: 1.2em;
+
+                    &.disabled {
+                        opacity: 0.4;
+                    }
                 }
             }
 

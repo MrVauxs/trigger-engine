@@ -127,6 +127,14 @@ class BlueprintApplication extends apps.ApplicationV2<fa.ApplicationConfiguratio
         return this;
     }
 
+    getTriggerFromElement(el: HTMLElement): OpenTrigger | null {
+        const target = htmlClosest(el, "[data-full-id]");
+        if (!target) return null;
+
+        const { fullId, invalid } = target.dataset as { fullId?: TriggerFullId; invalid?: "true" | "false" };
+        return !fullId ? null : this.blueprint[invalid === "true" ? "getInvalidTrigger" : "getTrigger"](fullId);
+    }
+
     async _onFirstRender() {
         this.bringToFront();
 
@@ -546,11 +554,6 @@ class BlueprintApplication extends apps.ApplicationV2<fa.ApplicationConfiguratio
     }
 
     #triggerContextMenu(): ContextMenuEntry[] {
-        const getTriggerFromElement = (el: HTMLElement): OpenTrigger | null => {
-            const { fullId, invalid } = el.dataset as { fullId?: TriggerFullId; invalid?: "true" | "false" };
-            return !fullId ? null : this.blueprint[invalid === "true" ? "getInvalidTrigger" : "getTrigger"](fullId);
-        };
-
         return [
             {
                 icon: `<i class="fa-solid fa-clipboard"></i>`,
@@ -561,11 +564,11 @@ class BlueprintApplication extends apps.ApplicationV2<fa.ApplicationConfiguratio
                 icon: `<i class="fa-solid fa-pen-to-square"></i>`,
                 label: localize.path("blueprint.trigger.edit"),
                 visible: (el) => {
-                    const trigger = getTriggerFromElement(el);
+                    const trigger = this.getTriggerFromElement(el);
                     return !!trigger && !trigger.locked && !trigger.invalid;
                 },
                 onClick: (_event, el) => {
-                    const trigger = getTriggerFromElement(el);
+                    const trigger = this.getTriggerFromElement(el);
                     return trigger && this.#editTrigger(trigger.folder, trigger);
                 },
             },
@@ -573,11 +576,11 @@ class BlueprintApplication extends apps.ApplicationV2<fa.ApplicationConfiguratio
                 icon: `<i class="fa-solid fa-pen-to-square"></i>`,
                 label: localize.path("edit-folder.title"),
                 visible: (el) => {
-                    const trigger = getTriggerFromElement(el);
+                    const trigger = this.getTriggerFromElement(el);
                     return !!trigger?.locked;
                 },
                 onClick: (_event, el) => {
-                    const trigger = getTriggerFromElement(el);
+                    const trigger = this.getTriggerFromElement(el);
                     return trigger?.locked && this.#editFolder(trigger);
                 },
             },
@@ -585,11 +588,11 @@ class BlueprintApplication extends apps.ApplicationV2<fa.ApplicationConfiguratio
                 icon: `<i class="fa-solid fa-copy"></i>`,
                 label: localize.path("blueprint.trigger.duplicate"),
                 visible: (el) => {
-                    const trigger = getTriggerFromElement(el);
+                    const trigger = this.getTriggerFromElement(el);
                     return !!trigger && !trigger.invalid;
                 },
                 onClick: (_event, el) => {
-                    const trigger = getTriggerFromElement(el);
+                    const trigger = this.getTriggerFromElement(el);
                     const source = trigger?.duplicate();
                     return source && this.blueprint.addTrigger(source, true, true);
                 },
@@ -598,7 +601,7 @@ class BlueprintApplication extends apps.ApplicationV2<fa.ApplicationConfiguratio
                 icon: `<i class="fa-solid fa-trash"></i>`,
                 label: localize.path("blueprint.trigger.delete.title"),
                 visible: (el) => {
-                    const trigger = getTriggerFromElement(el);
+                    const trigger = this.getTriggerFromElement(el);
                     return !!trigger && !trigger.locked;
                 },
                 onClick: (_event, el) => {
@@ -732,6 +735,7 @@ class BlueprintApplication extends apps.ApplicationV2<fa.ApplicationConfiguratio
                 mode: this.tagsMode,
                 selected: this.tags,
             },
+            updated: this.blueprint.triggers.some((trigger) => trigger.updated),
         };
     }
 
@@ -756,6 +760,7 @@ class BlueprintApplication extends apps.ApplicationV2<fa.ApplicationConfiguratio
 
             if (trigger) {
                 this.blueprint.enableTrigger(trigger, el.checked);
+                this.render();
             }
         });
 
@@ -916,6 +921,7 @@ type TriggersContext = fa.ApplicationRenderContext & {
         mode: MultiSelectTagsMode;
         selected: string[];
     };
+    updated: boolean;
 };
 
 type TriggersGroup = {

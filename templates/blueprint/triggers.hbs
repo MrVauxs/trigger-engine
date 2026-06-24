@@ -4,6 +4,9 @@
             <a data-action="close-window" {{{@root.i18n.tooltip 'close' }}}>
                 <i class="fa-solid fa-xmark-large"></i>
             </a>
+            <a {{#if updated}}data-action="save-triggers"{{else}}class="disabled"{{/if}} {{{@root.i18n.tooltip 'save'}}}>
+                <i class="fa-solid fa-floppy-disk"></i>
+            </a>
         </div>
         <div class="controls">
             <a data-action="import-triggers" {{{@root.i18n.tooltip 'import' }}}>
