@@ -34,7 +34,7 @@
         <div class="header sub folder" data-folder="{{group.folder}}">
             <div class="title">
                 <a data-action="toggle-folder">
-                    <i class="fa-solid fa-folder{{ifThen group.collapsed '' '-open'}} fa-fw"></i>
+                    <i class="fa-solid fa-folder{{ifThen group.expanded '-open' ''}} fa-fw"></i>
                 </a>
                 <div class="label"> {{localize group.folder}}</div>
             </div>
@@ -44,9 +44,9 @@
         </div>
         {{/if}}
         {{!-- triggers --}}
-        {{#unless group.collapsed}}
         <div class="list">
             {{#each group.triggers as |trigger|}}
+            {{#if (or trigger.updated group.expanded)}}
             <div class="trigger" {{#if trigger.name}}data-name="{{trigger.name}}"{{/if}} data-id="{{trigger.id}}"
                 data-locked="{{trigger.locked}}" data-updated="{{trigger.updated}}" data-invalid="{{trigger.invalid}}"
                 data-full-id="{{trigger.fullId}}" data-path="{{trigger.path}}" data-tags="{{trigger.tags}}">
@@ -68,9 +68,9 @@
                 {{/if}}
                 <div class="trigger-description"></div>
             </div>
+            {{/if}}
             {{/each}}
         </div>
-        {{/unless}}
         {{/each}}
     </div>
 </div>

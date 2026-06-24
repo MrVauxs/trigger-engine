@@ -688,7 +688,7 @@ class BlueprintApplication extends apps.ApplicationV2<fa.ApplicationConfiguratio
 
     #prepareTriggersGroups<T extends MaybeTrigger>(
         triggersData: T[],
-    ): { collapsed: boolean; folder: string; triggers: NonEmptyArray<T> }[] {
+    ): { expanded: boolean; folder: string; triggers: NonEmptyArray<T> }[] {
         return R.pipe(
             triggersData,
             R.groupBy((trigger) => this.blueprint.getFolder(trigger)),
@@ -696,7 +696,7 @@ class BlueprintApplication extends apps.ApplicationV2<fa.ApplicationConfiguratio
             R.filter(([_folder, triggers]) => triggers.length > 0),
             R.sortBy(([folder]) => folder),
             R.map(([folder, triggers]) => {
-                return { collapsed: !!folder && !this.#folders.has(folder), folder, triggers };
+                return { expanded: !folder || this.#folders.has(folder), folder, triggers };
             }),
         );
     }
