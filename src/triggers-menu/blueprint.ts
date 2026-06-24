@@ -354,7 +354,7 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         const folders = R.pick(this.#modulesFolders, lockedIds) as Record<string, string>;
 
         for (const trigger of triggers) {
-            trigger.resetUpdated();
+            trigger.setUpdated(false);
         }
 
         const setting: TriggersSetting = {

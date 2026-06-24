@@ -93,12 +93,8 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
         return this.#updated;
     }
 
-    setUpdated() {
-        this.#updated = true;
-    }
-
-    resetUpdated() {
-        this.#updated = false;
+    setUpdated(updated = true) {
+        this.#updated = updated;
     }
 
     getNode(id: string): OpenTriggerNode | undefined {
