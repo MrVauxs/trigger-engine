@@ -215,11 +215,13 @@ class BlueprintApplication extends apps.ApplicationV2<fa.ApplicationConfiguratio
             }
 
             case "close-window": {
-                const result = await confirmDialog("close-window");
-                if (result === null) return;
+                if (this.blueprint.hasUpdatedTriggers) {
+                    const result = await confirmDialog("close-window");
+                    if (result === null) return;
 
-                if (result) {
-                    this.blueprint.saveTriggers();
+                    if (result) {
+                        this.blueprint.saveTriggers();
+                    }
                 }
 
                 return this.close();

@@ -82,7 +82,7 @@
                 }
             },
             "triggers": {
-                "close": "Close Window",
+                "close": "Exit Application",
                 "create": "Create Trigger",
                 "export": "Export Triggers",
                 "invalid": "This trigger is invalid<br>It most likely contains missing nodes",
