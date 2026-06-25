@@ -1,3 +1,19 @@
+# 1.15.0
+
+- now return an object when an application is registered
+  - currently only contains the `prepareTriggers` function
+- custom setting applications can now specify if their menu is restricted or not
+- make the custom setting `afterPrepared` function asynchronous
+- you can now click on the folder's name to expand/collapse its content
+- the module has received some refactor to accommodate multi-user editing
+  - the blueprint menu is refreshed live when another user saved data
+  - any trigger that has been modified on your client since the last time you saved will remain intact on refresh
+    - modified triggers waiting to be saved are decorated with a disk icon in the triggers menu and will remain visible even if their parent folder is collapsed
+    - this means that if another user were to update/delete your trigger while you are working on it, it would remain intact for you until the next time you save your triggers
+- add `Save Triggers` button to the main blueprint menu tab
+  - it will be clickable if there are at least one modified trigger waiting to be saved or if you have deleted any trigger
+- rename the `Close Window` window button into `Exit Application` and only show the "save triggers before closing" popup if saving is possible
+
 # 1.14.0
 
 - fix `setting` applications using custom logic not being able to open the blueprint menu
