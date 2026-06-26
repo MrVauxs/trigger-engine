@@ -419,7 +419,6 @@ class TriggerApplication {
 
         // we refresh the app on this client if it is opened
         const blueprint = this.getMenuApplication()?.blueprint;
-        console.log(blueprint);
         if (blueprint) {
             blueprint.resetTriggers();
             blueprint.draw({ forceComputeConnections: true, renderApplication: true });

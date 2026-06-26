@@ -85,8 +85,6 @@ class CreateEffectSourceActionNode extends BaseActionNode<"out", Inputs, Outputs
             };
         }
 
-        console.log(source);
-
         // we create the effect
         const created = await createEmbeddedItem<EffectPF2e>(actor, source);
         if (created) {
