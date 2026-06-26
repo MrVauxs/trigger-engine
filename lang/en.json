@@ -788,8 +788,7 @@
             },
             "event": "Event",
             "search": {
-                "label": "Search Node",
-                "placeholder": "Node Name"
+                "label": "Search Node"
             },
             "tags": {
                 "label": "Filter Tags"

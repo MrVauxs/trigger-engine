@@ -12,6 +12,10 @@ class ConsoleLogActionNode extends BaseActionNode<"out", never, never, "input"> 
         return ["debug"];
     }
 
+    static get aliases(): string[] {
+        return ["debug"];
+    }
+
     static get defineCustomInputs(): BuiltinsCustomEntry[] {
         return [{ slug: "input", array: true }];
     }

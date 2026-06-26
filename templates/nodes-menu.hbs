@@ -4,8 +4,7 @@
         {{!-- search --}}
         <fieldset>
             <legend>{{@root.i18n 'search.label'}}</legend>
-            <extended-text-input name="search"
-                placeholder="{{@root.i18n 'search.placeholder'}}" autofocus></extended-text-input>
+            <extended-text-input name="search" autofocus></extended-text-input>
         </fieldset>
         {{!-- tags --}}
         {{#if tags.length}}
@@ -51,11 +50,17 @@
         {{group.label}}
         {{/if}}
     </legend>
-    <div class="nodes">{{#each group.nodes as |node|}}<div
-            class="selectable node" data-action="{{group.action}}" data-tags="{{node.tags}}"
+    <div class="nodes">
+        {{#each group.nodes as |node|}}
+        <div class="selectable node" data-action="{{group.action}}" data-tags="{{node.tags}}"
             data-name="{{node.title}}" data-type="{{node.type}}" data-id="{{node.id}}">
             <div class="name">{{node.title}}</div>
-        </div>{{/each}}</div>
+            {{#each node.aliases as |alias|}}
+            <div class="alias hidden" data-alias="{{alias}}">{{alias}}</div>
+            {{/each}}
+        </div>
+        {{/each}}
+    </div>
 </fieldset>
 {{/each}}
 {{/inline}}

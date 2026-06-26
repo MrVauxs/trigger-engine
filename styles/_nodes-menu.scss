@@ -44,6 +44,15 @@
                     padding-block: 0.2em;
                     cursor: pointer;
 
+                    .alias {
+                        color: #c79a47;
+
+                        &::before {
+                            content: "-- ";
+                            display: inline;
+                        }
+                    }
+
                     &:hover {
                         &::before {
                             content: "";
@@ -54,7 +63,8 @@
                             z-index: -1;
                         }
 
-                        .name {
+                        .name,
+                        .alias {
                             filter: brightness(1.1);
                         }
                     }

@@ -436,9 +436,9 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
         }
     }
 
-    #prepareVariablesGroup(): NodesGroup {
+    #prepareVariablesGroup(): VariablesGroup {
         const entry = this.#entry;
-        const group: NodesGroup = {
+        const group: VariablesGroup = {
             action: "select-variable",
             label: this.localize("category.variable"),
             nodes: [],
@@ -567,8 +567,9 @@ class BlueprintNodesMenu extends foundry.applications.api.ApplicationV2 {
 
                 const nodes = R.pipe(
                     Nodes,
-                    R.map((node): PreparedNode => {
+                    R.map((node): NodesGroup["nodes"][number] => {
                         return {
+                            aliases: node.aliases.map((alias) => localizeNodeAlias(this.application, alias)),
                             tags: node.tags,
                             title: localizeNodeProperty(this.application, node, "type"),
                             type: node.type,
@@ -658,6 +659,10 @@ function localizeNodeTag(application: TriggerApplication, tag: string): string {
     return application.localize("tag", tag, "title") ?? application.localize("entry", tag, "title") ?? tag;
 }
 
+function localizeNodeAlias(application: TriggerApplication, alias: string): string {
+    return application.localize("alias", alias, "title") ?? application.localize("entry", alias, "title") ?? alias;
+}
+
 type TriggerNodeStringProperty = keyof {
     [P in keyof typeof TriggerNode as (typeof TriggerNode)[P] extends string ? P : never]: (typeof TriggerNode)[P];
 };
@@ -670,16 +675,20 @@ type NodesMenuContext = fa.ApplicationRenderContext & {
     groups: NodesGroup[];
     inClipboard: boolean;
     tags: { value: string; label: string }[];
-    variables: NodesGroup[];
+    variables: VariablesGroup[];
 };
 
 type NodesGroup = {
     action: string;
     label: string;
+    nodes: (PreparedNode & { aliases: string[] })[];
+};
+
+type VariablesGroup = Omit<NodesGroup, "nodes"> & {
     nodes: PreparedNode[];
 };
 
-type GatesGroup = NodesGroup & {
+type GatesGroup = Omit<NodesGroup, "nodes"> & {
     nodes: (PreparedNode & { id: string })[];
     add: { action: string; tooltip: string };
 };

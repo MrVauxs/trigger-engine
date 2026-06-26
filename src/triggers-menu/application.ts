@@ -854,16 +854,34 @@ function filterElements(
     const tagsFn = tagsMode === "and" ? includesAll : includesAny;
 
     const validateSearch = searchTerm?.length
-        ? (name: string | undefined) => name?.toLowerCase().includes(searchTerm)
+        ? (value: string | undefined) => value?.toLowerCase().includes(searchTerm)
         : () => true;
 
     const validateTags = tags?.length
         ? (elementTags: string | undefined): boolean => tagsFn(elementTags?.split(",") ?? [], tags)
         : () => true;
 
+    const validateAliases = searchTerm?.length
+        ? (value: string | undefined) => value?.toLowerCase().includes(searchTerm)
+        : () => false;
+
     for (const el of elements) {
-        const valid = validateSearch(el.dataset.name) && validateTags(el.dataset.tags);
-        el.classList.toggle("hidden", !valid);
+        const validTag = validateTags(el.dataset.tags);
+        const validName = validTag && validateSearch(el.dataset.name);
+
+        let hasValidAlias = false;
+
+        for (const alias of el.querySelectorAll<HTMLElement>(".alias")) {
+            const validAlias = validTag && validateAliases(alias.dataset.alias);
+
+            if (validAlias) {
+                hasValidAlias = true;
+            }
+
+            alias.classList.toggle("hidden", !validAlias);
+        }
+
+        el.classList.toggle("hidden", !validName && !hasValidAlias);
     }
 }
 
