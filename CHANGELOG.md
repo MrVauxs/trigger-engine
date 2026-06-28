@@ -1,3 +1,11 @@
+# 1.16.0
+
+- remove some lingering debug logs
+- add new `aliases` static getter in `TriggerNode`
+  - they are being used in conjunction with the node's name when using the search field in the nodes menu
+  - any alias matching the seach input will appear just below the node entry in the menu
+- move the module's `RegionBehaviorType` registration to the `ready` hook to (hopefully) fix a localization issue with some systems
+
 # 1.15.0
 
 - now return an object when an application is registered
