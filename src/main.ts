@@ -15,19 +15,10 @@ import { id } from "../module.json";
 MODULE.register(id);
 
 Hooks.once("init", async () => {
-    const isPF2eSystem = R.isIncludedIn(game.system.id, ["pf2e", "sf2e"]);
-
-    // we have a different region behavior for pf2e system
-    CONFIG.RegionBehavior.dataModels[MODULE.path("builtins.region")] = isPF2eSystem
-        ? PF2eTriggerEngineRegionBehaviorType
-        : TriggerEngineRegionBehaviorType;
-
-    CONFIG.RegionBehavior.typeIcons[MODULE.path("builtins.region")] = "fa-solid fa-land-mine-on";
-
     CONFIG.queries[MODULE.path("user-query")] = onUserQuery;
 
     // we register the pf2e-trigger application
-    if (isPF2eSystem) {
+    if (R.isIncludedIn(game.system.id, ["pf2e", "sf2e"])) {
         registerPF2eApplication();
     }
 
@@ -48,6 +39,15 @@ Hooks.once("init", async () => {
 });
 
 Hooks.once("ready", async () => {
+    const regionPath = MODULE.path("builtins.region");
+
+    // we have a different region behavior for pf2e system
+    CONFIG.RegionBehavior.dataModels[regionPath] = R.isIncludedIn(game.system.id, ["pf2e", "sf2e"])
+        ? PF2eTriggerEngineRegionBehaviorType
+        : TriggerEngineRegionBehaviorType;
+
+    CONFIG.RegionBehavior.typeIcons[regionPath] = "fa-solid fa-land-mine-on";
+
     // we prepare the module triggers
     await TriggerApplication.prepareModulesTriggers();
     // we prepare all the applications once foundry is ready
