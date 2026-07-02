@@ -16,8 +16,8 @@ class ExecuteAnimationActionNode extends BaseActionNode<"out", Inputs, never, "i
         return [
             { key: "name", type: "text" },
             { key: "actor", type: "target" },
-            { key: "sources", type: "any", isArray: true },
-            { key: "targets", type: "any", isArray: true },
+            { key: "sources", type: "target", isArray: true },
+            { key: "targets", type: "target", isArray: true },
             { key: "item", type: "item" },
             { key: "options", type: "text", isArray: true },
             { key: "await", type: "boolean" },
