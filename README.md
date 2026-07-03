@@ -2,7 +2,7 @@
 
 [![Patreon](./images/patreon.webp)](https://patreon.com/IdleAtre?utm_medium=unknown&utm_source=join_link&utm_campaign=creatorshare_creator&utm_content=copyLink)
 
-This module provides a node-based scripting interface to automate logic in foundry. It is comprised of 3 parts.
+This module provides a node-based scripting interface to automate logic in foundry.
 
 ![](./images/trigger-engine.webp)
 
