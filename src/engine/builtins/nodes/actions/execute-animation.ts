@@ -16,8 +16,8 @@ class ExecuteAnimationActionNode extends BaseActionNode<"out", Inputs, never, "i
         return [
             { key: "name", type: "text" },
             { key: "actor", type: "target" },
-            { key: "sources", type: "any", isArray: true },
-            { key: "targets", type: "any", isArray: true },
+            { key: "sources", type: "target", isArray: true },
+            { key: "targets", type: "target", isArray: true },
             { key: "item", type: "item" },
             { key: "options", type: "text", isArray: true },
             { key: "await", type: "boolean" },
@@ -65,8 +65,8 @@ type Inputs = {
     item?: Item;
     name: string;
     options: string[];
-    sources: any[];
-    targets: any[];
+    sources: TargetDocuments[];
+    targets: TargetDocuments[];
 };
 
 declare global {
@@ -78,16 +78,15 @@ declare global {
         const api: API;
 
         type StartNodeOptions = {
-            name: string;
             actor: TargetDocuments | undefined;
             item: Item | undefined;
-            targets: any[];
-            sources: any[];
+            name: string;
             options: string[];
+            sources: TargetDocuments[];
+            targets: TargetDocuments[];
             userInputs: UserValue[];
         };
     }
 }
-
 
 export { ExecuteAnimationActionNode };
