@@ -411,6 +411,7 @@ class TriggerApplication {
             }
         }
         MODULE.debug("TRIGGERS:", triggers);
+        MODULE.debug("APPLICATION:", this);
         console.groupEnd();
 
         if (this.#customSettings?.afterPrepared) {
@@ -434,7 +435,7 @@ class TriggerApplication {
     }
 
     parseUserValue(userValue: UserValue): UserValue | undefined {
-        if (!R.isObjectType(userValue) || !R.isString(userValue.type)) return;
+        if (!isUserValue(userValue)) return;
 
         const entry = this.entries.get(userValue.type);
         if (!entry) return;
@@ -455,26 +456,23 @@ class TriggerApplication {
         return R.isArray(userValues) ? userValues.map((value) => this.parseUserValue(value)) : [];
     }
 
-    convertToEmitable(type: string, value: any): EmitableValue | undefined {
+    convertToEmitable(type: string, value: any): JSONValue | undefined {
         const entry = this.entries.get(type);
         if (!entry) return;
 
         const convert = (value: unknown) => (entry.isValidType(value) ? entry.toJSON(value) : undefined);
-        const converted = R.isArray(value) ? value.map((x) => convert(x)) : convert(value);
-        return { type, value: converted };
+        return R.isArray(value) ? value.map((x) => convert(x)) : convert(value);
     }
 
-    convertValueToEmitable(entry: unknown, parse?: boolean): EmitableValue | undefined {
+    convertValueToEmitable(entry: unknown, parse?: boolean): UserValue | undefined {
         if (!isUserValue(entry)) return;
 
         const parsed = parse ? this.parseUserValue(entry) : entry;
-        return parsed && this.convertToEmitable(parsed.type, parsed.value);
+        const converted = parsed && this.convertToEmitable(parsed.type, parsed.value);
+        return converted ? { type: parsed.type, value: converted } : undefined;
     }
 
-    convertValuesToEmitable(
-        values: unknown[] | ReadonlyArray<unknown>,
-        parse?: boolean,
-    ): (EmitableValue | undefined)[] {
+    convertValuesToEmitable(values: unknown[] | ReadonlyArray<unknown>, parse?: boolean): (UserValue | undefined)[] {
         return values.map((entry) => this.convertValueToEmitable(entry, parse));
     }
 
@@ -840,17 +838,5 @@ type UserValue = {
     value: any;
 };
 
-type EmitableValue = {
-    type: string;
-    value: JSONValue | JSONValue[];
-};
-
 export { TriggerApplication };
-export type {
-    ApplicationKey,
-    ApplicationParentType,
-    EmitableValue,
-    TriggerApplicationOptions,
-    TriggersSetting,
-    UserValue,
-};
+export type { ApplicationKey, ApplicationParentType, TriggerApplicationOptions, TriggersSetting, UserValue };

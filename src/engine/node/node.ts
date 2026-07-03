@@ -4,7 +4,6 @@ import {
     CustomInputSchema,
     CustomOutputSchema,
     CustomOutSchema,
-    EmitableValue,
     InputEntrySchemaSource,
     NodeEntry,
     NodeField,
@@ -287,7 +286,7 @@ interface TriggerNode<
     set userContext(user: UserPF2e);
 
     /** Convert a value back from its websocket version. */
-    convertFromEmitable(userValue: EmitableValue, withType?: boolean): Promise<any | undefined>;
+    convertFromEmitable(type: string, value: unknown, withType?: boolean): Promise<any | undefined>;
 
     /**
      * Convert a data object back from its websocket version.
@@ -324,10 +323,10 @@ interface TriggerNode<
     convertValueFromEmitable(entry: UserValue, withType?: boolean): Promise<any> | undefined;
 
     /** @see {@link TriggerNode#convertValueFromEmitable} */
-    convertValuesFomEmitable(values: (EmitableValue | undefined)[], withType?: boolean): Promise<(any | undefined)[]>;
+    convertValuesFomEmitable(values: (UserValue | undefined)[], withType?: boolean): Promise<(any | undefined)[]>;
 
     /** @see {@link TriggerNode#convertValueToEmitable} */
-    convertValuesToEmitable(values: UserValue[], parse?: boolean): (EmitableValue | undefined)[];
+    convertValuesToEmitable(values: UserValue[], parse?: boolean): (UserValue | undefined)[];
 
     /**
      * Convert a user value into one that is sent via websocket.
@@ -335,7 +334,7 @@ interface TriggerNode<
      * @see {@link TriggerNode#convertToEmitable}
      * @see {@link TriggerNode#parseUserValue}
      */
-    convertValueToEmitable(value: UserValue, parse?: boolean): EmitableValue | undefined;
+    convertValueToEmitable(value: UserValue, parse?: boolean): UserValue | undefined;
 
     /**
      * Calls the next `executable` node in the chain.

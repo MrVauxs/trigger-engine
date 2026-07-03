@@ -1,4 +1,4 @@
-import { ApplicationKey, EmitableValue, TriggerDataInput, TriggerNode, UserValue } from "engine";
+import { ApplicationKey, TriggerDataInput, TriggerNode, UserValue } from "engine";
 import { ActorPF2e, MODULE } from "foundry-helpers";
 
 class TriggerHook<TArgs extends Record<string, any> = Record<string, any>> {
@@ -74,10 +74,10 @@ interface TriggerHook<TArgs extends Record<string, any> = Record<string, any>> {
      *
      * @see {@link TriggerHook#parseUserValue}
      */
-    convertValueToEmitable(value: UserValue, parse?: boolean): EmitableValue | undefined;
+    convertValueToEmitable(value: UserValue, parse?: boolean): UserValue | undefined;
 
     /** @see {@link TriggerHook#convertValueToEmitable} */
-    convertValuesToEmitable(values: (UserValue | undefined)[], parse?: boolean): (EmitableValue | undefined)[];
+    convertValuesToEmitable(values: (UserValue | undefined)[], parse?: boolean): (UserValue | undefined)[];
 
     /**
      * Execute all triggers that have this event.
