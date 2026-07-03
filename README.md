@@ -4,6 +4,8 @@
 
 This module provides a node-based scripting interface to automate logic in foundry. It is comprised of 3 parts.
 
+![](./images/trigger-engine.webp)
+
 ## 1. Designing
 
 Third party can design and register trigger applications, they define the building blocks of the triggers later created,
