@@ -14,7 +14,7 @@ class UpdateItemActionNode extends BaseActionNode<"out", Inputs> {
 
     static get defineInputs(): BuiltinsInputEntry[] {
         return [
-            { key: "item", type: "item" },
+            { key: "item", type: "item", isArray: true },
             { key: "path", type: "text" },
             { key: "value", type: "any" },
         ];
@@ -29,26 +29,31 @@ class UpdateItemActionNode extends BaseActionNode<"out", Inputs> {
     }
 
     async _execute(): Promise<boolean> {
-        const item = await this.getInputValue("item");
         const path = await this.getInputValue("path");
 
-        if (!item || item.pack || !path) {
+        if (!path) {
             return this.executeNext("out");
         }
 
-        const value = await this.getInputValue("value");
-        const systemPath = path.startsWith("system.") ? path : `system.${path}`;
+        await Promise.all(
+            (await this.getInputValue("item")).map(async (item) => {
+                if (item.pack) return;
 
-        if (/^system(.\w+)+$/.test(systemPath)) {
-            await item.update({ [systemPath]: value });
-        }
+                const value = await this.getInputValue("value");
+                const systemPath = path.startsWith("system.") ? path : `system.${path}`;
+
+                if (/^system(.\w+)+$/.test(systemPath)) {
+                    await item.update({ [systemPath]: value });
+                }
+            }),
+        );
 
         return this.executeNext("out");
     }
 }
 
 type Inputs = {
-    item?: ItemPF2e;
+    item: ItemPF2e[];
     path: string;
     value: any;
 };
