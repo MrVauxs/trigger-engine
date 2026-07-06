@@ -396,7 +396,14 @@
                         "inputs": {
                             "path": {
                                 "title": "System Path"
+                            },
+                            "values": {
+                                "title": "Values"
                             }
+                        },
+                        "states": {
+                            "array": "Array",
+                            "regular": "Regular"
                         },
                         "title": "Update Item"
                     }

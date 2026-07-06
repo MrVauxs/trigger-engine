@@ -3,7 +3,7 @@ import { ItemPF2e } from "foundry-helpers";
 import { BaseActionNode } from ".";
 import { IconObject } from "_zod";
 
-class UpdateItemActionNode extends BaseActionNode<"out", Inputs> {
+class UpdateItemActionNode extends BaseActionNode<"out", Inputs, never, never, never, "regular" | "array"> {
     static get type(): "update-item" {
         return "update-item";
     }
@@ -12,11 +12,16 @@ class UpdateItemActionNode extends BaseActionNode<"out", Inputs> {
         return ["item"];
     }
 
+    static get states(): string[] | null {
+        return ["regular", "array"];
+    }
+
     static get defineInputs(): BuiltinsInputEntry[] {
         return [
             { key: "item", type: "item" },
             { key: "path", type: "text" },
-            { key: "value", type: "any" },
+            { key: "value", type: "any", state: "regular" },
+            { key: "values", type: "any", isArray: true, state: "array" },
         ];
     }
 
@@ -36,7 +41,7 @@ class UpdateItemActionNode extends BaseActionNode<"out", Inputs> {
             return this.executeNext("out");
         }
 
-        const value = await this.getInputValue("value");
+        const value = await this.getInputValue(this.state === "array" ? "values" : "value");
         const systemPath = path.startsWith("system.") ? path : `system.${path}`;
 
         if (/^system(.\w+)+$/.test(systemPath)) {
@@ -51,6 +56,7 @@ type Inputs = {
     item?: ItemPF2e;
     path: string;
     value: any;
+    values: any[];
 };
 
 export { UpdateItemActionNode };
