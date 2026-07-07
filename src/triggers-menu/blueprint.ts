@@ -333,6 +333,8 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
 
         if (setEnabled) {
             this.enableTrigger(trigger, true);
+        } else {
+            trigger.setUpdated();
         }
     }
 
