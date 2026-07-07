@@ -1,3 +1,12 @@
+# 1.17.0
+
+- `Execute Animation`:
+  - convert the `any` inputs into `target`
+- `Update Item`:
+  - add a second state to allow updating arrays as the module always convert arrays into non-arrays for non-array entries
+- fix issue with some websocket helper functions
+- fix imported triggers not triggering the "Require Saving" feature
+
 # 1.16.0
 
 - remove some lingering debug logs
