@@ -1,3 +1,15 @@
+# 1.18.0
+
+- add `Different from` option to all `Compare ...` logic nodes
+- fix custom input fallback label not using the entry type when appropriate even though the placeholder says it will
+- `pf2e-trigger`:
+  - add new `rank` connection type (labeled `Proficiency`)
+    - it represents a system profiency rank value (0~4)
+    - it can be converted to and from a `number` entry directly
+  - add new `Compare Proficiencies` logic node
+  - add new `Split Proficiency` splitter node
+  - add `Maximum` output to the `Has Special Resource` condition node
+
 # 1.17.0
 
 - `Execute Animation`:
