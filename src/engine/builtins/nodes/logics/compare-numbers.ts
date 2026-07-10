@@ -1,7 +1,7 @@
 import { BaseBooleanLogicNode, BuiltinsInputEntry } from "engine";
 import { localize } from "foundry-helpers";
 
-const COMPARE_ENTRIES = ["eq", "gt", "gte", "lt", "lte"] as const;
+const COMPARE_ENTRIES = ["eq", "gt", "gte", "lt", "lte", "diff"] as const;
 
 class CompareNumbersLogicNode extends BaseBooleanLogicNode<Inputs> {
     static #compareOptions: { value: string; label: string }[];
@@ -43,6 +43,8 @@ class CompareNumbersLogicNode extends BaseBooleanLogicNode<Inputs> {
 
     static compareNumbers(entryA: number, entryB: number, compare: CompareEntry): boolean {
         switch (compare) {
+            case "diff":
+                return entryA !== entryB;
             case "eq":
                 return entryA === entryB;
             case "gt":

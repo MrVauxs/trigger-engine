@@ -512,6 +512,7 @@
                         "inputs": {
                             "compare": {
                                 "options": {
+                                    "diff": "Different from",
                                     "eq": "Equal to",
                                     "gt": "Greater than",
                                     "gte": "Greater than or equal to",
