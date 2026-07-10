@@ -1060,7 +1060,8 @@ class BlueprintNode extends PIXI.Container {
 
     async #addCustomEntry(category: EntryCategory | "outs", schema: BaseCustomSchema) {
         const title = this.customEntryLabel(category, schema);
-        const label: CustomEntryDialogData["label"] = !schema.input?.replaceLabel && {
+        const replaceLabel = !!schema.input?.replaceLabel;
+        const label: CustomEntryDialogData["label"] = !replaceLabel && {
             value: "",
             placeholder: "",
         };
@@ -1144,7 +1145,7 @@ class BlueprintNode extends PIXI.Container {
             entrySchema.label = dialogData.types.find((type) => type.value === result.type)?.label ?? "";
         }
 
-        if (!entrySchema.label && schema.input) {
+        if ((replaceLabel || !entrySchema.label) && schema.input) {
             entrySchema.label = String(result.input);
         }
 
