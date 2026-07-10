@@ -1,5 +1,6 @@
-import { OutcomeSplitterNode } from ".";
+import { OutcomeSplitterNode, RankSplitterNode } from ".";
 
 export * from "./split-outcome";
+export * from "./split-rank";
 
-export default [OutcomeSplitterNode];
+export default [OutcomeSplitterNode, RankSplitterNode];

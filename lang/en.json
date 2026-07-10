@@ -866,6 +866,9 @@
                 "private": {
                     "title": "Private"
                 },
+                "rank": {
+                    "title": "Proficiency"
+                },
                 "region": {
                     "title": "Region"
                 },
@@ -1288,6 +1291,9 @@
                     "compare-outcomes": {
                         "title": "Compare Degree of Success"
                     },
+                    "compare-ranks": {
+                        "title": "Compare Proficiencies"
+                    },
                     "distance-between": {
                         "inputs": {
                             "strict": {
@@ -1314,6 +1320,9 @@
                 "splitter": {
                     "split-outcome": {
                         "title": "Split Degree of Success"
+                    },
+                    "split-rank": {
+                        "title": "Split Proficiency"
                     }
                 },
                 "value": {

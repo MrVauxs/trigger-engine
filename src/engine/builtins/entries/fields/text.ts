@@ -50,6 +50,10 @@ class TextField extends InputField<string, TextFieldSchema> {
         };
     }
 
+    get isNumberValue(): boolean {
+        return false;
+    }
+
     get cursor(): PIXI.Cursor {
         return this.isSelect ? "pointer" : "text";
     }
@@ -254,11 +258,16 @@ class TextField extends InputField<string, TextFieldSchema> {
         }
     }
 
-    activateEventListeners(input: HTMLInputElement, returnValue: (value: string) => Promise<void>): void {
+    processReturnedValue(value: string): any {
+        return value;
+    }
+
+    activateEventListeners(input: HTMLInputElement, returnValue: (value: any) => Promise<void>): void {
         if (this.isSelect) {
             const closeInput = (value: string) => {
                 (input as unknown as SearchSelectInputElement).collapse();
-                returnValue(value);
+                const processed = this.processReturnedValue(value);
+                returnValue(processed);
             };
 
             input.addEventListener("change", () => {

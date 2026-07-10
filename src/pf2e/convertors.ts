@@ -10,6 +10,20 @@ import { OutcomeEntryType } from ".";
 const pf2eConvertors = [
     {
         output: "number",
+        input: "rank",
+        convertToInput: (value: number): number => {
+            return value;
+        },
+    },
+    {
+        output: "rank",
+        input: "number",
+        convertToInput: (value: number): number => {
+            return value;
+        },
+    },
+    {
+        output: "number",
         input: "outcome",
         convertToInput: (value: number): DegreeOfSuccessString | undefined => {
             return degreeOfSuccessString(value);

@@ -1,9 +1,9 @@
 import { BaseInputEntrySchema, NodeEntry } from "engine";
 import { DegreeOfSuccessString, R, degreeOfSuccessString, isDegreeOfSuccessValue } from "foundry-helpers";
-import { OutcomeField, OutputFieldSchema } from ".";
+import { OutcomeField, OutcomeFieldSchema } from ".";
 import { DEGREE_OF_SUCCESS_STRINGS } from "foundry-helpers/dist";
 
-class OutcomEntry extends NodeEntry<OutcomeEntryType, OutputFieldSchema> {
+class OutcomEntry extends NodeEntry<OutcomeEntryType, OutcomeFieldSchema> {
     static options: OutcomeOption[] = R.map(["null", ...DEGREE_OF_SUCCESS_STRINGS] as const, (value) => {
         return {
             value,
@@ -72,7 +72,7 @@ type OutcomeOption = {
     label: string | undefined;
 };
 
-type InputOutcomeEntry = BaseInputEntrySchema<"outcome", Partial<OutputFieldSchema>>;
+type InputOutcomeEntry = BaseInputEntrySchema<"outcome", Partial<OutcomeFieldSchema>>;
 
 type OutcomeEntryType = DegreeOfSuccessString | "null";
 

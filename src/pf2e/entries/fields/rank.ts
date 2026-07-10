@@ -1,7 +1,7 @@
 import { NodeFieldSchema, TextField } from "engine";
 import { DegreeOfSuccessString } from "foundry-helpers";
 
-class OutcomeField extends TextField {
+class RankField extends TextField {
     static get defineSchema(): NodeFieldSchema {
         return {
             connector: {
@@ -35,14 +35,25 @@ class OutcomeField extends TextField {
     get isJSONInput(): boolean {
         return false;
     }
+
+    get toDisplay(): string {
+        const value = String(this.value);
+        const option = this.options.find((option) => option.value === value) ?? this.options[0];
+        return this.localizeOption(option);
+    }
+
+    processReturnedValue(value: string) {
+        const numbered = Number(value);
+        return this.entry.isValidType(numbered) ? numbered : this.entry.default;
+    }
 }
 
-type OutcomeFieldSchema = {
+type RankFieldSchema = {
     connector: boolean;
     default?: DegreeOfSuccessString;
     tooltip: boolean;
     width: number;
 };
 
-export { OutcomeField };
-export type { OutcomeFieldSchema };
+export { RankField };
+export type { RankFieldSchema };
