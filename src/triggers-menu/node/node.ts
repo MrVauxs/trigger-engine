@@ -1140,11 +1140,11 @@ class BlueprintNode extends PIXI.Container {
             slug: schema.slug,
         };
 
-        if (!result.label && dialogData.types?.length) {
+        if (!entrySchema.label && dialogData.types?.length) {
             entrySchema.label = dialogData.types.find((type) => type.value === result.type)?.label ?? "";
         }
 
-        if (!result.label && schema.input) {
+        if (!entrySchema.label && schema.input) {
             entrySchema.label = String(result.input);
         }
 
