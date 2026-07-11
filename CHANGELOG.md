@@ -1,3 +1,8 @@
+# 1.18.1
+
+- `pf2e-trigger`:
+  - fix `Damage Taken` event not triggering for damage that originate from an action
+
 # 1.18.0
 
 - add `Different from` option to all `Compare ...` logic nodes
