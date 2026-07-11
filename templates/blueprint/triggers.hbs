@@ -17,7 +17,9 @@
                 <i class="fa-solid fa-file-export"></i>
             </a>
             {{/if}}
-            {{> 'create'}}
+            <a data-action="create-trigger" {{{@root.i18n.tooltip 'create' }}}>
+                <i class="fa-solid fa-plus-large"></i>
+            </a>
         </div>
     </div>
     <extended-text-input name="search" value="{{search}}"
@@ -42,7 +44,9 @@
                 </a>
             </div>
             <div class="controls">
-                {{> 'create'}}
+                <a data-action="create-trigger" {{{@root.i18n.tooltip 'create' }}}>
+                    <i class="fa-solid fa-plus-large"></i>
+                </a>
             </div>
         </div>
         {{/if}}
@@ -77,10 +81,3 @@
         {{/each}}
     </div>
 </div>
-
-
-{{#*inline 'create'}}
-<a data-action="create-trigger" {{{@root.i18n.tooltip 'create' }}}>
-    <i class="fa-solid fa-plus-large"></i>
-</a>
-{{/inline}}
