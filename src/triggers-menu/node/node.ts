@@ -35,6 +35,7 @@ import {
     MouseInteractionManager,
     R,
     addListener,
+    addPoints,
     confirmDialog,
     createHTMLElement,
     drawRectangleMask,
@@ -1248,6 +1249,14 @@ class BlueprintNode extends PIXI.Container {
                 },
             },
             {
+                label: localize.path("builtins.node.action.console-log.title"),
+                icon: `<i class="fa-solid fa-terminal"></i>`,
+                visible: !locked && this.outputs.size > 0,
+                onClick: () => {
+                    this.#createConsoleLogNode();
+                },
+            },
+            {
                 label: localize.path(`blueprint.node.edit`),
                 icon: `<i class="fa-solid fa-pen-to-square"></i>`,
                 visible: !locked && isGateExitNode(this),
@@ -1267,6 +1276,53 @@ class BlueprintNode extends PIXI.Container {
         );
 
         this.createContextMenu(event, entries);
+    }
+
+    #createConsoleLogNode() {
+        const source: NodeDataOutput = {
+            type: "console-log",
+            position: addPoints(this.#node.data.position, { x: this.width + 50, y: 0 }),
+            id: foundry.utils.randomID(),
+            custom: {
+                inputs: {},
+                outputs: {},
+                outs: {},
+            },
+            inputs: {},
+            outs: {},
+        };
+
+        for (const { isArray, key, label, type } of this.outputs) {
+            const inputId = foundry.utils.randomID();
+
+            source.custom.inputs[inputId] = {
+                id: inputId,
+                isArray,
+                label,
+                slug: "input",
+                type,
+            };
+
+            source.inputs[inputId] = {
+                connection: `${this.id}:outputs:${key}`,
+            };
+        }
+
+        this.trigger.addNode(source);
+
+        this.update({
+            outs: {
+                out: {
+                    connection: `${source.id}:ins:in`,
+                },
+            },
+        });
+
+        this.blueprint.draw({
+            forceComputeConnections: true,
+            renderApplication: true,
+            selectNodes: [source.id],
+        });
     }
 }
 
