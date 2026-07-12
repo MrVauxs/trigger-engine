@@ -513,7 +513,6 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
         this.toggleLocked(false);
 
         if (result) {
-            this.trigger!.setUpdated();
             this.parent.render();
         }
 

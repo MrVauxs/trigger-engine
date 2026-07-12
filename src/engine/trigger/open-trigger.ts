@@ -126,6 +126,7 @@ class OpenTrigger extends Trigger<OpenTriggerNode> {
             const node = instantiateNode(this, data, true);
 
             if (node) {
+                this.setUpdated();
                 this.nodes.set(node.id, node);
                 return node;
             }
