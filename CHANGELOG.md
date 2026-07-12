@@ -1,3 +1,11 @@
+# 1.19.0
+
+- add `Console Log` option in the nodes context-menu
+  - only shows up if a single node with output entries is selected
+  - will automatically create a new `Console Log` action node next to the selected one
+  - automatically generates all the custom inputs on the new node to match the outputs of the selected one
+  - automatically connect all the outputs to the new node (won't override existing `Out` connection)
+
 # 1.18.1
 
 - `pf2e-trigger`:
