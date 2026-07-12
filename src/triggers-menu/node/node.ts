@@ -1279,9 +1279,12 @@ class BlueprintNode extends PIXI.Container {
     }
 
     #createConsoleLogNode() {
+        const hasOut = !!this.outs.get("out")?.connection;
+        const offset = hasOut ? { x: 100, y: 50 } : { x: this.width + 50, y: 0 };
+
         const source: NodeDataOutput = {
             type: "console-log",
-            position: addPoints(this.#node.data.position, { x: this.width + 50, y: 0 }),
+            position: addPoints(this.#node.data.position, offset),
             id: foundry.utils.randomID(),
             custom: {
                 inputs: {},
@@ -1310,13 +1313,15 @@ class BlueprintNode extends PIXI.Container {
 
         this.trigger.addNode(source);
 
-        this.update({
-            outs: {
-                out: {
-                    connection: `${source.id}:ins:in`,
+        if (!hasOut) {
+            this.update({
+                outs: {
+                    out: {
+                        connection: `${source.id}:ins:in`,
+                    },
                 },
-            },
-        });
+            });
+        }
 
         this.blueprint.draw({
             forceComputeConnections: true,
