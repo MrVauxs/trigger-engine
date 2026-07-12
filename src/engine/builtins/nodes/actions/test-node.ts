@@ -23,8 +23,6 @@ class TestNodeActionNode extends BaseActionNode {
     }
 
     async _execute(): Promise<boolean> {
-        console.log("I AM A TEST NODES");
-
         return this.executeNext("out");
     }
 }
