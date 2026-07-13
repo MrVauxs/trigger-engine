@@ -9,7 +9,6 @@ import {
     ExecuteAnimationActionNode,
     ExecuteScriptActionNode,
     MoveRegionActionNode,
-    // TestNodeActionNode,
     UpdateItemActionNode,
 } from ".";
 
@@ -25,7 +24,6 @@ export * from "./delete-item";
 export * from "./execute-animation";
 export * from "./execute-script";
 export * from "./move-region";
-// export * from "./test-node";
 export * from "./update-item";
 
 export default [
@@ -39,6 +37,5 @@ export default [
     ExecuteAnimationActionNode,
     ExecuteScriptActionNode,
     MoveRegionActionNode,
-    // TestNodeActionNode,
     UpdateItemActionNode,
 ] as const;
