@@ -7,7 +7,7 @@ import {
     TriggerHook,
     TriggerNode,
 } from "engine";
-import { MODULE, R } from "foundry-helpers";
+import { MODULE, R, SYSTEM } from "foundry-helpers";
 import { PF2eTriggerEngineRegionBehaviorType, registerPF2eApplication } from "pf2e";
 import { onUserQuery } from "queries";
 import { id } from "../module.json";
@@ -18,7 +18,7 @@ Hooks.once("init", async () => {
     CONFIG.queries[MODULE.path("user-query")] = onUserQuery;
 
     // we register the pf2e-trigger application
-    if (R.isIncludedIn(game.system.id, ["pf2e", "sf2e"])) {
+    if (SYSTEM.isPathfinder) {
         registerPF2eApplication();
     }
 
@@ -42,7 +42,7 @@ Hooks.once("ready", async () => {
     const regionPath = MODULE.path("builtins.region");
 
     // we have a different region behavior for pf2e system
-    CONFIG.RegionBehavior.dataModels[regionPath] = R.isIncludedIn(game.system.id, ["pf2e", "sf2e"])
+    CONFIG.RegionBehavior.dataModels[regionPath] = SYSTEM.isPathfinder
         ? PF2eTriggerEngineRegionBehaviorType
         : TriggerEngineRegionBehaviorType;
 
