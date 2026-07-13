@@ -1,7 +1,14 @@
-import { ApplicationKey, DescriptionInputsData, TriggerApplication, TriggerPath, createConfirmDialog } from "engine";
+import {
+    ApplicationKey,
+    DescriptionInputsData,
+    QueryUserArgs,
+    TriggerApplication,
+    TriggerPath,
+    createConfirmDialog,
+} from "engine";
 
 function onUserQuery(data: UserQueryOptions) {
-    if (data._type === "confirm-dialog") {
+    if (data._type === "await-confirm") {
         return createConfirmDialog(data);
     }
 
@@ -34,11 +41,13 @@ type ExecuteEventQueryOptions = {
     userId: string;
 };
 
-type ConfirmDialogQueryOptions = DescriptionInputsData & {
-    _type: "confirm-dialog";
-    timeout: number;
-    title: string;
-};
+type ConfirmDialogQueryOptions = QueryUserArgs<"await-confirm"> & DescriptionInputsData;
 
 export { onUserQuery };
-export type { ConfirmDialogQueryOptions, ExecuteEventQueryOptions, ExecuteTriggerQueryOptions };
+export type {
+    ConfirmDialogQueryOptions,
+    ExecuteEventQueryOptions,
+    ExecuteTriggerQueryOptions,
+    QueryUserArgs,
+    UserQueryOptions,
+};

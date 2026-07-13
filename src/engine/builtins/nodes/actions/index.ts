@@ -14,6 +14,7 @@ import {
 
 export * from "./utils";
 export * from "./base";
+export * from "./base-query-user";
 export * from "./attach-region";
 export * from "./await-confirm";
 export * from "./await-delay";
