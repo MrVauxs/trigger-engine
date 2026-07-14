@@ -1,4 +1,3 @@
-import { IconObject } from "_zod";
 import { BridgeSchemaInput, BuiltinsInputEntry } from "engine";
 import { ConfirmDialogQueryOptions } from "queries";
 import {
@@ -58,15 +57,7 @@ class AwaitConfirmActionNode extends AwaitDialogActionNode<
                 },
             ],
             content: await localizeKeyOrDescription(options),
-            position: { width: 400 },
         });
-    }
-
-    get icon(): IconObject {
-        return {
-            fontWeight: "900",
-            unicode: "\uf4a2",
-        };
     }
 
     async _execute(): Promise<boolean> {

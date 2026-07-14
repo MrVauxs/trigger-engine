@@ -264,13 +264,6 @@
                             },
                             "plain": {
                                 "title": "Prompt Text"
-                            },
-                            "timeout": {
-                                "title": "Timeout (s)"
-                            },
-                            "title": {
-                                "title": "Dialog Title",
-                                "tooltip": "Can be a localization key"
                             }
                         },
                         "title": "Await Confirmation"
@@ -294,6 +287,23 @@
                         "titles": {
                             "repeat": "Repeat With Delay"
                         }
+                    },
+                    "await-select": {
+                        "inputs": {
+                            "json": {
+                                "title": "Options List",
+                                "tooltip": "Array of <code>{value, label}</code>"
+                            },
+                            "list": {
+                                "title": "Options List",
+                                "tooltip": "Comma separated list of <code>value:Label</code><br>Label can be a localization key<br>You can omit the <code>:Label</code> part"
+                            }
+                        },
+                        "states": {
+                            "json": "JSON",
+                            "list": "List"
+                        },
+                        "title": "Await Selection"
                     },
                     "console-log": {
                         "title": "Console Log"
@@ -594,6 +604,11 @@
                                 "tooltip": "Comma separated list"
                             }
                         },
+                        "outputs": {
+                            "list": {
+                                "title": "List"
+                            }
+                        },
                         "title": "Text List"
                     },
                     "scene-targets": {
@@ -639,6 +654,15 @@
                         "tooltip": "Set to <code>0</code> to not override"
                     }
                 },
+                "user-query": {
+                    "timeout": {
+                        "label": "Timeout (s)"
+                    },
+                    "title": {
+                        "label": "Dialog Title",
+                        "tooltip": "Can be a localization key"
+                    }
+                },
                 "variables": {
                     "tooltip": "Prefix variables with the <code>@</code> character"
                 }
@@ -649,6 +673,7 @@
                 "emit": "Awaits User Input",
                 "loop": "Can Loop Over",
                 "state": "Has Multiple States",
+                "stop": "May not call the next node",
                 "warning": "Be very careful when using this node"
             },
             "state": {
