@@ -1,15 +1,15 @@
 import {
     ApplicationKey,
+    AwaitConfirmActionNode,
     DescriptionInputsData,
     QueryUserArgs,
     TriggerApplication,
     TriggerPath,
-    createConfirmDialog,
 } from "engine";
 
 function onUserQuery(data: UserQueryOptions) {
     if (data._type === "await-confirm") {
-        return createConfirmDialog(data);
+        return AwaitConfirmActionNode.createDialog(data);
     }
 
     if (data._type === "execute-event") {

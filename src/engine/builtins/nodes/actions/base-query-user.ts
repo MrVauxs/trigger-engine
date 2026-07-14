@@ -35,6 +35,48 @@ class AwaitDialogActionNode<
         ];
     }
 
+    static async awaitQueryDialog<TQueryResult>(options: {
+        buttons: foundry.applications.api.DialogV2Button[];
+        content: string;
+        position?: Partial<foundry.applications.ApplicationPosition>;
+        timeout: number;
+        title: string;
+    }): Promise<TQueryResult | null> {
+        let intervale: NodeJS.Timeout | undefined;
+        let timeout = options.timeout ?? AwaitDialogActionNode.TIMEOUT;
+
+        const title = game.i18n.localize(options.title);
+
+        const dialogOptions: WaitDialogOptions = {
+            content: options.content,
+            buttons: options.buttons,
+            render: (_, dialog) => {
+                if (timeout <= 0) return;
+
+                setTimeout(() => {
+                    dialog.close();
+                }, timeout * 1000);
+
+                const titleEl = htmlQuery(dialog.element, ".window-header .window-title");
+                if (!titleEl) return;
+
+                intervale = setInterval(() => {
+                    timeout--;
+                    titleEl.innerHTML = `(${timeout}) ${title}`;
+                }, 1000);
+            },
+            close: () => {
+                clearInterval(intervale);
+            },
+            position: options.position,
+            window: {
+                title: timeout > 0 ? `(${timeout}) ${title}` : title,
+            },
+        };
+
+        return foundry.applications.api.DialogV2.wait(dialogOptions) as Promise<TQueryResult | null>;
+    }
+
     get isEmit(): boolean {
         return true;
     }
@@ -62,48 +104,6 @@ class AwaitDialogActionNode<
     }
 }
 
-async function awaitQueryDialog<TQueryResult>(options: {
-    buttons: foundry.applications.api.DialogV2Button[];
-    content: string;
-    position?: Partial<foundry.applications.ApplicationPosition>;
-    timeout: number;
-    title: string;
-}): Promise<TQueryResult | null> {
-    let intervale: NodeJS.Timeout | undefined;
-    let timeout = options.timeout ?? AwaitDialogActionNode.TIMEOUT;
-
-    const title = game.i18n.localize(options.title);
-
-    const dialogOptions: WaitDialogOptions = {
-        content: options.content,
-        buttons: options.buttons,
-        render: (_, dialog) => {
-            if (timeout <= 0) return;
-
-            setTimeout(() => {
-                dialog.close();
-            }, timeout * 1000);
-
-            const titleEl = htmlQuery(dialog.element, ".window-header .window-title");
-            if (!titleEl) return;
-
-            intervale = setInterval(() => {
-                timeout--;
-                titleEl.innerHTML = `(${timeout}) ${title}`;
-            }, 1000);
-        },
-        close: () => {
-            clearInterval(intervale);
-        },
-        position: options.position,
-        window: {
-            title: timeout > 0 ? `(${timeout}) ${title}` : title,
-        },
-    };
-
-    return foundry.applications.api.DialogV2.wait(dialogOptions) as Promise<TQueryResult | null>;
-}
-
 type QueryUserArgs<T extends string = string> = {
     _type: T;
     timeout: number;
@@ -116,5 +116,5 @@ type QueryUserInputs = {
     user?: UserPF2e;
 };
 
-export { AwaitDialogActionNode, awaitQueryDialog };
+export { AwaitDialogActionNode };
 export type { QueryUserArgs, QueryUserInputs };

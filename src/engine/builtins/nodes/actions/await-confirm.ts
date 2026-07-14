@@ -7,7 +7,6 @@ import {
     DescriptionInputsData,
     DescriptionState,
     QueryUserInputs,
-    awaitQueryDialog,
     descriptionSchemas,
     descriptionStates,
     getDescriptionData,
@@ -40,6 +39,33 @@ class AwaitConfirmActionNode extends AwaitDialogActionNode<
         return [...AwaitDialogActionNode.defineInputs, ...descriptionSchemas()];
     }
 
+    static async createDialog(options: ConfirmDialogQueryOptions): Promise<boolean | null> {
+        if (!R.isString(options.content) && !R.isString(options.key) && !R.isString(options.plain)) return null;
+
+        return this.awaitQueryDialog({
+            buttons: [
+                {
+                    action: "yes",
+                    icon: "fa-solid fa-check",
+                    label: "COMMON.Yes",
+                    default: false,
+                    callback: () => true,
+                },
+                {
+                    action: "no",
+                    icon: "fa-solid fa-xmark",
+                    label: "COMMON.No",
+                    default: true,
+                    callback: () => false,
+                },
+            ],
+            content: await localizeKeyOrDescription(options),
+            position: { width: 400 },
+            timeout: options.timeout,
+            title: options.title ? game.i18n.localize(options.title) : localize("confirm-dialog.title"),
+        });
+    }
+
     get icon(): IconObject {
         return {
             fontWeight: "900",
@@ -59,33 +85,6 @@ class AwaitConfirmActionNode extends AwaitDialogActionNode<
     }
 }
 
-async function createConfirmDialog(options: ConfirmDialogQueryOptions): Promise<boolean | null> {
-    if (!R.isString(options.content) && !R.isString(options.key) && !R.isString(options.plain)) return null;
-
-    return awaitQueryDialog({
-        buttons: [
-            {
-                action: "yes",
-                icon: "fa-solid fa-check",
-                label: "COMMON.Yes",
-                default: false,
-                callback: () => true,
-            },
-            {
-                action: "no",
-                icon: "fa-solid fa-xmark",
-                label: "COMMON.No",
-                default: true,
-                callback: () => false,
-            },
-        ],
-        content: await localizeKeyOrDescription(options),
-        position: { width: 400 },
-        timeout: options.timeout,
-        title: options.title ? game.i18n.localize(options.title) : localize("confirm-dialog.title"),
-    });
-}
-
 type Inputs = QueryUserInputs & DescriptionInputsData;
 
-export { AwaitConfirmActionNode, createConfirmDialog };
+export { AwaitConfirmActionNode };
