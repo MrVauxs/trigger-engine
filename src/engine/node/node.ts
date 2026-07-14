@@ -185,6 +185,11 @@ class TriggerNode<
     }
 
     /** Used to display a special icon. */
+    get canStop(): boolean {
+        return false;
+    }
+
+    /** Used to display a special icon. */
     get isEmit(): boolean {
         return false;
     }
