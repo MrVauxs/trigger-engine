@@ -21,6 +21,7 @@ class ExecuteAnimationActionNode extends BaseActionNode<"out", Inputs, never, "i
             { key: "item", type: "item" },
             { key: "options", type: "text", isArray: true },
             { key: "await", type: "boolean" },
+            { key: "user", type: "user" },
         ];
     }
 
@@ -49,6 +50,7 @@ class ExecuteAnimationActionNode extends BaseActionNode<"out", Inputs, never, "i
             sources: await this.getInputValue("sources"),
             targets: await this.getInputValue("targets"),
             userInputs: await this.getCustomInputs("input"),
+            user: await this.getInputValue("user"),
         });
 
         if (await this.getInputValue("await")) {
@@ -67,6 +69,7 @@ type Inputs = {
     options: string[];
     sources: TargetDocuments[];
     targets: TargetDocuments[];
+    user: User;
 };
 
 declare global {
@@ -85,6 +88,7 @@ declare global {
             sources: TargetDocuments[];
             targets: TargetDocuments[];
             userInputs: UserValue[];
+            user: User;
         };
     }
 }
