@@ -1,5 +1,5 @@
 import { BuiltinsInputEntry } from "engine/builtins/entries";
-import { htmlQuery, localize, MODULE, UserPF2e, WaitDialogOptions } from "foundry-helpers";
+import { foundryLocalizeIfExist, htmlQuery, localize, MODULE, UserPF2e, WaitDialogOptions } from "foundry-helpers";
 import { onUserQuery } from "queries";
 import { BaseActionNode } from ".";
 
@@ -45,7 +45,7 @@ class AwaitDialogActionNode<
         let intervale: NodeJS.Timeout | undefined;
         let timeout = options.timeout ?? AwaitDialogActionNode.TIMEOUT;
 
-        const title = game.i18n.localize(options.title);
+        const title = foundryLocalizeIfExist(options.title) ?? localize("builtins.node.action", this.type, "title");
 
         const dialogOptions: WaitDialogOptions = {
             content: options.content,

@@ -514,9 +514,6 @@
       "yes": "Guardar y cerrar",
       "no": "Cerrar sin guardar"
     },
-    "confirm-dialog": {
-      "title": "Confirmar diálogo"
-    },
     "edit-entry": {
       "array": "Es una matriz",
       "input": "Entrada",

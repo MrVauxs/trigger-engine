@@ -704,9 +704,6 @@
             "yes": "Save & Close",
             "no": "Close w/o Saving"
         },
-        "confirm-dialog": {
-            "title": "Confirm Dialog"
-        },
         "edit-entry": {
             "array": "Is Array",
             "input": "Input",

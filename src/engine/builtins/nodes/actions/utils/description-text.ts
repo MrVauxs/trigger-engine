@@ -1,4 +1,5 @@
 import { BuiltinsInputEntry, TriggerNode } from "engine";
+import { enrichHTML } from "foundry-helpers";
 
 const descriptionStates = ["plain", "description", "localization"];
 
@@ -39,9 +40,7 @@ async function getDescriptionData(
 }
 
 async function localizeKeyOrDescription({ content, key, plain }: DescriptionInputsData): Promise<string> {
-    return key
-        ? game.i18n.localize(key)
-        : foundry.applications.ux.TextEditor.implementation.enrichHTML(content ?? plain ?? "");
+    return key ? game.i18n.localize(key) : enrichHTML(content ?? plain ?? "");
 }
 
 type DescriptionState = "plain" | "description" | "localization";

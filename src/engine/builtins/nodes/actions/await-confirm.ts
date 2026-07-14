@@ -1,6 +1,5 @@
 import { IconObject } from "_zod";
 import { BridgeSchemaInput, BuiltinsInputEntry } from "engine";
-import { R, localize } from "foundry-helpers";
 import { ConfirmDialogQueryOptions } from "queries";
 import {
     AwaitDialogActionNode,
@@ -40,9 +39,8 @@ class AwaitConfirmActionNode extends AwaitDialogActionNode<
     }
 
     static async createDialog(options: ConfirmDialogQueryOptions): Promise<boolean | null> {
-        if (!R.isString(options.content) && !R.isString(options.key) && !R.isString(options.plain)) return null;
-
         return this.awaitQueryDialog({
+            ...options,
             buttons: [
                 {
                     action: "yes",
@@ -61,8 +59,6 @@ class AwaitConfirmActionNode extends AwaitDialogActionNode<
             ],
             content: await localizeKeyOrDescription(options),
             position: { width: 400 },
-            timeout: options.timeout,
-            title: options.title ? game.i18n.localize(options.title) : localize("confirm-dialog.title"),
         });
     }
 
