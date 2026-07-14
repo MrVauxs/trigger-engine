@@ -7,7 +7,7 @@ class NumberField extends InputField<number, NumberFieldSchema> {
             default: { type: "number" },
             min: { type: "number" },
             max: { type: "number" },
-            step: { default: 1, type: "number" },
+            step: { type: "number" },
         };
     }
 
