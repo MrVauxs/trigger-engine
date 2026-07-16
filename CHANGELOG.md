@@ -1,3 +1,21 @@
+# 1.20.0
+
+- change icon for the `Await Confirmation` action node
+- add `canStop` getter to `TriggerNode` indicating that the node may not call the next one
+- add `User Context` input to the `Execute Animation` action node
+- add new `Await User Input` action node
+  - the node will send an input request to a specific user
+  - the node has two states for `text` or `number` input
+  - the `title`, `label` and `placeholder` inputs can be localization keys
+- add new `Await Selection` action node
+  - the node will send to a specific user a list of options to select from
+  - the `List` state accepts a `text` list of `value:Label` (or just `value`)
+  - the `Json` state must be an array of `{value: string; label?: string}`
+  - the `title` input can be a localization key
+- add new `Vitality Network` example trigger in the source files
+- fix `number` input having a default `step` value
+- fix missing output localization for the `Text List` value node
+
 # 1.19.0
 
 - add `Console Log` option in the nodes context-menu
