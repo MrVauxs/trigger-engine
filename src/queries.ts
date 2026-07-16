@@ -1,10 +1,12 @@
 import {
     ApplicationKey,
     AwaitConfirmActionNode,
+    AwaitInputActionNode,
     AwaitSelectActionNode,
-    AwaitSelectQueryArgs,
-    DescriptionInputsData,
+    ConfirmDialogQueryOptions,
+    InputDialogQueryOptions,
     QueryUserArgs,
+    SelectDialogQueryOptions,
     TriggerApplication,
     TriggerPath,
 } from "engine";
@@ -12,6 +14,10 @@ import {
 function onUserQuery(data: UserQueryOptions) {
     if (data._type === "await-confirm") {
         return AwaitConfirmActionNode.createDialog(data);
+    }
+
+    if (data._type === "await-input") {
+        return AwaitInputActionNode.createDialog(data);
     }
 
     if (data._type === "await-select") {
@@ -30,7 +36,11 @@ function onUserQuery(data: UserQueryOptions) {
 }
 
 type UserQueryOptions =
-    ConfirmDialogQueryOptions | ExecuteEventQueryOptions | ExecuteTriggerQueryOptions | SelectDialogQueryOptions;
+    | ConfirmDialogQueryOptions
+    | ExecuteEventQueryOptions
+    | ExecuteTriggerQueryOptions
+    | InputDialogQueryOptions
+    | SelectDialogQueryOptions;
 
 type ExecuteTriggerQueryOptions = {
     _type: "execute-trigger";
@@ -48,16 +58,5 @@ type ExecuteEventQueryOptions = {
     userId: string;
 };
 
-type ConfirmDialogQueryOptions = QueryUserArgs<"await-confirm"> & DescriptionInputsData;
-
-type SelectDialogQueryOptions = QueryUserArgs<"await-select"> & AwaitSelectQueryArgs;
-
 export { onUserQuery };
-export type {
-    ConfirmDialogQueryOptions,
-    ExecuteEventQueryOptions,
-    ExecuteTriggerQueryOptions,
-    QueryUserArgs,
-    SelectDialogQueryOptions,
-    UserQueryOptions,
-};
+export type { ExecuteEventQueryOptions, ExecuteTriggerQueryOptions, QueryUserArgs, UserQueryOptions };

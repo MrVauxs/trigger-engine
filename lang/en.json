@@ -167,6 +167,9 @@
                 "current": {
                     "title": "Current"
                 },
+                "default": {
+                    "title": "Default"
+                },
                 "entry": {
                     "title": "Entry"
                 },
@@ -181,6 +184,9 @@
                 },
                 "item": {
                     "title": "Item"
+                },
+                "list": {
+                    "title": "List"
                 },
                 "localization": {
                     "title": "Localization Key"
@@ -197,8 +203,14 @@
                 "once": {
                     "title": "Execute Once"
                 },
+                "placeholder": {
+                    "title": "Placeholder"
+                },
                 "point": {
                     "title": "Point"
+                },
+                "step": {
+                    "title": "Step"
                 },
                 "target": {
                     "title": "Target"
@@ -288,6 +300,24 @@
                             "repeat": "Repeat With Delay"
                         }
                     },
+                    "await-input": {
+                        "inputs": {
+                            "label": {
+                                "title": "Input Label",
+                                "tooltip": "Can be a localization key"
+                            }
+                        },
+                        "label": "User Input",
+                        "outputs": {
+                            "number": {
+                                "title": "Value"
+                            },
+                            "text": {
+                                "title": "Value"
+                            }
+                        },
+                        "title": "Await User Input"
+                    },
                     "await-select": {
                         "inputs": {
                             "json": {
@@ -297,6 +327,11 @@
                             "list": {
                                 "title": "Options List",
                                 "tooltip": "Comma separated list of <code>value:Label</code><br>Label can be a localization key<br>You can omit the <code>:Label</code> part"
+                            }
+                        },
+                        "ouputs": {
+                            "value": {
+                                "title": "Selected"
                             }
                         },
                         "states": {
@@ -607,11 +642,6 @@
                                 "tooltip": "Comma separated list"
                             }
                         },
-                        "outputs": {
-                            "list": {
-                                "title": "List"
-                            }
-                        },
                         "title": "Text List"
                     },
                     "scene-targets": {
@@ -657,13 +687,17 @@
                         "tooltip": "Set to <code>0</code> to not override"
                     }
                 },
+                "strings": {
+                    "localize": {
+                        "tooltip": "Can be a localization key"
+                    }
+                },
                 "user-query": {
                     "timeout": {
                         "label": "Timeout (s)"
                     },
                     "title": {
-                        "label": "Dialog Title",
-                        "tooltip": "Can be a localization key"
+                        "label": "Dialog Title"
                     }
                 },
                 "variables": {
@@ -1275,7 +1309,7 @@
                                 "title": "flag"
                             },
                             "option": {
-                                "title": "rolloPtion"
+                                "title": "rollOption"
                             }
                         },
                         "outputs": {

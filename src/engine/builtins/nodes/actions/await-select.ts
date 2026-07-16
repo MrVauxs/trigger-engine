@@ -1,6 +1,6 @@
 import { BuiltinsInputEntry, BuiltinsOutputEntry } from "engine";
 import { R } from "foundry-helpers";
-import { SelectDialogQueryOptions } from "queries";
+import { QueryUserArgs } from "queries";
 import { AwaitDialogActionNode, QueryUserInputs } from ".";
 
 class AwaitSelectActionNode extends AwaitDialogActionNode<
@@ -136,5 +136,7 @@ type AwaitSelectQueryArgs = {
     list: { value: string; label?: string }[];
 };
 
+type SelectDialogQueryOptions = QueryUserArgs<"await-select"> & AwaitSelectQueryArgs;
+
 export { AwaitSelectActionNode };
-export type { AwaitSelectQueryArgs };
+export type { AwaitSelectQueryArgs, SelectDialogQueryOptions };

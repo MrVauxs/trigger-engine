@@ -1,5 +1,5 @@
 import { BuiltinsInputEntry } from "engine/builtins/entries";
-import { foundryLocalizeIfExist, htmlQuery, localize, MODULE, UserPF2e, WaitDialogOptions } from "foundry-helpers";
+import { htmlQuery, localize, MODULE, UserPF2e, WaitDialogOptions } from "foundry-helpers";
 import { onUserQuery } from "queries";
 import { BaseActionNode } from ".";
 import { IconObject } from "_zod";
@@ -26,7 +26,7 @@ class AwaitDialogActionNode<
                 key: "title",
                 type: "text",
                 label: localize.path("builtins.shared.user-query.title.label"),
-                tooltip: localize.path("builtins.shared.user-query.title.tooltip"),
+                tooltip: localize.path("builtins.shared.strings.localize.tooltip"),
             },
             { key: "user", type: "user" },
             {
@@ -44,18 +44,20 @@ class AwaitDialogActionNode<
 
     static async awaitQueryDialog<TQueryResult>(options: {
         buttons: foundry.applications.api.DialogV2Button[];
-        content: string | HTMLDivElement;
+        content: string;
         timeout: number;
         title: string;
     }): Promise<TQueryResult | false | null> {
         let intervale: NodeJS.Timeout | undefined;
         let timeout = options.timeout ?? AwaitDialogActionNode.TIMEOUT;
 
-        const title = foundryLocalizeIfExist(options.title) ?? localize("builtins.node.action", this.type, "title");
+        const title = options.title
+            ? game.i18n.localize(options.title)
+            : localize("builtins.node.action", this.type, "title");
 
         const dialogOptions: WaitDialogOptions = {
             classes: [MODULE.id, `${MODULE.id}-query-${this.type}`],
-            content: options.content as any,
+            content: options.content,
             buttons: options.buttons,
             render: (_, dialog) => {
                 if (timeout <= 0) return;

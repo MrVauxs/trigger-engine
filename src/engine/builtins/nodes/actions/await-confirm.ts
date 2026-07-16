@@ -1,5 +1,5 @@
 import { BridgeSchemaInput, BuiltinsInputEntry } from "engine";
-import { ConfirmDialogQueryOptions } from "queries";
+import { QueryUserArgs } from "queries";
 import {
     AwaitDialogActionNode,
     DescriptionInputsData,
@@ -74,4 +74,7 @@ class AwaitConfirmActionNode extends AwaitDialogActionNode<
 
 type Inputs = QueryUserInputs & DescriptionInputsData;
 
+type ConfirmDialogQueryOptions = QueryUserArgs<"await-confirm"> & DescriptionInputsData;
+
 export { AwaitConfirmActionNode };
+export type { ConfirmDialogQueryOptions };

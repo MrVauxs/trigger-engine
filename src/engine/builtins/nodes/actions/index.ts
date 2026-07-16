@@ -2,6 +2,7 @@ import {
     AttachRegionActionNode,
     AwaitConfirmActionNode,
     AwaitDelayActionNode,
+    AwaitInputActionNode,
     AwaitSelectActionNode,
     ConsoleLogActionNode,
     CreateBehaviorActionNode,
@@ -19,6 +20,7 @@ export * from "./base-query-user";
 export * from "./attach-region";
 export * from "./await-confirm";
 export * from "./await-delay";
+export * from "./await-input";
 export * from "./await-select";
 export * from "./console-log";
 export * from "./create-behavior";
@@ -33,6 +35,7 @@ export default [
     AttachRegionActionNode,
     AwaitConfirmActionNode,
     AwaitDelayActionNode,
+    AwaitInputActionNode,
     AwaitSelectActionNode,
     ConsoleLogActionNode,
     CreateBehaviorActionNode,
