@@ -1,4 +1,4 @@
-import { R, UserPF2e } from "foundry-helpers";
+import { R } from "foundry-helpers";
 
 function mapConvertors<T extends EntryConvertor>(convertors: T[]): [ExtractConvertorsKeys<T>, EntryConvertor][] {
     return R.pipe(
@@ -26,7 +26,7 @@ type ExtractConvertorsKeys<T extends EntryConvertor> = T extends {
 type EntryConvertor<TInput extends any = any, TOutput extends any = any> = {
     input: string;
     output: string;
-    convertToInput: (value: TOutput, userContext: UserPF2e) => Promise<TInput> | TInput;
+    convertToInput: (value: TOutput, userContext: User) => Promise<TInput> | TInput;
 };
 
 export { createConvertorKey, mapConvertors };

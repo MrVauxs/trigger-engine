@@ -20,7 +20,6 @@ import {
     MODULE,
     R,
     ScenePF2e,
-    UserPF2e,
 } from "foundry-helpers";
 import {
     getInputsSchemas,
@@ -121,10 +120,10 @@ function instantiateNode(
 
             // scene context
             Object.defineProperty(this, "sceneContext", {
-                get(): ScenePF2e | undefined {
+                get(): Scene | undefined {
                     return (self.#sceneId && game.scenes.get(self.#sceneId)) || parent.sceneContext;
                 },
-                set(sceneOrToken: Maybe<ScenePF2e | TokenDocument>) {
+                set(sceneOrToken: Maybe<Scene | TokenDocument>) {
                     const scene = sceneOrToken instanceof TokenDocument ? sceneOrToken.parent : sceneOrToken;
 
                     if (scene) {
@@ -138,10 +137,10 @@ function instantiateNode(
 
             // user context
             Object.defineProperty(this, "userContext", {
-                get(): UserPF2e {
+                get(): User {
                     return (self.#userId && game.users.get(self.#userId)) || parent.userContext;
                 },
-                set(user: UserPF2e) {
+                set(user: User) {
                     self.#userId = user.id;
                     parent.userContext = user;
                 },

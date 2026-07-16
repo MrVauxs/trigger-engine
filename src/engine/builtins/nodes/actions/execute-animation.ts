@@ -87,7 +87,7 @@ declare global {
             options: string[];
             sources: TargetDocuments[];
             targets: TargetDocuments[];
-            user: UserPF2e;
+            user: User;
             userInputs: UserValue[];
         };
     }

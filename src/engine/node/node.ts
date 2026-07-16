@@ -11,7 +11,7 @@ import {
     TriggerPath,
     UserValue,
 } from "engine";
-import { LocalizeArgs, MODULE, ScenePF2e, TokenDocumentPF2e, TokenDocumentUUID, UserPF2e } from "foundry-helpers";
+import { LocalizeArgs, MODULE, ScenePF2e, TokenDocumentPF2e, TokenDocumentUUID } from "foundry-helpers";
 
 class TriggerNode<
     TOuts extends string | never = string,
@@ -287,8 +287,8 @@ interface TriggerNode<
     /** @see {@link TriggerNode.type} */
     get type(): string;
     /** User context getter and setter. */
-    get userContext(): UserPF2e;
-    set userContext(user: UserPF2e);
+    get userContext(): User;
+    set userContext(user: User);
 
     /** Convert a value back from its websocket version. */
     convertFromEmitable(type: string, value: unknown, withType?: boolean): Promise<any | undefined>;

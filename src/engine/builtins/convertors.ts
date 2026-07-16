@@ -45,7 +45,7 @@ const builtinsConvertors = [
     {
         output: "target",
         input: "user",
-        convertToInput: (value: TargetDocuments, userContext): UserPF2e | undefined => {
+        convertToInput: (value: TargetDocuments, userContext): User | undefined => {
             return !userContext.isGM && value.actor.testUserPermission(userContext, "OWNER")
                 ? userContext
                 : (primaryPlayerOwner(value.actor) ?? undefined);

@@ -1,6 +1,5 @@
-import { UserPF2e } from "foundry-helpers";
-import { BaseValueNode } from ".";
 import { BuiltinsInputEntry, BuiltinsOutputEntry, SelectField, SelectFieldOption } from "engine";
+import { BaseValueNode } from ".";
 
 class UserValueNode extends BaseValueNode<Inputs> {
     static get type(): "user-value" {
@@ -38,7 +37,7 @@ class UserValueNode extends BaseValueNode<Inputs> {
         return [{ key: "user", type: "user" }];
     }
 
-    async _query(): Promise<UserPF2e | undefined> {
+    async _query(): Promise<User | undefined> {
         const id = await this.getInputValue("id");
 
         switch (id) {
