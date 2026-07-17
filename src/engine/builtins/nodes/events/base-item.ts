@@ -25,8 +25,8 @@ abstract class BaseItemEvent extends BaseEventNode<Inputs, Outputs> {
     }
 
     async _execute({ item, parent }: ItemEventOptions): Promise<boolean> {
-        const type = await this.getInputValue("type");
-        const types = R.split(type, ",");
+        const type = (await this.getInputValue("type")).trim();
+        const types = type ? R.split(type, ",") : [];
         if (types.length && !R.isIncludedIn(item.type, types)) return false;
 
         this.setOutputValue("item", item);
