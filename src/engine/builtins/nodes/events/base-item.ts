@@ -1,5 +1,5 @@
 import { BaseEventNode, BuiltinsInputEntry, BuiltinsOutputEntry, ItemEventOptions } from "engine";
-import { localize, R } from "foundry-helpers";
+import { localize, R, splitListString } from "foundry-helpers";
 
 abstract class BaseItemEvent extends BaseEventNode<Inputs, Outputs> {
     static get tags(): string[] {
@@ -25,8 +25,8 @@ abstract class BaseItemEvent extends BaseEventNode<Inputs, Outputs> {
     }
 
     async _execute({ item, parent }: ItemEventOptions): Promise<boolean> {
-        const type = (await this.getInputValue("type")).trim();
-        const types = type ? R.split(type, ",") : [];
+        const type = await this.getInputValue("type");
+        const types = splitListString(type);
         if (types.length && !R.isIncludedIn(item.type, types)) return false;
 
         this.setOutputValue("item", item);
