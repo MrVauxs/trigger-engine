@@ -7,7 +7,7 @@ class DeleteItemEvent extends BaseItemEvent {
     }
 
     get icon(): IconObject {
-        return { unicode: "\uf1f8", fontWeight: "900" };
+        return { unicode: "\uf0f2" };
     }
 }
 
