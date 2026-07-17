@@ -3,6 +3,7 @@ import {
     CreateItemHook,
     CreateTokenHook,
     DeleteCombatantHook,
+    DeleteItemHook,
     DeleteTokenHook,
     ExecuteHook,
     HookCalledHook,
@@ -19,6 +20,7 @@ export * from "./create-combatant";
 export * from "./create-item";
 export * from "./create-token";
 export * from "./delete-combatant";
+export * from "./delete-item";
 export * from "./delete-token";
 export * from "./execute-hook";
 export * from "./hook-called";
@@ -31,6 +33,7 @@ export default [
     CreateItemHook,
     CreateTokenHook,
     DeleteCombatantHook,
+    DeleteItemHook,
     DeleteTokenHook,
     ExecuteHook,
     HookCalledHook,

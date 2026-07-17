@@ -3,6 +3,7 @@ import {
     CreateItemEvent,
     CreateTokenEvent,
     DeleteCombatantEvent,
+    DeleteItemEvent,
     DeleteTokenEvent,
     ExecuteEvent,
     HookCalledEvent,
@@ -19,6 +20,7 @@ export * from "./create-combatant";
 export * from "./create-item";
 export * from "./create-token";
 export * from "./delete-combatant";
+export * from "./delete-item";
 export * from "./delete-token";
 export * from "./execute-event";
 export * from "./hook-called";
@@ -32,6 +34,7 @@ export default [
     CreateItemEvent,
     CreateTokenEvent,
     DeleteCombatantEvent,
+    DeleteItemEvent,
     DeleteTokenEvent,
     ExecuteEvent,
     HookCalledEvent,

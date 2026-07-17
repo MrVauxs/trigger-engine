@@ -498,6 +498,9 @@
                     "delete-combatant-event": {
                         "title": "Combatant Removed"
                     },
+                    "delete-item-event": {
+                        "title": "Item Removed from Actor"
+                    },
                     "delete-token-event": {
                         "title": "Token Removed"
                     },
