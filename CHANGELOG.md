@@ -1,3 +1,8 @@
+#
+
+- add new `Remove Item from Actor` event node
+- fix `Item Added to Actor` without a `type` input not being triggered
+
 # 1.20.0
 
 - change icon for the `Await Confirmation` action node
