@@ -194,9 +194,13 @@ class BlueprintApplication extends apps.ApplicationV2<fa.ApplicationConfiguratio
 
             ui.innerHTML = result + description + stretch;
 
-            R.forEach(htmlQueryAll(ui, ".scroll"), (el, i) => {
-                el.scrollTop = scrolls.at(i) ?? 0;
-            });
+            const newElements = htmlQueryAll(ui, ".scroll");
+
+            if (scrolls.length === newElements.length) {
+                R.forEach(htmlQueryAll(ui, ".scroll"), (el, i) => {
+                    el.scrollTop = scrolls[i];
+                });
+            }
         } else {
             const wrapper = createHTMLElement("div", {
                 classes: ["ui"],
