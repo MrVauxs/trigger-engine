@@ -15,7 +15,6 @@
     --background-color-highlight: #ffffff14;
     --border: 1px solid #111111;
     --border-separator: 1px solid #ffffff3b;
-    --border-radius: 0 5px 5px 0;
     --folder-spacer-width: 6px;
     --tags-buttons-border: 1px solid var(--color-border-light-tertiary);
 
@@ -28,7 +27,7 @@
     pointer-events: none;
     top: var(--outer-spacing);
     bottom: var(--outer-spacing);
-    border-radius: var(--border-radius);
+    border-radius: 0 5px 5px 0;
     color: var(--color-text-light-highlight);
 
     &.stretched {
@@ -313,14 +312,18 @@
         z-index: 20;
         position: absolute;
         right: -1px;
-        top: 0;
-        bottom: 0;
+        top: -1px;
+        bottom: -1px;
         width: 10px;
         background: var(--background);
         background-color: var(--background-color);
         pointer-events: all;
         cursor: pointer;
-        border-radius: var(--border-radius);
+        border-radius: 0 4px 4px 0;
+    }
+
+    .sidebar.triggers ~ .window-stretch {
+        filter: brightness(3);
     }
 
     .window-collapsed {

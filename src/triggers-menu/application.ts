@@ -18,6 +18,7 @@ import {
     confirmDialog,
     ContextMenuEntry,
     createHTMLElement,
+    getSetting,
     htmlClosest,
     htmlQuery,
     htmlQueryAll,
@@ -29,17 +30,18 @@ import {
     R,
     registerCustomElement,
     render,
+    setSetting,
     waitDialog,
 } from "foundry-helpers";
 import {
     Blueprint,
     BlueprintEntry,
     BlueprintNode,
-    PointInputElement,
     ExtendedMultiSelectElement,
     ExtendedTextInputElement,
     MaybeTrigger,
     MultiSelectTagsMode,
+    PointInputElement,
     SearchSelectInputElement,
 } from ".";
 import apps = foundry.applications.api;
@@ -202,6 +204,9 @@ class BlueprintApplication extends apps.ApplicationV2<fa.ApplicationConfiguratio
         if (!options.trigger) {
             this.#activateTriggersListeners(content);
         }
+
+        const stretched = getSetting("stretched");
+        content.classList.toggle("stretched", stretched);
     }
 
     async _onClickAction(event: PointerEvent, target: HTMLElement) {
@@ -339,7 +344,8 @@ class BlueprintApplication extends apps.ApplicationV2<fa.ApplicationConfiguratio
             }
 
             case "toggle-stretch": {
-                return this.element.classList.toggle("stretched");
+                const current = getSetting("stretched");
+                return setSetting("stretched", !current);
             }
         }
     }
