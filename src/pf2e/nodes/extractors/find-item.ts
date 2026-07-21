@@ -1,9 +1,9 @@
 import { IconObject } from "_zod";
-import { BaseExtractorNode } from "engine";
-import { actorItems, getItemSlug, getItemSourceId, isSupressedFeat, ItemPF2e } from "foundry-helpers";
+import { BaseExtractorNode, BridgeSchemaInput } from "engine";
+import { actorItems, getItemSlug, getItemSourceId, isSupressedFeat, ItemPF2e, localize } from "foundry-helpers";
 import { DoubleUuidInputs, doubleUuidSchemas, getDoubleUuidValue, PF2eInputEntry, PF2eOutputEntry } from "pf2e";
 
-class FindItemExtractorNode extends BaseExtractorNode<Inputs, Outputs, never, never, State> {
+class FindItemExtractorNode extends BaseExtractorNode<Inputs, Outputs, never, never, State, "out" | "after"> {
     static get type(): "find-item" {
         return "find-item";
     }
@@ -14,6 +14,17 @@ class FindItemExtractorNode extends BaseExtractorNode<Inputs, Outputs, never, ne
 
     static get states(): string[] {
         return ["uuid", "slug"];
+    }
+
+    static get defineOuts(): BridgeSchemaInput[] {
+        return [
+            { key: "out" },
+            {
+                key: "after",
+                label: localize.path("builtins.shared.loop.after.label"),
+                tooltip: localize.path("builtins.shared.loop.after.tooltip"),
+            },
+        ];
     }
 
     static get defineInputs(): PF2eInputEntry[] {
@@ -51,7 +62,7 @@ class FindItemExtractorNode extends BaseExtractorNode<Inputs, Outputs, never, ne
             if (!keepExecuting) break;
         }
 
-        return true;
+        return this.executeNext("after");
     }
 
     async #slugDelegate(): Promise<(item: ItemPF2e) => boolean> {
