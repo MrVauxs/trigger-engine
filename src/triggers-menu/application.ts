@@ -190,7 +190,13 @@ class BlueprintApplication extends apps.ApplicationV2<fa.ApplicationConfiguratio
         const stretch = `<div class="window-stretch" data-action="toggle-stretch"></div>`;
 
         if (ui) {
+            const scrolls = R.map(htmlQueryAll(ui, ".scroll"), (el) => el.scrollTop);
+
             ui.innerHTML = result + description + stretch;
+
+            R.forEach(htmlQueryAll(ui, ".scroll"), (el, i) => {
+                el.scrollTop = scrolls.at(i) ?? 0;
+            });
         } else {
             const wrapper = createHTMLElement("div", {
                 classes: ["ui"],
