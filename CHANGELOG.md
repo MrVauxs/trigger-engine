@@ -1,7 +1,14 @@
-#
+# 1.21.0
 
-- add new `Remove Item from Actor` event node
+- now allow `out` bridge connections to have tooltips
+- now save the stretched state of the triggers menu (it is now a user setting)
+  - also change the contrast of the stretch handler when the background is fully dark
+- add new `Item Removed from Actor` event node
+- fix scrollable elements in the triggers menu not retaining their position on refresh
+- fix triggers menu not being refreshed when using `Blueprint#addTrigger` without setting the new trigger as current
 - fix `Item Added to Actor` without a `type` input not being triggered
+- `pf2e-trigger`:
+  - add an `After Loop` out bridge to the `Find Item Instances` extractor node
 
 # 1.20.0
 
