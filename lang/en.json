@@ -685,7 +685,7 @@
                 "loop": {
                     "after": {
                         "label": "After Loop",
-                        "tooltip": "Is executed only once after the full loop is done, even if a <u>Break Current Loop</u> node is used"
+                        "tooltip": "Is executed only once after the full loop is done, even if a <strong>Break Current Loop</strong> node is used"
                     }
                 },
                 "numbers": {
