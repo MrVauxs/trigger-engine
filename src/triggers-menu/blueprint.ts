@@ -327,14 +327,16 @@ class Blueprint extends PIXI.Application<HTMLCanvasElement> {
 
         this.triggers.set(trigger.fullId, trigger);
 
-        if (setTrigger) {
-            this.trigger = trigger;
-        }
-
         if (setEnabled) {
             this.enableTrigger(trigger, true);
         } else {
             trigger.setUpdated();
+        }
+
+        if (setTrigger) {
+            this.trigger = trigger;
+        } else {
+            this.parent.render();
         }
     }
 
