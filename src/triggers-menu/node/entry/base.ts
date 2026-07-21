@@ -5,6 +5,8 @@ import {
     EntryId,
     isGateEntryNode,
     isGateExitNode,
+    NodeBridge,
+    OpenNodeEntry,
     OpenTrigger,
     PreciseEntryCategory,
 } from "engine";
@@ -12,36 +14,59 @@ import { confirmDialog, ContextMenuEntry, localize, R, waitDialog } from "foundr
 import { Blueprint, splitTwoWays } from "triggers-menu";
 import { alignHorizontally, BlueprintNode, CustomEntryDialogData } from "..";
 
-abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
+abstract class BaseBlueprintEntry<
+    TEntry extends OpenNodeEntry | NodeBridge = OpenNodeEntry | NodeBridge,
+> extends PIXI.Container<PIXI.Container> {
     #category: EntryCategory;
     #connector?: PIXI.Graphics;
+    #entry: TEntry;
     #field?: PIXI.Container;
     #label?: PreciseText;
     #parent: BlueprintNode;
 
-    constructor(parent: BlueprintNode, category: EntryCategory) {
+    constructor(parent: BlueprintNode, category: EntryCategory, entry: TEntry) {
         super();
 
         this.#category = category;
+        this.#entry = entry;
         this.#parent = parent;
     }
 
     abstract get canConnect(): boolean;
-    abstract get color(): ColorSource;
-    abstract get connection(): ConnectionId | undefined;
-    abstract get customSlug(): string | undefined;
     abstract get hasConnector(): boolean;
     abstract get isConnectionInitiator(): boolean;
-    abstract get key(): string;
     abstract get label(): string;
-    abstract get schema(): BaseEntry;
 
     get id(): EntryId {
         return `${this.node.id}:${this.preciseCategory}:${this.key}`;
     }
 
+    get entry(): TEntry {
+        return this.#entry;
+    }
+
+    get key(): string {
+        return this.entry.key;
+    }
+
     get category(): EntryCategory {
         return this.#category;
+    }
+
+    get connection(): ConnectionId | undefined {
+        return this.entry.connection;
+    }
+
+    get color(): ColorSource {
+        return 0xffffff;
+    }
+
+    get schema(): BaseEntry {
+        return this.entry.schema;
+    }
+
+    get customSlug(): string | undefined {
+        return this.schema.slug;
     }
 
     get preciseCategory(): PreciseEntryCategory {
@@ -152,6 +177,12 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
 
         this.eventMode = "static";
         this.hitArea = new PIXI.Rectangle(0, 0, this.width, this.height);
+
+        this.blueprint.addTooltip(
+            this,
+            () => this.entry.generateTooltip(this.label, this.isConnected),
+            this.isInput ? "LEFT" : "RIGHT",
+        );
     }
 
     redrawConnector(isConnected: boolean) {
@@ -162,7 +193,7 @@ abstract class BaseBlueprintEntry extends PIXI.Container<PIXI.Container> {
         this._drawConnector(connector, isConnected);
     }
 
-    canConnectTo(other: BaseBlueprintEntry) {
+    canConnectTo(other: BaseBlueprintEntry<TEntry>) {
         return (
             this.hasConnector &&
             this.canConnect &&

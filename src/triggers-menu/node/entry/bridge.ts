@@ -1,21 +1,8 @@
-import { BridgeSchemaOutput, ConnectionId, NodeBridge, PreciseEntryCategory } from "engine";
+import { NodeBridge, PreciseEntryCategory } from "engine";
 import { localize } from "foundry-helpers";
-import { BaseBlueprintEntry, EntryCategory } from ".";
-import { BlueprintNode } from "..";
+import { BaseBlueprintEntry } from ".";
 
-class BlueprintBridgeEntry extends BaseBlueprintEntry {
-    #data: NodeBridge;
-
-    constructor(parent: BlueprintNode, category: EntryCategory, data: NodeBridge) {
-        super(parent, category);
-
-        this.#data = data;
-    }
-
-    get connection(): ConnectionId | undefined {
-        return this.#data.connection;
-    }
-
+class BlueprintBridgeEntry extends BaseBlueprintEntry<NodeBridge> {
     get isConnectionInitiator(): boolean {
         return this.isOutput;
     }
@@ -28,20 +15,8 @@ class BlueprintBridgeEntry extends BaseBlueprintEntry {
         return this.isInput ? "outs" : "ins";
     }
 
-    get key(): string {
-        return this.#data.key;
-    }
-
-    get schema(): BridgeSchemaOutput {
-        return this.#data.schema;
-    }
-
-    get customSlug(): string | undefined {
-        return this.#data.schema.slug;
-    }
-
     get label(): string {
-        const { key, label } = this.#data;
+        const { key, label } = this.entry;
 
         if (label) {
             return game.i18n.localize(label);
@@ -52,10 +27,6 @@ class BlueprintBridgeEntry extends BaseBlueprintEntry {
         }
 
         return this.node.localize("outs", key) ?? localize.ifExist("node", key) ?? key;
-    }
-
-    get color(): ColorSource {
-        return 0xffffff;
     }
 
     get hasConnector(): boolean {

@@ -1,5 +1,4 @@
 import {
-    BaseEntrySchemaOutput,
     ConnectionId,
     instantiateField,
     isVariableGetterNode,
@@ -13,58 +12,40 @@ import { editLabelDialog } from "triggers-menu";
 import { BaseBlueprintEntry } from ".";
 import { BlueprintNode } from "..";
 
-class BlueprintEntry extends BaseBlueprintEntry {
-    #entry: OpenNodeEntry;
-
+class BlueprintEntry extends BaseBlueprintEntry<OpenNodeEntry> {
     constructor(parent: BlueprintNode, entry: OpenNodeEntry) {
-        super(parent, entry.category);
-        this.#entry = entry;
+        super(parent, entry.category, entry);
     }
 
     get type(): string {
-        return this.#entry.type;
-    }
-
-    get key(): string {
-        return this.#entry.key;
-    }
-
-    get schema(): BaseEntrySchemaOutput {
-        return this.#entry.schema;
-    }
-
-    get connection() {
-        return this.#entry.connection;
+        return this.entry.type;
     }
 
     get label(): string {
         const variable = this.trigger.data.variables[this.id as ConnectionId]?.label;
         if (variable) return variable;
 
-        const { key, label } = this.#entry;
+        const { key, label } = this.entry;
+
         return label
             ? game.i18n.localize(label)
             : (this.node.localize(this.category, key, "title") ?? this.node.rootLocalize("entry", key, "title") ?? key);
     }
 
     get isArray(): boolean {
-        return this.#entry.isArray;
+        return this.entry.isArray;
     }
 
     get isConnectionInitiator(): boolean {
         return this.isInput;
     }
 
-    get customSlug(): string | undefined {
-        return this.#entry.schema.slug;
-    }
-
     get color(): ColorSource {
-        return this.#entry.color;
+        return this.entry.color;
     }
 
     get FieldCls(): typeof NodeField | undefined {
-        const FieldCls = (this.#entry.constructor as typeof NodeEntry).FieldClass as typeof NodeField;
+        const FieldCls = (this.entry.constructor as typeof NodeEntry).FieldClass as typeof NodeField;
         return FieldCls?.prototype instanceof NodeField ? FieldCls : undefined;
     }
 
@@ -73,9 +54,9 @@ class BlueprintEntry extends BaseBlueprintEntry {
         if (this.node.isEvent || !this.node.inputsHaveConnector) return false;
 
         return (
-            !this.#entry.field ||
-            !("connector" in this.#entry.field) ||
-            (this.#entry.field as { connector: boolean }).connector !== false
+            !this.entry.field ||
+            !("connector" in this.entry.field) ||
+            (this.entry.field as { connector: boolean }).connector !== false
         );
     }
 
@@ -92,16 +73,6 @@ class BlueprintEntry extends BaseBlueprintEntry {
 
     canConnectTo(other: BlueprintEntry): boolean {
         return super.canConnectTo(other) && this.canConvertWith(other);
-    }
-
-    draw(): void {
-        super.draw();
-
-        this.blueprint.addTooltip(
-            this,
-            () => this.#entry.generateTooltip(this.label, this.isConnected),
-            this.isInput ? "LEFT" : "RIGHT",
-        );
     }
 
     _drawConnector(connector: PIXI.Graphics, isConnected: boolean) {
@@ -142,7 +113,7 @@ class BlueprintEntry extends BaseBlueprintEntry {
     _drawField(label: PreciseText): PIXI.Graphics | null {
         if (!this.isInput || this.isArray || !this.node.inputsHaveField) return null;
 
-        const entry = this.#entry;
+        const entry = this.entry;
         const FieldCls = this.FieldCls;
         if (!FieldCls) return null;
 
@@ -165,7 +136,7 @@ class BlueprintEntry extends BaseBlueprintEntry {
             value: processValue(rawValue),
         };
 
-        const fieldElement = instantiateField(FieldCls, this.#entry, node, options);
+        const fieldElement = instantiateField(FieldCls, entry, node, options);
         fieldElement.draw();
 
         if (isConnected || !this.canConnect) {

@@ -249,7 +249,10 @@ function instantiateNode(
             // bridges
             const [ins, outs] = R.map(
                 [
-                    ["inputs", !isEvent && NodeCls.hasIn ? [{ key: "in", spacing: 0, state: undefined }] : []],
+                    [
+                        "inputs",
+                        !isEvent && NodeCls.hasIn ? [{ key: "in", spacing: 0, state: undefined, tooltip: false }] : [],
+                    ],
                     ["outputs", getOutsSchemas(NodeCls, { data: nodeData, state: nodeState })],
                 ] as const,
                 ([category, schemas]) => {
@@ -257,7 +260,7 @@ function instantiateNode(
                         schemas,
                         R.map((schema) => {
                             try {
-                                const bridge = new NodeBridge(category, nodeData, schema);
+                                const bridge = new NodeBridge(this, category, nodeData, schema);
                                 return [bridge.key, bridge] as const;
                             } catch (error) {}
                         }),

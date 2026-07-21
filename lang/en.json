@@ -682,6 +682,12 @@
                         "tooltip": "Comma separated list of ite types"
                     }
                 },
+                "loop": {
+                    "after": {
+                        "label": "After Loop",
+                        "tooltip": "Is executed only once after the full loop is done, even if a <u>Break Current Loop</u> node is used"
+                    }
+                },
                 "numbers": {
                     "disable": {
                         "tooltip": "Set to <code>0</code> to disable"

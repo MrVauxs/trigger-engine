@@ -6,7 +6,8 @@ abstract class BaseExtractorNode<
     TCustomInputs extends string | never = string,
     TCustomOutputs extends string | never = string,
     TState extends string | never = string,
-> extends TriggerNode<"out", TInputs, TOutputs, TCustomInputs, TCustomOutputs, TState> {
+    TOuts extends string = "out",
+> extends TriggerNode<TOuts, TInputs, TOutputs, TCustomInputs, TCustomOutputs, TState> {
     static get category(): string {
         return "extractor";
     }

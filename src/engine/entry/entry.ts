@@ -75,9 +75,7 @@ class NodeEntry<TValue extends unknown = unknown, TFieldSchema extends Record<st
         return (this.constructor as typeof NodeEntry).default as TValue;
     }
 
-    /**
-     * Tooltip to display when the entry is hovered over.
-     */
+    /** Tooltip to display when the entry is hovered over. */
     generateTooltip(label: string, isConnected: boolean): string | undefined {
         if (this.tooltip === false) return;
 

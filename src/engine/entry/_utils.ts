@@ -11,6 +11,7 @@ const zBaseEntry = z.object({
     slug: z.string().trim().min(1).optional(),
     spacing: z.number().default(0),
     state: zEntrySchemaState,
+    tooltip: z.union([z.boolean(), z.string()]).default(true),
 });
 
 type BaseEntry = z.output<typeof zBaseEntry>;

@@ -1,15 +1,18 @@
-import { ConnectionId, NodeData } from "engine";
+import { ConnectionId, NodeData, TriggerNode } from "engine";
+import { R } from "foundry-helpers";
 import { EntryCategory } from "triggers-menu";
 import { BridgeSchemaOutput } from ".";
 
 class NodeBridge {
     #category: EntryCategory;
+    #parent: TriggerNode;
     #schema: BridgeSchemaOutput;
     #nodeData: NodeData;
 
-    constructor(category: EntryCategory, nodeData: NodeData, schema: BridgeSchemaOutput) {
+    constructor(parent: TriggerNode, category: EntryCategory, nodeData: NodeData, schema: BridgeSchemaOutput) {
         this.#category = category;
         this.#nodeData = nodeData;
+        this.#parent = parent;
         this.#schema = schema;
     }
 
@@ -39,6 +42,19 @@ class NodeBridge {
 
     get spacing(): number {
         return this.schema.spacing;
+    }
+
+    /** only outs can have tooltips */
+    generateTooltip(): string | undefined {
+        if (this.schema.tooltip === false) return;
+
+        if (R.isString(this.schema.tooltip)) {
+            return game.i18n.localize(this.schema.tooltip);
+        }
+
+        return this.slug
+            ? this.#parent.localize("customs.outs", this.slug, "tooltip")
+            : this.#parent.localize("outs", this.key, "tooltip");
     }
 }
 
