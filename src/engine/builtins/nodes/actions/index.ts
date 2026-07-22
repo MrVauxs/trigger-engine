@@ -12,6 +12,7 @@ import {
     ExecuteScriptActionNode,
     MoveRegionActionNode,
     UpdateItemActionNode,
+    UserTargetsActionNode,
 } from ".";
 
 export * from "./utils";
@@ -30,6 +31,7 @@ export * from "./execute-animation";
 export * from "./execute-script";
 export * from "./move-region";
 export * from "./update-item";
+export * from "./user-targets";
 
 export default [
     AttachRegionActionNode,
@@ -45,4 +47,5 @@ export default [
     ExecuteScriptActionNode,
     MoveRegionActionNode,
     UpdateItemActionNode,
+    UserTargetsActionNode,
 ] as const;

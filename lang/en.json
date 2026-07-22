@@ -454,6 +454,16 @@
                             "regular": "Regular"
                         },
                         "title": "Update Item"
+                    },
+                    "user-targets": {
+                        "states": {
+                            "all": "All Targets",
+                            "only": "Only Target"
+                        },
+                        "title": "Get User Targets",
+                        "titles": {
+                            "only": "Get Only Target"
+                        }
                     }
                 },
                 "condition": {

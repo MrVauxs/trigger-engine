@@ -1,0 +1,75 @@
+import { IconObject } from "_zod";
+import { BuiltinsInputEntry, BuiltinsOutputEntry } from "engine";
+import { BaseActionNode } from ".";
+import { R, TokenPF2e } from "foundry-helpers";
+
+class UserTargetsActionNode extends BaseActionNode<"out", Inputs, Outputs, never, never, "all" | "only"> {
+    static get type(): "user-targets" {
+        return "user-targets";
+    }
+
+    static get tags(): string[] {
+        return ["user", "token"];
+    }
+
+    static get states(): string[] | null {
+        return ["all", "only"];
+    }
+
+    static get defineInputs(): BuiltinsInputEntry[] {
+        return [{ key: "user", type: "user" }];
+    }
+
+    static get defineOutputs(): BuiltinsOutputEntry[] {
+        return [
+            { key: "targets", type: "target", isArray: true, state: "all" },
+            { key: "target", type: "target", state: "only" },
+        ];
+    }
+
+    get title(): string | null {
+        return this.localize(this.state === "only" ? "titles.only" : "title") ?? null;
+    }
+
+    get icon(): IconObject {
+        return { unicode: "\uf648" };
+    }
+
+    async _execute(): Promise<boolean> {
+        const user = (await this.getInputValue("user")) ?? this.userContext;
+        const userTargets = [...user.targets] as TokenPF2e[];
+
+        if (this.state === "only") {
+            const token = R.only(userTargets);
+            const actor = token?.actor;
+
+            if (actor) {
+                this.setOutputValue("target", { actor, token: token.document });
+            }
+        } else {
+            const targets = R.pipe(
+                userTargets,
+                R.map((token): TargetDocuments | undefined => {
+                    const actor = token.actor;
+                    return actor ? { actor, token: token.document } : undefined;
+                }),
+                R.filter(R.isTruthy),
+            );
+
+            this.setOutputValue("targets", targets);
+        }
+
+        return this.executeNext("out");
+    }
+}
+
+type Inputs = {
+    user?: User;
+};
+
+type Outputs = {
+    target: TargetDocuments;
+    targets: TargetDocuments[];
+};
+
+export { UserTargetsActionNode };
