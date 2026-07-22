@@ -228,6 +228,16 @@ class TriggerNode<
     }
 
     /**
+     * Tooltip to display when the node's header is hovered over.
+     *
+     * Localization path:
+     * `<module-id>.<application-id>.node.<category>.<type>.tooltip`
+     */
+    generateTooltip(): string {
+        return this.localize("tooltip") ?? "";
+    }
+
+    /**
      * @abstract
      * A node with `in` or `outs` is considered an `executable` node.
      *

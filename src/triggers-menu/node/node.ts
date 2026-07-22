@@ -383,6 +383,13 @@ class BlueprintNode extends PIXI.Container {
 
             header.mask = mask;
             header.addChild(mask);
+
+            header.eventMode = "none";
+
+            background.eventMode = "static";
+            background.hitArea = new PIXI.Rectangle(0, 0, width, header.calculatedHeight);
+
+            this.blueprint.addTooltip(background, () => this.#node.generateTooltip(), "UP");
         }
 
         // body
