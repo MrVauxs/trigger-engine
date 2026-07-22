@@ -456,6 +456,11 @@
                         "title": "Update Item"
                     },
                     "user-targets": {
+                        "outputs": {
+                            "target": {
+                                "tooltip": "Returns a target only when a single one exist"
+                            }
+                        },
                         "states": {
                             "all": "All Targets",
                             "only": "Only Target"
