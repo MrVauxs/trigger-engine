@@ -1,3 +1,11 @@
+# 1.22.0
+
+- rename `Scene Targets` value node into `Scene Tokens` to avoid confusion
+- now allow nodes to have tooltips when hovering their header
+- add new `Get User Targets` action node
+  - retrieve the current targets for the provided user (or the current trigger user context)
+  - the `Only Target` state will return a `target` when only one exist
+
 # 1.21.0
 
 - now allow `out` bridge connections to have tooltips
